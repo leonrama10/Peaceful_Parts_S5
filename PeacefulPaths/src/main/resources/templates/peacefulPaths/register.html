@@ -1,0 +1,158 @@
+<!DOCTYPE HTML>
+<html lang="en" xmlns:th="http://www.thymeleaf.org" xmlns:sec="http://www.thymeleaf.org/extras/spring-security">
+
+<head>
+    <!-- Required meta tags -->
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+
+    <!-- Bootstrap CSS -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.2.2/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-Zenh87qX5JnK2Jl0vWa8Ck2rdkQ2Bzep5IDxbcnCeuOxjzrPF/et3URy9Bv1WTRi" crossorigin="anonymous">
+
+    <title>Register | PeacefulParts</title>
+
+    <style>
+
+        @font-face {
+            font-family: 'Salsa';
+            src: url('C:/Users/RS Comnputers/Documents/Salsa-Regular.ttf') format('truetype');
+        }
+
+        body {
+            font-family: "Salsa",serif;
+            margin: 0;
+            padding: 0;
+        }
+
+        header {
+            background-color: #2e4057;
+            color: #fff;
+            padding: 1em;
+            text-align: center;
+            display: flex;
+            justify-content: space-between;
+        }
+
+        .logo{
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        h1 {
+            margin: 0;
+
+        }
+
+        nav {
+            margin-top: 10px;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+        }
+
+        nav a {
+            color: #fff;
+            text-decoration: none;
+            margin: 0 15px;
+        }
+
+        footer {
+            background-color: #2e4057;
+            color: #fff;
+            text-align: center;
+            padding: 1em;
+            position: fixed;
+            bottom: 0;
+            width: 100%;
+        }
+
+        .costum-btn{
+            background-color: #007CF4;
+            color: #fff;
+            border-radius: 50px;
+        }
+
+        .costum-btn:hover{
+            background-color: #fff;
+            color: #007CF4;
+        }
+
+        .error{
+            color: red;
+        }
+
+
+    </style>
+</head>
+<body>
+<header>
+    <div class="logo">
+<!--        <img alt="image" src="icons8-psychotherapy-64.png">-->
+        <h1><span style="color: #007CF4;">Peaceful</span>Parts</h1>
+    </div>
+    <nav>
+        <a th:href="@{/peacefulPaths/home}">Home</a>
+        <a href="#">Business</a>
+        <a href="#">About</a>
+        <a href="#">Advice</a>
+        <a href="#">FAQ</a>
+        <a href="#">Reviews</a>
+        <a href="#">Therapist Jobs</a>
+        <a href="#">Contact</a>
+        <a th:href="@{/peacefulPaths/login}" class="btn costum-btn ">Login</a>
+    </nav>
+</header>
+
+<div class="container">
+    <h3>Register Directory</h3>
+    <hr>
+
+    <form th:action="@{/peacefulPaths/register}"
+          th:object="${therapist}" method="POST">
+
+        <!-- Add hidden form field to handle update -->
+        <input type="hidden" th:field="*{id}" />
+        <div style="gap:10px; display: flex" >
+        <input type="text" th:field="*{name}"
+               class="form-control mb-4 w-25" placeholder="First name">
+        <span th:if="${#fields.hasErrors('name')}" th:errors="${therapist.name}" class="error"></span>
+        </div>
+        <div style="gap:10px; display: flex" >
+        <input type="text" th:field="*{surname}"
+               class="form-control mb-4 w-25" placeholder="Last name">
+        <span th:if="${#fields.hasErrors('surname')}" th:errors="${therapist.surname}" class="error"></span>
+        </div>
+        <div style="gap:10px; display: flex" >
+        <input type="text" th:field="*{email}"
+               class="form-control mb-4 w-25" placeholder="Email">
+        <span th:if="${#fields.hasErrors('email')}" th:errors="${therapist.email}" class="error"></span>
+        </div>
+        <div style="gap:10px; display: flex" >
+            <input type="text" th:field="*{number}"
+                   class="form-control mb-4 w-25" placeholder="Phone Number">
+            <span th:if="${#fields.hasErrors('number')}" th:errors="${therapist.number}" class="error"></span>
+        </div>
+        <div style="gap:10px; display: flex" >
+        <input type="password" th:field="*{password}"
+               class="form-control mb-4 w-25" placeholder="Password">
+        <span th:if="${#fields.hasErrors('password')}" th:errors="${therapist.password}" class="error"></span>
+        </div>
+        <div style="gap:10px; display: flex" >
+        <input type="password" th:field="*{confirmPassword}"
+               class="form-control mb-4 w-25" placeholder="Confirm Password">
+        <span th:if="${#fields.hasErrors('confirmPassword')}" th:errors="${therapist.confirmPassword}" class="error"></span>
+        </div>
+        <button type="submit" class="btn btn-info col-2">Register</button>
+
+    </form>
+
+    <hr>
+
+</div>
+
+<footer>
+    <p>&copy; 2024 PeacefulParts</p>
+</footer>
+</body>
+</html>

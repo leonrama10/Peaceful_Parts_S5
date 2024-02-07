@@ -1,0 +1,191 @@
+<!DOCTYPE HTML>
+<html lang="en" xmlns:th="http://www.thymeleaf.org" xmlns:sec="http://www.thymeleaf.org/extras/spring-security">
+
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.2.2/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-Zenh87qX5JnK2Jl0vWa8Ck2rdkQ2Bzep5IDxbcnCeuOxjzrPF/et3URy9Bv1WTRi" crossorigin="anonymous">
+
+    <title>PeacefulParts | Professional Therapy</title>
+
+    <style>
+
+        @font-face {
+            font-family: 'Salsa';
+            src: url('C:/Users/RS Comnputers/Documents/Salsa-Regular.ttf') format('truetype');
+        }
+
+        body {
+            font-family: "Salsa",serif;
+            margin: 0;
+            padding: 0;
+        }
+
+        header {
+            background-color: #2e4057;
+            color: #fff;
+            padding: 1em;
+            text-align: center;
+            display: flex;
+            justify-content: space-between;
+        }
+
+        .logo{
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        h1 {
+            margin: 0;
+
+        }
+
+        nav {
+            margin-top: 10px;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+        }
+
+        nav a {
+            color: #fff;
+            text-decoration: none;
+            margin: 0 15px;
+        }
+
+
+        footer {
+            background-color: #2e4057;
+            color: #fff;
+            text-align: center;
+            padding: 1em;
+            position: fixed;
+            bottom: 0;
+            width: 100%;
+        }
+
+        .costum-btn{
+            background-color: #007CF4;
+            color: #fff;
+            border-radius: 50px;
+        }
+
+        .costum-btn:hover{
+            background-color: #fff;
+            color: #007CF4;
+        }
+
+        .container {
+            max-width: 600px;
+            margin: 50px auto;
+            background-color: #fff;
+            padding: 20px;
+            border-radius: 5px;
+            box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+        }
+
+        h2 {
+            text-align: center;
+            color: #333;
+        }
+
+        .error{
+            color: red;
+        }
+
+    </style>
+</head>
+<body>
+<header>
+    <div class="logo">
+        <!--        <img alt="image" src="icons8-psychotherapy-64.png">-->
+        <h1><span style="color: #007CF4;">Peaceful</span>Parts</h1>
+    </div>
+    <nav>
+        <a th:href="@{/peacefulPaths/home}">Home</a>
+        <a href="#">Business</a>
+        <a href="#">About</a>
+        <a href="#">Advice</a>
+        <a href="#">FAQ</a>
+        <a href="#">Reviews</a>
+        <a href="#">Therapist Jobs</a>
+        <a href="#">Contact</a>
+        <div sec:authorize="hasRole('MANAGER')">
+            <a th:href="@{/peacefulPaths/users}" class="btn costum-btn">Manage Users</a>
+        </div>
+    </nav>
+</header>
+<main>
+
+    <div class="container" >
+        <h2>User Account</h2>
+
+        <form th:action="@{/peacefulPaths/update}"
+              th:object="${therapist}" method="POST">
+
+            <input type="hidden" th:field="*{id}" />
+            <div style="gap:10px;" >
+                <label>Name:</label>
+                <div style="display: flex; gap:10px;">
+                <input type="text"  th:field="*{name}"
+                       class="form-control mb-4 w-25" placeholder="First name">
+                <span th:if="${#fields.hasErrors('name')}" th:errors="${therapist.name}" class="error"></span>
+                </div>
+            </div>
+            <div style="gap:10px;" >
+                <label>Surname:</label>
+                <div style="display: flex; gap:10px;">
+                <input type="text" th:field="*{surname}"
+                       class="form-control mb-4 w-25" placeholder="Last name">
+                <span th:if="${#fields.hasErrors('surname')}" th:errors="${therapist.surname}" class="error"></span>
+                </div>
+            </div>
+            <div style="gap:10px;" >
+                <label>Email:</label>
+                <div style="display: flex; gap:10px;">
+                <input type="text" th:field="*{email}"
+                       class="form-control mb-4 w-25" placeholder="Email">
+                <span th:if="${#fields.hasErrors('email')}" th:errors="${therapist.email}" class="error"></span>
+                </div>
+            </div>
+            <div style="gap:10px;" >
+                <label>Phone number:</label>
+                <div style="display: flex; gap:10px;">
+                    <input type="text" th:field="*{number}" class="form-control mb-4 w-25" placeholder="Phone Number" >
+                    <span th:if="${#fields.hasErrors('number')}" th:errors="${therapist.number}" class="error"></span>
+                </div>
+            </div>
+            <div style="gap:10px;" th:each="role : ${therapist.roles}">
+                <div th:if="${role.getRole() == 'ROLE_EMPLOYEE'}">
+                    <label>Experience:</label>
+                    <div style="display: flex; gap:10px;">
+                    <input type="number" th:field="*{experience}"
+                         class="form-control mb-4 w-25" placeholder="Experience">
+                    <span th:if="${#fields.hasErrors('experience')}" th:errors="${therapist.experience}" class="error"></span>
+                    </div>
+                </div>
+            </div>
+            <div style="gap:10px;">
+                <label>Roles:</label>
+                <br>
+                <div th:each="role : ${therapist.allRoles}">
+                    <input type="checkbox" th:field="*{roles}" th:value="${role.id}" id="${'role-' + role.id}" />
+                    <label th:for="${'role-' + role.id}" th:text="${role.role}"></label>
+                </div>
+                <span th:if="${#fields.hasErrors('roles')}" th:errors="${therapist.roles}" class="error"></span>
+            </div>
+
+
+            <button type="submit" class="btn btn-info col-2">Save</button>
+
+        </form>
+    </div>
+
+</main>
+<footer>
+    <p>&copy; 2024 PeacefulParts</p>
+</footer>
+</body>
+</html>
