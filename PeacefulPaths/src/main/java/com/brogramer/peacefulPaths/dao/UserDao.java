@@ -1,9 +1,9 @@
 package com.brogramer.peacefulPaths.dao;
 
-import com.brogramer.peacefulPaths.entity.Therapist;
+import com.brogramer.peacefulPaths.entity.User;
 
 public interface UserDao {
 
-    Therapist findByEmailDAO(String theEmail);
+    User findByEmailDAO(String theEmail);
     
 }

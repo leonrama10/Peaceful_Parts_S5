@@ -3,8 +3,9 @@ package com.brogramer.peacefulPaths.service;
 import com.brogramer.peacefulPaths.dao.RoleDao;
 import com.brogramer.peacefulPaths.dao.TherapistRepository;
 import com.brogramer.peacefulPaths.dao.UserDao;
+import com.brogramer.peacefulPaths.entity.CustomUserDetails;
 import com.brogramer.peacefulPaths.entity.Roles;
-import com.brogramer.peacefulPaths.entity.Therapist;
+import com.brogramer.peacefulPaths.entity.User;
 import jakarta.mail.MessagingException;
 import jakarta.mail.internet.MimeMessage;
 import jakarta.persistence.EntityManager;
@@ -44,15 +45,15 @@ public class TherapistServiceImpl implements TherapistService{
     }
 
     @Override
-    public List<Therapist> findAll() {
+    public List<User> findAll() {
         return therapistRepository.findAll();
     }
 
     @Override
-    public Therapist findById(int id) {
-        Optional<Therapist> therapist = therapistRepository.findById(id);
+    public User findById(int id) {
+        Optional<User> therapist = therapistRepository.findById(id);
 
-        Therapist theTherapist = null;
+        User theTherapist = null;
 
         if (therapist.isPresent()){
             theTherapist=therapist.get();
@@ -62,7 +63,7 @@ public class TherapistServiceImpl implements TherapistService{
     }
 
     @Override
-    public void save(Therapist therapist) {
+    public void save(User therapist) {
         Roles userRole = roleDao.findRoleByName("ROLE_USER");
 
         if (therapist.getRoles() == null) {
@@ -78,7 +79,7 @@ public class TherapistServiceImpl implements TherapistService{
 
     @Override
     public void deleteById(int id) {
-        Therapist therapist = therapistRepository.findById(id)
+        User therapist = therapistRepository.findById(id)
                 .orElseThrow(() -> new EntityNotFoundException("Therapist not found"));
 
         therapist.getRoles().clear();
@@ -87,11 +88,11 @@ public class TherapistServiceImpl implements TherapistService{
     }
 
     @Override
-    public Therapist findByEmailAndPassword(String email,String password) {
+    public User findByEmailAndPassword(String email,String password) {
 
-        Optional<Therapist> therapist = therapistRepository.findByEmail(email);
+        Optional<User> therapist = therapistRepository.findByEmail(email);
 
-        Therapist theTherapist = null;
+        User theTherapist = null;
         if (therapist.isPresent()){
             boolean passwordmatch = BCrypt.checkpw(password, therapist.get().getPassword());
             if (passwordmatch){
@@ -103,7 +104,7 @@ public class TherapistServiceImpl implements TherapistService{
     }
 
     @Override
-    public Optional<Therapist> findByEmail(String email) {
+    public Optional<User> findByEmail(String email) {
 
         return therapistRepository.findByEmail(email);
     }
@@ -121,7 +122,7 @@ public class TherapistServiceImpl implements TherapistService{
 //    }
 
     @Override
-    public void sendEmail(Therapist therapist) throws MessagingException {
+    public void sendEmail(User therapist) throws MessagingException {
         String token = UUID.randomUUID().toString();
         therapist.setResetToken(token);
         therapist.setExpirationTime(System.currentTimeMillis() + (10 * 60 * 1000));
@@ -148,7 +149,7 @@ public class TherapistServiceImpl implements TherapistService{
     public List<String> findByRole(String email) throws Exception {
 
         try {
-            TypedQuery<Roles> theQuery = entityManager.createQuery("SELECT roles FROM Therapist where email=:theData", Roles.class);
+            TypedQuery<Roles> theQuery = entityManager.createQuery("SELECT roles FROM User where email=:theData", Roles.class);
 
             theQuery.setParameter("theData",email);
 
@@ -187,19 +188,20 @@ public class TherapistServiceImpl implements TherapistService{
 
 
     @Override
-    public Therapist findByEmailDAO(String email) {
+    public User findByEmailDAO(String email) {
         // check the database if the user already exists
         return userDao.findByEmailDAO(email);
     }
 
     @Override
     public UserDetails loadUserByUsername(String email) throws UsernameNotFoundException {
-        Therapist user = userDao.findByEmailDAO(email);
+        User user = userDao.findByEmailDAO(email);
         if (user == null) {
             throw new UsernameNotFoundException("Invalid email or password.");
         }
-        return new org.springframework.security.core.userdetails.User(user.getEmail(), user.getPassword(),
-                mapRolesToAuthorities(user.getRoles()));
+//        return new org.springframework.security.core.userdetails.User(user.getEmail(), user.getPassword(),
+//                mapRolesToAuthorities(user.getRoles()));
+        return new CustomUserDetails(user);
     }
 
     private Collection<? extends GrantedAuthority> mapRolesToAuthorities(Collection<Roles> roles) {

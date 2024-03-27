@@ -117,14 +117,14 @@
           th:object="${therapist}" method="post">
 
         <div style="gap:10px; display: flex" >
-        <input type="text" th:field="*{email}"
-               class="form-control mb-4 w-25" placeholder="Email">
+        <input type="email" th:field="*{email}"
+               class="form-control mb-4 w-25" placeholder="Email" id="email">
         </div>
 
         <div style="gap:10px; display: flex; position: relative" >
             <input type="password" th:field="*{password}"
-                   id="password" class="form-control mb-4 w-25" placeholder="Password">
-                <span id="showPasswordBtn" onclick="togglePasswordVisibility()">👁️</span>
+                   id="password" class="form-control mb-4 w-25" placeholder="Password" autocomplete="new-password">
+                <span id="showPasswordBtn" onclick="togglePasswordVisibility()">👁</span>
         </div>
         <a th:href="@{/peacefulPaths/forgotPassword}">Forgot Password?</a>
         <br>

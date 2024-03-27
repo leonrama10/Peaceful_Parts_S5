@@ -82,6 +82,22 @@
             color: red;
         }
 
+        #showPasswordBtn {
+            position: absolute;
+            right: 67.5%;
+            top:44.7%;
+            transform: translateY(-50%);
+            cursor: pointer;
+        }
+
+        #showConfPasswordBtn {
+            position: absolute;
+            right: 67.5%;
+            top: 51.5%;
+            transform: translateY(-50%);
+            cursor: pointer;
+        }
+
 
     </style>
 </head>
@@ -124,8 +140,8 @@
         <span th:if="${#fields.hasErrors('surname')}" th:errors="${therapist.surname}" class="error"></span>
         </div>
         <div style="gap:10px; display: flex" >
-        <input type="text" th:field="*{email}"
-               class="form-control mb-4 w-25" placeholder="Email">
+        <input type="email" th:field="*{email}"
+               class="form-control mb-4 w-25" placeholder="Email" >
         <span th:if="${#fields.hasErrors('email')}" th:errors="${therapist.email}" class="error"></span>
         </div>
         <div style="gap:10px; display: flex" >
@@ -135,13 +151,15 @@
         </div>
         <div style="gap:10px; display: flex" >
         <input type="password" th:field="*{password}"
-               class="form-control mb-4 w-25" placeholder="Password">
-        <span th:if="${#fields.hasErrors('password')}" th:errors="${therapist.password}" class="error"></span>
+               class="form-control mb-4 w-25" placeholder="Password" autocomplete="new-password" id="password">
+            <span id="showPasswordBtn" onclick="togglePasswordVisibility()">👁</span>
+            <span th:if="${#fields.hasErrors('password')}" th:errors="${therapist.password}" class="error"></span>
         </div>
         <div style="gap:10px; display: flex" >
         <input type="password" th:field="*{confirmPassword}"
-               class="form-control mb-4 w-25" placeholder="Confirm Password">
-        <span th:if="${#fields.hasErrors('confirmPassword')}" th:errors="${therapist.confirmPassword}" class="error"></span>
+               class="form-control mb-4 w-25" placeholder="Confirm Password" id="confPassword">
+            <span id="showConfPasswordBtn" onclick="toggleConfPasswordVisibility()">👁</span>
+            <span th:if="${#fields.hasErrors('confirmPassword')}" th:errors="${therapist.confirmPassword}" class="error"></span>
         </div>
         <button type="submit" class="btn btn-info col-2">Register</button>
 
@@ -150,6 +168,27 @@
     <hr>
 
 </div>
+
+<script>
+    function togglePasswordVisibility() {
+        let passwordInput = document.getElementById("password");
+
+        if (passwordInput.type === "password") {
+            passwordInput.type = "text";
+        } else {
+            passwordInput.type = "password";
+        }
+    }
+    function toggleConfPasswordVisibility() {
+        let passwordInput = document.getElementById("confPassword");
+
+        if (passwordInput.type === "password") {
+            passwordInput.type = "text";
+        } else {
+            passwordInput.type = "password";
+        }
+    }
+</script>
 
 <footer>
     <p>&copy; 2024 PeacefulParts</p>

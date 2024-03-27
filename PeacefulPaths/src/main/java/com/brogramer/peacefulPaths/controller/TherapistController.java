@@ -1,6 +1,6 @@
 package com.brogramer.peacefulPaths.controller;
 
-import com.brogramer.peacefulPaths.entity.Therapist;
+import com.brogramer.peacefulPaths.entity.User;
 import com.brogramer.peacefulPaths.service.RoleServiceImpl;
 import com.brogramer.peacefulPaths.service.TherapistService;
 import jakarta.mail.MessagingException;
@@ -17,6 +17,7 @@ import org.springframework.web.bind.annotation.*;
 import java.util.List;
 import java.util.Optional;
 
+//@RestController
 @Controller
 @SessionAttributes("therapistShared")
 @RequestMapping("/peacefulPaths")
@@ -31,7 +32,7 @@ public class TherapistController {
     }
 
     @GetMapping("/home")
-    public String home(@ModelAttribute("therapist") Therapist therapist, Model model,HttpSession session) throws Exception {
+    public String home(@ModelAttribute("therapist") User therapist, Model model,HttpSession session) throws Exception {
 
         if (session.getAttribute("success") !=null && (boolean) session.getAttribute("success")) {
             isLoggedIn = true;
@@ -51,7 +52,7 @@ public class TherapistController {
     }
 
     @GetMapping("/login")
-    public String login(@ModelAttribute("therapist") Therapist therapist,Model model,HttpSession session){
+    public String login(@ModelAttribute("therapist") User therapist,Model model,HttpSession session){
 
         if (session.getAttribute("error") !=null){
             model.addAttribute("error", "Invalid credentials!");
@@ -65,7 +66,7 @@ public class TherapistController {
     @GetMapping ("/register")
     public String register(Model model){
 
-        Therapist therapist = new Therapist();
+        User therapist = new User();
 
         model.addAttribute("therapist",therapist);
 
@@ -73,9 +74,9 @@ public class TherapistController {
     }
 
     @PostMapping("/register")
-    public String registerForm(@Valid @ModelAttribute("therapist")  Therapist therapist, BindingResult bindingResult){
+    public String registerForm(@Valid @ModelAttribute("therapist")  User therapist, BindingResult bindingResult){
 
-        Optional<Therapist> optionalTherapist = therapistService.findByEmail(therapist.getEmail());
+        Optional<User> optionalTherapist = therapistService.findByEmail(therapist.getEmail());
 
         if(bindingResult.hasErrors()){
             return "peacefulPaths/register";
@@ -98,7 +99,7 @@ public class TherapistController {
     }
 
     @GetMapping ("/forgotPassword")
-    public String forgotPassword(Therapist therapist, Model model){
+    public String forgotPassword(User therapist, Model model){
 
         model.addAttribute("therapistShared",therapist);
 
@@ -107,9 +108,9 @@ public class TherapistController {
 
 
     @PostMapping ("/sendEmail")
-    public String sendEmail(@ModelAttribute("therapistShared")Therapist therapist,Model model) throws MessagingException {
+    public String sendEmail(@ModelAttribute("therapistShared")User therapist,Model model) throws MessagingException {
 
-        Optional<Therapist> theTherapist = therapistService.findByEmail(therapist.getEmail());
+        Optional<User> theTherapist = therapistService.findByEmail(therapist.getEmail());
 
         if (theTherapist.isPresent()) {
             therapist = theTherapist.get();
@@ -125,7 +126,7 @@ public class TherapistController {
     }
 
     @GetMapping ("/resetPassword")
-    public String resetPassword(@ModelAttribute("therapistShared")Therapist therapist,Model model, @RequestParam(name = "token", required = false) String resetToken) {
+    public String resetPassword(@ModelAttribute("therapistShared")User therapist,Model model, @RequestParam(name = "token", required = false) String resetToken) {
 
         if (therapist != null) {
             if (therapist.getResetToken().equals(resetToken) && System.currentTimeMillis() < therapist.getExpirationTime()) {
@@ -138,19 +139,17 @@ public class TherapistController {
     }
 
     @PostMapping ("/resetPassword")
-    public String updatePassword(@Valid @ModelAttribute("therapistShared")Therapist therapist, BindingResult bindingResult,Model model){
+    public String updatePassword(@Valid @ModelAttribute("therapistShared")User therapist, BindingResult bindingResult,Model model){
 
         if(bindingResult.hasErrors()){
-//            System.out.println("Validation errors: " + bindingResult.getAllErrors());
             model.addAttribute("error", "Invalid password!");
             return "peacefulPaths/resetPassword";
         }else if (!therapist.getPassword().equals(therapist.getConfirmPassword())) {
             model.addAttribute("error", "Passwords do not match!");
-//            bindingResult.rejectValue("confirmPassword", "password.mismatch", "Passwords do not match");
             return "peacefulPaths/resetPassword";
         }
 
-        Optional<Therapist> therapistOptional = therapistService.findByEmail(therapist.getEmail());
+        Optional<User> therapistOptional = therapistService.findByEmail(therapist.getEmail());
 
         boolean passwordMatch = BCrypt.checkpw(therapist.getPassword(), therapistOptional.get().getPassword());
 
@@ -171,17 +170,19 @@ public class TherapistController {
     @GetMapping("/users")
     public String manageUsers(Model model){
 
-        List<Therapist> therapists = therapistService.findAll();
+        List<User> therapists = therapistService.findAll();
 
         model.addAttribute("therapists", therapists);
 
         return "peacefulPaths/users";
     }
 
+
+
     @GetMapping("/showFormForUpdate")
     public String showFormForUpdate(@RequestParam("id") int theId, Model theModel) {
 
-        Therapist therapist = therapistService.findById(theId);
+        User therapist = therapistService.findById(theId);
 
         theModel.addAttribute("therapist", therapist);
 
@@ -189,14 +190,14 @@ public class TherapistController {
     }
 
     @PostMapping("/update")
-    public String updateTherapist(@Valid @ModelAttribute("therapist") Therapist therapist, BindingResult bindingResult) {
+    public String updateTherapist(@Valid @ModelAttribute("therapist") User therapist, BindingResult bindingResult) {
 
         if(bindingResult.hasErrors()){
             return "peacefulPaths/showFormForUpdate";
         }else {
-            Optional<Therapist> optionalTherapist = therapistService.findByEmail(therapist.getEmail());
+            Optional<User> optionalTherapist = therapistService.findByEmail(therapist.getEmail());
 
-            Therapist existingTherapist = optionalTherapist.get();
+            User existingTherapist = optionalTherapist.get();
 
             BeanUtils.copyProperties(therapist, existingTherapist, "id", "confirmPassword","password", "otherFieldsToExclude");
 
@@ -207,14 +208,14 @@ public class TherapistController {
     }
 
     @GetMapping("/account")
-    public String showAccount(@ModelAttribute("therapist") Therapist therapist, Model model,HttpSession session) throws Exception {
+    public String showAccount(@ModelAttribute("therapist") User therapist, Model model,HttpSession session) throws Exception {
 
         if (session.getAttribute("success") !=null && (boolean) session.getAttribute("success")) {
             isLoggedIn = true;
 
             String email = (String) session.getAttribute("email");
 
-            Optional<Therapist> optionalTherapist = therapistService.findByEmail(email);
+            Optional<User> optionalTherapist = therapistService.findByEmail(email);
 
             therapist = optionalTherapist.get();
 
@@ -246,4 +247,14 @@ public class TherapistController {
         return "peacefulPaths/getStarted";
     }
 
+    // React faze
+    @GetMapping("/getUsers")
+    public List<User> getUsers(Model model){
+
+        List<User> therapists = therapistService.findAll();
+
+        model.addAttribute("therapists", therapists);
+
+        return therapists;
+    }
 }
