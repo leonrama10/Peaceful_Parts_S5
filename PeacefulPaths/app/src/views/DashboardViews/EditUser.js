@@ -1,6 +1,6 @@
 import React,{useState} from 'react';
-import {fetchUserData, userUpdate} from '../../api/authService';
-import {Link, useNavigate} from 'react-router-dom';
+import {fetchUserData, fetchUserDataId, userUpdate} from '../../api/authService';
+import {Link, useNavigate, useParams} from 'react-router-dom';
 import { Container, Row, Col, Form, Button } from 'react-bootstrap';
 import {authenticate, authFailure, authSuccess} from "../../redux/authActions";
 import '../../styles/Dashboard.css';
@@ -15,7 +15,10 @@ import navimg1 from "../../img/undraw_profile_1.svg"
 import navimg3 from "../../img/undraw_profile_3.svg"
 import {Alert} from "reactstrap";
 import {connect} from "react-redux";
-function UserDashboard({loading,error,...props}){
+function EditUser({loading,error,...props}){
+
+    const { id } = useParams();
+    const idNumber = Number(id);
 
     const history = useNavigate ();
 
@@ -30,12 +33,15 @@ function UserDashboard({loading,error,...props}){
         roles:[],
         number:'',
         experience:0,
-        location:''
+        location:'',
+        allRoles:[]
     });
 
+
     React.useEffect(()=>{
-        fetchUserData().then((response)=>{
-            if (response.data.roles.at(0).role === 'ROLE_USER'){
+        fetchUserDataId(idNumber).then((response)=>{
+            // if (response.data.roles.at(0).role === 'ROLE_USER'){
+            console.log("DATAAAAAAAAAAAA",response.data)
                 setData(response.data);
                 setValues({
                     id:response.data.id,
@@ -46,13 +52,14 @@ function UserDashboard({loading,error,...props}){
                     roles: response.data.roles,
                     number:response.data.number,
                     experience:response.data.experience,
-                    location:response.data.location
+                    location:response.data.location,
+                    allRoles: response.data.allRoles
                 })
-            }
-            else{
-                localStorage.clear();
-                history('/loginBoot');
-            }
+            // }
+            // else{
+            //     localStorage.clear();
+            //     history('/loginBoot');
+            // }
         }).catch((e)=>{
             localStorage.clear();
             history('/loginBoot');
@@ -69,12 +76,10 @@ function UserDashboard({loading,error,...props}){
 
     const handleUpdate = (e) => {
         e.preventDefault();
-        props.authenticate();
 
         userUpdate(values).then((response)=>{
             if(response.status===201){
-                props.setUser(response.data);
-                history('/dashboard/userDashboard');
+                history('/dashboard/adminDashboard');
             }
             else{
                 props.loginFailure('Something LEKAAAAAAA!Please Try Again');
@@ -105,10 +110,31 @@ function UserDashboard({loading,error,...props}){
 
     const handleChange = (e) => {
         e.persist();
-        setValues(values => ({
-            ...values,
-            [e.target.name]: e.target.name === 'experience' ? Number(e.target.value) : e.target.value
-        }));
+        if (e.target.type === 'checkbox') {
+            const roleObject = data.allRoles.find(role => role.role === e.target.value);
+            if (e.target.checked) {
+                // If the checkbox is checked, add the role to the array
+                setValues(values => ({
+                    ...values,
+                    roles: [...values.roles, roleObject]
+                }));
+            } else {
+                // If the checkbox is unchecked, remove the role from the array
+                setValues(values => ({
+                    ...values,
+                    roles: values.roles.filter(role => role !== e.target)
+                }));
+            }
+            console.log("ROLEEEEEEEEEEEEEE ",values)
+        } else {
+            setValues(values => ({
+                ...values,
+                [e.target.name]: e.target.name === 'experience' ? Number(e.target.value) : e.target.value
+            }));
+            console.log("ROLEEEEEEEEEEEEEE ",values)
+        }
+
+
     };
 
     return (
@@ -447,36 +473,60 @@ function UserDashboard({loading,error,...props}){
                                             <Form.Group controlId="formName">
                                                 <Form.Label>Name</Form.Label>
                                                 <Form.Control type="text" name="name"
-                                                              defaultValue={data.name} onChange={handleChange} required/>
+                                                              defaultValue={data.name} onChange={handleChange}
+                                                              required/>
                                             </Form.Group>
 
                                             <Form.Group controlId="formSurname">
                                                 <Form.Label>Surname</Form.Label>
                                                 <Form.Control type="text" name="surname"
-                                                              defaultValue={data.surname} onChange={handleChange} required/>
+                                                              defaultValue={data.surname} onChange={handleChange}
+                                                              required/>
                                             </Form.Group>
 
                                             <Form.Group controlId="formBasicEmail">
                                                 <Form.Label>Email address</Form.Label>
-                                                <Form.Control type="email" name="email" defaultValue={data.email} onChange={handleChange} required/>
+                                                <Form.Control type="email" name="email" defaultValue={data.email}
+                                                              onChange={handleChange} required/>
                                             </Form.Group>
 
                                             <Form.Group controlId="formBasicPhone">
                                                 <Form.Label>Phone</Form.Label>
-                                                <Form.Control type="tel" defaultValue={data.number} onChange={handleChange} name="number"/>
+                                                <Form.Control type="tel" defaultValue={data.number}
+                                                              onChange={handleChange} name="number"/>
                                             </Form.Group>
 
                                             <Form.Group controlId="formBasicAddress">
                                                 <Form.Label>Location</Form.Label>
-                                                <Form.Control type="text" defaultValue={data.location} onChange={handleChange} name="location"/>
+                                                <Form.Control type="text" defaultValue={data.location}
+                                                              onChange={handleChange} name="location"/>
                                             </Form.Group>
 
-                                            <Form.Group controlId="formBasicAddress">
+                                            <Form.Group controlId="formBasicExperience">
                                                 <Form.Label>Experience</Form.Label>
-                                                <Form.Control type="number" defaultValue={data.experience} onChange={handleChange} name="experience" min={0}/>
+                                                <Form.Control type="number" defaultValue={data.experience}
+                                                              onChange={handleChange} name="experience" min={0}/>
                                             </Form.Group>
 
-                                            <div className="text-left" style={{padding:'10px 0'}}>
+                                                <div style={{gap: '10px'}}>
+                                                    <Form.Label>Roles:</Form.Label>
+                                                    <br/>
+                                                    { data.allRoles && data.allRoles.map((role) => (
+                                                        <div key={role.id}>
+                                                            <input
+                                                                defaultValue={role.role}
+                                                                name="roles"
+                                                                type="checkbox"
+                                                                id={role.id}
+                                                                onChange={handleChange}
+                                                                defaultChecked={data.roles.some(r => r.id === role.id)}
+                                                            />
+                                                            <label htmlFor={role.id}>{role.role}</label>
+                                                        </div>
+                                                    ))}
+                                                </div>
+
+                                            <div className="text-left" style={{padding: '10px 0'}}>
                                                 <Link className="small" to="/forgotPassBoot">Forgot Password?</Link>
                                             </div>
 
@@ -495,7 +545,7 @@ function UserDashboard({loading,error,...props}){
                     <footer className="sticky-footer bg-white">
                         <div className="container my-auto">
                             <div className="copyright text-center my-auto">
-                                <span style={{color:'grey'}}>Copyright &copy; PeacefulParts 2024</span>
+                                <span style={{color: 'grey'}}>Copyright &copy; PeacefulParts 2024</span>
                             </div>
                         </div>
                     </footer>
@@ -556,4 +606,4 @@ const mapDispatchToProps=(dispatch)=>{
         loginFailure:(message)=>dispatch(authFailure(message))
     }
 }
-export default connect(mapStateToProps,mapDispatchToProps)(UserDashboard);
+export default connect(mapStateToProps,mapDispatchToProps)(EditUser);

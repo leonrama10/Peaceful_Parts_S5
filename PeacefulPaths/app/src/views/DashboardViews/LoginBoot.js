@@ -21,7 +21,14 @@ function LoginBoot({loading,error,...props}){
         userLogin(values).then((response)=>{
             if(response.status===200){
                 props.setUser(response.data);
-                history('/dashboard/userDashboard');
+                if (response.data.roles.at(1)){
+                    if (response.data.roles.at(1).role === 'ROLE_ADMIN') {
+                        history('/dashboard/adminDashboard');
+                    }
+                }
+                else{
+                    history('/dashboard/userDashboard');
+                }
             }
             else{
                 props.loginFailure('Something LEKAAAAAAA!Please Try Again');

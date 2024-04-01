@@ -70,5 +70,13 @@ public class CustomUserDetails implements UserDetails {
     public Collection<Roles> getRoles() {
         return user.getRoles();
     }
+
+    public String getLocation() {
+        return user.getLocation();
+    }
+
+    public int getExperience() {
+        return user.getExperience();
+    }
 }
 

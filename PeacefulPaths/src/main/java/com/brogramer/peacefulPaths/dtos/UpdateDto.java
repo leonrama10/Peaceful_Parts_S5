@@ -29,11 +29,18 @@ public class UpdateDto {
     @NotEmpty
     private String password;
 
-    @NotEmpty
+    private String location;
+
     private String number;
+
+    private int experience;
 
     @NotEmpty
     private Collection<Roles> roles;
+
+    public String getLocation() {
+        return location;
+    }
 
     public String getNumber() {
         return number;
@@ -65,5 +72,9 @@ public class UpdateDto {
 
     public Collection<Roles> getRoles() {
         return roles;
+    }
+
+    public int getExperience() {
+        return experience;
     }
 }

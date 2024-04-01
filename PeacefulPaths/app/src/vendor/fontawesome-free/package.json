@@ -46,7 +46,18 @@
   "engines": {
     "node": ">=6"
   },
-  "dependencies": {},
+  "dependencies": {
+    "browser-sync": "^3.0.2",
+    "del": "^7.1.0",
+    "gulp-autoprefixer": "^9.0.0",
+    "gulp-clean-css": "^4.3.0",
+    "gulp-header": "^2.0.9",
+    "gulp-plumber": "^1.2.1",
+    "gulp-rename": "^2.0.0",
+    "gulp-sass": "^5.1.0",
+    "gulp-uglify": "^3.0.2",
+    "merge-stream": "^2.0.0"
+  },
   "version": "5.15.3",
   "name": "@fortawesome/fontawesome-free",
   "main": "js/fontawesome.js",

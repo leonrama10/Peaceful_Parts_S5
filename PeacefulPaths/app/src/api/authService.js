@@ -43,3 +43,35 @@ export const fetchUserData=(authRequest)=>{
         }
     })
 }
+
+export const fetchAllUserData=(authRequest)=>{
+    return axios({
+        method:'GET',
+        url:`${process.env.hostUrl||'http://localhost:8080'}/api/auth/allUserinfo`,
+        headers:{
+            'Authorization':'Bearer '+getToken()
+        }
+    })
+}
+export const fetchUserDataId=(authRequest)=>{
+    return axios({
+        method:'GET',
+        url:`${process.env.hostUrl||'http://localhost:8080'}/api/auth/userinfoId/${authRequest}`,
+        headers:{
+            'Authorization':'Bearer '+getToken()
+        }
+    })
+}
+
+export const userDelete = (authRequest) => {
+    return axios({
+        method: 'DELETE',
+        url: `${process.env.hostUrl || 'http://localhost:8080'}/api/auth/deleteUser/${authRequest}`,
+        headers: {
+            'Authorization': 'Bearer ' + getToken()
+        }
+    })
+}
+
+
+

@@ -39,6 +39,9 @@ public class User {
     @Column(name = "number")
     private String number;
 
+    @Column(name = "location")
+    private String location;
+
     @Min(value= 0,message = "Must be greater than or equal to 0!")
     @Column(name = "experience")
     private int experience;
@@ -71,16 +74,17 @@ public class User {
     private List<Roles> allRoles = new ArrayList<>();
 
     public static final Roles ROLE_USER = new Roles(1,"ROLE_USER");
-    public static final Roles ROLE_EMPLOYEE = new Roles(2,"ROLE_EMPLOYEE");
+    public static final Roles ROLE_THERAPIST = new Roles(2,"ROLE_THERAPIST");
     public static final Roles ROLE_MANAGER = new Roles(3,"ROLE_MANAGER");
 
     public User() {}
 
-    public User(String name, String surname, String email, String number, int experience,Collection<Roles> roles,List<Roles> allRoles) {
+    public User(String name, String surname, String email, String number,String location, int experience,Collection<Roles> roles,List<Roles> allRoles) {
         this.name = name;
         this.surname = surname;
         this.email = email;
         this.number = number;
+        this.location = location;
         this.experience = experience;
         this.roles = roles;
         this.allRoles = allRoles;
@@ -88,7 +92,7 @@ public class User {
 
     public List<Roles> getAllRoles() {
         allRoles.add(ROLE_USER);
-        allRoles.add(ROLE_EMPLOYEE);
+        allRoles.add(ROLE_THERAPIST);
         allRoles.add(ROLE_MANAGER);
         return allRoles;
     }
@@ -107,6 +111,14 @@ public class User {
 
     public void setRoles(Collection<Roles> roles) {
         this.roles = roles;
+    }
+
+    public String getLocation() {
+        return location;
+    }
+
+    public void setLocation(String location) {
+        this.location = location;
     }
 
     public int getId() {

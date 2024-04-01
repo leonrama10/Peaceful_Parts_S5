@@ -22,7 +22,17 @@ public class UserDto {
     private String token;
     private String password;
     private String number;
+    private String location;
+    private int experience;
     private Collection<Roles> roles;
+
+    public String getLocation() {
+        return location;
+    }
+
+    public void setLocation(String location) {
+        this.location = location;
+    }
 
     public String getNumber() {
         return number;
@@ -96,5 +106,12 @@ public class UserDto {
 
     public void setPassword(String password) {
         this.password = password;
+    }
+
+    public void setExperience(int experience) {
+        this.experience=experience;
+    }
+    public int getExperience() {
+        return experience;
     }
 }
