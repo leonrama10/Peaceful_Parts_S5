@@ -84,7 +84,7 @@ public class AuthController {
     }
     @GetMapping("/auth/allUserinfo")
     public ResponseEntity<?> getAllUserInfo(){
-        List<UserInfo> userInfos = therapistService.findAll().stream().map(userDetails -> {
+        List<UserInfo> userInfos = therapistService.findAllByRole("ROLE_USER").stream().map(userDetails -> {
             UserInfo userInfo = new UserInfo();
             userInfo.setId(userDetails.getId());
             userInfo.setEmail(userDetails.getEmail());
@@ -100,6 +100,7 @@ public class AuthController {
 
         return ResponseEntity.ok(userInfos);
     }
+
     @GetMapping("/auth/userinfoId/{id}")
     public ResponseEntity<?> getUserInfoId(@PathVariable int id){
         User userDetails = therapistService.findById(id);

@@ -12,6 +12,8 @@ public interface TherapistService extends UserDetailsService {
 
     List<User> findAll();
 
+    List<User> findAllByRole(String role);
+
     User findById(int id);
 
     void save(User therapist);

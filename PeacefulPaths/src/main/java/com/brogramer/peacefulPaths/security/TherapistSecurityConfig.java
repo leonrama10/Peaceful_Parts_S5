@@ -103,12 +103,13 @@ public class TherapistSecurityConfig {
                 .sessionManagement(s -> s.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
                 .authorizeHttpRequests((requests) -> requests
                         .requestMatchers(HttpMethod.POST, "/api/auth/login","/api/auth/register").permitAll()
-                        .requestMatchers(HttpMethod.PUT,"/api/auth/update").hasRole("USER")
-                        .requestMatchers(HttpMethod.GET, "/api/auth/userinfo").hasRole("USER")
+                        .requestMatchers(HttpMethod.PUT,"/api/auth/update").hasAnyRole("USER","THERAPIST","ADMIN")
+                        .requestMatchers(HttpMethod.GET, "/api/auth/userinfo").hasAnyRole("USER","THERAPIST","ADMIN")
                         .requestMatchers(HttpMethod.GET, "/api/auth/allUserinfo").hasRole("ADMIN")
                         .requestMatchers(HttpMethod.GET, "/api/auth/userinfoId/{id}").hasRole("ADMIN")
                         .requestMatchers(HttpMethod.DELETE, "/api/auth/deleteUser").hasRole("ADMIN")
                         .anyRequest().authenticated());
+
 
         return http.build();
     }

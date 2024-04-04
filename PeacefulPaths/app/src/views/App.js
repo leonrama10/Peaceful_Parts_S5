@@ -1,11 +1,14 @@
-import '../styles/App.css';
+import '../css/App.css';
 import Home from "./Home";
 import Header from "./Header";
 import Footer from "./Footer";
 import { BrowserRouter, Routes, Route} from "react-router-dom"
-import Dashboard from "./DashboardViews/Dashboard";
-import UserDashboard from "./DashboardViews/UserDashboard";
 import AdminDashboard from "./DashboardViews/AdminDashboard";
+import AdminProfile from "./DashboardViews/AdminProfile";
+import UserDashboard from "./DashboardViews/UserDashboard";
+import AdminDashboardUsers from "./DashboardViews/AdminDashboardUsers";
+import AdminDashboardTherapists from "./DashboardViews/AdminDashboardTherapists";
+import AdminDashboardAdmin from "./DashboardViews/AdminDashboardAdmin";
 import TherapistDashboard from "./DashboardViews/TherapistDashboard";
 import LoginBoot from "./DashboardViews/LoginBoot";
 import RegisterBoot from "./DashboardViews/RegisterBoot";
@@ -25,10 +28,13 @@ function Main() {
                 <Route path="/loginBoot" element={<LoginBoot />}/>
                 <Route path="/registerBoot" element={<RegisterBoot />}/>
                 <Route path="/forgotPassBoot" element={<ForgotPasswordBoot />}/>
-                <Route path="/dashboard" element={<Dashboard />}/>
                 <Route path="/dashboard/userDashboard" element={<UserDashboard />}/>
                 <Route path="/dashboard/adminDashboard" element={<AdminDashboard />}/>
-                <Route path="/dashboard/adminDashboard/edit/:id" element={<EditUser />}/>
+                <Route path="/dashboard/adminDashboard/profile" element={<AdminProfile />}/>
+                <Route path="/dashboard/adminDashboard/users" element={<AdminDashboardUsers />}/>
+                <Route path="/dashboard/adminDashboard/therapists" element={<AdminDashboardTherapists />}/>
+                <Route path="/dashboard/adminDashboard/admin" element={<AdminDashboardAdmin />}/>
+                <Route path="/dashboard/adminDashboard/users/edit/:id" element={<EditUser />}/>
                 <Route path="/dashboard/therapistDashboard" element={<TherapistDashboard />}/>
                 <Route path="/dashboard/errorPage" element={<ErrorPage />}/>
                 <Route path="/" element={<Home />}/>

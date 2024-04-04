@@ -1,9 +1,9 @@
 import React,{useState} from 'react';
-import {fetchUserData, fetchUserDataId, userUpdate} from '../../api/authService';
+import {fetchUserDataId, userUpdate} from '../../api/authService';
 import {Link, useNavigate, useParams} from 'react-router-dom';
-import { Container, Row, Col, Form, Button } from 'react-bootstrap';
+import {Container, Row, Col, Form, Button, Dropdown} from 'react-bootstrap';
 import {authenticate, authFailure, authSuccess} from "../../redux/authActions";
-import '../../styles/Dashboard.css';
+import '../../css/sb-admin-2.min.css';
 import mail from "../../img/mail.png"
 import arrow from "../../img/arrow.png"
 import leftArrow from "../../img/leftArrow.png"
@@ -41,7 +41,6 @@ function EditUser({loading,error,...props}){
     React.useEffect(()=>{
         fetchUserDataId(idNumber).then((response)=>{
             // if (response.data.roles.at(0).role === 'ROLE_USER'){
-            console.log("DATAAAAAAAAAAAA",response.data)
                 setData(response.data);
                 setValues({
                     id:response.data.id,
@@ -79,7 +78,7 @@ function EditUser({loading,error,...props}){
 
         userUpdate(values).then((response)=>{
             if(response.status===201){
-                history('/dashboard/adminDashboard');
+                history('/dashboard/adminDashboard/users');
             }
             else{
                 props.loginFailure('Something LEKAAAAAAA!Please Try Again');
@@ -421,36 +420,22 @@ function EditUser({loading,error,...props}){
 
                                 {/*HEREEEEEEEEEEEEEEEEEEEEEEE IS THE ACCOUNT*/}
 
-                                <li className="nav-item dropdown no-arrow">
-                                    <a className="nav-link dropdown-toggle" href="#" id="userDropdown" role="button"
-                                       data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+                                <Dropdown className="nav-item dropdown no-arrow hover-effect">
+                                    <Dropdown.Toggle id="dropdown-basic" className="nav-link dropdown-toggle custom-dropdown-toggle hover-effect">
                                         <span className="mr-2 d-none d-lg-inline text-gray-600 small">{data.name} {data.surname}</span>
-                                        {/*FIX IMAGE*/}
-                                        <img className="img-profile rounded-circle"
-                                             src={accLogo} alt="logo"/>
-                                    </a>
+                                        <img className="img-profile rounded-circle" src={accLogo} alt="logo"/>
+                                    </Dropdown.Toggle>
 
-                                    <div className="dropdown-menu dropdown-menu-right shadow animated--grow-in"
-                                         aria-labelledby="userDropdown">
-                                        <a className="dropdown-item" href="#">
-                                            <i className="fas fa-user fa-sm fa-fw mr-2 text-gray-400"></i>
-                                            Profile
-                                        </a>
-                                        <a className="dropdown-item" href="#">
-                                            <i className="fas fa-cogs fa-sm fa-fw mr-2 text-gray-400"></i>
-                                            Settings
-                                        </a>
-                                        <a className="dropdown-item" href="#">
-                                            <i className="fas fa-list fa-sm fa-fw mr-2 text-gray-400"></i>
-                                            Activity Log
-                                        </a>
-                                        <div className="dropdown-divider"></div>
-                                        <a className="dropdown-item" href="#" data-toggle="modal" data-target="#logoutModal">
-                                            <i className="fas fa-sign-out-alt fa-sm fa-fw mr-2 text-gray-400"></i>
-                                            Logout
-                                        </a>
-                                    </div>
-                                </li>
+                                    <Dropdown.Menu className="dropdown-menu dropdown-menu-right shadow animated--grow-in ">
+                                        <Dropdown.Item as={Link} to="/dashboard/adminDashboard/profile"><i className="fas fa-user fa-sm fa-fw mr-2 text-gray-400"></i>Profile</Dropdown.Item>
+                                        <Dropdown.Item as={Link} to="#"><i className="fas fa-cogs fa-sm fa-fw mr-2 text-gray-400"></i>Settings</Dropdown.Item>
+                                        <Dropdown.Item as={Link} to="#"><i className="fas fa-list fa-sm fa-fw mr-2 text-gray-400"></i>Activity Log</Dropdown.Item>
+                                        <Dropdown.Divider />
+                                        <Dropdown.Item as={Link} to="#" data-toggle="modal" data-target="#logoutModal">
+                                            <i className="fas fa-sign-out-alt fa-sm fa-fw mr-2 text-gray-400"></i>Logout
+                                        </Dropdown.Item>
+                                    </Dropdown.Menu>
+                                </Dropdown>
 
                             </ul>
 

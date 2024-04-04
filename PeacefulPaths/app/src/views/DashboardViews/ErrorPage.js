@@ -1,7 +1,7 @@
 import React,{useState} from 'react';
 import {fetchUserData} from '../../api/authService';
 import {Link, useNavigate} from 'react-router-dom';
-import '../../styles/Dashboard.css';
+import '../../css/sb-admin-2.min.css';
 import accLogo from "../../img/undraw_profile.svg"
 import navimg2 from "../../img/undraw_profile_2.svg"
 import navimg1 from "../../img/undraw_profile_1.svg"

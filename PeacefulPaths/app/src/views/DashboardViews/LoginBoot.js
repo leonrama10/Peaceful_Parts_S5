@@ -2,7 +2,7 @@ import React,{useState} from 'react';
 import {connect} from 'react-redux';
 import {userLogin} from '../../api/authService';
 import {Link, useNavigate} from 'react-router-dom';
-import '../../styles/Dashboard.css';
+import '../../css/sb-admin-2.min.css';
 import {authenticate, authFailure, authSuccess} from "../../redux/authActions";
 import {Alert} from "reactstrap";
 
@@ -21,13 +21,15 @@ function LoginBoot({loading,error,...props}){
         userLogin(values).then((response)=>{
             if(response.status===200){
                 props.setUser(response.data);
-                if (response.data.roles.at(1)){
-                    if (response.data.roles.at(1).role === 'ROLE_ADMIN') {
+                if (response.data.roles.at(0)){
+                    if (response.data.roles.at(0).role === 'ROLE_ADMIN') {
                         history('/dashboard/adminDashboard');
+                    }else if (response.data.roles.at(0).role === 'ROLE_USER') {
+                        history('/dashboard/userDashboard');
                     }
                 }
                 else{
-                    history('/dashboard/userDashboard');
+                    history('/loginBoot');
                 }
             }
             else{

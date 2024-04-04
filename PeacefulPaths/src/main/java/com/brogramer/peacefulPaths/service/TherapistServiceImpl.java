@@ -21,6 +21,7 @@ import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.stereotype.Service;
 
+import javax.management.relation.Role;
 import java.util.*;
 import java.util.stream.Collectors;
 
@@ -47,6 +48,13 @@ public class TherapistServiceImpl implements TherapistService{
     @Override
     public List<User> findAll() {
         return therapistRepository.findAll();
+    }
+
+    @Override
+    public List<User> findAllByRole(String role) {
+        Collection<Roles> roles = new ArrayList<>();
+        roles.add(roleDao.findRoleByName(role));
+        return therapistRepository.findAllByRolesIn(roles);
     }
 
     @Override
@@ -79,10 +87,10 @@ public class TherapistServiceImpl implements TherapistService{
 
     @Override
     public void deleteById(int id) {
-        User therapist = therapistRepository.findById(id)
-                .orElseThrow(() -> new EntityNotFoundException("Therapist not found"));
+        User user = therapistRepository.findById(id)
+                .orElseThrow(() -> new EntityNotFoundException("User not found"));
 
-        therapist.getRoles().clear();
+        user.getRoles().clear();
 
         therapistRepository.deleteById(id);
     }

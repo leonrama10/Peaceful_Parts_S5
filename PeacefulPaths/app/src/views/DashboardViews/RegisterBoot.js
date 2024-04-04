@@ -2,7 +2,7 @@ import React,{useState} from 'react';
 import {connect} from 'react-redux';
 import {userRegister} from '../../api/authService';
 import {Link, useNavigate} from 'react-router-dom';
-import '../../styles/Dashboard.css';
+import '../../css/sb-admin-2.min.css';
 import {Alert} from "reactstrap";
 import {authenticate, authFailure, authSuccess} from "../../redux/authActions";
 function RegisterBoot({loading,error,...props}){

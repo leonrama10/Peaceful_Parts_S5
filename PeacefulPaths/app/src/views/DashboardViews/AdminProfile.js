@@ -15,7 +15,7 @@ import navimg1 from "../../img/undraw_profile_1.svg"
 import navimg3 from "../../img/undraw_profile_3.svg"
 import {Alert} from "reactstrap";
 import {connect} from "react-redux";
-function UserDashboard({loading,error,...props}){
+function AdminProfile({loading,error,...props}){
 
     const history = useNavigate ();
 
@@ -35,7 +35,7 @@ function UserDashboard({loading,error,...props}){
 
     React.useEffect(()=>{
         fetchUserData().then((response)=>{
-            if (response.data.roles.at(0).role === 'ROLE_USER'){
+            if (response.data.roles.at(0).role === 'ROLE_ADMIN'){
                 setData(response.data);
                 setValues({
                     id:response.data.id,
@@ -74,7 +74,7 @@ function UserDashboard({loading,error,...props}){
         userUpdate(values).then((response)=>{
             if(response.status===201){
                 props.setUser(response.data);
-                history('/dashboard/userDashboard');
+                history('/dashboard/adminDashboard/profile');
             }
             else{
                 props.loginFailure('Something LEKAAAAAAA!Please Try Again');
@@ -542,4 +542,4 @@ const mapDispatchToProps=(dispatch)=>{
         loginFailure:(message)=>dispatch(authFailure(message))
     }
 }
-export default connect(mapStateToProps,mapDispatchToProps)(UserDashboard);
+export default connect(mapStateToProps,mapDispatchToProps)(AdminProfile);

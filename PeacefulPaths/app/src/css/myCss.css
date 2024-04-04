@@ -1,0 +1,7 @@
+.hover-effect:hover, .hover-effect:focus, .hover-effect:active{
+    background-color: transparent !important;
+    border: none !important;
+    outline: none !important;
+}
+
+
