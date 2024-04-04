@@ -33,7 +33,7 @@ function LoginBoot({loading,error,...props}){
                 }
             }
             else{
-                props.loginFailure('Something LEKAAAAAAA!Please Try Again');
+                props.loginFailure('Something LEKAAAAAAAA!Please Try Again');
             }
         }).catch((err)=>{
 
