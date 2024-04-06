@@ -144,7 +144,7 @@ public class UserService {
     public UserDto findByLogin(String login,String token) {
         Optional<User> user1 = userRepository.findByEmail(login);
 
-        if (user1.isEmpty()){
+        if (!user1.isPresent()){
             return null;
         }
         User user = user1.get();
