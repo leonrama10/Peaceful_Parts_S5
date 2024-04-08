@@ -26,6 +26,8 @@ function LoginBoot({loading,error,...props}){
                         history('/dashboard/adminDashboard');
                     }else if (response.data.roles.at(0).role === 'ROLE_USER') {
                         history('/dashboard/userDashboard');
+                    } else if(response.data.roles.at(0).role == 'ROLE_THERAPIST'){
+                         history('/dashboard/therapistDashboard');
                     }
                 }
                 else{

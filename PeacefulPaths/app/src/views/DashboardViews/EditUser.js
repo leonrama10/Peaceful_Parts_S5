@@ -107,34 +107,32 @@ function EditUser({loading,error,...props}){
         });
     };
 
-    const handleChange = (e) => {
-        e.persist();
-        if (e.target.type === 'checkbox') {
-            const roleObject = data.allRoles.find(role => role.role === e.target.value);
-            if (e.target.checked) {
-                // If the checkbox is checked, add the role to the array
-                setValues(values => ({
-                    ...values,
-                    roles: [...values.roles, roleObject]
-                }));
-            } else {
-                // If the checkbox is unchecked, remove the role from the array
-                setValues(values => ({
-                    ...values,
-                    roles: values.roles.filter(role => role !== e.target)
-                }));
-            }
-            console.log("ROLEEEEEEEEEEEEEE ",values)
-        } else {
-            setValues(values => ({
-                ...values,
-                [e.target.name]: e.target.name === 'experience' ? Number(e.target.value) : e.target.value
-            }));
-            console.log("ROLEEEEEEEEEEEEEE ",values)
-        }
-
-
-    };
+  const handleChange = (e) => {
+          e.persist();
+          if (e.target.type === 'checkbox') {
+              const roleObject = data.allRoles.find(role => role.role === e.target.value);
+              if (e.target.checked) {
+                  // If the checkbox is checked, add the role to the array
+                  setValues(values => ({
+                      ...values,
+                      roles: [...values.roles, roleObject]
+                  }));
+              } else {
+                  // If the checkbox is unchecked, remove the role from the array
+                  setValues(values => ({
+                      ...values,
+                      roles: values.roles.filter(role => role.role !== roleObject.role)
+                  }));
+              }
+              console.log("ROLEEEEEEEEEEEEEE ",values)
+          } else {
+              setValues(values => ({
+                  ...values,
+                  [e.target.name]: e.target.name === 'experience' ? Number(e.target.value) : e.target.value
+              }));
+              console.log("ROLEEEEEEEEEEEEEE ",values)
+          }
+      };
 
     return (
         <main id="page-top">

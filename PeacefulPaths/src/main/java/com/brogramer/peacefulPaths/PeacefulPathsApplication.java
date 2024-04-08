@@ -8,6 +8,6 @@ public class PeacefulPathsApplication {
 
 	public static void main(String[] args) {
 		SpringApplication.run(PeacefulPathsApplication.class, args);
-	}
+	}	
 
 }

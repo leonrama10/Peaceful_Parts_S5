@@ -24,7 +24,7 @@ export default function TherapistDashboard(props){
             setData(response.data);
         }).catch((e)=>{
             localStorage.clear();
-            history('/therapistDashboard');
+            history('/TherapistDashboard');
         })
     },[])
 
