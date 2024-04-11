@@ -7,6 +7,7 @@ import AdminDashboard from "./DashboardViews/AdminDashboard";
 import AdminProfile from "./DashboardViews/AdminProfile";
 import UserProfile from "./DashboardViews/UserProfile";
 import AdminDashboardUsers from "./DashboardViews/AdminDashboardUsers";
+import TherapistsDashboardUsers from "./DashboardViews/TherapistsDashboardUsers";
 import AdminDashboardTherapists from "./DashboardViews/AdminDashboardTherapists";
 import AdminDashboardAdmin from "./DashboardViews/AdminDashboardAdmin";
 import TherapistDashboard from "./DashboardViews/TherapistDashboard";
@@ -39,7 +40,9 @@ function Main() {
                 <Route path="/dashboard/adminDashboard/therapists" element={<AdminDashboardTherapists />}/>
                 <Route path="/dashboard/adminDashboard/admin" element={<AdminDashboardAdmin />}/>
                 <Route path="/dashboard/adminDashboard/users/edit/:id" element={<EditUser />}/>
+                <Route path="/dashboard/therapistDashboard/users/edit/:id" element={<EditUser />}/>
                 <Route path="/dashboard/therapistDashboard" element={<TherapistDashboard />}/>
+                <Route path="/dashboard/therapistDashboard/users" element={<TherapistsDashboardUsers />}/>
                 <Route path="/dashboard/errorPage" element={<ErrorPage />}/>
                 <Route path="/" element={<Home />}/>
             </Routes>

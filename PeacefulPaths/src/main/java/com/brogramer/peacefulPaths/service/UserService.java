@@ -4,7 +4,6 @@ import com.brogramer.peacefulPaths.dao.RoleDao;
 import com.brogramer.peacefulPaths.dao.TherapistRepository;
 import com.brogramer.peacefulPaths.dtos.CredentialsDto;
 import com.brogramer.peacefulPaths.dtos.SignUpDto;
-import com.brogramer.peacefulPaths.dtos.UpdateDto;
 import com.brogramer.peacefulPaths.dtos.UserDto;
 import com.brogramer.peacefulPaths.entity.Roles;
 import com.brogramer.peacefulPaths.entity.User;
@@ -14,11 +13,10 @@ import jakarta.mail.internet.MimeMessage;
 import jakarta.persistence.EntityNotFoundException;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
+import org.springframework.mail.javamail.JavaMailSender;
 import org.springframework.mail.javamail.MimeMessageHelper;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
-import org.springframework.mail.javamail.JavaMailSender;
-import org.springframework.mail.javamail.MimeMessageHelper;
 
 import java.nio.CharBuffer;
 import java.util.ArrayList;
@@ -108,7 +106,11 @@ public class UserService {
                 user.setEmail(userDto.getEmail());
                 user.setName(userDto.getName());
                 user.setSurname(userDto.getSurname());
-                user.setPassword(passwordEncoder.encode(CharBuffer.wrap(userDto.getPassword())));
+                if (emailUser.get().getPassword().equals(userDto.getPassword())) {
+                    user.setPassword(emailUser.get().getPassword());
+                }else {
+                    user.setPassword(passwordEncoder.encode(CharBuffer.wrap(userDto.getPassword())));
+                }
                 user.setNumber(userDto.getNumber());
                 user.setRoles(userDto.getRoles());
                 user.setLocation(userDto.getLocation());
@@ -190,7 +192,8 @@ public class UserService {
     public UserDto findByEmail(String email) {
         Optional<User> user1 = userRepository.findByEmail(email);
 
-        if (user1.isEmpty()){
+        if (!user1.isPresent()){
+
             return null;
         }
         User user = user1.get();

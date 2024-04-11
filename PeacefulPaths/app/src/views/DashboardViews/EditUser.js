@@ -7,8 +7,10 @@ import '../../css/sb-admin-2.min.css';
 import arrow from "../../img/arrow.png"
 import leftArrow from "../../img/leftArrow.png"
 import {Alert} from "reactstrap";
+import {loadState} from "../../helper/sessionStorage";
 import {connect} from "react-redux";
 import DashboardNav from "./DashboardNav";
+const role = loadState("role",'');
 function EditUser({loading,error,...props}){
 
     const { id } = useParams();
@@ -33,7 +35,8 @@ function EditUser({loading,error,...props}){
 
     React.useEffect(()=>{
         fetchUserDataId(idNumber).then((response)=>{
-            if (response.data.roles.at(0).role === 'ROLE_ADMIN'){
+            if (response.data.roles.at(0).role === 'ROLE_USER'){
+            console.log('fetchuserdataidif');
                 setData(response.data);
                 setValues({
                     id:response.data.id,
@@ -49,14 +52,17 @@ function EditUser({loading,error,...props}){
                 })
             }
             else{
+              console.log('fetchuserdataidelse');
                 localStorage.clear();
                 history('/loginBoot');
             }
         }).catch((e)=>{
+          console.log('fetchuserdataidcatch');
             localStorage.clear();
             history('/loginBoot');
         })
     },[])
+
 
 
     const handleUpdate = (e) => {
@@ -64,7 +70,12 @@ function EditUser({loading,error,...props}){
 
         userUpdate(values).then((response)=>{
             if(response.status===201){
+               if (role==="ROLE_ADMIN") {
                 history('/dashboard/adminDashboard/users');
+             }else if (role==="ROLE_THERAPIST"){
+               history('/dashboard/therapistDashboard/users');
+          }
+
             }
             else{
                 props.loginFailure('Something LEKAAAAAAA!Please Try Again');
