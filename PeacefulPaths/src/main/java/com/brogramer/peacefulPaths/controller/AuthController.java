@@ -125,6 +125,27 @@ public class AuthController {
 
         return ResponseEntity.ok(userInfo);
     }
+    @GetMapping("/auth/allTherapistInfo")
+    public ResponseEntity<?> getAllTherapistInfo(){
+        List<UserInfo> therapistInfos = therapistService.findAllByRole("ROLE_THERAPIST").stream().map(therapistDetails -> {
+            UserInfo therapistInfo = new UserInfo();
+            therapistInfo.setId(therapistDetails.getId());
+            therapistInfo.setEmail(therapistDetails.getEmail());
+            therapistInfo.setName(therapistDetails.getName());
+            therapistInfo.setSurname(therapistDetails.getSurname());
+            therapistInfo.setRoles(therapistDetails.getRoles());
+            therapistInfo.setPassword(therapistDetails.getPassword());
+            therapistInfo.setNumber(therapistDetails.getNumber());
+            therapistInfo.setLocation(therapistDetails.getLocation());
+            therapistInfo.setExperience(therapistDetails.getExperience());
+            return therapistInfo;
+        }).collect(Collectors.toList());
+
+        return ResponseEntity.ok(therapistInfos);
+    }
+
+
+
 
     @PostMapping ("/auth/sendEmail")
     public ResponseEntity<UserDto> sendEmail(@RequestBody @Valid CredentialsDto credentialsDto) throws MessagingException {

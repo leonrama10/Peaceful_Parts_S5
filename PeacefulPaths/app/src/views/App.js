@@ -26,7 +26,7 @@ function Main() {
     return (
         <>
             {!isDashboard && <Header />}
-            <Routes>
+               <Routes>
                 <Route path="/loginBoot" element={<LoginBoot />}/>
                 <Route path="/registerBoot" element={<RegisterBoot />}/>
                 <Route path="/forgotPassBoot" element={<ForgotPasswordBoot />}/>
