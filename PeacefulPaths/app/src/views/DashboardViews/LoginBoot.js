@@ -5,6 +5,8 @@ import {Link, useNavigate} from 'react-router-dom';
 import '../../css/sb-admin-2.min.css';
 import {authenticate, authFailure, authSuccess} from "../../redux/authActions";
 import {Alert} from "reactstrap";
+import {saveState} from "../../helper/sessionStorage";
+
 
 function LoginBoot({loading,error,...props}){
     const history = useNavigate ();
@@ -13,6 +15,11 @@ function LoginBoot({loading,error,...props}){
         email: '',
         password: ''
     });
+
+    React.useEffect(()=>{
+        saveState("loggedInState", false)
+        saveState("role",'')
+    },[])
 
     const handleSubmit=(evt)=>{
         evt.preventDefault();
@@ -23,9 +30,13 @@ function LoginBoot({loading,error,...props}){
                 props.setUser(response.data);
                 if (response.data.roles.at(0)){
                     if (response.data.roles.at(0).role === 'ROLE_ADMIN') {
+                        saveState("loggedInState",true)
+                        saveState("role",'ROLE_ADMIN')
                         history('/dashboard/adminDashboard');
                     }else if (response.data.roles.at(0).role === 'ROLE_USER') {
-                        history('/dashboard/userDashboard');
+                        saveState("loggedInState",true)
+                        saveState("role",'ROLE_USER')
+                        history('/dashboard/userDashboard/profile');
                     }
                 }
                 else{
@@ -133,9 +144,7 @@ function LoginBoot({loading,error,...props}){
             <script src="../../vendor/jquery/jquery.min.js"></script>
             <script src="../../vendor/bootstrap/js/bootstrap.bundle.min.js"></script>
 
-
             <script src="../../vendor/jquery-easing/jquery.easing.min.js"></script>
-
 
             <script src="../../js/sb-admin-2.min.js"></script>
 

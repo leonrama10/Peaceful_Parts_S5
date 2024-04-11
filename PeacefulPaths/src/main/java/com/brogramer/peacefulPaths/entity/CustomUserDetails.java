@@ -78,5 +78,13 @@ public class CustomUserDetails implements UserDetails {
     public int getExperience() {
         return user.getExperience();
     }
+
+    public String getResetToken() {
+        return user.getResetToken();
+    }
+
+    public Long getExpirationTime() {
+        return user.getExpirationTime();
+    }
 }
 

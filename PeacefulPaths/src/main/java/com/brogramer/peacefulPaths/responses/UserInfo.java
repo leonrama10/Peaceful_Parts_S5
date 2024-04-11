@@ -17,6 +17,8 @@ public class UserInfo {
     private String location;
     private Collection<Roles> roles;
     private List<Roles> allRoles;
+    private String resetToken;
+    private Long expirationTime;
 
     public List<Roles> getAllRoles() {
         return allRoles;
@@ -94,5 +96,21 @@ public class UserInfo {
 
     public void setAllRoles(List<Roles> allRoles) {
         this.allRoles=allRoles;
+    }
+
+    public String getResetToken() {
+        return resetToken;
+    }
+
+    public Long getExpirationTime() {
+        return expirationTime;
+    }
+
+    public void setResetToken(String resetToken) {
+        this.resetToken=resetToken;
+    }
+
+    public void setExpirationTime(Long expirationTime) {
+        this.expirationTime=expirationTime;
     }
 }

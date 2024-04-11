@@ -1,27 +1,71 @@
 import React,{useState} from 'react';
-import {fetchUserData} from '../../api/authService';
+import {userSendEmail} from '../../api/authService';
 import {Link, useNavigate} from 'react-router-dom';
 import '../../css/sb-admin-2.min.css';
-export default function ForgotPasswordBoot(){
+import {Alert} from "reactstrap";
+import {authenticate, authFailure, authSuccess} from "../../redux/authActions";
+import {connect} from "react-redux";
+import {loadState, saveState} from "../../helper/sessionStorage";
+loadState("ResetPassword",false)
+function ForgotPasswordBoot({loading,error,...props}){
 
     const history = useNavigate ();
 
-    const [data,setData]=useState({});
+    const [values, setValues] = useState({
+        email: ''
+    });
 
-    React.useEffect(()=>{
-        fetchUserData().then((response)=>{
-            setData(response.data);
-        }).catch((e)=>{
-            localStorage.clear();
-            history('/forgotPassBoot');
-        })
-    },[])
+    const handleSubmit=(evt)=>{
+        evt.preventDefault();
+        props.authenticate();
+
+        userSendEmail(values).then((response)=>{
+            if(response.status===201){
+
+                // props.setUser(response.data);
+                if (response.data.roles.at(0)){
+                    saveState("ResetPassword",true)
+                    history('/verifyPasswordInfo');
+                }
+                else{
+                    props.loginFailure('Email does not exist! Please Try Again');
+                }
+            }
+            else{
+                props.loginFailure('Something LEKAAAAAAA!Please Try Again');
+            }
+        }).catch((err)=>{
+
+            if(err && err.response){
+
+                switch(err.response.status) {
+                    case 401:
+                        console.log("401 status");
+                        props.loginFailure("Authentication Failed.Bad Credentials");
+                        break;
+                    default:
+                        props.loginFailure('Something BABAAAAAA!Please Try Again');
+                }
+            }
+            else{
+                console.log("ERROR: ",err)
+                props.loginFailure('Something NaNAAAAA!Please Try Again');
+            }
+        });
+    }
+
+    const handleChange = (e) => {
+        e.persist();
+        setValues(values => ({
+            ...values,
+            [e.target.name]: e.target.value
+        }));
+    };
 
     return (
             <main className="bg-gradient-primary">
 
             <div className="container">
-
 
                 <div className="row justify-content-center">
 
@@ -39,22 +83,28 @@ export default function ForgotPasswordBoot(){
                                                 <p className="mb-4">We get it, stuff happens. Just enter your email address below
                                                     and we'll send you a link to reset your password!</p>
                                             </div>
-                                            <form className="user">
+                                            { error &&
+                                                <Alert style={{marginTop:'20px'}} variant="danger">
+                                                    {error}
+                                                </Alert>
+                                            }
+                                            <form className="user" onSubmit={handleSubmit}>
                                                 <div className="form-group">
                                                     <input type="email" className="form-control form-control-user"
                                                            id="exampleInputEmail" aria-describedby="emailHelp"
-                                                           placeholder="Enter Email Address..."/>
+                                                           placeholder="Enter Email Address..." value={values.email}
+                                                           name="email" onChange={handleChange} required/>
                                                 </div>
-                                                <Link to="/loginBoot" className="btn btn-primary btn-user btn-block">
+                                                <button type="submit" className="btn btn-primary btn-user btn-block">
                                                     Reset Password
-                                                </Link>
+                                                </button>
                                             </form>
                                             <hr/>
-                                                <div className="text-center">
-                                                    <Link className="small" to="/registerBoot">Create an Account!</Link>
-                                                </div>
-                                                <div className="text-center">
-                                                    <Link className="small" to="/loginBoot">Already have an account? Login!</Link>
+                                            <div className="text-center">
+                                                <Link className="small" to="/registerBoot">Create an Account!</Link>
+                                            </div>
+                                            <div className="text-center">
+                                                <Link className="small" to="/loginBoot">Already have an account? Login!</Link>
                                                 </div>
                                         </div>
                                     </div>
@@ -81,3 +131,19 @@ export default function ForgotPasswordBoot(){
             </main>
     )
 }
+
+const mapStateToProps=({auth})=>{
+    console.log("state ",auth)
+    return {
+        loading:auth.loading,
+        error:auth.error
+    }}
+const mapDispatchToProps=(dispatch)=>{
+
+    return {
+        authenticate :()=> dispatch(authenticate()),
+        setUser:(data)=> dispatch(authSuccess(data)),
+        loginFailure:(message)=>dispatch(authFailure(message))
+    }
+}
+export default connect(mapStateToProps,mapDispatchToProps)(ForgotPasswordBoot);

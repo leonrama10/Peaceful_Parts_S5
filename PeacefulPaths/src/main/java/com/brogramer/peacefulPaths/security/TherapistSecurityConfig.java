@@ -102,8 +102,9 @@ public class TherapistSecurityConfig {
                 .csrf(AbstractHttpConfigurer::disable)
                 .sessionManagement(s -> s.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
                 .authorizeHttpRequests((requests) -> requests
-                        .requestMatchers(HttpMethod.POST, "/api/auth/login","/api/auth/register").permitAll()
+                        .requestMatchers(HttpMethod.POST, "/api/auth/login","/api/auth/register","api/auth/sendEmail").permitAll()
                         .requestMatchers(HttpMethod.PUT,"/api/auth/update").hasAnyRole("USER","THERAPIST","ADMIN")
+                        .requestMatchers(HttpMethod.PUT,"/api/auth/resetPassword").hasAnyRole("USER","THERAPIST","ADMIN")
                         .requestMatchers(HttpMethod.GET, "/api/auth/userinfo").hasAnyRole("USER","THERAPIST","ADMIN")
                         .requestMatchers(HttpMethod.GET, "/api/auth/allUserinfo").hasRole("ADMIN")
                         .requestMatchers(HttpMethod.GET, "/api/auth/userinfoId/{id}").hasRole("ADMIN")

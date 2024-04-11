@@ -24,8 +24,6 @@ public class SignUpDto {
     @NotEmpty
     private String password;
 
-    @NotEmpty
-    private String confirmPassword;
 
     public String getName() {
         return name;
@@ -43,9 +41,6 @@ public class SignUpDto {
         return password;
     }
 
-    public String getConfirmPassword() {
-        return confirmPassword;
-    }
     public String getLogin() {
         return email;
     }

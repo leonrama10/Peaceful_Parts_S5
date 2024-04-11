@@ -10,15 +10,18 @@ import com.brogramer.peacefulPaths.entity.User;
 import com.brogramer.peacefulPaths.responses.UserInfo;
 import com.brogramer.peacefulPaths.service.TherapistService;
 import com.brogramer.peacefulPaths.service.UserService;
+import jakarta.mail.MessagingException;
 import jakarta.validation.Valid;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.userdetails.UserDetailsService;
+import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.*;
 
 import java.net.URI;
 import java.security.Principal;
 import java.util.List;
+import java.util.Optional;
 import java.util.stream.Collectors;
 
 //(origins = "http://localhost:3000")
@@ -56,7 +59,7 @@ public class AuthController {
     }
 
     @PutMapping("/auth/update")
-    public ResponseEntity<UserDto> update(@RequestBody @Valid UpdateDto user) {
+    public ResponseEntity<UserDto> update(@RequestBody @Valid UserDto user) {
         UserDto createdUser = userService.update(user);
         createdUser.setToken(userAuthenticationProvider.createToken(user.getEmail()));
         return ResponseEntity.created(URI.create("/users/" + createdUser.getId())).body(createdUser);
@@ -79,6 +82,8 @@ public class AuthController {
         userInfo.setNumber(userDetails.getNumber());
         userInfo.setLocation(userDetails.getLocation());
         userInfo.setExperience(userDetails.getExperience());
+        userInfo.setResetToken(userDetails.getResetToken());
+        userInfo.setExpirationTime(userDetails.getExpirationTime());
 
         return ResponseEntity.ok(userInfo);
     }
@@ -119,6 +124,22 @@ public class AuthController {
         userInfo.setAllRoles(userDetails.getAllRoles());
 
         return ResponseEntity.ok(userInfo);
+    }
+
+    @PostMapping ("/auth/sendEmail")
+    public ResponseEntity<UserDto> sendEmail(@RequestBody @Valid CredentialsDto credentialsDto) throws MessagingException {
+        UserDto user = userService.findByEmail(credentialsDto.getEmail());
+        user.setToken(userAuthenticationProvider.createToken(user.getEmail()));
+        userService.sendEmail(user);
+        userService.update(user);
+        return ResponseEntity.created(URI.create("/users/" + user.getId())).body(user);
+    }
+
+    @PutMapping("/auth/resetPassword")
+    public ResponseEntity<UserDto> resetPassword(@RequestBody @Valid UserDto user) {
+        UserDto createdUser = userService.update(user);
+        createdUser.setToken(userAuthenticationProvider.createToken(createdUser.getEmail()));
+        return ResponseEntity.created(URI.create("/users/" + createdUser.getId())).body(createdUser);
     }
 
 }

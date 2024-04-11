@@ -21,7 +21,6 @@ import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.stereotype.Service;
 
-import javax.management.relation.Role;
 import java.util.*;
 import java.util.stream.Collectors;
 
@@ -130,15 +129,15 @@ public class TherapistServiceImpl implements TherapistService{
 //    }
 
     @Override
-    public void sendEmail(User therapist) throws MessagingException {
+    public void sendEmail(User user) throws MessagingException {
         String token = UUID.randomUUID().toString();
-        therapist.setResetToken(token);
-        therapist.setExpirationTime(System.currentTimeMillis() + (10 * 60 * 1000));
+        user.setResetToken(token);
+        user.setExpirationTime(System.currentTimeMillis() + (10 * 60 * 1000));
 
         MimeMessage message = javaMailSender.createMimeMessage();
         MimeMessageHelper helper = new MimeMessageHelper(message, true);
 
-        helper.setTo(therapist.getEmail());
+        helper.setTo(user.getEmail());
         helper.setSubject("Forgotten password reset");
 
         String verificationLink = "<a href='http://localhost:8080/peacefulPaths/resetPassword?token=" + token + "'>Click here to reset your password.</a>";

@@ -9,15 +9,22 @@ import com.brogramer.peacefulPaths.dtos.UserDto;
 import com.brogramer.peacefulPaths.entity.Roles;
 import com.brogramer.peacefulPaths.entity.User;
 import com.brogramer.peacefulPaths.exceptions.AppException;
+import jakarta.mail.MessagingException;
+import jakarta.mail.internet.MimeMessage;
 import jakarta.persistence.EntityNotFoundException;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
+import org.springframework.mail.javamail.MimeMessageHelper;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
+import org.springframework.mail.javamail.JavaMailSender;
+import org.springframework.mail.javamail.MimeMessageHelper;
 
 import java.nio.CharBuffer;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Optional;
+import java.util.UUID;
 
 @Service
 public class UserService {
@@ -26,6 +33,8 @@ public class UserService {
     private final RoleDao roleDao;
     private final PasswordEncoder passwordEncoder;
 
+    @Autowired
+    private JavaMailSender javaMailSender;
 
     public UserService(TherapistRepository userRepository, PasswordEncoder passwordEncoder,RoleDao roleDao) {
         this.userRepository = userRepository;
@@ -68,7 +77,6 @@ public class UserService {
         user.setName(userDto.getName());
         user.setSurname(userDto.getSurname());
         user.setPassword(passwordEncoder.encode(CharBuffer.wrap(userDto.getPassword())));
-        user.setConfirmPassword(passwordEncoder.encode(CharBuffer.wrap(userDto.getConfirmPassword())));
         Collection<Roles> collection = new ArrayList<>();
         collection.add(roleDao.findRoleByName("ROLE_USER"));
         user.setRoles(collection);
@@ -89,7 +97,7 @@ public class UserService {
         return userDto1;
     }
 
-    public UserDto update(UpdateDto userDto) {
+    public UserDto update(UserDto userDto) {
         Optional<User> emailUser = userRepository.findByEmail(userDto.getEmail());
 
         User user = new User();
@@ -100,11 +108,13 @@ public class UserService {
                 user.setEmail(userDto.getEmail());
                 user.setName(userDto.getName());
                 user.setSurname(userDto.getSurname());
-                user.setPassword(userDto.getPassword());
+                user.setPassword(passwordEncoder.encode(CharBuffer.wrap(userDto.getPassword())));
                 user.setNumber(userDto.getNumber());
                 user.setRoles(userDto.getRoles());
                 user.setLocation(userDto.getLocation());
                 user.setExperience(userDto.getExperience());
+                user.setExpirationTime(userDto.getExpirationTime());
+                user.setResetToken(userDto.getResetToken());
             }
             else {
                 throw new AppException("Login already exists", HttpStatus.BAD_REQUEST);
@@ -114,11 +124,13 @@ public class UserService {
             user.setEmail(userDto.getEmail());
             user.setName(userDto.getName());
             user.setSurname(userDto.getSurname());
-            user.setPassword(userDto.getPassword());
+            user.setPassword(passwordEncoder.encode(CharBuffer.wrap(userDto.getPassword())));
             user.setNumber(userDto.getNumber());
             user.setRoles(userDto.getRoles());
             user.setLocation(userDto.getLocation());
             user.setExperience(userDto.getExperience());
+            user.setExpirationTime(userDto.getExpirationTime());
+            user.setResetToken(userDto.getResetToken());
         }
 
         User savedUser = userRepository.save(user);
@@ -135,11 +147,11 @@ public class UserService {
         userDto1.setPassword(savedUser.getPassword());
         userDto1.setLocation(savedUser.getLocation());
         userDto1.setExperience(savedUser.getExperience());
+        userDto1.setExpirationTime(savedUser.getExpirationTime());
+        userDto1.setResetToken(savedUser.getResetToken());
 
         return userDto1;
     }
-
-
 
     public UserDto findByLogin(String login,String token) {
         Optional<User> user1 = userRepository.findByEmail(login);
@@ -165,6 +177,7 @@ public class UserService {
         return userDto;
     }
 
+
     public void delete(int id) {
         User theUser = userRepository.findById(id)
                 .orElseThrow(() -> new EntityNotFoundException("User not found"));
@@ -172,5 +185,51 @@ public class UserService {
         theUser.getRoles().clear();
 
         userRepository.deleteById(id);
+    }
+
+    public UserDto findByEmail(String email) {
+        Optional<User> user1 = userRepository.findByEmail(email);
+
+        if (user1.isEmpty()){
+            return null;
+        }
+        User user = user1.get();
+
+        UserDto userDto = new UserDto();
+
+        userDto.setEmail( user.getEmail() );
+        userDto.setId( user.getId() );
+        userDto.setName( user.getName() );
+        userDto.setSurname( user.getSurname() );
+        userDto.setNumber(user.getNumber());
+        userDto.setRoles(user.getRoles());
+        userDto.setPassword(user.getPassword());
+        userDto.setLocation(user.getLocation());
+        userDto.setExperience(user.getExperience());
+
+        return userDto;
+    }
+
+    public void sendEmail(UserDto user) throws MessagingException {
+        String token = UUID.randomUUID().toString();
+        user.setResetToken(token);
+        user.setExpirationTime(System.currentTimeMillis() + (60 * 10 * 1000));
+
+        MimeMessage message = javaMailSender.createMimeMessage();
+        MimeMessageHelper helper = new MimeMessageHelper(message, true);
+
+        helper.setTo(user.getEmail());
+        helper.setSubject("Forgotten password reset");
+
+        String verificationLink = "<a href='http://localhost:3000/passwordReset/" + token + "'>Click here to reset your password.</a>";
+
+        String emailContent = "<p>Hello,</p>" +
+                "<p>" + verificationLink + "</p>" +
+                "<p>If you didn't request this email or have any questions, please contact us at markaj.leka@gmail.com</p>" +
+                "<p>Thanks,<br>PeacefulParts team</p>";
+
+        helper.setText(emailContent, true);
+
+        javaMailSender.send(message);
     }
 }

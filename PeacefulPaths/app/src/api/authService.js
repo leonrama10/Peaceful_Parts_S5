@@ -23,7 +23,6 @@ export const userRegister=(authRequest)=>{
 }
 
 export const userUpdate=(authRequest)=>{
-    console.log("UUUUUUUUUUUUUUUUU",authRequest)
     return axios({
          method:'PUT',
         url:`${process.env.hostUrl||'http://localhost:8080'}/api/auth/update`,
@@ -34,7 +33,7 @@ export const userUpdate=(authRequest)=>{
     })
 }
 
-export const fetchUserData=(authRequest)=>{
+export const fetchUserData=()=>{
     return axios({
         method:'GET',
         url:`${process.env.hostUrl||'http://localhost:8080'}/api/auth/userinfo`,
@@ -44,7 +43,7 @@ export const fetchUserData=(authRequest)=>{
     })
 }
 
-export const fetchAllUserData=(authRequest)=>{
+export const fetchAllUserData=()=>{
     return axios({
         method:'GET',
         url:`${process.env.hostUrl||'http://localhost:8080'}/api/auth/allUserinfo`,
@@ -53,6 +52,7 @@ export const fetchAllUserData=(authRequest)=>{
         }
     })
 }
+
 export const fetchUserDataId=(authRequest)=>{
     return axios({
         method:'GET',
@@ -73,5 +73,22 @@ export const userDelete = (authRequest) => {
     })
 }
 
+export const userSendEmail=(authRequest)=>{
+    return axios({
+        'method':'POST',
+        'url':`${process.env.hostUrl||'http://localhost:8080'}/api/auth/sendEmail`,
+        'data':authRequest
+    })
+}
 
+export const userResetPassword=(authRequest)=>{
+    return axios({
+        method:'PUT',
+        url:`${process.env.hostUrl||'http://localhost:8080'}/api/auth/resetPassword`,
+        data:authRequest,
+        headers:{
+            'Authorization':'Bearer '+getToken()
+        }
+    })
+}
 

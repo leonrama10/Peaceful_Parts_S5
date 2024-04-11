@@ -53,10 +53,12 @@ public class User {
     @Transient
     private String confirmPassword;
 
-    @Transient
+
+    @Column(name = "reset_token")
     private String resetToken;
 
-    @Transient
+
+    @Column(name = "expiration_time")
     private Long expirationTime;
 
     @Transient
@@ -75,7 +77,7 @@ public class User {
 
     public static final Roles ROLE_USER = new Roles(1,"ROLE_USER");
     public static final Roles ROLE_THERAPIST = new Roles(2,"ROLE_THERAPIST");
-    public static final Roles ROLE_MANAGER = new Roles(3,"ROLE_MANAGER");
+    public static final Roles ROLE_MANAGER = new Roles(3,"ROLE_ADMIN");
 
     public User() {}
 

@@ -1,5 +1,6 @@
 {
   "dependencies": {
+    "redux-react-session": "^2.6.1",
     "startbootstrap-sb-admin-2": "^4.1.4"
   }
 }

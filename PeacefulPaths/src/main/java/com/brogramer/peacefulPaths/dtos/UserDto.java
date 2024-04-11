@@ -1,6 +1,7 @@
 package com.brogramer.peacefulPaths.dtos;
 
 import com.brogramer.peacefulPaths.entity.Roles;
+import jakarta.persistence.Transient;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
@@ -25,6 +26,8 @@ public class UserDto {
     private String location;
     private int experience;
     private Collection<Roles> roles;
+    private String resetToken;
+    private Long expirationTime;
 
     public String getLocation() {
         return location;
@@ -113,5 +116,21 @@ public class UserDto {
     }
     public int getExperience() {
         return experience;
+    }
+
+    public String getResetToken() {
+        return resetToken;
+    }
+
+    public void setResetToken(String resetToken) {
+        this.resetToken = resetToken;
+    }
+
+    public Long getExpirationTime() {
+        return expirationTime;
+    }
+
+    public void setExpirationTime(Long expirationTime) {
+        this.expirationTime = expirationTime;
     }
 }
