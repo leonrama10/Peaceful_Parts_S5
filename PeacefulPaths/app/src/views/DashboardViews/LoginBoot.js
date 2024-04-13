@@ -36,8 +36,10 @@ function LoginBoot({loading,error,...props}){
                     }else if (response.data.roles.at(0).role === 'ROLE_USER') {
                         saveState("loggedInState",true)
                         saveState("role",'ROLE_USER')
-                        history('/dashboard/userDashboard/profile');
-                    } else if(response.data.roles.at(0).role == 'ROLE_THERAPIST'){
+                        history('/dashboard/userDashboard');
+                    } else if(response.data.roles.at(0).role === 'ROLE_THERAPIST'){
+                        saveState("loggedInState",true)
+                        saveState("role",'ROLE_THERAPIST')
                          history('/dashboard/therapistDashboard');
                     }
                 }

@@ -15,8 +15,6 @@ import org.mindrot.jbcrypt.BCrypt;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.mail.javamail.JavaMailSender;
 import org.springframework.mail.javamail.MimeMessageHelper;
-import org.springframework.security.core.GrantedAuthority;
-import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.stereotype.Service;
@@ -174,7 +172,6 @@ public class TherapistServiceImpl implements TherapistService{
         }
     }
 
-
 //    @Override
 //    public void sendEmailError(String email) throws MessagingException {
 //        MimeMessage message = javaMailSender.createMimeMessage();
@@ -193,7 +190,6 @@ public class TherapistServiceImpl implements TherapistService{
 //    }
 
 
-
     @Override
     public User findByEmailDAO(String email) {
         // check the database if the user already exists
@@ -209,10 +205,6 @@ public class TherapistServiceImpl implements TherapistService{
 //        return new org.springframework.security.core.userdetails.User(user.getEmail(), user.getPassword(),
 //                mapRolesToAuthorities(user.getRoles()));
         return new CustomUserDetails(user);
-    }
-
-    private Collection<? extends GrantedAuthority> mapRolesToAuthorities(Collection<Roles> roles) {
-        return roles.stream().map(role -> new SimpleGrantedAuthority(role.getRole())).collect(Collectors.toList());
     }
 
 }

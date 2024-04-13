@@ -72,7 +72,8 @@ export const userDelete = (authRequest) => {
         }
     })
 }
-export const fetchAllTherapistData = (authRequest) => {
+
+export const fetchAllTherapistData = () => {
     return axios({
         method: 'GET',
         url: `${process.env.hostUrl || 'http://localhost:8080'}/api/auth/allTherapistInfo`,
@@ -81,13 +82,6 @@ export const fetchAllTherapistData = (authRequest) => {
         }
     });
 };
-
-
-
-
-
-
-
 
 export const userSendEmail=(authRequest)=>{
     return axios({
@@ -108,7 +102,7 @@ export const userResetPassword=(authRequest)=>{
     })
 }
 
-export const fetchAllAdminData = (authRequest) => {
+export const fetchAllAdminData = () => {
     return axios({
         method: 'GET',
         url: `${process.env.hostUrl || 'http://localhost:8080'}/api/auth/allAdminInfo`,
@@ -118,4 +112,46 @@ export const fetchAllAdminData = (authRequest) => {
     });
 };
 
+export const userTherapistConnection=(authRequest)=>{
+    return axios({
+        'method':'POST',
+        'url':`${process.env.hostUrl||'http://localhost:8080'}/api/auth/userTherapistConnection`,
+        'data':authRequest,
+        headers: {
+            'Authorization': 'Bearer ' + getToken()
+        }
+    })
+}
 
+
+export const fetchUserTherapistConnectionData = (authRequest) => {
+    return axios({
+        method: 'GET',
+        url: `${process.env.hostUrl || 'http://localhost:8080'}/api/auth/fetchUserTherapistConnectionData/${authRequest}`,
+        headers: {
+            'Authorization': 'Bearer ' + getToken()
+        }
+    });
+};
+
+export const removeTherapist = (authRequest) => {
+    return axios({
+        method: 'DELETE',
+        url: `${process.env.hostUrl || 'http://localhost:8080'}/api/auth/removeTherapist/${authRequest}`,
+        headers: {
+            'Authorization': 'Bearer ' + getToken()
+        }
+    })
+}
+
+
+export const fetchAllUsersConnectedData = (authRequest) => {
+    console.log("DATAAAAAAAAAAAAAAAA",authRequest)
+    return axios({
+        method: 'GET',
+        url: `${process.env.hostUrl || 'http://localhost:8080'}/api/auth/fetchAllUsersConnectedData/${authRequest}`,
+        headers: {
+            'Authorization': 'Bearer ' + getToken()
+        }
+    });
+};

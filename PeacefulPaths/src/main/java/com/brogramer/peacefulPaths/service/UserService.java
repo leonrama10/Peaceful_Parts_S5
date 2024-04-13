@@ -8,6 +8,7 @@ import com.brogramer.peacefulPaths.dtos.UserDto;
 import com.brogramer.peacefulPaths.entity.Roles;
 import com.brogramer.peacefulPaths.entity.User;
 import com.brogramer.peacefulPaths.exceptions.AppException;
+import com.brogramer.peacefulPaths.responses.UserInfo;
 import jakarta.mail.MessagingException;
 import jakarta.mail.internet.MimeMessage;
 import jakarta.persistence.EntityNotFoundException;
@@ -17,12 +18,11 @@ import org.springframework.mail.javamail.JavaMailSender;
 import org.springframework.mail.javamail.MimeMessageHelper;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
+
 
 import java.nio.CharBuffer;
-import java.util.ArrayList;
-import java.util.Collection;
-import java.util.Optional;
-import java.util.UUID;
+import java.util.*;
 
 @Service
 public class UserService {
@@ -33,6 +33,8 @@ public class UserService {
 
     @Autowired
     private JavaMailSender javaMailSender;
+    @Autowired
+    private TherapistServiceImpl therapistServiceImpl;
 
     public UserService(TherapistRepository userRepository, PasswordEncoder passwordEncoder,RoleDao roleDao) {
         this.userRepository = userRepository;
@@ -234,5 +236,39 @@ public class UserService {
         helper.setText(emailContent, true);
 
         javaMailSender.send(message);
+    }
+
+    @Transactional
+    public void connect(int userId, int therapistId) {
+        userRepository.addConnection(userId,therapistId);
+    }
+
+    public int findTherapistIdByUserId(int id) {
+        return userRepository.findTherapistIdByUserId(id);
+    }
+
+    public void removeTherapist(int userId) {
+        userRepository.deleteConnection(userId);
+    }
+
+    public User findUserConnectionsById(int userId) {
+        Integer id = userRepository.findUserConnectionById(userId);
+
+        if(id == null){
+            return null;
+        }
+
+        return userRepository.findById(id)
+                .orElseThrow(null);
+    }
+
+    public Collection<User> findAllUsersConnectedById(int id) {
+        Collection<User> users = new ArrayList<>();
+        Collection<Integer> userId = userRepository.findAllUsersConnectedById(id);
+        for (Integer i : userId) {
+            users.add(therapistServiceImpl.findById(i));
+        }
+
+        return users;
     }
 }

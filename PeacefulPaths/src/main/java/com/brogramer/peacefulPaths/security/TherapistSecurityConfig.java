@@ -107,8 +107,11 @@ public class TherapistSecurityConfig {
                         .requestMatchers(HttpMethod.PUT,"/api/auth/resetPassword").hasAnyRole("USER","THERAPIST","ADMIN")
                         .requestMatchers(HttpMethod.GET, "/api/auth/userinfo").hasAnyRole("USER","THERAPIST","ADMIN")
                         .requestMatchers(HttpMethod.GET, "/api/auth/allUserinfo").hasAnyRole("ADMIN","THERAPIST")
-                        .requestMatchers(HttpMethod.GET, "/api/auth/userinfoId/{id}").hasAnyRole("ADMIN","THERAPIST")
+                        .requestMatchers(HttpMethod.GET, "/api/auth/userinfoId/{id}").hasAnyRole("ADMIN","THERAPIST","USER")
                         .requestMatchers(HttpMethod.DELETE, "/api/auth/deleteUser").hasRole("ADMIN")
+                        .requestMatchers(HttpMethod.POST, "/api/auth/userTherapistConnection").hasRole("USER")
+                        .requestMatchers(HttpMethod.GET, "/api/auth/fetchUserTherapistConnectionData/{id}").hasRole("USER")
+                        .requestMatchers(HttpMethod.DELETE, "/api/auth/removeTherapist/{id}").hasRole("USER")
                         .anyRequest().authenticated());
 
 
