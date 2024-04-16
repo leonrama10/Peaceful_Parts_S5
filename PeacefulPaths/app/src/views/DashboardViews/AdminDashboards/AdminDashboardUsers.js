@@ -1,14 +1,23 @@
 import React,{useState} from 'react';
-import {fetchAllUserData, fetchAllUsersConnectedData, fetchUserData, userDelete} from '../../api/authService';
+import {fetchAllUserData, fetchUserData, userDelete} from '../../../api/authService';
 import {useNavigate} from 'react-router-dom';
-import '../../css/sb-admin-2.css';
-import '../../css/myCss.css';
+import '../../../css/sb-admin-2.css';
+import '../../../css/myCss.css';
 import DataTable from 'datatables.net-dt';
+import mail from "../../../img/mail.png"
+import arrow from "../../../img/arrow.png"
+import leftArrow from "../../../img/leftArrow.png"
+import bell from "../../../img/bell.png"
+import search from "../../../img/search.png"
+import accLogo from "../../../img/undraw_profile.svg"
+import navimg2 from "../../../img/undraw_profile_2.svg"
+import navimg1 from "../../../img/undraw_profile_1.svg"
+import navimg3 from "../../../img/undraw_profile_3.svg"
 import $ from 'jquery';
-import DashboardNav from "./DashboardNav";
-import SideBarTherapist from "./SideBarTherapist";
+import DashboardNav from "../DashboardNav";
+import SideBarAdmin from "../SideBars/SideBarAdmin";
 
-export default function TherapistDashboardUsers({loading,error,...props}){
+export default function AdminDashboardUsers({loading,error,...props}){
 
     const history = useNavigate ();
     const [data,setData]=useState({});
@@ -17,14 +26,8 @@ export default function TherapistDashboardUsers({loading,error,...props}){
 
     React.useEffect(()=>{
         fetchUserData().then((response)=>{
-            if (response.data.roles.at(0).role === 'ROLE_THERAPIST'){
+            if (response.data.roles.at(0).role === 'ROLE_ADMIN'){
                 setData(response.data);
-
-                    fetchAllUsersConnectedData(response.data.id).then((response)=>{
-                        setAllUsers(response.data)
-                    }).catch((e)=>{
-                        history('/loginBoot');
-                    })
             }
             else{
                 history('/loginBoot');
@@ -34,7 +37,13 @@ export default function TherapistDashboardUsers({loading,error,...props}){
         })
     },[])
 
-
+    React.useEffect(()=>{
+        fetchAllUserData().then((response)=>{
+            setAllUsers(response.data)
+        }).catch((e)=>{
+            history('/loginBoot');
+        })
+    },[])
 
     React.useEffect(() => {
         if (allUsers.length > 0) {
@@ -52,7 +61,7 @@ export default function TherapistDashboardUsers({loading,error,...props}){
             }
             else{
                 //Add error on page if user cant be deleted
-                history('/dashboard/therapistDashboard');
+                history('/dashboard/adminDashboard');
             }
         }).catch((err)=>{
             history('/loginBoot');
@@ -61,16 +70,15 @@ export default function TherapistDashboardUsers({loading,error,...props}){
 
     const handleEdit = (id) => {
         setId(id);
-        history(`/dashboard/therapistDashboard/users/edit/${id}`);
+        history(`/dashboard/adminDashboard/users/edit/${id}`);
     };
-
 
     return (
                 <main id="page-top">
 
                     <div id="wrapper">
 
-                        <SideBarTherapist />
+                        <SideBarAdmin />
 
                         <div id="content-wrapper" className="d-flex flex-column">
 
@@ -135,7 +143,9 @@ export default function TherapistDashboardUsers({loading,error,...props}){
 
                                 </div>
 
+
                             </div>
+
 
                             <footer className="sticky-footer bg-white">
                                 <div className="container my-auto">
@@ -145,7 +155,9 @@ export default function TherapistDashboardUsers({loading,error,...props}){
                                 </div>
                             </footer>
 
+
                         </div>
+
 
                     </div>
 
@@ -177,10 +189,10 @@ export default function TherapistDashboardUsers({loading,error,...props}){
                         </div>
                     </div>
 
-                    <script src="../../vendor/jquery/jquery.min.js"></script>
-                    <script src="../../vendor/bootstrap/js/bootstrap.bundle.min.js"></script>
+                    <script src="../../../vendor/jquery/jquery.min.js"></script>
+                    <script src="../../../vendor/bootstrap/js/bootstrap.bundle.min.js"></script>
 
-                    <script src="../../vendor/jquery-easing/jquery.easing.min.js"></script>
+                    <script src="../../../vendor/jquery-easing/jquery.easing.min.js"></script>
 
                     {/*<script src="../../vendor/datatables/jquery.dataTables.min.js"></script>*/}
                     {/*<script src="../../vendor/datatables/dataTables.bootstrap4.min.js"></script>*/}

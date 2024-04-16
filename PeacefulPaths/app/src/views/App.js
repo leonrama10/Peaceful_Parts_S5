@@ -3,14 +3,14 @@ import Home from "./Home";
 import Header from "./Header";
 import Footer from "./Footer";
 import { BrowserRouter, Routes, Route} from "react-router-dom"
-import AdminDashboard from "./DashboardViews/AdminDashboard";
-import AdminProfile from "./DashboardViews/AdminProfile";
-import UserProfile from "./DashboardViews/UserProfile";
-import AdminDashboardUsers from "./DashboardViews/AdminDashboardUsers";
-import TherapistDashboardUsers from "./DashboardViews/TherapistDashboardUsers";
-import AdminDashboardTherapists from "./DashboardViews/AdminDashboardTherapists";
-import AdminDashboardAdmin from "./DashboardViews/AdminDashboardAdmin";
-import TherapistDashboard from "./DashboardViews/TherapistDashboard";
+import AdminDashboard from "./DashboardViews/AdminDashboards/AdminDashboard";
+import AdminProfile from "./DashboardViews/AdminDashboards/AdminProfile";
+import UserProfile from "./DashboardViews/UserDashboards/UserProfile";
+import AdminDashboardUsers from "./DashboardViews/AdminDashboards/AdminDashboardUsers";
+import TherapistDashboardUsers from "./DashboardViews/TherapistDashboards/TherapistDashboardUsers";
+import AdminDashboardTherapists from "./DashboardViews/AdminDashboards/AdminDashboardTherapists";
+import AdminDashboardAdmin from "./DashboardViews/AdminDashboards/AdminDashboardAdmin";
+import TherapistDashboard from "./DashboardViews/TherapistDashboards/TherapistDashboard";
 import LoginBoot from "./DashboardViews/LoginBoot";
 import RegisterBoot from "./DashboardViews/RegisterBoot";
 import ForgotPasswordBoot from "./DashboardViews/ForgotPasswordBoot";
@@ -19,9 +19,10 @@ import PasswordResetView from "./DashboardViews/PasswordResetView";
 import ErrorPage from "./DashboardViews/ErrorPage";
 import EditUser from "./DashboardViews/EditUser";
 import { useLocation } from 'react-router-dom';
-import UserDashboard from "./DashboardViews/UserDashboard";
-import TherapistCardInfo from "./DashboardViews/TherapistCardInfo";
-import UserDashboardTherapists from "./DashboardViews/UserDashboardTherapists";
+import UserDashboard from "./DashboardViews/UserDashboards/UserDashboard";
+import TherapistCardInfo from "./DashboardViews/TherapistDashboards/TherapistCardInfo";
+import UserDashboardTherapists from "./DashboardViews/UserDashboards/UserDashboardTherapists";
+import GetStarted from "./DashboardViews/GetStartedDirectory/GetStarted";
 
 function Main() {
     const location = useLocation();
@@ -33,6 +34,7 @@ function Main() {
                <Routes>
                 <Route path="/loginBoot" element={<LoginBoot />}/>
                 <Route path="/registerBoot" element={<RegisterBoot />}/>
+                <Route path="/get-started" element={<GetStarted />}/>
                 <Route path="/forgotPassBoot" element={<ForgotPasswordBoot />}/>
                 <Route path="/verifyPasswordInfo" element={<VerifyPasswordInfo />}/>
                 <Route path="/passwordReset/:token" element={<PasswordResetView />}/>

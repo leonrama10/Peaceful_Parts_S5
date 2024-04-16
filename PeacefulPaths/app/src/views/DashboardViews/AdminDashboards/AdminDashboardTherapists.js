@@ -1,12 +1,12 @@
     import React,{useState} from 'react';
-    import {fetchUserData, userDelete, fetchAllTherapistData} from '../../api/authService';
+    import {fetchUserData, userDelete, fetchAllTherapistData} from '../../../api/authService';
     import {useNavigate} from 'react-router-dom';
-    import '../../css/sb-admin-2.css';
-    import '../../css/myCss.css';
+    import '../../../css/sb-admin-2.css';
+    import '../../../css/myCss.css';
     import DataTable from 'datatables.net-dt';
     import $ from 'jquery';
-    import SideBarAdmin from "./SideBarAdmin";
-    import DashboardNav from "./DashboardNav";
+    import SideBarAdmin from "../SideBars/SideBarAdmin";
+    import DashboardNav from "../DashboardNav";
 
     export default function AdminDashboardTherapists({loading,error,...props}){
 
@@ -182,10 +182,10 @@
                             </div>
                         </div>
 
-                        <script src="../../vendor/jquery/jquery.min.js"></script>
-                        <script src="../../vendor/bootstrap/js/bootstrap.bundle.min.js"></script>
+                        <script src="../../../vendor/jquery/jquery.min.js"></script>
+                        <script src="../../../vendor/bootstrap/js/bootstrap.bundle.min.js"></script>
 
-                        <script src="../../vendor/jquery-easing/jquery.easing.min.js"></script>
+                        <script src="../../../vendor/jquery-easing/jquery.easing.min.js"></script>
 
                         {/*<script src="../../vendor/datatables/jquery.dataTables.min.js"></script>*/}
                         {/*<script src="../../vendor/datatables/dataTables.bootstrap4.min.js"></script>*/}

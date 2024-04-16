@@ -129,9 +129,6 @@ function LoginBoot({loading,error,...props}){
                                                 <div className="text-center">
                                                     <Link className="small" to="/forgotPassBoot">Forgot Password?</Link>
                                                 </div>
-                                                <div className="text-center">
-                                                    <Link className="small" to="/registerBoot">Create an Account!</Link>
-                                                </div>
                                         </div>
                                     </div>
                                 </div>

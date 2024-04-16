@@ -1,10 +1,10 @@
 import React, {useState} from 'react';
 import { Link } from 'react-router-dom';
 import {Collapse} from "react-bootstrap";
-import arrow from "../../img/arrow.png";
-import leftArrow from "../../img/leftArrow.png";
+import arrow from "../../../img/arrow.png";
+import leftArrow from "../../../img/leftArrow.png";
 
-export default function SideBarUser(){
+export default function SideBarTherapist(){
 
     const [open, setOpen] = useState(false);
 
@@ -24,7 +24,7 @@ export default function SideBarUser(){
             <hr className="sidebar-divider my-0"/>
 
             <li className="nav-item active">
-                <Link className="nav-link" to="/dashboard/userDashboard">
+                <Link className="nav-link" to="/dashboard/therapistDashboard">
                     <i className="fas fa-fw fa-tachometer-alt"></i>
                     <span>Dashboard</span></Link>
             </li>
@@ -50,8 +50,8 @@ export default function SideBarUser(){
                     <div id="collapse-text">
                         <div className="bg-white py-2 collapse-inner rounded">
                             <h6 className="collapse-header">Custom Components:</h6>
-                            <Link className="collapse-item" to="/dashboard/userDashboard/therapists">Manage
-                                Therapists</Link>
+                            <Link className="collapse-item" to="/dashboard/therapistDashboard/users">Manage
+                                Users</Link>
                         </div>
                     </div>
                 </Collapse>

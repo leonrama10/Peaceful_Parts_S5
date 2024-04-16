@@ -1,5 +1,5 @@
 import React from 'react';
-import { Link } from 'react-router-dom';
+import {Link, useLocation} from 'react-router-dom';
 import {loadState} from "../helper/sessionStorage";
 const loggedInState = loadState("loggedInState", false)
 const role = loadState("role",'')
@@ -8,6 +8,8 @@ export default function Header(){
 
     const [loggedIn, setLoggedIn] = React.useState(false);
     const [location, setLocation] = React.useState('');
+    const locationn = useLocation();
+    const isGetStarted = locationn.pathname.startsWith('/get-started');
 
     React.useEffect(()=>{
         if (loggedInState){
@@ -19,7 +21,7 @@ export default function Header(){
 
     React.useEffect(()=>{
         if (role === 'ROLE_USER'){
-            setLocation(l => l = '/userDashboard/profile')
+            setLocation(l => l = '/userDashboard')
         }else if (role === 'ROLE_THERAPIST'){
             setLocation(l => l = '/therapistDashboard')
         }else if(role === 'ROLE_ADMIN'){
@@ -42,7 +44,7 @@ export default function Header(){
                 <Link to="/contact">Contact</Link>
                 {loggedIn && <Link to={`/dashboard${location}`} className="btn costum-btn">Account</Link>}
                 {!loggedIn && <Link to="/loginBoot" className="btn costum-btn">Login</Link>}
-                {!loggedIn && <Link to="/get-started" className="btn costum-btn">Get Started</Link>}
+                {!isGetStarted && !loggedIn && <Link to="/get-started" className="btn costum-btn">Get Started</Link>}
             </nav>
         </header>
     )

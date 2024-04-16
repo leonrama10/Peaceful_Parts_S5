@@ -2,14 +2,14 @@ import React,{useState} from 'react';
 import {
     fetchUserData,
     fetchUserTherapistConnectionData, removeTherapist
-} from '../../api/authService';
+} from '../../../api/authService';
 import {useNavigate} from 'react-router-dom';
-import '../../css/sb-admin-2.css';
-import '../../css/myCss.css';
-import DashboardNav from "./DashboardNav";
-import SideBarUser from "./SideBarUser";
+import '../../../css/sb-admin-2.css';
+import '../../../css/myCss.css';
+import DashboardNav from "../DashboardNav";
+import SideBarUser from "../SideBars/SideBarUser";
 import {Alert} from "reactstrap";
-import {authenticate, authFailure, authSuccess} from "../../redux/authActions";
+import {authenticate, authFailure, authSuccess} from "../../../redux/authActions";
 import {connect} from "react-redux";
 
 function UserDashboardTherapists({loading,error,...props}){
@@ -168,9 +168,9 @@ function UserDashboardTherapists({loading,error,...props}){
                 </div>
             </div>
 
-            <script src="../../vendor/jquery/jquery.min.js"></script>
-            <script src="../../vendor/bootstrap/js/bootstrap.bundle.min.js"></script>
-            <script src="../../vendor/jquery-easing/jquery.easing.min.js"></script>
+            <script src="../../../vendor/jquery/jquery.min.js"></script>
+            <script src="../../../vendor/bootstrap/js/bootstrap.bundle.min.js"></script>
+            <script src="../../../vendor/jquery-easing/jquery.easing.min.js"></script>
 
         </main>
     )

@@ -1,13 +1,13 @@
 import React,{useState} from 'react';
-import {fetchUserData} from '../../api/authService';
+import {fetchUserData} from '../../../api/authService';
 import {Link, useNavigate} from 'react-router-dom';
-import '../../css/sb-admin-2.css';
-import undraw_posting_photo from "../../img/undraw_posting_photo.svg"
+import '../../../css/sb-admin-2.css';
+import undraw_posting_photo from "../../../img/undraw_posting_photo.svg"
 import DataTable from 'datatables.net-dt';
-import DashboardNav from "./DashboardNav";
-import {authenticate, authFailure, authSuccess} from "../../redux/authActions";
+import DashboardNav from "../DashboardNav";
+import {authenticate, authFailure, authSuccess} from "../../../redux/authActions";
 import {connect} from "react-redux";
-import SideBarAdmin from "./SideBarAdmin";
+import SideBarAdmin from "../SideBars/SideBarAdmin";
 
 function AdminDashboard({loading,error,...props}){
 
@@ -412,17 +412,17 @@ function AdminDashboard({loading,error,...props}){
                     <i className="fas fa-angle-up"></i>
                 </a>
 
-                <script src="../../vendor/jquery/jquery.min.js"></script>
-                <script src="../../vendor/bootstrap/js/bootstrap.bundle.min.js"></script>
+                <script src="../../../vendor/jquery/jquery.min.js"></script>
+                <script src="../../../vendor/bootstrap/js/bootstrap.bundle.min.js"></script>
 
-                <script src="../../vendor/jquery-easing/jquery.easing.min.js"></script>
+                <script src="../../../vendor/jquery-easing/jquery.easing.min.js"></script>
 
-                <script src="../../js/sb-admin-2.min.js"></script>
+                <script src="../../../js/sb-admin-2.min.js"></script>
 
-                <script src="../../vendor/chart.js/Chart.min.js"></script>
+                <script src="../../../vendor/chart.js/Chart.min.js"></script>
 
-                <script src="../../js/demo/chart-area-demo.js"></script>
-                <script src="../../js/demo/chart-pie-demo.js"></script>
+                <script src="../../../js/demo/chart-area-demo.js"></script>
+                <script src="../../../js/demo/chart-pie-demo.js"></script>
 
             </main>
     )

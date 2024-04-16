@@ -1,23 +1,23 @@
 import React,{useState} from 'react';
-import {fetchUserDataId, userUpdate} from '../../api/authService';
+import {fetchUserData, fetchUserDataId, userUpdate} from '../../api/authService';
 import {Link, useNavigate, useParams} from 'react-router-dom';
-import {Container, Row, Col, Form, Button, Collapse} from 'react-bootstrap';
+import {Container, Row, Col, Form, Button} from 'react-bootstrap';
 import {authenticate, authFailure, authSuccess} from "../../redux/authActions";
 import '../../css/sb-admin-2.min.css';
-import arrow from "../../img/arrow.png"
-import leftArrow from "../../img/leftArrow.png"
 import {Alert} from "reactstrap";
 import {loadState} from "../../helper/sessionStorage";
 import {connect} from "react-redux";
 import DashboardNav from "./DashboardNav";
+import SideBarAdmin from "./SideBars/SideBarAdmin";
+import SideBarTherapist from "./SideBars/SideBarTherapist";
 const role = loadState("role",'');
 function EditUser({loading,error,...props}){
 
     const { id } = useParams();
     const idNumber = Number(id);
-    const [open, setOpen] = useState(false);
     const history = useNavigate ();
     const [data,setData]=useState({});
+    const [userData,setUserData]=useState({});
 
     const [values, setValues] = useState({
         id:0,
@@ -31,6 +31,20 @@ function EditUser({loading,error,...props}){
         location:'',
         allRoles:[]
     });
+
+    React.useEffect(()=>{
+        fetchUserData().then((response)=>{
+            if (response.data.roles.at(0).role === 'ROLE_ADMIN' || response.data.roles.at(0).role === 'ROLE_THERAPIST'){
+                setUserData(response.data);
+            }
+            else{
+                history('/loginBoot');
+            }
+        }).catch((e)=>{
+            localStorage.clear();
+            history('/loginBoot');
+        })
+    },[])
 
     React.useEffect(()=>{
         fetchUserDataId(idNumber).then((response)=>{
@@ -53,15 +67,16 @@ function EditUser({loading,error,...props}){
         })
     },[])
 
-
-
     const handleUpdate = (e) => {
         e.preventDefault();
 
         userUpdate(values).then((response)=>{
             if(response.status===201){
                if (role==="ROLE_ADMIN") {
-                    history('/dashboard/adminDashboard/users');
+                   // update this so it when u update a user it sends to adminDashboard/users ,
+                   // when u update a therapist sends to adminDashboard/therapists ,
+                   // and when u update admins sends to adminDashboard/admins
+                    history('/dashboard/adminDashboard');
                }else if (role==="ROLE_THERAPIST"){
                     history('/dashboard/therapistDashboard/users');
                }
@@ -83,7 +98,6 @@ function EditUser({loading,error,...props}){
                         props.loginFailure('Something BABAAAAAA!Please Try Again');
 
                 }
-
             }
             else{
                 console.log("ERROR: ",err)
@@ -124,123 +138,13 @@ function EditUser({loading,error,...props}){
 
             <div id="wrapper">
 
-                <ul className="navbar-nav bg-gradient-primary sidebar sidebar-dark accordion"
-                    id="accordionSidebar">
-
-                    <Link className="sidebar-brand d-flex align-items-center justify-content-center"
-                          to="/dashboard">
-                        <div className="sidebar-brand-icon rotate-n-15">
-                            <i className="fas fa-laugh-wink"></i>
-                        </div>
-                        <div className="sidebar-brand-text mx-3">PeacefulParts</div>
-                    </Link>
-
-                    <hr className="sidebar-divider my-0"/>
-
-                    <li className="nav-item active">
-                        <Link className="nav-link" to="/dashboard">
-                            <i className="fas fa-fw fa-tachometer-alt"></i>
-                            <span>Dashboard</span></Link>
-                    </li>
-
-                    <hr className="sidebar-divider"/>
-
-                    <div className="sidebar-heading">
-                        Interface
-                    </div>
-
-                    <li className="nav-item" style={{marginTop: "10px", marginBottom: "10px"}}>
-                        <a style={{
-                            textDecoration: "none",
-                            color: "white",
-                            fontSize: "13px",
-                            marginLeft: "20px",
-                            fontWeight: "550"
-                        }} onClick={() => setOpen(!open)} aria-controls="collapse-text" aria-expanded={open}>
-                            <span>Managing</span>
-                            <img style={{marginLeft: "99px", width: "15px"}} src={arrow} alt="arrow"/>
-                        </a>
-                        <Collapse in={open}>
-                            <div id="collapse-text">
-                                <div className="bg-white py-2 collapse-inner rounded">
-                                    <h6 className="collapse-header">Custom Components:</h6>
-                                    <Link className="collapse-item" to="/dashboard/adminDashboard/therapists">Manage
-                                        Therapists</Link>
-                                    <Link className="collapse-item" to="/dashboard/adminDashboard/users">Manage
-                                        Users</Link>
-                                    <Link className="collapse-item" to="/dashboard/adminDashboard/admin">Manage
-                                        Admins</Link>
-                                </div>
-                            </div>
-                        </Collapse>
-                    </li>
-
-                    <li className="nav-item" style={{marginTop: "10px", marginBottom: "14px"}}>
-                        <a style={{
-                            textDecoration: "none",
-                            color: "white",
-                            fontSize: "13px",
-                            marginLeft: "20px",
-                            fontWeight: "550"
-                        }} href="#" data-toggle="collapse" data-target="#collapseUtilities"
-                           aria-expanded="true" aria-controls="collapseUtilities">
-                            <span>Utilities</span>
-                            <img style={{marginLeft: "132px", width: "15px"}} src={arrow} alt="arrow"/>
-                        </a>
-                        <div id="collapseUtilities" className="collapse" aria-labelledby="headingUtilities"
-                             data-parent="#accordionSidebar">
-                            <div className="bg-white py-2 collapse-inner rounded">
-                                <h6 className="collapse-header">Custom Utilities:</h6>
-
-                            </div>
-                        </div>
-                    </li>
-
-                    <hr className="sidebar-divider"/>
-
-                    <div className="sidebar-heading">
-                        Addons
-                    </div>
-
-                    <li className="nav-item" style={{marginTop: "10px", marginBottom: "20px"}}>
-                        <a style={{
-                            textDecoration: "none",
-                            color: "white",
-                            fontSize: "13px",
-                            marginLeft: "20px",
-                            fontWeight: "550"
-                        }} href="#" data-toggle="collapse" data-target="#collapsePages"
-                           aria-expanded="true" aria-controls="collapsePages">
-                            <span>Pages</span>
-                            <img style={{marginLeft: "139px", width: "15px"}} src={arrow} alt="arrow"/>
-                        </a>
-                        <div id="collapsePages" className="collapse" aria-labelledby="headingPages"
-                             data-parent="#accordionSidebar">
-                            <div className="bg-white py-2 collapse-inner rounded">
-                                <h6 className="collapse-header">Login Screens:</h6>
-
-                                <div className="collapse-divider"></div>
-                                <h6 className="collapse-header">Other Pages:</h6>
-
-                            </div>
-                        </div>
-                    </li>
-
-                    <hr className="sidebar-divider d-none d-md-block"/>
-
-
-                    <div className="text-center d-none d-md-inline">
-                        <button className="rounded-circle border-0" id="sidebarToggle"><img
-                            style={{width: "19px", paddingBottom: "3px"}} src={leftArrow} alt="logo"/></button>
-                    </div>
-
-                </ul>
+                {role==='ROLE_ADMIN'?<SideBarAdmin />:role==='ROLE_THERAPIST'?<SideBarTherapist />:false}
 
                 <div id="content-wrapper" className="d-flex flex-column">
 
                     <div id="content">
 
-                        <DashboardNav data={data} setUser={props.setUser}/>
+                        <DashboardNav data={userData} setUser={props.setUser}/>
 
                         <div className="container-fluid">
 
@@ -294,23 +198,23 @@ function EditUser({loading,error,...props}){
                                                               onChange={handleChange} name="experience" min={0}/>
                                             </Form.Group>
 
-                                            <div style={{gap: '10px'}}>
-                                                <Form.Label>Roles:</Form.Label>
-                                                <br/>
-                                                {data.allRoles && data.allRoles.map((role) => (
-                                                    <div key={role.id}>
-                                                        <input
-                                                            defaultValue={role.role}
-                                                            name="roles"
-                                                            type="checkbox"
-                                                            id={role.id}
-                                                            onChange={handleChange}
-                                                            defaultChecked={data.roles.some(r => r.id === role.id)}
-                                                        />
-                                                        <label htmlFor={role.id}>{role.role}</label>
-                                                    </div>
-                                                ))}
-                                            </div>
+                                            {/*<div style={{gap: '10px'}}>*/}
+                                            {/*    <Form.Label>Roles:</Form.Label>*/}
+                                            {/*    <br/>*/}
+                                            {/*    {data.allRoles && data.allRoles.map((role) => (*/}
+                                            {/*        <div key={role.id}>*/}
+                                            {/*            <input*/}
+                                            {/*                defaultValue={role.role}*/}
+                                            {/*                name="roles"*/}
+                                            {/*                type="checkbox"*/}
+                                            {/*                id={role.id}*/}
+                                            {/*                onChange={handleChange}*/}
+                                            {/*                defaultChecked={data.roles.some(r => r.id === role.id)}*/}
+                                            {/*            />*/}
+                                            {/*            <label htmlFor={role.id}>{role.role}</label>*/}
+                                            {/*        </div>*/}
+                                            {/*    ))}*/}
+                                            {/*</div>*/}
 
                                             <div className="text-left" style={{padding: '10px 0'}}>
                                                 <Link className="small" to="/forgotPassBoot">Forgot Password?</Link>

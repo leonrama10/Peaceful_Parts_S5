@@ -1,12 +1,12 @@
 import React,{useState} from 'react';
-import {fetchUserData} from '../../api/authService';
+import {fetchUserData} from '../../../api/authService';
 import {Link, useNavigate} from 'react-router-dom';
-import '../../css/sb-admin-2.min.css';
-import undraw_posting_photo from "../../img/undraw_posting_photo.svg"
-import {authenticate, authFailure, authSuccess} from "../../redux/authActions";
+import '../../../css/sb-admin-2.min.css';
+import undraw_posting_photo from "../../../img/undraw_posting_photo.svg"
+import {authenticate, authFailure, authSuccess} from "../../../redux/authActions";
 import {connect} from "react-redux";
-import SideBarTherapist from "./SideBarTherapist";
-import DashboardNav from "./DashboardNav";
+import SideBarTherapist from "../SideBars/SideBarTherapist";
+import DashboardNav from "../DashboardNav";
 
 function TherapistDashboard({loading,error,...props}){
 
@@ -391,17 +391,17 @@ function TherapistDashboard({loading,error,...props}){
                 </div>
             </div>
 
-            <script src="../../vendor/jquery/jquery.min.js"></script>
-            <script src="../../vendor/bootstrap/js/bootstrap.bundle.min.js"></script>
+            <script src="../../../vendor/jquery/jquery.min.js"></script>
+            <script src="../../../vendor/bootstrap/js/bootstrap.bundle.min.js"></script>
 
-            <script src="../../vendor/jquery-easing/jquery.easing.min.js"></script>
+            <script src="../../../vendor/jquery-easing/jquery.easing.min.js"></script>
 
-            <script src="../../js/sb-admin-2.min.js"></script>
+            <script src="../../../js/sb-admin-2.min.js"></script>
 
-            <script src="../../vendor/chart.js/Chart.min.js"></script>
+            <script src="../../../vendor/chart.js/Chart.min.js"></script>
 
-            <script src="../../js/demo/chart-area-demo.js"></script>
-            <script src="../../js/demo/chart-pie-demo.js"></script>
+            <script src="../../../js/demo/chart-area-demo.js"></script>
+            <script src="../../../js/demo/chart-pie-demo.js"></script>
 
         </main>
     )

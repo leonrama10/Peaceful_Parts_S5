@@ -1,11 +1,11 @@
 import React,{useState} from 'react';
-import {fetchUserData, fetchUserDataId, userTherapistConnection} from '../../api/authService';
+import {fetchUserData, fetchUserDataId, userTherapistConnection} from '../../../api/authService';
 import {useNavigate, useParams} from 'react-router-dom';
-import '../../css/sb-admin-2.css';
-import DashboardNav from "./DashboardNav";
-import {authenticate, authFailure, authSuccess} from "../../redux/authActions";
+import '../../../css/sb-admin-2.css';
+import DashboardNav from "../DashboardNav";
+import {authenticate, authFailure, authSuccess} from "../../../redux/authActions";
 import {connect} from "react-redux";
-import SideBarUser from "./SideBarUser";
+import SideBarUser from "../SideBars/SideBarUser";
 import {Alert} from "reactstrap";
 
 function TherapistCardInfo({loading,error,...props}){
@@ -194,17 +194,17 @@ function TherapistCardInfo({loading,error,...props}){
             {/*    </div>*/}
             {/*</div>*/}
 
-            <script src="../../vendor/jquery/jquery.min.js"></script>
-            <script src="../../vendor/bootstrap/js/bootstrap.bundle.min.js"></script>
+            <script src="../../../vendor/jquery/jquery.min.js"></script>
+            <script src="../../../vendor/bootstrap/js/bootstrap.bundle.min.js"></script>
 
-            <script src="../../vendor/jquery-easing/jquery.easing.min.js"></script>
+            <script src="../../../vendor/jquery-easing/jquery.easing.min.js"></script>
 
-            <script src="../../js/sb-admin-2.min.js"></script>
+            <script src="../../../js/sb-admin-2.min.js"></script>
 
-            <script src="../../vendor/chart.js/Chart.min.js"></script>
+            <script src="../../../vendor/chart.js/Chart.min.js"></script>
 
-            <script src="../../js/demo/chart-area-demo.js"></script>
-            <script src="../../js/demo/chart-pie-demo.js"></script>
+            <script src="../../../js/demo/chart-area-demo.js"></script>
+            <script src="../../../js/demo/chart-pie-demo.js"></script>
 
         </main>
     )
