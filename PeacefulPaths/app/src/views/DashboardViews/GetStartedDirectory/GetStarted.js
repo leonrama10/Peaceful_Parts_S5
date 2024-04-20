@@ -2,53 +2,209 @@ import React,{useState} from 'react';
 import {useNavigate} from 'react-router-dom';
 import '../../../css/sb-admin-2.min.css';
 import Questionnaire from "./Questionnaire";
-import ScoreView from "./ScoreView";
+import RegisterBoot from "../RegisterBoot";
 import "../../../css/QuestionnaireForm.css";
 export default function GetStarted({loading,error,...props}){
 
     const history = useNavigate ();
 
     const questions = [
+//        {
+//            question: "Total number of oceans in the World is",
+//            answers: [{ text: "7" }, { text: "6" }, { text: "5", isCorrect: true }],
+//        },
         {
-            question: "Total number of oceans in the World is",
-            answers: [{ text: "7" }, { text: "6" }, { text: "5", isCorrect: true }],
-        },
-        {
-            question: "Who is CEO of Tesla?",
+            question: "What type of therapy are you looking for?",
             answers: [
-                { text: "Jeff Bezos" },
-                { text: "Elon Musk", isCorrect: true },
-                { text: "Bill Gates" },
-                { text: "Tony Stark" },
+                { text: "Individual (for myself)" },
+                { text: "Couples (for myself and my partner)", isCorrect: true },
+                { text: "Teen (for my child)" },
+//                { text: "" },
             ],
+            answerMethod: "button"  // kjo na tregon se jena tu e ba me button jo me drop down
         },
         {
-            question: "Where is Statue of Liberty is located?",
+            question: "What is your gender identity?",
             answers: [
-                { text: "India" },
-                { text: "Russia" },
-                { text: "UK" },
-                { text: "USA", isCorrect: true },
+                { text: "Women" },
+//                { text: "" },
+//                { text: "" },
+                { text: "Man", isCorrect: true },
             ],
+            answerMethod: "button"
         },
         {
-            question: "What is the capital of Germany?",
-            answers: [
-                { text: "Paris" },
-                { text: "Berlin", isCorrect: true },
-                { text: "London" },
-                { text: "Dublin" },
-            ],
+           question: "Select your age?",
+           answers: [
+                { text: "18", isCorrect: true },
+                { text: "19" },{ text: "20" },{ text: "21" },
+                { text: "22" },{ text: "23" }, { text: "24" },
+                { text: "25" },{ text: "26" },{ text: "27" },
+                { text: "28" },{ text: "29" },{ text: "30" },
+                { text: "31" },{ text: "32" },{ text: "33" },
+                { text: "34" },{ text: "35" },{ text: "36" },
+                { text: "37" },{ text: "38" },{ text: "39" },
+                { text: "40" },{ text: "41" },{ text: "42" },
+                { text: "43" },{ text: "44" },{ text: "45" },
+                { text: "46" },{ text: "47" },{ text: "48" },
+                { text: "49" },{ text: "50" },{ text: "51" },
+                { text: "52" },{ text: "53" },{ text: "54" },
+                { text: "55" },{ text: "56" },{ text: "57" },
+                { text: "58" },{ text: "59" },{ text: "60" },
+                { text: "61" },{ text: "62" },{ text: "63" },
+                { text: "64" },{ text: "65" },{ text: "66" },
+                { text: "67" },{ text: "68" },{ text: "69" },
+                { text: "70" },{ text: "71" },{ text: "72" },
+                { text: "73" },{ text: "74" }, { text: "75" },
+                { text: "76" },{ text: "77" },{ text: "78" },
+                { text: "79" },{ text: "80" },{ text: "81" },
+                { text: "82" },{ text: "83" },{ text: "84" },
+                { text: "85" },{ text: "86" },{ text: "87" },
+                { text: "88" },{ text: "89" },{ text: "90" },
+                { text: "91" },{ text: "92" },{ text: "93" },
+                { text: "94" },{ text: "95" },{ text: "96" },
+                { text: "97" },{ text: "98" },{ text: "99" },
+
+
+             ],
+             answerMethod: "dropdown"
         },
         {
-            question: "Which one is the largest tropical rain forest in the world?",
+            question: "How do you identify?",
             answers: [
-                { text: "Amazon", isCorrect: true },
-                { text: "Bosawas" },
-                { text: "Southeast Asian Rain Forest" },
-                { text: "Daintree Rain Forest" },
+                { text: "Straight" },
+                { text: "Gay", isCorrect: true },
+                { text: "Lesbian" },
+                { text: "Prefer not to say" },
             ],
+            answerMethod: "button"
         },
+        {
+            question: "What is your relationship status?",
+            answers: [
+                { text: "Single", isCorrect: true },
+                { text: "In a relationship" },
+                { text: "Married" },
+                { text: "Divorced" },
+            ],
+            answerMethod: "button"
+        },
+        {
+            question: "Have you ever been in therapy before?",
+            answers: [
+                { text: "No", isCorrect: true },
+                { text: "Yes" },
+//              { text: "" },
+//              { text: "" },
+            ],
+            answerMethod: "button"
+        },
+         {
+                    question: "Are you currently taking any medication?",
+                    answers: [
+                        { text: "No" },
+                        { text: "Yes", isCorrect: true },
+//                        { text: "" },
+//                        { text: "" },
+                    ],
+                    answerMethod: "button"
+                },
+           {
+              question: "How do you prefer to communicate with your therapist?",
+              answers: [
+                { text: "Mostly via messaging" },
+                { text: "Mostly via phone", isCorrect: true },
+                { text: "video sessions" },
+                { text: "Not sure yet (decide later)" },
+               ],
+               answerMethod: "button"
+           },
+                 {
+                    question: "Are there any specific preferences for your therapist?",
+                    answers: [
+                       { text: "Male therapist", isCorrect: true },
+                       { text: "Female therapist" },
+//                     { text: "" },
+//                     { text: "" },
+                     ],
+                     answerMethod: "button"
+                  },
+                 {
+                    question: "What are your expectations from your therapist? A therapist who...?",
+                    answers: [
+                        { text: "Listens", isCorrect: true },
+                        { text: "Explores my past" },
+                        { text: "Teaches me new skills" },
+                         { text: "I don't now" },
+                      ],
+                      answerMethod: "button"
+                  },
+                  {
+                      question: "How would you rate your current physical health?",
+                      answers: [
+                         { text: "Good", isCorrect: true },
+                         { text: "Fair" },
+                         { text: "Poor" },
+//                       { text: "" },
+                      ],
+                      answerMethod: "button"
+                   },
+                 {
+                   question: "Little interest or pleasure in doing things.",
+                   answers: [
+                      { text: "Not at all", isCorrect: true },
+                      { text: "Several days" },
+                      { text: "More than half the days" },
+                      { text: "Nearly every day" },
+                   ],
+                   answerMethod: "button"
+                 },
+            {
+               question: "Feeling down, depressed or hopeless.",
+               answers: [
+                  { text: "Not at all" },
+                  { text: "Several days", isCorrect: true },
+                  { text: "More than half the days" },
+                  { text: "Nearly every day" },
+             ],
+             answerMethod:  "button"
+           },
+           {
+                question: "Thoughts that you would be better off dead or of hurting yourself in some way.",
+                answers: [
+                   { text: "Not at all" },
+                   { text: "Several days", isCorrect: true },
+                   { text: "More than half the days" },
+                   { text: "Nearly every day" },
+               ],
+               answerMethod: "button"
+           },
+           {
+               question: "Which country are you in?",
+               answers: [
+                   { text: "Albania", isCorrect: true },
+                   { text: "Andorra" },
+                   { text: "Argentina" },
+                   { text: "Belgium" },
+                   { text: "Brazil" },
+                   { text: "Bulgaria" },
+                   { text: "Canada" },
+                   { text: "China" },
+                   { text: "Denmark" },
+                   { text: "Germany" },
+                ],
+                       answerMethod: "dropdown"
+            },
+            {
+                question: "What is your preferred language?",
+                answers: [
+                     { text: "Albanian" },
+                     { text: "English", isCorrect: true },
+                     { text: "French" },
+                     { text: "German" },
+                 ],
+                     answerMethod: "dropdown"
+            },
     ];
 
     const [currentQuestion, setCurrentQuestion] = useState(0);
@@ -74,13 +230,14 @@ export default function GetStarted({loading,error,...props}){
 
     return (
         <main className="bg-gradient-primary">
+        <p className="main-p">.</p>
             <div className="container">
                 <div className="card o-hidden border-0 shadow-lg my-5">
                     <div className="card-body p-0">
                         <div className="row">
                             <div className="QuestionnaireForm">
                                 {isQuizOver ? (
-                                    <ScoreView handleResetClick={handleResetClick} score={score}/>
+                                    <RegisterBoot handleResetClick={handleResetClick} score={score}/>
                                 ) : (
                                     <Questionnaire
                                         questions={questions}

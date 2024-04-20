@@ -5,3 +5,15 @@
 /*    font-weight: lighter;*/
 /*    align-items: center;*/
 /*}*/
+
+button{
+border-radius: 15px;
+background-color: white;
+color: black;
+}
+
+button:hover{
+background-color: #2e4057;
+color: White;
+transition: 3ms;
+}
