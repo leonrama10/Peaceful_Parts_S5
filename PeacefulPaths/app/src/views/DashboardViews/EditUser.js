@@ -5,12 +5,13 @@ import {Container, Row, Col, Form, Button} from 'react-bootstrap';
 import {authenticate, authFailure, authSuccess} from "../../redux/authActions";
 import '../../css/sb-admin-2.min.css';
 import {Alert} from "reactstrap";
-import {loadState} from "../../helper/sessionStorage";
+import {loadState, saveState} from "../../helper/sessionStorage";
 import {connect} from "react-redux";
 import DashboardNav from "./DashboardNav";
 import SideBarAdmin from "./SideBars/SideBarAdmin";
 import SideBarTherapist from "./SideBars/SideBarTherapist";
-const role = loadState("role",'');
+let role;
+let userRole ;
 function EditUser({loading,error,...props}){
 
     const { id } = useParams();
@@ -28,7 +29,8 @@ function EditUser({loading,error,...props}){
         roles:[],
         number:'',
         experience:0,
-        location:'',
+        location:{},
+        gender:{},
         allRoles:[]
     });
 
@@ -36,6 +38,7 @@ function EditUser({loading,error,...props}){
         fetchUserData().then((response)=>{
             if (response.data.roles.at(0).role === 'ROLE_ADMIN' || response.data.roles.at(0).role === 'ROLE_THERAPIST'){
                 setUserData(response.data);
+                role = loadState("role",'');
             }
             else{
                 history('/loginBoot');
@@ -59,8 +62,11 @@ function EditUser({loading,error,...props}){
                     number:response.data.number,
                     experience:response.data.experience,
                     location:response.data.location,
+                    gender:response.data.gender,
                     allRoles: response.data.allRoles
                 })
+            userRole = loadState("userRole",'')
+            saveState("userRole",response.data.roles.at(0).role);
         }).catch((e)=>{
             localStorage.clear();
             history('/loginBoot');
@@ -103,33 +109,18 @@ function EditUser({loading,error,...props}){
                 console.log("ERROR: ",err)
                 props.loginFailure('Something NaNAAAAA!Please Try Again');
             }
-
         });
     };
 
     const handleChange = (e) => {
-        e.persist();
-        if (e.target.type === 'checkbox') {
-            const roleObject = data.allRoles.find(role => role.role === e.target.value);
-            if (e.target.checked) {
-                // If the checkbox is checked, add the role to the array
-                setValues(values => ({
-                    ...values,
-                    roles: [...values.roles, roleObject]
-                }));
-            } else {
-                // If the checkbox is unchecked, remove the role from the array
-                setValues(values => ({
-                    ...values,
-                    roles: values.roles.filter(role => role.role !== roleObject.role)
-                }));
-            }
-        } else {
-            setValues(values => ({
-                ...values,
-                [e.target.name]: e.target.name === 'experience' ? Number(e.target.value) : e.target.value
-            }));
-        }
+        const { name, value } = e.target;
+        setValues(values => ({
+            ...values,
+            [name]: name === 'experience' ? Number(value) :
+                name === 'gender' ? { id: Number(value.split('-')[0]), gender: value.split('-')[1] } :
+                    name === 'location' ? { id: Number(value.split('-')[0]), location: value.split('-')[1] } :
+                        value
+        }));
     };
 
 
@@ -180,6 +171,15 @@ function EditUser({loading,error,...props}){
                                                               onChange={handleChange} required/>
                                             </Form.Group>
 
+                                            <Form.Group controlId="formBasicGender">
+                                                <Form.Label>Gender</Form.Label>
+                                                <Form.Select name="gender" value={values.gender ? `${values.gender.id}-${values.gender.gender}` : ''} onChange={handleChange} required>
+                                                    {/*<option value="">Select Gender</option>*/}
+                                                    <option value="1-M">Male</option>
+                                                    <option value="2-F">Female</option>
+                                                </Form.Select>
+                                            </Form.Group>
+
                                             <Form.Group controlId="formBasicPhone">
                                                 <Form.Label>Phone</Form.Label>
                                                 <Form.Control type="tel" defaultValue={data.number}
@@ -188,33 +188,19 @@ function EditUser({loading,error,...props}){
 
                                             <Form.Group controlId="formBasicAddress">
                                                 <Form.Label>Location</Form.Label>
-                                                <Form.Control type="text" defaultValue={data.location}
-                                                              onChange={handleChange} name="location"/>
+                                                <Form.Select name="location" value={values.location ? `${values.location.id}-${values.location.location}` : ''} onChange={handleChange} required>
+                                                    {/*<option value="">Select Location</option>*/}
+                                                    <option value="1-Zllakuqan">Zllakuqan</option>
+                                                    <option value="2-Los Angeles">Los Angeles</option>
+                                                    <option value="3-Chicago">Chicago</option>
+                                                </Form.Select>
                                             </Form.Group>
 
-                                            <Form.Group controlId="formBasicExperience">
+                                            {userRole!=='ROLE_USER' && <Form.Group controlId="formBasicExperience">
                                                 <Form.Label>Experience</Form.Label>
                                                 <Form.Control type="number" defaultValue={data.experience}
                                                               onChange={handleChange} name="experience" min={0}/>
-                                            </Form.Group>
-
-                                            {/*<div style={{gap: '10px'}}>*/}
-                                            {/*    <Form.Label>Roles:</Form.Label>*/}
-                                            {/*    <br/>*/}
-                                            {/*    {data.allRoles && data.allRoles.map((role) => (*/}
-                                            {/*        <div key={role.id}>*/}
-                                            {/*            <input*/}
-                                            {/*                defaultValue={role.role}*/}
-                                            {/*                name="roles"*/}
-                                            {/*                type="checkbox"*/}
-                                            {/*                id={role.id}*/}
-                                            {/*                onChange={handleChange}*/}
-                                            {/*                defaultChecked={data.roles.some(r => r.id === role.id)}*/}
-                                            {/*            />*/}
-                                            {/*            <label htmlFor={role.id}>{role.role}</label>*/}
-                                            {/*        </div>*/}
-                                            {/*    ))}*/}
-                                            {/*</div>*/}
+                                            </Form.Group>}
 
                                             <div className="text-left" style={{padding: '10px 0'}}>
                                                 <Link className="small" to="/forgotPassBoot">Forgot Password?</Link>

@@ -1,12 +1,244 @@
 import React, {useState} from 'react';
-import { Link } from 'react-router-dom';
+import {Link} from 'react-router-dom';
 import {Collapse} from "react-bootstrap";
 import arrow from "../../../img/arrow.png";
-import leftArrow from "../../../img/leftArrow.png";
+import {
+    therapistFilterByExperience, therapistFilterByExperienceNotConnected,
+    therapistFilterByGender, therapistFilterByGenderNotConnected,
+    therapistFilterByLocation, therapistFilterByLocationNotConnected
+} from "../../../api/authService";
+import {authenticate, authFailure, authSuccess} from "../../../redux/authActions";
+import {connect} from "react-redux";
+import {loadState} from "../../../helper/sessionStorage";
+let connected = loadState("connected",false);
+let therapistId = 0;
+function SideBarUser({loading,error,...props}){
 
-export default function SideBarUser(){
+    const [openManaging, setOpenManaging] = useState(false);
+    const [openFilter, setOpenFilter] = useState(false);
+    const [openGenderFilter, setOpenGenderFilter] = useState(false);
+    const [openExperienceFilter, setOpenExperienceFilter] = useState(false);
+    const [openLocationFilter, setOpenLocationFilter] = useState(false);
 
-    const [open, setOpen] = useState(false);
+    React.useEffect(() => {
+        connected = loadState("connected",false)
+        therapistId = loadState("therapistId",0)
+    }, []);
+
+    function handleFilterByGender (gender){
+        connected = loadState("connected",false)
+        therapistId = loadState("therapistId",0)
+        const newFilterData = {
+            therapistId: therapistId,
+            gender: gender
+        };
+        if (!connected){
+            therapistFilterByGender(gender).then((response)=>{
+                if(response.status===200){
+                    props.setAllUsers(response.data)
+                    props.setHideTherapists(true);
+                }
+                else{
+                    props.loginFailure('Something LEKAAAAAAA!Please Try Again');
+                }
+
+            }).catch((err)=>{
+
+                if(err && err.response){
+
+                    switch(err.response.status){
+                        case 401:
+                            console.log("401 status");
+                            props.loginFailure("Authentication Failed.Bad Credentials");
+                            break;
+                        default:
+                            props.loginFailure('Something BABAAAAAA!Please Try Again');
+
+                    }
+
+                }
+                else{
+                    console.log("ERROR: ",err)
+                    props.loginFailure('Something NaNAAAAA!Please Try Again');
+                }
+
+            });
+        }else {
+            therapistFilterByGenderNotConnected(newFilterData).then((response)=>{
+                if(response.status===200){
+                    props.setAllUsers(response.data)
+                    props.setHideTherapists(true);
+                }
+                else{
+                    props.loginFailure('Something LEKAAAAAAA!Please Try Again');
+                }
+
+            }).catch((err)=>{
+
+                if(err && err.response){
+
+                    switch(err.response.status){
+                        case 401:
+                            console.log("401 status");
+                            props.loginFailure("Authentication Failed.Bad Credentials");
+                            break;
+                        default:
+                            props.loginFailure('Something BABAAAAAA!Please Try Again');
+
+                    }
+
+                }
+                else{
+                    console.log("ERROR: ",err)
+                    props.loginFailure('Something NaNAAAAA!Please Try Again');
+                }
+
+            });
+        }
+    }
+
+    function handleFilterByExperience (experience){
+        connected = loadState("connected",false)
+        therapistId = loadState("therapistId",0)
+        const newFilterData = {
+            therapistId: therapistId,
+            experience: experience
+        };
+        if (!connected){
+            therapistFilterByExperience(experience).then((response)=>{
+                if(response.status===200){
+                    props.setAllUsers(response.data)
+                    props.setHideTherapists(true);
+                }
+                else{
+                    props.loginFailure('Something LEKAAAAAAA!Please Try Again');
+                }
+
+            }).catch((err)=>{
+
+                if(err && err.response){
+
+                    switch(err.response.status){
+                        case 401:
+                            console.log("401 status");
+                            props.loginFailure("Authentication Failed.Bad Credentials");
+                            break;
+                        default:
+                            props.loginFailure('Something BABAAAAAA!Please Try Again');
+                    }
+                }
+                else{
+                    console.log("ERROR: ",err)
+                    props.loginFailure('Something NaNAAAAA!Please Try Again');
+                }
+            });
+        }else {
+            therapistFilterByExperienceNotConnected(newFilterData).then((response)=>{
+                if(response.status===200){
+                    props.setAllUsers(response.data)
+                    props.setHideTherapists(true);
+                }
+                else{
+                    props.loginFailure('Something LEKAAAAAAA!Please Try Again');
+                }
+
+            }).catch((err)=>{
+
+                if(err && err.response){
+
+                    switch(err.response.status){
+                        case 401:
+                            console.log("401 status");
+                            props.loginFailure("Authentication Failed.Bad Credentials");
+                            break;
+                        default:
+                            props.loginFailure('Something BABAAAAAA!Please Try Again');
+
+                    }
+
+                }
+                else{
+                    console.log("ERROR: ",err)
+                    props.loginFailure('Something NaNAAAAA!Please Try Again');
+                }
+
+            });
+        }
+
+    }
+
+
+    function handleFilterByLocation (location){
+        connected = loadState("connected",false)
+        therapistId = loadState("therapistId",0)
+        const newFilterData = {
+            therapistId: therapistId,
+            location: location
+        };
+        if (!connected){
+            therapistFilterByLocation(location).then((response)=>{
+                if(response.status===200){
+                    props.setAllUsers(response.data)
+                    props.setHideTherapists(true);
+                }
+                else{
+                    props.loginFailure('Something LEKAAAAAAA!Please Try Again');
+                }
+
+            }).catch((err)=>{
+
+                if(err && err.response){
+
+                    switch(err.response.status){
+                        case 401:
+                            console.log("401 status");
+                            props.loginFailure("Authentication Failed.Bad Credentials");
+                            break;
+                        default:
+                            props.loginFailure('Something BABAAAAAA!Please Try Again');
+
+                    }
+
+                }
+                else{
+                    console.log("ERROR: ",err)
+                    props.loginFailure('Something NaNAAAAA!Please Try Again');
+                }
+
+            });
+        }else {
+            therapistFilterByLocationNotConnected(newFilterData).then((response)=>{
+                if(response.status===200){
+                    props.setAllUsers(response.data)
+                    props.setHideTherapists(true);
+                }
+                else{
+                    props.loginFailure('Something LEKAAAAAAA!Please Try Again');
+                }
+
+            }).catch((err)=>{
+
+                if(err && err.response){
+
+                    switch(err.response.status){
+                        case 401:
+                            console.log("401 status");
+                            props.loginFailure("Authentication Failed.Bad Credentials");
+                            break;
+                        default:
+                            props.loginFailure('Something BABAAAAAA!Please Try Again');
+
+                    }
+
+                }
+                else{
+                    console.log("ERROR: ",err)
+                    props.loginFailure('Something NaNAAAAA!Please Try Again');
+                }
+
+            });
+        }
+    }
 
     return (
 
@@ -42,11 +274,11 @@ export default function SideBarUser(){
                     fontSize: "13px",
                     marginLeft: "20px",
                     fontWeight: "550"
-                }} onClick={() => setOpen(!open)} aria-controls="collapse-text" aria-expanded={open}>
+                }} onClick={() => setOpenManaging(!openManaging)} aria-controls="collapse-text" aria-expanded={openManaging}>
                     <span>Managing</span>
-                    <img style={{marginLeft: "99px", width: "15px"}} src={arrow} alt="arrow"/>
+                    <img style={{marginLeft: "115px", width: "15px"}} src={arrow} alt="arrow"/>
                 </a>
-                <Collapse in={open}>
+                <Collapse in={openManaging}>
                     <div id="collapse-text">
                         <div className="bg-white py-2 collapse-inner rounded">
                             <h6 className="collapse-header">Custom Components:</h6>
@@ -57,26 +289,58 @@ export default function SideBarUser(){
                 </Collapse>
             </li>
 
-            <li className="nav-item" style={{marginTop: "10px", marginBottom: "14px"}}>
+            {!props.hideFilterMenu && <li className="nav-item" style={{marginTop: "10px", marginBottom: "14px"}}>
                 <a style={{
                     textDecoration: "none",
                     color: "white",
                     fontSize: "13px",
                     marginLeft: "20px",
                     fontWeight: "550"
-                }} href="#" data-toggle="collapse" data-target="#collapseUtilities"
-                   aria-expanded="true" aria-controls="collapseUtilities">
-                    <span>Utilities</span>
-                    <img style={{marginLeft: "132px", width: "15px"}} src={arrow} alt="arrow"/>
+                }} onClick={() => setOpenFilter(!openFilter)} aria-controls="collapseUtilities" aria-expanded={openFilter}>
+                    <span>Filter Menu:</span>
+                    <img style={{marginLeft: "104px", width: "15px"}} src={arrow} alt="arrow"/>
                 </a>
-                <div id="collapseUtilities" className="collapse" aria-labelledby="headingUtilities"
-                     data-parent="#accordionSidebar">
-                    <div className="bg-white py-2 collapse-inner rounded">
-                        <h6 className="collapse-header">Custom Utilities:</h6>
-
+                <Collapse in={openFilter}>
+                    <div id="collapse-text">
+                        <div className="bg-white py-2 collapse-inner rounded">
+                            <h6 className="collapse-header">Filter Menu:</h6>
+                            <button className="collapse-item" onClick={() => setOpenGenderFilter(!openGenderFilter)}>Filter By Gender</button>
+                            <Collapse in={openGenderFilter}>
+                                <div>
+                                    <button onClick={() => handleFilterByGender('M')}>Male</button>
+                                    <button onClick={() => handleFilterByGender('F')}>Female</button>
+                                </div>
+                            </Collapse>
+                            <button className="collapse-item" onClick={() => setOpenExperienceFilter(!openExperienceFilter)}>Filter By Experience</button>
+                            <Collapse in={openExperienceFilter}>
+                                <div>
+                                    <select onChange={(event) => handleFilterByExperience(event.target.value)}>
+                                        <option value="">Select Number</option>
+                                        {[...Array(50).keys()].map((value, index) =>
+                                            <option key={index} value={value + 1}>{value + 1}</option>
+                                        )}
+                                    </select>
+                                </div>
+                            </Collapse>
+                            <button className="collapse-item"
+                                    onClick={() => setOpenLocationFilter(!openLocationFilter)}>Filter By Location
+                            </button>
+                            <Collapse in={openLocationFilter}>
+                                <div>
+                                    <select onChange={(event) => handleFilterByLocation(event.target.value)}>
+                                        <option value="">Select Location</option>
+                                        <option value="Zllakuqan">Zllakuqan</option>
+                                        <option value="Los Angeles">Los Angeles</option>
+                                        <option value="Chicago">Chicago</option>
+                                        {/* Add more locations as needed */}
+                                    </select>
+                                </div>
+                            </Collapse>
+                            {/*<button className="collapse-item">Filter By Language</button>*/}
+                        </div>
                     </div>
-                </div>
-            </li>
+                </Collapse>
+            </li>}
 
             <hr className="sidebar-divider"/>
 
@@ -84,38 +348,53 @@ export default function SideBarUser(){
                 Addons
             </div>
 
-            <li className="nav-item" style={{marginTop: "10px", marginBottom: "20px"}}>
-                <a style={{
-                    textDecoration: "none",
-                    color: "white",
-                    fontSize: "13px",
-                    marginLeft: "20px",
-                    fontWeight: "550"
-                }} href="#" data-toggle="collapse" data-target="#collapsePages"
-                   aria-expanded="true" aria-controls="collapsePages">
-                    <span>Pages</span>
-                    <img style={{marginLeft: "139px", width: "15px"}} src={arrow} alt="arrow"/>
-                </a>
-                <div id="collapsePages" className="collapse" aria-labelledby="headingPages"
-                     data-parent="#accordionSidebar">
-                    <div className="bg-white py-2 collapse-inner rounded">
-                        <h6 className="collapse-header">Login Screens:</h6>
+           {/* <li className="nav-item" style={{marginTop: "10px", marginBottom: "20px"}}>*/}
+           {/*     <a style={{*/}
+           {/*         textDecoration: "none",*/}
+           {/*         color: "white",*/}
+           {/*         fontSize: "13px",*/}
+           {/*         marginLeft: "20px",*/}
+           {/*         fontWeight: "550"*/}
+           {/*     }} href="#" data-toggle="collapse" data-target="#collapsePages"*/}
+           {/*aria-expanded="true" aria-controls="collapsePages">*/}
+           {/* <span>Pages</span>*/}
+           {/* <img style={{marginLeft: "139px", width: "15px"}} src={arrow} alt="arrow"/>*/}
+           {/*     </a>*/}
+           {/*     <div id="collapsePages" className="collapse" aria-labelledby="headingPages"*/}
+           {/*          data-parent="#accordionSidebar">*/}
+           {/*         <div className="bg-white py-2 collapse-inner rounded">*/}
+           {/*             <h6 className="collapse-header">Login Screens:</h6>*/}
 
-                        <div className="collapse-divider"></div>
-                        <h6 className="collapse-header">Other Pages:</h6>
+           {/*             <div className="collapse-divider"></div>*/}
+           {/*             <h6 className="collapse-header">Other Pages:</h6>*/}
 
-                    </div>
-                </div>
-            </li>
+           {/*         </div>*/}
+           {/*     </div>*/}
+           {/* </li>*/}
 
             <hr className="sidebar-divider d-none d-md-block"/>
 
-
-            <div className="text-center d-none d-md-inline">
-                <button className="rounded-circle border-0" id="sidebarToggle"><img
-                    style={{width: "19px", paddingBottom: "3px"}} src={leftArrow} alt="logo"/></button>
-            </div>
+            {/*<div className="text-center d-none d-md-inline">*/}
+            {/*    <button className="rounded-circle border-0" id="sidebarToggle"><img*/}
+            {/*        style={{width: "19px", paddingBottom: "3px"}} src={leftArrow} alt="logo"/></button>*/}
+            {/*</div>*/}
 
         </ul>
     )
 }
+
+const mapStateToProps = ({auth}) => {
+    console.log("state ", auth)
+    return {
+        loading: auth.loading,
+        error: auth.error
+    }
+}
+const mapDispatchToProps = (dispatch) => {
+    return {
+        authenticate: () => dispatch(authenticate()),
+        setUser: (data) => dispatch(authSuccess(data)),
+        loginFailure: (message) => dispatch(authFailure(message))
+    }
+}
+export default connect(mapStateToProps, mapDispatchToProps)(SideBarUser);

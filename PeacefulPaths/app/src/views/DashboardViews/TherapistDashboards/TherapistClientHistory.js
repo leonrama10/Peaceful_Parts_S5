@@ -1,16 +1,20 @@
 import React,{useState} from 'react';
-import {fetchAllAdminData, fetchUserData, userDelete} from '../../../api/authService';
+import {
+    fetchAllUserData,
+    fetchAllUsersConnectedData,
+    fetchAllUsersConnectedDataHistory,
+    fetchUserData,
+    userDelete
+} from '../../../api/authService';
 import {useNavigate} from 'react-router-dom';
 import '../../../css/sb-admin-2.css';
 import '../../../css/myCss.css';
 import DataTable from 'datatables.net-dt';
 import $ from 'jquery';
 import DashboardNav from "../DashboardNav";
-import SideBarAdmin from "../SideBars/SideBarAdmin";
-import {authenticate, authFailure, authSuccess} from "../../../redux/authActions";
-import {connect} from "react-redux";
+import SideBarTherapist from "../SideBars/SideBarTherapist";
 
-function AdminDashboardAdmin({loading,error,...props}){
+export default function TherapistClientHistory({loading,error,...props}){
 
     const history = useNavigate ();
     const [data,setData]=useState({});
@@ -18,28 +22,22 @@ function AdminDashboardAdmin({loading,error,...props}){
 
     React.useEffect(()=>{
         fetchUserData().then((response)=>{
-            if (response.data.roles.at(0).role === 'ROLE_ADMIN'){
+            if (response.data.roles.at(0).role === 'ROLE_THERAPIST'){
                 setData(response.data);
+
+                fetchAllUsersConnectedDataHistory(response.data.id).then((response)=>{
+                    setAllUsers(response.data)
+                }).catch((e)=>{
+                    history('/loginBoot');
+                })
             }
             else{
-                console.log("AAAAAAAAAAAAAAAAAAAAA ", response.data.roles.at(0).role)
                 history('/loginBoot');
             }
         }).catch((e)=>{
-            console.log("BBBBBBBBBBBBBBBBBBBBBBBBBB")
             history('/loginBoot');
         })
     },[])
-
-    React.useEffect(()=>{
-        fetchAllAdminData().then((response)=>{
-            setAllUsers(response.data)
-        }).catch((e)=>{
-            history('/loginBoot');
-        })
-    },[])
-
-
 
     React.useEffect(() => {
         if (allUsers.length > 0) {
@@ -50,30 +48,13 @@ function AdminDashboardAdmin({loading,error,...props}){
         }
     }, [allUsers]);
 
-    function handleDelete(id) {
-        userDelete(id).then((response)=>{
-            if(response.status===200){
-                window.location.reload();
-            }
-            else{
-                //Add error on page if user cant be deleted
-                history('/loginBoot');
-            }
-        }).catch((err)=>{
-            history('/loginBoot');
-        });
-    }
-
-    const handleEdit = (id) => {
-        history(`/dashboard/adminDashboard/users/edit/${id}`);
-    };
 
     return (
         <main id="page-top">
 
             <div id="wrapper">
 
-                <SideBarAdmin />
+                <SideBarTherapist />
 
                 <div id="content-wrapper" className="d-flex flex-column">
 
@@ -98,8 +79,6 @@ function AdminDashboardAdmin({loading,error,...props}){
                                                 <th>Number</th>
                                                 <th>Gender</th>
                                                 <th>Location</th>
-                                                <th>Experience</th>
-                                                <th>Actions</th>
                                             </tr>
                                             </thead>
                                             <tfoot>
@@ -109,8 +88,6 @@ function AdminDashboardAdmin({loading,error,...props}){
                                                 <th>Number</th>
                                                 <th>Gender</th>
                                                 <th>Location</th>
-                                                <th>Experience</th>
-                                                <th>Actions</th>
                                             </tr>
                                             </tfoot>
                                             <tbody>
@@ -121,19 +98,6 @@ function AdminDashboardAdmin({loading,error,...props}){
                                                     <td>{tempEmployee.number}</td>
                                                     <td>{tempEmployee.gender.gender}</td>
                                                     <td>{tempEmployee.location.location}</td>
-                                                    <td>{tempEmployee.experience}</td>
-                                                    <td>
-                                                        <button className="btn btn-info btn-sm"
-                                                                onClick={() => handleEdit(tempEmployee.id)}>
-                                                            Edit
-                                                        </button>
-
-                                                        <button style={{marginLeft: "5px"}}
-                                                                className="btn btn-danger btn-sm"
-                                                                onClick={() => handleDelete(tempEmployee.id)}>
-                                                            Delete
-                                                        </button>
-                                                    </td>
                                                 </tr>
                                             ))}
                                             </tbody>
@@ -162,6 +126,30 @@ function AdminDashboardAdmin({loading,error,...props}){
                 <i className="fas fa-angle-up"></i>
             </a>
 
+
+            <div className="modal fade" id="logoutModal" tabIndex="-1" role="dialog"
+                 aria-labelledby="exampleModalLabel"
+                 aria-hidden="true">
+                <div className="modal-dialog" role="document">
+                    <div className="modal-content">
+                        <div className="modal-header">
+                            <h5 className="modal-title" id="exampleModalLabel">Ready to Leave?</h5>
+                            <button className="close" type="button" data-dismiss="modal" aria-label="Close">
+                                <span aria-hidden="true">×</span>
+                            </button>
+                        </div>
+                        <div className="modal-body">Select "Logout" below if you are ready to end your current
+                            session.
+                        </div>
+                        <div className="modal-footer">
+                            <button className="btn btn-secondary" type="button" data-dismiss="modal">Cancel
+                            </button>
+                            <a className="btn btn-primary" href="login.html">Logout</a>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
             <script src="../../../vendor/jquery/jquery.min.js"></script>
             <script src="../../../vendor/bootstrap/js/bootstrap.bundle.min.js"></script>
             <script src="../../../vendor/jquery-easing/jquery.easing.min.js"></script>
@@ -170,18 +158,3 @@ function AdminDashboardAdmin({loading,error,...props}){
     )
 
 }
-const mapStateToProps = ({auth}) => {
-    console.log("state ", auth)
-    return {
-        loading: auth.loading,
-        error: auth.error
-    }
-}
-const mapDispatchToProps = (dispatch) => {
-    return {
-        authenticate: () => dispatch(authenticate()),
-        setUser: (data) => dispatch(authSuccess(data)),
-        loginFailure: (message) => dispatch(authFailure(message))
-    }
-}
-export default connect(mapStateToProps, mapDispatchToProps)(AdminDashboardAdmin);

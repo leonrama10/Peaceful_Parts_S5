@@ -20,9 +20,10 @@ import ErrorPage from "./DashboardViews/ErrorPage";
 import EditUser from "./DashboardViews/EditUser";
 import { useLocation } from 'react-router-dom';
 import UserDashboard from "./DashboardViews/UserDashboards/UserDashboard";
-import TherapistCardInfo from "./DashboardViews/TherapistDashboards/TherapistCardInfo";
+import TherapistCardInfo from "./DashboardViews/UserDashboards/TherapistCardInfo";
 import UserDashboardTherapists from "./DashboardViews/UserDashboards/UserDashboardTherapists";
 import GetStarted from "./DashboardViews/GetStartedDirectory/GetStarted";
+import TherapistClientHistory from "./DashboardViews/TherapistDashboards/TherapistClientHistory";
 
 function Main() {
     const location = useLocation();
@@ -51,6 +52,7 @@ function Main() {
                 <Route path="/dashboard/therapistDashboard/users/edit/:id" element={<EditUser />}/>
                 <Route path="/dashboard/therapistDashboard" element={<TherapistDashboard />}/>
                 <Route path="/dashboard/therapistDashboard/users" element={<TherapistDashboardUsers />}/>
+                <Route path="/dashboard/therapistDashboard/history" element={<TherapistClientHistory />}/>
                 <Route path="/dashboard/errorPage" element={<ErrorPage />}/>
                 <Route path="/" element={<Home />}/>
             </Routes>

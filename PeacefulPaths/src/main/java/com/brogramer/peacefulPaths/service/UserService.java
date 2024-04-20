@@ -2,13 +2,15 @@ package com.brogramer.peacefulPaths.service;
 
 import com.brogramer.peacefulPaths.dao.RoleDao;
 import com.brogramer.peacefulPaths.dao.TherapistRepository;
+import com.brogramer.peacefulPaths.dao.UserDao;
 import com.brogramer.peacefulPaths.dtos.CredentialsDto;
 import com.brogramer.peacefulPaths.dtos.SignUpDto;
 import com.brogramer.peacefulPaths.dtos.UserDto;
+import com.brogramer.peacefulPaths.entity.CustomUserDetails;
+import com.brogramer.peacefulPaths.entity.Gender;
 import com.brogramer.peacefulPaths.entity.Roles;
 import com.brogramer.peacefulPaths.entity.User;
 import com.brogramer.peacefulPaths.exceptions.AppException;
-import com.brogramer.peacefulPaths.responses.UserInfo;
 import jakarta.mail.MessagingException;
 import jakarta.mail.internet.MimeMessage;
 import jakarta.persistence.EntityNotFoundException;
@@ -16,6 +18,9 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.mail.javamail.JavaMailSender;
 import org.springframework.mail.javamail.MimeMessageHelper;
+import org.springframework.security.core.userdetails.UserDetails;
+import org.springframework.security.core.userdetails.UserDetailsService;
+import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -25,24 +30,77 @@ import java.nio.CharBuffer;
 import java.util.*;
 
 @Service
-public class UserService {
+public class UserService implements UserDetailsService {
 
     private final TherapistRepository userRepository;
     private final RoleDao roleDao;
     private final PasswordEncoder passwordEncoder;
+    private final UserDao userDao;
 
     @Autowired
     private JavaMailSender javaMailSender;
-    @Autowired
-    private TherapistServiceImpl therapistServiceImpl;
 
-    public UserService(TherapistRepository userRepository, PasswordEncoder passwordEncoder,RoleDao roleDao) {
+    public UserService(TherapistRepository userRepository, PasswordEncoder passwordEncoder,RoleDao roleDao,UserDao userDao) {
         this.userRepository = userRepository;
         this.passwordEncoder = passwordEncoder;
         this.roleDao = roleDao;
+        this.userDao = userDao;
     }
 
-    //fix this
+    public List<User> findAllByRole(String role) {
+        Collection<Roles> roles = new ArrayList<>();
+        roles.add(roleDao.findRoleByName(role));
+        return userRepository.findAllByRolesIn(roles);
+    }
+
+    public UserDetails loadUserByUsername(String email) throws UsernameNotFoundException {
+        User user = userDao.findByEmailDAO(email);
+        if (user == null) {
+            throw new UsernameNotFoundException("Invalid email or password.");
+        }
+        return new CustomUserDetails(user);
+    }
+
+    public UserDto convertToUserDto(User savedUser) {
+        UserDto userDto1 = new UserDto();
+
+        userDto1.setEmail(savedUser.getEmail());
+        userDto1.setId(savedUser.getId());
+        userDto1.setName(savedUser.getName());
+        userDto1.setSurname(savedUser.getSurname());
+        userDto1.setNumber(savedUser.getNumber());
+        userDto1.setToken(savedUser.getToken());
+        userDto1.setRoles(savedUser.getRoles());
+        userDto1.setPassword(savedUser.getPassword());
+
+        return userDto1;
+    }
+
+    public UserDto findUserByEmailAndConvert(String email) {
+        Optional<User> user1 = userRepository.findByEmail(email);
+
+        if (!user1.isPresent()){
+            return null;
+        }
+        User user = user1.get();
+
+        UserDto userDto = new UserDto();
+
+        userDto.setEmail(user.getEmail());
+        userDto.setId(user.getId());
+        userDto.setName(user.getName());
+        userDto.setSurname(user.getSurname());
+        userDto.setNumber(user.getNumber());
+        userDto.setRoles(user.getRoles());
+        userDto.setPassword(user.getPassword());
+        userDto.setLocation(user.getLocation());
+        userDto.setExperience(user.getExperience());
+
+        return userDto;
+    }
+
+
+
     public UserDto login(CredentialsDto credentialsDto) {
         Optional<User> user1 = userRepository.findByEmail(credentialsDto.getEmail());
 
@@ -83,18 +141,7 @@ public class UserService {
 
         User savedUser = userRepository.save(user);
 
-        UserDto userDto1 = new UserDto();
-
-        userDto1.setEmail( savedUser.getEmail() );
-        userDto1.setId( savedUser.getId() );
-        userDto1.setName( savedUser.getName() );
-        userDto1.setSurname( savedUser.getSurname() );
-        userDto1.setNumber(savedUser.getNumber());
-        userDto1.setToken(savedUser.getToken());
-        userDto1.setRoles(savedUser.getRoles());
-        userDto1.setPassword(savedUser.getPassword());
-
-        return userDto1;
+        return convertToUserDto(savedUser);
     }
 
     public UserDto update(UserDto userDto) {
@@ -119,6 +166,7 @@ public class UserService {
                 user.setExperience(userDto.getExperience());
                 user.setExpirationTime(userDto.getExpirationTime());
                 user.setResetToken(userDto.getResetToken());
+                user.setGender(userDto.getGender());
             }
             else {
                 throw new AppException("Login already exists", HttpStatus.BAD_REQUEST);
@@ -139,16 +187,8 @@ public class UserService {
 
         User savedUser = userRepository.save(user);
 
-        UserDto userDto1 = new UserDto();
+        UserDto userDto1 = convertToUserDto(savedUser);
 
-        userDto1.setEmail( savedUser.getEmail() );
-        userDto1.setId( savedUser.getId() );
-        userDto1.setName( savedUser.getName() );
-        userDto1.setSurname( savedUser.getSurname() );
-        userDto1.setNumber(savedUser.getNumber());
-        userDto1.setToken(savedUser.getToken());
-        userDto1.setRoles(savedUser.getRoles());
-        userDto1.setPassword(savedUser.getPassword());
         userDto1.setLocation(savedUser.getLocation());
         userDto1.setExperience(savedUser.getExperience());
         userDto1.setExpirationTime(savedUser.getExpirationTime());
@@ -158,26 +198,8 @@ public class UserService {
     }
 
     public UserDto findByLogin(String login,String token) {
-        Optional<User> user1 = userRepository.findByEmail(login);
-
-        if (!user1.isPresent()){
-            return null;
-        }
-        User user = user1.get();
-
-        UserDto userDto = new UserDto();
-
-        userDto.setEmail( user.getEmail() );
-        userDto.setId( user.getId() );
-        userDto.setName( user.getName() );
-        userDto.setSurname( user.getSurname() );
-        userDto.setNumber(user.getNumber());
+        UserDto userDto = findUserByEmailAndConvert(login);
         userDto.setToken(token);
-        userDto.setRoles(user.getRoles());
-        userDto.setPassword(user.getPassword());
-        userDto.setLocation(user.getLocation());
-        userDto.setExperience(user.getExperience());
-
         return userDto;
     }
 
@@ -192,27 +214,8 @@ public class UserService {
     }
 
     public UserDto findByEmail(String email) {
-        Optional<User> user1 = userRepository.findByEmail(email);
 
-        if (!user1.isPresent()){
-
-            return null;
-        }
-        User user = user1.get();
-
-        UserDto userDto = new UserDto();
-
-        userDto.setEmail( user.getEmail() );
-        userDto.setId( user.getId() );
-        userDto.setName( user.getName() );
-        userDto.setSurname( user.getSurname() );
-        userDto.setNumber(user.getNumber());
-        userDto.setRoles(user.getRoles());
-        userDto.setPassword(user.getPassword());
-        userDto.setLocation(user.getLocation());
-        userDto.setExperience(user.getExperience());
-
-        return userDto;
+        return findUserByEmailAndConvert(email);
     }
 
     public void sendEmail(UserDto user) throws MessagingException {
@@ -241,6 +244,7 @@ public class UserService {
     @Transactional
     public void connect(int userId, int therapistId) {
         userRepository.addConnection(userId,therapistId);
+        userRepository.addConnectionHistory(userId,therapistId);
     }
 
     public int findTherapistIdByUserId(int id) {
@@ -266,9 +270,62 @@ public class UserService {
         Collection<User> users = new ArrayList<>();
         Collection<Integer> userId = userRepository.findAllUsersConnectedById(id);
         for (Integer i : userId) {
-            users.add(therapistServiceImpl.findById(i));
+            users.add(userRepository.findById(i).get());
         }
 
         return users;
     }
+
+    public Collection<User> findAllUsersConnectedHistoryById(int id) {
+        Collection<User> users = new ArrayList<>();
+        Collection<Integer> userId = userRepository.findAllUsersConnectedHistoryById(id);
+        for (Integer i : userId) {
+            users.add(userRepository.findById(i).get());
+        }
+
+        return users;
+    }
+
+    public Collection<User> findAllTherapistsByGender(String gender) {
+        Collection<Roles> roles = new ArrayList<>();
+        roles.add(roleDao.findRoleByName("ROLE_THERAPIST"));
+        Collection<User> therapists = new ArrayList<>();
+        List<User> user = userRepository.findAllByRolesIn(roles);
+        for (User u : user) {
+            if(u.getGender().getGender().equals(gender)){
+                therapists.add(u);
+            }
+        }
+
+        return new ArrayList<>(therapists);
+    }
+
+    public Collection<User> findAllTherapistsByExperience(int experience) {
+        Collection<Roles> roles = new ArrayList<>();
+        roles.add(roleDao.findRoleByName("ROLE_THERAPIST"));
+        Collection<User> therapists = new ArrayList<>();
+        List<User> user = userRepository.findAllByRolesIn(roles);
+        for (User u : user) {
+            if(u.getExperience()==experience){
+                therapists.add(u);
+            }
+        }
+
+        return new ArrayList<>(therapists);
+    }
+
+    public Collection<User> findAllTherapistsByLocation(String location) {
+        Collection<Roles> roles = new ArrayList<>();
+        roles.add(roleDao.findRoleByName("ROLE_THERAPIST"));
+        Collection<User> therapists = new ArrayList<>();
+        List<User> user = userRepository.findAllByRolesIn(roles);
+        for (User u : user) {
+            if(u.getLocation().getLocation().equals(location)){
+                therapists.add(u);
+            }
+        }
+
+        return new ArrayList<>(therapists);
+    }
+
 }

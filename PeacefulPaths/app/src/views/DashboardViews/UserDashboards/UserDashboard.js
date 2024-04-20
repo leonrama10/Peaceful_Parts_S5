@@ -1,50 +1,91 @@
 import React,{useState} from 'react';
-import {fetchAllTherapistData, fetchUserData} from '../../../api/authService';
+import {
+    fetchAllTherapistData,
+    fetchAllTherapistNotConnectedData,
+    fetchUserData,
+    fetchUserTherapistConnectionData
+} from '../../../api/authService';
 import {useNavigate} from 'react-router-dom';
 import '../../../css/sb-admin-2.css';
 import DashboardNav from "../DashboardNav";
 import {authenticate, authFailure, authSuccess} from "../../../redux/authActions";
 import {connect} from "react-redux";
 import SideBarUser from "../SideBars/SideBarUser";
-import $ from "jquery";
-import TherapistCards from "../TherapistDashboards/TherapistCards";
+import TherapistCards from "./TherapistCards";
+import {loadState, saveState} from "../../../helper/sessionStorage";
+let connected = null;
 function UserDashboard({loading,error,...props}){
 
     const history = useNavigate ();
     const [allUsers, setAllUsers] = useState([]);
     const [data,setData]=useState({});
-
-
-    React.useEffect(()=>{
-        fetchUserData().then((response)=>{
-            if (response.data.roles.at(0).role === 'ROLE_USER'){
-                setData(response.data);
-            }
-            else{
-                history('/loginBoot');
-            }
-        }).catch((e)=>{
-            localStorage.clear();
-            history('/loginBoot');
-        })
-    },[])
-
-    React.useEffect(()=>{
-        fetchAllTherapistData().then((response)=>{
-            setAllUsers(response.data)
-        }).catch((e)=>{
-            history('/loginBoot');
-        })
-    },[])
+    const [hideTherapists,setHideTherapists]=useState(false);
+    const [therapistData, setTherapistData] = useState({
+        id:0,
+    });
 
     React.useEffect(() => {
-        if (allUsers.length > 0) {
-            if ($.fn.dataTable.isDataTable('#dataTable')) {
-                $('#dataTable').DataTable().destroy();
+        connected = loadState("connected",false)
+        fetchUserData().then((response) => {
+            if (response.data.roles.at(0).role === 'ROLE_USER') {
+                setData(response.data);
+
+                fetchUserTherapistConnectionData(response.data.id).then((response) => {
+                    if (response.data.roles.at(0).role === 'ROLE_THERAPIST') {
+                        console.log("LEKAAAAAAAAAA")
+                        setTherapistData({
+                            id: response.data.id
+                        });
+                        saveState("therapistId",response.data.id)
+                        if(response.data.id===0){
+                            saveState("connected",false)
+                        }else {
+                            saveState("connected",true)
+                        }
+
+                        if(!hideTherapists){
+                            fetchAllTherapistNotConnectedData(response.data.id).then((response)=>{
+                                console.log("MARKAAAAAAAAAAAAAAAAJ")
+                                setAllUsers(response.data)
+                            }).catch((e)=>{
+                                history('/loginBoot');
+                            })
+                        }
+                    } else {
+                        localStorage.clear();
+                        history('/loginBoot');
+                    }
+                }).catch((e) => {
+                        fetchAllTherapistData().then((response)=>{
+                            console.log("DAAAAAAAAAAAADA")
+                            setAllUsers(response.data)
+                        }).catch((e)=>{
+                            history('/loginBoot');
+                        })
+
+                    console.log("PPPPPPPPPPPPPPPPP")
+                    connected = loadState("connected",false)
+                    if (e.response) {
+                        // The request was made and the server responded with a status code
+                        // that falls out of the range of 2xx
+                        // props.loginFailure(e.response.data);
+                        console.log(e.response.data); // This will log 'Connect with a therapist!!!'
+                        console.log(e.response.status); // This will log 404 (NOT_FOUND)
+                    } else if (e.request) {
+                        // The request was made but no response was received
+                        console.log(e.request);
+                    } else {
+                        // Something happened in setting up the request that triggered an Error
+                        console.log('Error', e.message);
+                    }
+                });
+            } else {
+                history('/loginBoot');
             }
-            $('#dataTable').DataTable();
-        }
-    }, [allUsers]);
+        }).catch((e) => {
+            history('/loginBoot');
+        });
+    }, []);
 
 
     return (
@@ -52,7 +93,7 @@ function UserDashboard({loading,error,...props}){
 
             <div id="wrapper">
 
-                <SideBarUser />
+                <SideBarUser setAllUsers={setAllUsers} setHideTherapists={setHideTherapists}/>
 
                 <div id="content-wrapper" className="d-flex flex-column">
 
@@ -67,7 +108,6 @@ function UserDashboard({loading,error,...props}){
                             ))}
 
                         </div>
-
                     </div>
 
                     <footer className="sticky-footer bg-white">
@@ -77,9 +117,7 @@ function UserDashboard({loading,error,...props}){
                             </div>
                         </div>
                     </footer>
-
                 </div>
-
             </div>
 
             <a className="scroll-to-top rounded" href="#page-top">

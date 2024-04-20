@@ -4,16 +4,16 @@ import "../../../css/Questionnaire.css";
 const Questionnaire = ({ questions, currentQuestion, handleAnswerClick }) => {
     return (
         <>
-                    <div className="question">
-                        <div className="question-number">
-                  <span>
-                    Question {currentQuestion + 1} / {questions.length}
-                  </span>
-                        </div>
-                        <div className="question-text">
-                            {questions[currentQuestion].question}
-                        </div>
-                    </div>
+            <div className="question">
+                <div className="question-number">
+                    <span>
+                        Question {currentQuestion + 1} / {questions.length}
+                    </span>
+                </div>
+                <div className="question-text">
+                    {questions[currentQuestion].question}
+                </div>
+            </div>
 
        {questions[currentQuestion].answerMethod === "dropdown" && (
                    <div className="answer">
@@ -37,6 +37,7 @@ const Questionnaire = ({ questions, currentQuestion, handleAnswerClick }) => {
                )}
                 </>
     );
+
 };
 
 export default Questionnaire;

@@ -1,5 +1,7 @@
 package com.brogramer.peacefulPaths.dtos;
 
+import com.brogramer.peacefulPaths.entity.Gender;
+import com.brogramer.peacefulPaths.entity.Location;
 import com.brogramer.peacefulPaths.entity.Roles;
 import jakarta.persistence.Transient;
 import lombok.AllArgsConstructor;
@@ -23,17 +25,18 @@ public class UserDto {
     private String token;
     private String password;
     private String number;
-    private String location;
+    private Location location;
     private int experience;
     private Collection<Roles> roles;
     private String resetToken;
     private Long expirationTime;
+    private Gender gender;
 
-    public String getLocation() {
+    public Location getLocation() {
         return location;
     }
 
-    public void setLocation(String location) {
+    public void setLocation(Location location) {
         this.location = location;
     }
 
@@ -132,5 +135,13 @@ public class UserDto {
 
     public void setExpirationTime(Long expirationTime) {
         this.expirationTime = expirationTime;
+    }
+
+    public Gender getGender() {
+        return gender;
+    }
+
+    public void setGender(Gender gender) {
+        this.gender = gender;
     }
 }

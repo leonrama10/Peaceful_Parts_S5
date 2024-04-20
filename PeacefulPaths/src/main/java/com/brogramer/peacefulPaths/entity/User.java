@@ -35,9 +35,6 @@ public class User {
     @Column(name = "number")
     private String number;
 
-    @Column(name = "location")
-    private String location;
-
     @Min(value= 0,message = "Must be greater than or equal to 0!")
     @Column(name = "experience")
     private int experience;
@@ -68,6 +65,14 @@ public class User {
             inverseJoinColumns = @JoinColumn(name = "role_id"))
     private Collection<Roles> roles;
 
+    @ManyToOne
+    @JoinColumn(name = "location_id")
+    private Location location;
+
+    @ManyToOne
+    @JoinColumn(name = "gender_id")
+    private Gender gender;
+
     @Transient
     private List<Roles> allRoles = new ArrayList<>();
 
@@ -77,7 +82,7 @@ public class User {
 
     public User() {}
 
-    public User(String name, String surname, String email, String number,String location, int experience,Collection<Roles> roles,List<Roles> allRoles) {
+    public User(String name, String surname, String email, String number,Location location, int experience,Collection<Roles> roles,List<Roles> allRoles) {
         this.name = name;
         this.surname = surname;
         this.email = email;
@@ -93,6 +98,14 @@ public class User {
         allRoles.add(ROLE_THERAPIST);
         allRoles.add(ROLE_MANAGER);
         return allRoles;
+    }
+
+    public Gender getGender() {
+        return gender;
+    }
+
+    public void setGender(Gender gender) {
+        this.gender = gender;
     }
 
     public String getToken() {
@@ -111,11 +124,11 @@ public class User {
         this.roles = roles;
     }
 
-    public String getLocation() {
+    public Location getLocation() {
         return location;
     }
 
-    public void setLocation(String location) {
+    public void setLocation(Location location) {
         this.location = location;
     }
 

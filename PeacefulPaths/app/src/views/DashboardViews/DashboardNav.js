@@ -1,6 +1,5 @@
 import React from 'react';
 import { Link } from 'react-router-dom';
-import search from "../../img/search.png";
 import {Dropdown} from "react-bootstrap";
 import bell from "../../img/bell.png";
 import mail from "../../img/mail.png";
@@ -38,19 +37,6 @@ export default function DashboardNav(props){
             <button id="sidebarToggleTop" className="btn btn-link d-md-none rounded-circle mr-3">
                 <i className="fa fa-bars"></i>
             </button>
-
-            <form
-                className="d-none d-sm-inline-block form-inline mr-auto ml-md-3 my-2 my-md-0 mw-100 navbar-search">
-                <div className="input-group">
-                    <input type="text" className="form-control bg-light border-0 small" placeholder="Search for..."
-                           aria-label="Search" aria-describedby="basic-addon2"/>
-                    <div className="input-group-append">
-                        <button className="btn btn-primary" type="button">
-                            <img width={"17px"} src={search} alt="logo"/>
-                        </button>
-                    </div>
-                </div>
-            </form>
 
             <ul className="navbar-nav ml-auto">
 

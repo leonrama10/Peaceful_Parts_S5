@@ -83,6 +83,16 @@ export const fetchAllTherapistData = () => {
     });
 };
 
+export const fetchAllTherapistNotConnectedData = (authRequest) => {
+    return axios({
+        method: 'GET',
+        url: `${process.env.hostUrl || 'http://localhost:8080'}/api/auth/fetchAllTherapistNotConnectedData/${authRequest}`,
+        headers: {
+            'Authorization': 'Bearer ' + getToken()
+        }
+    });
+};
+
 export const userSendEmail=(authRequest)=>{
     return axios({
         'method':'POST',
@@ -146,7 +156,6 @@ export const removeTherapist = (authRequest) => {
 
 
 export const fetchAllUsersConnectedData = (authRequest) => {
-    console.log("DATAAAAAAAAAAAAAAAA",authRequest)
     return axios({
         method: 'GET',
         url: `${process.env.hostUrl || 'http://localhost:8080'}/api/auth/fetchAllUsersConnectedData/${authRequest}`,
@@ -155,3 +164,78 @@ export const fetchAllUsersConnectedData = (authRequest) => {
         }
     });
 };
+
+export const fetchAllUsersConnectedDataHistory = (authRequest) => {
+    return axios({
+        method: 'GET',
+        url: `${process.env.hostUrl || 'http://localhost:8080'}/api/auth/fetchAllUsersConnectedDataHistory/${authRequest}`,
+        headers: {
+            'Authorization': 'Bearer ' + getToken()
+        }
+    });
+};
+
+export const therapistFilterByGender = (authRequest) => {
+    return axios({
+        method: 'GET',
+        url: `${process.env.hostUrl || 'http://localhost:8080'}/api/auth/therapistFilterByGender/${authRequest}`,
+        headers: {
+            'Authorization': 'Bearer ' + getToken()
+        }
+    });
+};
+
+export const therapistFilterByGenderNotConnected = (authRequest) => {
+    return axios({
+        method: 'POST',
+        url: `${process.env.hostUrl || 'http://localhost:8080'}/api/auth/therapistFilterByGenderNotConnected`,
+        data:authRequest,
+        headers: {
+            'Authorization': 'Bearer ' + getToken()
+        }
+    });
+};
+
+
+export const therapistFilterByExperience = (authRequest) => {
+    return axios({
+        method: 'GET',
+        url: `${process.env.hostUrl || 'http://localhost:8080'}/api/auth/therapistFilterByExperience/${authRequest}`,
+        headers: {
+            'Authorization': 'Bearer ' + getToken()
+        }
+    });
+};
+
+export const therapistFilterByExperienceNotConnected = (authRequest) => {
+    return axios({
+        method: 'POST',
+        url: `${process.env.hostUrl || 'http://localhost:8080'}/api/auth/therapistFilterByExperienceNotConnected`,
+        data:authRequest,
+        headers: {
+            'Authorization': 'Bearer ' + getToken()
+        }
+    });
+};
+
+export const therapistFilterByLocation = (authRequest) => {
+    return axios({
+        method: 'GET',
+        url: `${process.env.hostUrl || 'http://localhost:8080'}/api/auth/therapistFilterByLocation/${authRequest}`,
+        headers: {
+            'Authorization': 'Bearer ' + getToken()
+        }
+    });
+};
+
+export const therapistFilterByLocationNotConnected = (authRequest) => {
+    return axios({
+        method: 'POST',
+        url: `${process.env.hostUrl || 'http://localhost:8080'}/api/auth/therapistFilterByLocationNotConnected`,
+        data:authRequest,
+        headers: {
+            'Authorization': 'Bearer ' + getToken()
+        }
+    });
+};
+

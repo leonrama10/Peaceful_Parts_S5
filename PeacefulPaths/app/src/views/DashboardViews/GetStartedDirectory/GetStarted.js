@@ -235,17 +235,17 @@ export default function GetStarted({loading,error,...props}){
                 <div className="card o-hidden border-0 shadow-lg my-5">
                     <div className="card-body p-0">
                         <div className="row">
-                            <div className="QuestionnaireForm">
                                 {isQuizOver ? (
                                     <RegisterBoot handleResetClick={handleResetClick} score={score}/>
                                 ) : (
+                                    <div className="QuestionnaireForm">
                                     <Questionnaire
                                         questions={questions}
                                         currentQuestion={currentQuestion}
                                         handleAnswerClick={handleAnswerClick}
                                     />
+                                    </div>
                                 )}
-                            </div>
                         </div>
                     </div>
                 </div>

@@ -3,7 +3,7 @@ package com.brogramer.peacefulPaths.security;
 import com.brogramer.peacefulPaths.config.JWTAuthenticationFilter;
 import com.brogramer.peacefulPaths.config.UserAuthenticationEntryPoint;
 import com.brogramer.peacefulPaths.config.UserAuthenticationProvider;
-import com.brogramer.peacefulPaths.service.TherapistService;
+import com.brogramer.peacefulPaths.service.UserService;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.context.annotation.Lazy;
@@ -21,69 +21,19 @@ import org.springframework.security.web.authentication.www.BasicAuthenticationFi
 @EnableWebSecurity
 public class TherapistSecurityConfig {
 
-//    @Autowired
-//    private JWTTokenHelper jWTTokenHelper;
-
-//    @Bean
-//    public AuthenticationFailureHandler authenticationFailureHandler() {
-//        return (request, response, exception) -> {
-//            System.out.println("Login failed: " + exception.getMessage());
-//            request.getSession().setAttribute("error", "Invalid credentials!");
-//
-//            response.sendRedirect("/peacefulPaths/login");
-//        };
-//    }
-
-//    private String determineTargetUrl(Authentication authentication) {
-//        Collection<? extends GrantedAuthority> authorities = authentication.getAuthorities();
-//
-////        if (authorities.stream().anyMatch(authority -> "ROLE_MANAGER".equals(authority.getAuthority()))) {
-////            return "/peacefulPaths/account";
-////        } else {
-//            return "/peacefulPaths/account";
-////        }
-//    }
-
     @Bean
     public BCryptPasswordEncoder passwordEncoder() {
         return new BCryptPasswordEncoder();
     }
 
     @Bean
-    public DaoAuthenticationProvider authenticationProvider(TherapistService userService) {
+    public DaoAuthenticationProvider authenticationProvider(UserService userService) {
         DaoAuthenticationProvider auth = new DaoAuthenticationProvider();
         auth.setUserDetailsService(userService);
         auth.setPasswordEncoder(passwordEncoder());
         return auth;
     }
 
-//    @Bean
-//    public SecurityFilterChain filterChain(HttpSecurity http) throws Exception{
-//
-//        http.authorizeHttpRequests(configurer ->
-//                        configurer
-//                                .requestMatchers("/api/auth/login").permitAll()
-//                                .requestMatchers("peacefulPaths/getUsers").hasRole("MANAGER")
-//                                .requestMatchers("/peacefulPaths/account").hasRole("USER")
-//                                .anyRequest().authenticated());
-//
-////                .formLogin(form -> form.loginPage("/peacefulPaths/login")
-////                        .loginProcessingUrl("/authenticateTheUser")
-////                        .usernameParameter("email")
-////                        .successHandler((request, response, authentication) -> {
-////                            request.getSession().setAttribute("success", true);
-////                            request.getSession().setAttribute("email", authentication.getName());
-////                            String targetUrl = determineTargetUrl(authentication);
-////                            response.sendRedirect(targetUrl);
-////                        })
-////                        .failureHandler(authenticationFailureHandler()).permitAll())
-////                .logout(logout -> logout.logoutSuccessUrl("/peacefulPaths/home").permitAll());
-////                .exceptionHandling(configurer->
-////                        configurer.accessDeniedPage("/peacefulPaths/login"));
-//
-//
-//        return http.build();
-//    }
 
     private final UserAuthenticationEntryPoint userAuthenticationEntryPoint;
     private final UserAuthenticationProvider userAuthenticationProvider;
@@ -103,15 +53,16 @@ public class TherapistSecurityConfig {
                 .sessionManagement(s -> s.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
                 .authorizeHttpRequests((requests) -> requests
                         .requestMatchers(HttpMethod.POST, "/api/auth/login","/api/auth/register","api/auth/sendEmail").permitAll()
-                        .requestMatchers(HttpMethod.PUT,"/api/auth/update").hasAnyRole("USER","THERAPIST","ADMIN")
-                        .requestMatchers(HttpMethod.PUT,"/api/auth/resetPassword").hasAnyRole("USER","THERAPIST","ADMIN")
-                        .requestMatchers(HttpMethod.GET, "/api/auth/userinfo").hasAnyRole("USER","THERAPIST","ADMIN")
+                        .requestMatchers(HttpMethod.PUT,"/api/auth/update","/api/auth/resetPassword").hasAnyRole("USER","THERAPIST","ADMIN")
+                        .requestMatchers(HttpMethod.GET, "/api/auth/userinfo","/api/auth/userinfoId/{id}").hasAnyRole("USER","THERAPIST","ADMIN")
                         .requestMatchers(HttpMethod.GET, "/api/auth/allUserinfo").hasAnyRole("ADMIN","THERAPIST")
-                        .requestMatchers(HttpMethod.GET, "/api/auth/userinfoId/{id}").hasAnyRole("ADMIN","THERAPIST","USER")
-                        .requestMatchers(HttpMethod.DELETE, "/api/auth/deleteUser").hasRole("ADMIN")
-                        .requestMatchers(HttpMethod.POST, "/api/auth/userTherapistConnection").hasRole("USER")
-                        .requestMatchers(HttpMethod.GET, "/api/auth/fetchUserTherapistConnectionData/{id}").hasRole("USER")
+                        .requestMatchers(HttpMethod.DELETE, "/api/auth/deleteUser/{id}").hasAnyRole("ADMIN","THERAPIST")
+                        .requestMatchers(HttpMethod.GET, "/api/auth/allAdminInfo").hasRole("ADMIN")
+                        .requestMatchers(HttpMethod.GET, "/api/auth/allTherapistInfo").hasAnyRole("ADMIN","USER")
+                        .requestMatchers(HttpMethod.POST, "/api/auth/userTherapistConnection","/api/auth/therapistFilterByGenderNotConnected","/api/auth/therapistFilterByExperienceNotConnected","/api/auth/therapistFilterByLocationNotConnected").hasRole("USER")
+                        .requestMatchers(HttpMethod.GET, "/api/auth/fetchUserTherapistConnectionData/{id}","/api/auth/therapistFilterByGender/{gender}","/api/auth/therapistFilterByExperience/{experience}","/api/auth/therapistFilterByLocation/{location}","/api/auth/fetchAllTherapistNotConnectedData/{id}").hasRole("USER")
                         .requestMatchers(HttpMethod.DELETE, "/api/auth/removeTherapist/{id}").hasRole("USER")
+                        .requestMatchers(HttpMethod.GET,"/api/auth/fetchAllUsersConnectedDataHistory/{id}","/api/auth/fetchAllUsersConnectedData/{id}").hasRole("THERAPIST")
                         .anyRequest().authenticated());
 
 

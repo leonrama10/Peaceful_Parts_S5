@@ -11,11 +11,14 @@ import SideBarUser from "../SideBars/SideBarUser";
 import {Alert} from "reactstrap";
 import {authenticate, authFailure, authSuccess} from "../../../redux/authActions";
 import {connect} from "react-redux";
+import {loadState, saveState} from "../../../helper/sessionStorage";
 
+let connected = null;
 function UserDashboardTherapists({loading,error,...props}){
 
     const history = useNavigate ();
     const [data,setData]=useState({});
+    const [hideFilterMenu,setHideFilterMenu]=useState(true);
 
     const [therapistData, setTherapistData] = useState({
         id:0,
@@ -26,12 +29,13 @@ function UserDashboardTherapists({loading,error,...props}){
         roles:[],
         number:'',
         experience:0,
-        location:'',
+        location:{},
+        gender:{},
         allRoles:[]
     });
 
-
     React.useEffect(() => {
+        connected = loadState("connected",false)
         fetchUserData().then((response) => {
             if (response.data.roles.at(0).role === 'ROLE_USER') {
                 setData(response.data);
@@ -48,14 +52,21 @@ function UserDashboardTherapists({loading,error,...props}){
                             number: response.data.number,
                             experience: response.data.experience,
                             location: response.data.location,
+                            gender: response.data.gender,
                             allRoles: response.data.allRoles
                         });
+                        connected = loadState("connected",false)
+                        if(response.data.id===0){
+                            saveState("connected",false)
+                        }else {
+                            saveState("connected",true)
+                        }
                     } else {
-                        console.log("AAAAAAAAAAAAAAAAAA");
                         localStorage.clear();
                         history('/loginBoot');
                     }
                 }).catch((e) => {
+                    connected = loadState("connected",false)
                     if (e.response) {
                         // The request was made and the server responded with a status code
                         // that falls out of the range of 2xx
@@ -80,15 +91,15 @@ function UserDashboardTherapists({loading,error,...props}){
         });
     }, []);
 
-
     function handleRemove(id) {
         removeTherapist(id).then((response)=>{
             if(response.status===200){
-                window.location.reload();
+                saveState("connected",false)
+                history('/dashboard/userDashboard')
             }
             else{
                 //Add error on page if user cant be deleted
-                history('/dashboard/adminDashboard');
+                history('/loginBoot');
             }
         }).catch((err)=>{
             history('/loginBoot');
@@ -100,7 +111,7 @@ function UserDashboardTherapists({loading,error,...props}){
 
             <div id="wrapper">
 
-                <SideBarUser />
+                <SideBarUser hideFilterMenu={hideFilterMenu}/>
 
                 <div id="content-wrapper" className="d-flex flex-column">
 
@@ -115,16 +126,17 @@ function UserDashboardTherapists({loading,error,...props}){
                         }
 
                         <div className="container-fluid">
-                            <div className="card">
+                            {connected && <div className="card">
                                 <div className="card-body">
-                                    <h5 className="card-title">{therapistData.name} {therapistData.surname}</h5>
+                                    <h5 className="card-title">Full name: {therapistData.name} {therapistData.surname}</h5>
                                     <p className="card-text">Email: {therapistData.email}</p>
                                     <p className="card-text">Phone: {therapistData.number}</p>
+                                    <p className="card-text">Gender: {therapistData.gender.gender}</p>
                                     <p className="card-text">Experience: {therapistData.experience} years</p>
-                                    <p className="card-text">Location: {therapistData.location}</p>
+                                    <p className="card-text">Location: {therapistData.location.location}</p>
                                     <button onClick={() => handleRemove(data.id)}>Remove Therapist</button>
                                 </div>
-                            </div>
+                            </div>}
                         </div>
 
                     </div>

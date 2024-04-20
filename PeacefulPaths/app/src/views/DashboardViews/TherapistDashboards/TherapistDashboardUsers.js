@@ -13,7 +13,6 @@ export default function TherapistDashboardUsers({loading,error,...props}){
     const history = useNavigate ();
     const [data,setData]=useState({});
     const [allUsers, setAllUsers] = useState([]);
-    const [id, setId] = useState(null);
 
     React.useEffect(()=>{
         fetchUserData().then((response)=>{
@@ -33,8 +32,6 @@ export default function TherapistDashboardUsers({loading,error,...props}){
             history('/loginBoot');
         })
     },[])
-
-
 
     React.useEffect(() => {
         if (allUsers.length > 0) {
@@ -60,7 +57,6 @@ export default function TherapistDashboardUsers({loading,error,...props}){
     }
 
     const handleEdit = (id) => {
-        setId(id);
         history(`/dashboard/therapistDashboard/users/edit/${id}`);
     };
 
@@ -93,8 +89,8 @@ export default function TherapistDashboardUsers({loading,error,...props}){
                                                         <th>Name</th>
                                                         <th>Email</th>
                                                         <th>Number</th>
+                                                        <th>Gender</th>
                                                         <th>Location</th>
-                                                        <th>Experience</th>
                                                         <th>Actions</th>
                                                     </tr>
                                                     </thead>
@@ -103,8 +99,8 @@ export default function TherapistDashboardUsers({loading,error,...props}){
                                                         <th>Name</th>
                                                         <th>Email</th>
                                                         <th>Number</th>
+                                                        <th>Gender</th>
                                                         <th>Location</th>
-                                                        <th>Experience</th>
                                                         <th>Actions</th>
                                                     </tr>
                                                     </tfoot>
@@ -114,8 +110,8 @@ export default function TherapistDashboardUsers({loading,error,...props}){
                                                                 <td>{tempEmployee.name} {tempEmployee.surname}</td>
                                                                 <td>{tempEmployee.email}</td>
                                                                 <td>{tempEmployee.number}</td>
-                                                                <td>{tempEmployee.location}</td>
-                                                                <td>{tempEmployee.experience}</td>
+                                                                <td>{tempEmployee.gender.gender}</td>
+                                                                <td>{tempEmployee.location.location}</td>
                                                                 <td>
                                                                     <button  className="btn btn-info btn-sm" onClick={() => handleEdit(tempEmployee.id)}>
                                                                         Edit
@@ -179,13 +175,7 @@ export default function TherapistDashboardUsers({loading,error,...props}){
 
                     <script src="../../../vendor/jquery/jquery.min.js"></script>
                     <script src="../../../vendor/bootstrap/js/bootstrap.bundle.min.js"></script>
-
                     <script src="../../../vendor/jquery-easing/jquery.easing.min.js"></script>
-
-                    {/*<script src="../../vendor/datatables/jquery.dataTables.min.js"></script>*/}
-                    {/*<script src="../../vendor/datatables/dataTables.bootstrap4.min.js"></script>*/}
-
-                    {/*<script src="../../js/demo/datatables-demo.js"></script>*/}
 
                 </main>
     )

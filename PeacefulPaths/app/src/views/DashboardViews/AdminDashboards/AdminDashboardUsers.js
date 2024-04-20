@@ -4,25 +4,17 @@ import {useNavigate} from 'react-router-dom';
 import '../../../css/sb-admin-2.css';
 import '../../../css/myCss.css';
 import DataTable from 'datatables.net-dt';
-import mail from "../../../img/mail.png"
-import arrow from "../../../img/arrow.png"
-import leftArrow from "../../../img/leftArrow.png"
-import bell from "../../../img/bell.png"
-import search from "../../../img/search.png"
-import accLogo from "../../../img/undraw_profile.svg"
-import navimg2 from "../../../img/undraw_profile_2.svg"
-import navimg1 from "../../../img/undraw_profile_1.svg"
-import navimg3 from "../../../img/undraw_profile_3.svg"
 import $ from 'jquery';
 import DashboardNav from "../DashboardNav";
 import SideBarAdmin from "../SideBars/SideBarAdmin";
+import {authenticate, authFailure, authSuccess} from "../../../redux/authActions";
+import {connect} from "react-redux";
 
-export default function AdminDashboardUsers({loading,error,...props}){
+function AdminDashboardUsers({loading,error,...props}){
 
     const history = useNavigate ();
     const [data,setData]=useState({});
     const [allUsers, setAllUsers] = useState([]);
-    const [id, setId] = useState(null);
 
     React.useEffect(()=>{
         fetchUserData().then((response)=>{
@@ -69,7 +61,6 @@ export default function AdminDashboardUsers({loading,error,...props}){
     }
 
     const handleEdit = (id) => {
-        setId(id);
         history(`/dashboard/adminDashboard/users/edit/${id}`);
     };
 
@@ -101,8 +92,8 @@ export default function AdminDashboardUsers({loading,error,...props}){
                                                         <th>Name</th>
                                                         <th>Email</th>
                                                         <th>Number</th>
+                                                        <th>Gender</th>
                                                         <th>Location</th>
-                                                        <th>Experience</th>
                                                         <th>Actions</th>
                                                     </tr>
                                                     </thead>
@@ -111,8 +102,8 @@ export default function AdminDashboardUsers({loading,error,...props}){
                                                         <th>Name</th>
                                                         <th>Email</th>
                                                         <th>Number</th>
+                                                        <th>Gender</th>
                                                         <th>Location</th>
-                                                        <th>Experience</th>
                                                         <th>Actions</th>
                                                     </tr>
                                                     </tfoot>
@@ -122,14 +113,17 @@ export default function AdminDashboardUsers({loading,error,...props}){
                                                                 <td>{tempEmployee.name} {tempEmployee.surname}</td>
                                                                 <td>{tempEmployee.email}</td>
                                                                 <td>{tempEmployee.number}</td>
-                                                                <td>{tempEmployee.location}</td>
-                                                                <td>{tempEmployee.experience}</td>
+                                                                <td>{tempEmployee.gender.gender}</td>
+                                                                <td>{tempEmployee.location.location}</td>
                                                                 <td>
-                                                                    <button  className="btn btn-info btn-sm" onClick={() => handleEdit(tempEmployee.id)}>
+                                                                    <button className="btn btn-info btn-sm"
+                                                                            onClick={() => handleEdit(tempEmployee.id)}>
                                                                         Edit
                                                                     </button>
 
-                                                                    <button  style={{marginLeft:"5px"}} className="btn btn-danger btn-sm" onClick={() => handleDelete(tempEmployee.id)} >
+                                                                    <button style={{marginLeft: "5px"}}
+                                                                            className="btn btn-danger btn-sm"
+                                                                            onClick={() => handleDelete(tempEmployee.id)}>
                                                                         Delete
                                                                     </button>
                                                                 </td>
@@ -191,15 +185,24 @@ export default function AdminDashboardUsers({loading,error,...props}){
 
                     <script src="../../../vendor/jquery/jquery.min.js"></script>
                     <script src="../../../vendor/bootstrap/js/bootstrap.bundle.min.js"></script>
-
                     <script src="../../../vendor/jquery-easing/jquery.easing.min.js"></script>
-
-                    {/*<script src="../../vendor/datatables/jquery.dataTables.min.js"></script>*/}
-                    {/*<script src="../../vendor/datatables/dataTables.bootstrap4.min.js"></script>*/}
-
-                    {/*<script src="../../js/demo/datatables-demo.js"></script>*/}
 
                 </main>
     )
 
 }
+const mapStateToProps = ({auth}) => {
+    console.log("state ", auth)
+    return {
+        loading: auth.loading,
+        error: auth.error
+    }
+}
+const mapDispatchToProps = (dispatch) => {
+    return {
+        authenticate: () => dispatch(authenticate()),
+        setUser: (data) => dispatch(authSuccess(data)),
+        loginFailure: (message) => dispatch(authFailure(message))
+    }
+}
+export default connect(mapStateToProps, mapDispatchToProps)(AdminDashboardUsers);

@@ -1,5 +1,7 @@
 package com.brogramer.peacefulPaths.responses;
 
+import com.brogramer.peacefulPaths.entity.Gender;
+import com.brogramer.peacefulPaths.entity.Location;
 import com.brogramer.peacefulPaths.entity.Roles;
 import org.springframework.security.core.GrantedAuthority;
 
@@ -14,11 +16,12 @@ public class UserInfo {
     private String surname;
     private String password;
     private String number;
-    private String location;
+    private Location location;
     private Collection<Roles> roles;
     private List<Roles> allRoles;
     private String resetToken;
     private Long expirationTime;
+    private Gender gender;
 
     public List<Roles> getAllRoles() {
         return allRoles;
@@ -36,11 +39,11 @@ public class UserInfo {
         return password;
     }
 
-    public String getLocation() {
+    public Location getLocation() {
         return location;
     }
 
-    public void setLocation(String location) {
+    public void setLocation(Location location) {
         this.location = location;
     }
 
@@ -112,5 +115,13 @@ public class UserInfo {
 
     public void setExpirationTime(Long expirationTime) {
         this.expirationTime=expirationTime;
+    }
+
+    public Gender getGender() {
+        return gender;
+    }
+
+    public void setGender(Gender gender) {
+        this.gender=gender;
     }
 }

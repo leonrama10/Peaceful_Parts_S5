@@ -1,29 +1,18 @@
 import React,{useState} from 'react';
 import {fetchUserData, userUpdate} from '../../../api/authService';
 import {Link, useNavigate} from 'react-router-dom';
-import {Container, Row, Col, Form, Button, Dropdown} from 'react-bootstrap';
+import {Container, Row, Col, Form, Button} from 'react-bootstrap';
 import {authenticate, authFailure, authSuccess} from "../../../redux/authActions";
 import '../../../css/sb-admin-2.min.css';
-import mail from "../../../img/mail.png"
-import arrow from "../../../img/arrow.png"
-import leftArrow from "../../../img/leftArrow.png"
-import bell from "../../../img/bell.png"
-import search from "../../../img/search.png"
-import accLogo from "../../../img/undraw_profile.svg"
-import navimg2 from "../../../img/undraw_profile_2.svg"
-import navimg1 from "../../../img/undraw_profile_1.svg"
-import navimg3 from "../../../img/undraw_profile_3.svg"
 import {Alert} from "reactstrap";
 import {connect} from "react-redux";
-import {saveState} from "../../../helper/sessionStorage";
 import DashboardNav from "../DashboardNav";
 import SideBarUser from "../SideBars/SideBarUser";
 function UserProfile({loading,error,...props}){
 
     const history = useNavigate ();
-
+    const [hideFilterMenu,setHideFilterMenu]=useState(true);
     const [data,setData]=useState({});
-
     const [values, setValues] = useState({
         id:0,
         email: '',
@@ -33,7 +22,8 @@ function UserProfile({loading,error,...props}){
         roles:[],
         number:'',
         experience:0,
-        location:''
+        location:{},
+        gender:{}
     });
 
     React.useEffect(()=>{
@@ -48,7 +38,8 @@ function UserProfile({loading,error,...props}){
                     password: response.data.password,
                     roles: response.data.roles,
                     number:response.data.number,
-                    location:response.data.location
+                    location:response.data.location,
+                    gender:response.data.gender
                 })
             }
             else{
@@ -99,13 +90,15 @@ function UserProfile({loading,error,...props}){
     };
 
     const handleChange = (e) => {
-        e.persist();
+        const { name, value } = e.target;
         setValues(values => ({
             ...values,
-            [e.target.name]: e.target.name === 'experience' ? Number(e.target.value) : e.target.value
+            [name]: name === 'experience' ? Number(value) :
+                name === 'gender' ? { id: Number(value.split('-')[0]), gender: value.split('-')[1] } :
+                    name === 'location' ? { id: Number(value.split('-')[0]), location: value.split('-')[1] } :
+                        value
         }));
     };
-
 
     return (
 
@@ -113,7 +106,7 @@ function UserProfile({loading,error,...props}){
 
             <div id="wrapper">
 
-                <SideBarUser />
+                <SideBarUser hideFilterMenu={hideFilterMenu}/>
 
                 <div id="content-wrapper" className="d-flex flex-column">
 
@@ -152,6 +145,15 @@ function UserProfile({loading,error,...props}){
                                                 <Form.Control type="email" name="email" defaultValue={data.email} onChange={handleChange} required/>
                                             </Form.Group>
 
+                                            <Form.Group controlId="formBasicGender">
+                                                <Form.Label>Gender</Form.Label>
+                                                <Form.Select name="gender" value={values.gender ? `${values.gender.id}-${values.gender.gender}` : ''} onChange={handleChange} required>
+                                                    {/*<option value="">Select Gender</option>*/}
+                                                    <option value="1-M">Male</option>
+                                                    <option value="2-F">Female</option>
+                                                </Form.Select>
+                                            </Form.Group>
+
                                             <Form.Group controlId="formBasicPhone">
                                                 <Form.Label>Phone</Form.Label>
                                                 <Form.Control type="tel" defaultValue={data.number} onChange={handleChange} name="number"/>
@@ -159,7 +161,12 @@ function UserProfile({loading,error,...props}){
 
                                             <Form.Group controlId="formBasicAddress">
                                                 <Form.Label>Location</Form.Label>
-                                                <Form.Control type="text" defaultValue={data.location} onChange={handleChange} name="location"/>
+                                                <Form.Select name="location" value={values.location ? `${values.location.id}-${values.location.location}` : ''} onChange={handleChange} required>
+                                                    {/*<option value="">Select Location</option>*/}
+                                                    <option value="1-Zllakuqan">Zllakuqan</option>
+                                                    <option value="2-Los Angeles">Los Angeles</option>
+                                                    <option value="3-Chicago">Chicago</option>
+                                                </Form.Select>
                                             </Form.Group>
 
                                             <div className="text-left" style={{padding:'10px 0'}}>

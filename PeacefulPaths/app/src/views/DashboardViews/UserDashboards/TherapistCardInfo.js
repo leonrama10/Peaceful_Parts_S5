@@ -1,5 +1,5 @@
 import React,{useState} from 'react';
-import {fetchUserData, fetchUserDataId, userTherapistConnection} from '../../../api/authService';
+import {fetchUserData, fetchUserDataId, removeTherapist, userTherapistConnection} from '../../../api/authService';
 import {useNavigate, useParams} from 'react-router-dom';
 import '../../../css/sb-admin-2.css';
 import DashboardNav from "../DashboardNav";
@@ -7,13 +7,15 @@ import {authenticate, authFailure, authSuccess} from "../../../redux/authActions
 import {connect} from "react-redux";
 import SideBarUser from "../SideBars/SideBarUser";
 import {Alert} from "reactstrap";
-
+import {loadState, saveState} from "../../../helper/sessionStorage";
+let connected = null;
 function TherapistCardInfo({loading,error,...props}){
 
     const history = useNavigate ();
     const [data,setData]=useState({});
     const { id } = useParams();
     const idNumber = Number(id);
+    const [hideFilterMenu,setHideFilterMenu]=useState(true);
     const [therapistData, setTherapistData] = useState({
         id:0,
         email: '',
@@ -23,7 +25,8 @@ function TherapistCardInfo({loading,error,...props}){
         roles:[],
         number:'',
         experience:0,
-        location:'',
+        location:{},
+        gender:{},
         allRoles:[]
     });
 
@@ -65,6 +68,7 @@ function TherapistCardInfo({loading,error,...props}){
                     number:response.data.number,
                     experience:response.data.experience,
                     location:response.data.location,
+                    gender:response.data.gender,
                     allRoles: response.data.allRoles
                 })
                 setUserTherapistValues(data => {
@@ -73,6 +77,7 @@ function TherapistCardInfo({loading,error,...props}){
                         therapistId: response.data.id
                     };
                 });
+                connected = loadState("connected",false)
             }
             else{
                 localStorage.clear();
@@ -90,6 +95,7 @@ function TherapistCardInfo({loading,error,...props}){
 
         userTherapistConnection(userTherapistValues).then((response)=>{
             if(response.status===201){
+                saveState("connected",true)
                 history('/dashboard/userDashboard/therapists');
             }
             else{
@@ -120,12 +126,27 @@ function TherapistCardInfo({loading,error,...props}){
         });
     };
 
+    function handleRemove(id) {
+        removeTherapist(id).then((response)=>{
+            if(response.status===200){
+                saveState("connected",false)
+                history('/dashboard/userDashboard')
+            }
+            else{
+                //Add error on page if user cant be deleted
+                history('/loginBoot');
+            }
+        }).catch((err)=>{
+            history('/loginBoot');
+        });
+    }
+
     return (
         <main id="page-top">
 
             <div id="wrapper">
 
-                <SideBarUser />
+                <SideBarUser hideFilterMenu={hideFilterMenu}/>
 
                 <div id="content-wrapper" className="d-flex flex-column">
 
@@ -147,11 +168,13 @@ function TherapistCardInfo({loading,error,...props}){
                                 <p>Email: {therapistData.email}</p>
                                 <p>Name: {therapistData.name}</p>
                                 <p>Surname: {therapistData.surname}</p>
+                                <p>Surname: {therapistData.gender.gender}</p>
                                 <p>Number: {therapistData.number}</p>
                                 <p>Experience: {therapistData.experience} years</p>
-                                <p>Location: {therapistData.location}</p>
+                                <p>Location: {therapistData.location.location}</p>
                             </div>
-                            <button onClick={handleConnection}>Connect</button>
+                            {!connected ? <button onClick={handleConnection}>Connect</button> :
+                                <button onClick={() => handleRemove(data.id)}>Remove Therapist</button>}
                         </div>
 
                     </div>
