@@ -29,13 +29,10 @@ function UserDashboardTherapists({loading,error,...props}){
         roles:[],
         number:'',
         experience:0,
-        location:'',
         allRoles:[],
-         university: '',
-          gender: '',
+        university: '',
         location:{},
         gender:{},
-        allRoles:[]
     });
 
     React.useEffect(() => {
@@ -47,29 +44,18 @@ function UserDashboardTherapists({loading,error,...props}){
                 fetchUserTherapistConnectionData(response.data.id).then((response) => {
                     if (response.data.roles.at(0).role === 'ROLE_THERAPIST') {
                         setTherapistData({
-                       id: response.data.id,
-                                            email: response.data.email,
-                                            name: response.data.name,
-                                            surname: response.data.surname,
-                                            password: response.data.password,
-                                            roles: response.data.roles,
-                                            number: response.data.number,
-                                            experience: response.data.experience,
-                                            location: response.data.location,
-                                            allRoles: response.data.allRoles,
-                                            University: response.data.University,
-                                            Gender: response.data.Gender,
-                            id: response.data.id,
-                            email: response.data.email,
-                            name: response.data.name,
-                            surname: response.data.surname,
-                            password: response.data.password,
-                            roles: response.data.roles,
-                            number: response.data.number,
-                            experience: response.data.experience,
-                            location: response.data.location,
-                            gender: response.data.gender,
-                            allRoles: response.data.allRoles
+                           id: response.data.id,
+                           email: response.data.email,
+                           name: response.data.name,
+                           surname: response.data.surname,
+                           password: response.data.password,
+                           roles: response.data.roles,
+                           number: response.data.number,
+                           experience: response.data.experience,
+                           location: response.data.location,
+                           allRoles: response.data.allRoles,
+                           University: response.data.University,
+                           gender: response.data.gender
                         });
                         connected = loadState("connected",false)
                         if(response.data.id===0){

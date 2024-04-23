@@ -14,9 +14,7 @@ public class UserInfo {
     private String surname;
     private String password;
     private String number;
-    private String location;
-    private String Gender;
-    private String University;
+    private University university;
     private Location location;
     private Collection<Roles> roles;
     private List<Roles> allRoles;
@@ -136,20 +134,14 @@ public class UserInfo {
         this.expirationTime=expirationTime;
     }
 
-    public String getGender() {
-        return Gender;
+    public University getUniversity() {
+        return university;
     }
 
-    public void setGender(String gender) {
-        Gender = gender;
+    public void setUniversity(University university) {
+        this.university = university;
     }
 
-    public String getUniversity() {
-        return University;
-    }
-
-    public void setUniversity(String university) {
-        University = university;
     public Gender getGender() {
         return gender;
     }

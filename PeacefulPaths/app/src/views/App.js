@@ -43,7 +43,7 @@ function Main() {
 
                 <Route path="/loginBoot" element={<LoginBoot />}/>
                 <Route path="/registerBoot" element={<RegisterBoot />}/>
-                <Route path="/registerBoot-therapist" element={<RegisterBootTherapist />}/>  // TERAPIST
+                <Route path="/dashboard/registerBoot-therapist" element={<RegisterBootTherapist />}/>  // TERAPIST
                 <Route path="/get-started" element={<GetStarted />}/>
                 <Route path="/forgotPassBoot" element={<ForgotPasswordBoot />}/>
                 <Route path="/verifyPasswordInfo" element={<VerifyPasswordInfo />}/>

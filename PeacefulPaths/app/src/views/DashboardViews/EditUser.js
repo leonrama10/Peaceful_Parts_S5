@@ -33,7 +33,8 @@ function EditUser({loading,error,...props}){
         gender:{},
         language:{},
         questionnaire:{},
-        allRoles:[]
+        allRoles:[],
+        university:{}
     });
 
     React.useEffect(()=>{
@@ -67,7 +68,8 @@ function EditUser({loading,error,...props}){
                     gender:response.data.gender,
                     language:response.data.language,
                     allRoles: response.data.allRoles,
-                    questionnaire: response.data.questionnaire
+                    questionnaire: response.data.questionnaire,
+                    university: response.data.university,
                 })
             userRole = loadState("userRole",'')
             saveState("userRole",response.data.roles.at(0).role);
@@ -124,7 +126,9 @@ function EditUser({loading,error,...props}){
             [name]: name === 'experience' ? Number(value) :
                 name === 'gender' ? { id: Number(value.split('-')[0]), gender: value.split('-')[1] } :
                     name === 'location' ? { id: Number(value.split('-')[0]), location: value.split('-')[1] } :
-                        value
+                        name === 'university' ? { id: Number(value.split('-')[0]), university: value.split('-')[1] } :
+                            name === 'language' ? { id: Number(value.split('-')[0]), language: value.split('-')[1] } :
+                                value
         }));
     };
 
@@ -189,6 +193,23 @@ function EditUser({loading,error,...props}){
                                                 <Form.Control type="tel" defaultValue={data.number}
                                                               onChange={handleChange} name="number"/>
                                             </Form.Group>
+
+                                            {userRole==='ROLE_THERAPIST' && <Form.Group controlId="formBasicUniversity">
+                                                <Form.Label>University Attended</Form.Label>
+                                                <Form.Select
+                                                    id="universitySelect"
+                                                    name="university"
+                                                    value={values.university ? `${values.university.id}-${values.university.university}` : ''}
+                                                    onChange={handleChange}
+                                                    required
+                                                >
+                                                    <option value="1-AAB">AAB</option>
+                                                    <option value="2-UBT">UBT</option>
+                                                    <option value="3-KAKTUS">KAKTUS</option>
+                                                    <option value="4-UNIVERSITETI I PRISHTINES">UNIVERSITETI I PRISHTINES</option>
+                                                </Form.Select>
+                                            </Form.Group>}
+
 
                                             <Form.Group controlId="formBasicAddress">
                                                 <Form.Label>Location</Form.Label>

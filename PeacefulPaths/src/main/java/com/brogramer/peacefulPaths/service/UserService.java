@@ -28,10 +28,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.nio.CharBuffer;
-import java.util.ArrayList;
-import java.util.Collection;
-import java.util.Optional;
-import java.util.UUID;
+import java.util.*;
 
 @Service
 public class UserService implements UserDetailsService {
@@ -163,21 +160,11 @@ public class UserService implements UserDetailsService {
         return convertToUserDto(savedUser);
     }
 
-        userDto1.setEmail( savedUser.getEmail() );
-        userDto1.setId( savedUser.getId() );
-        userDto1.setName( savedUser.getName() );
-        userDto1.setSurname( savedUser.getSurname() );
-        userDto1.setNumber(savedUser.getNumber());
-        userDto1.setToken(savedUser.getToken());
-        userDto1.setRoles(savedUser.getRoles());
-        userDto1.setPassword(savedUser.getPassword());
-        userDto1.setExperience(savedUser.getExperience());
-
-        return userDto1;
     public Questionnaire questionnaire(Questionnaire questionnaire) {
         questionnaireRepository.save(questionnaire);
         return questionnaire;
     }
+
     public UserDto registerTherapist(SignUpDto userDto) {
         // Check if the user (therapist) already exists based on email
         Optional<User> optionalUser = userRepository.findByEmail(userDto.getEmail());
@@ -188,13 +175,17 @@ public class UserService implements UserDetailsService {
         // Create a new User entity for the therapist
         User user = new User();
         user.setEmail(userDto.getEmail());
+        user.setNumber(userDto.getNumber());
         user.setName(userDto.getName());
         user.setSurname(userDto.getSurname());
+        user.setExperience(userDto.getExperience());
         // Encode the password
         user.setPassword(passwordEncoder.encode(CharBuffer.wrap(userDto.getPassword())));
         // Set gender and university from the DTO
         user.setGender(userDto.getGender());
         user.setUniversity(userDto.getUniversity());
+        user.setLocation(userDto.getLocation());
+        user.setLanguage(userDto.getLanguage());
 
         // Assign the ROLE_THERAPIST to this user
         Collection<Roles> roles = new ArrayList<>();
@@ -217,6 +208,8 @@ public class UserService implements UserDetailsService {
         userDtoResult.setExperience(savedUser.getExperience());
         userDtoResult.setGender(savedUser.getGender());
         userDtoResult.setUniversity(savedUser.getUniversity());
+        userDtoResult.setLocation(savedUser.getLocation());
+        userDtoResult.setLanguage(savedUser.getLanguage());
 
         return userDtoResult;
     }

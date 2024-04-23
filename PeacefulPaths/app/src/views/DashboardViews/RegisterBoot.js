@@ -16,13 +16,14 @@ function RegisterBoot({loading,error,...props}){
         }
     },[])
     const history = useNavigate ();
+    const [confirmPassword, setConfirmPassword] = useState('')
     const [registerFailure, setRegisterFailure] = useState('');
     const [values, setValues] = useState({
         email: '',
         name:'',
         surname:'',
         password: '',
-        confirmPassword: ''
+        confirmPassword: '',
         questionnaire: props.questionnaire
     });
 

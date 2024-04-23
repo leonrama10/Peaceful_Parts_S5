@@ -18,7 +18,7 @@ CREATE TABLE `gender` (
 
 INSERT INTO `gender` (`gender`)
 VALUES
-('M'), ('F');
+('M'), ('F'),('O');
 
 SET FOREIGN_KEY_CHECKS = 0;
 DROP TABLE IF EXISTS `location`;
@@ -46,6 +46,19 @@ CREATE TABLE `language` (
 INSERT INTO `language` (`language`)
 VALUES
 ('Albanian'), ('English'), ('Serbian');
+
+SET FOREIGN_KEY_CHECKS = 0;
+DROP TABLE IF EXISTS `university`;
+SET FOREIGN_KEY_CHECKS = 1;
+CREATE TABLE `university` (
+  `id` int(11) NOT NULL AUTO_INCREMENT,
+  `university` varchar(35) NOT NULL,
+  PRIMARY KEY (`id`)
+) AUTO_INCREMENT=1;
+
+INSERT INTO `university` (`university`)
+VALUES
+('AAB'), ('UBT'), ('KAKTUS'), ('UNIVERSITETI I PRISHTINES');
 
 DROP TABLE IF EXISTS `questionnaire`;
 CREATE TABLE `questionnaire` (
@@ -85,18 +98,20 @@ CREATE TABLE `user` (
   `location_id` int(11),
   `language_id` int(11),
   `gender_id` int(11),
+  `university_id` int(11),
   PRIMARY KEY (`id`),
   FOREIGN KEY (`questionnaire_id`) REFERENCES `questionnaire`(`id`) ON DELETE CASCADE on update cascade,
   FOREIGN KEY (`gender_id`) REFERENCES `gender`(`id`) ON DELETE CASCADE on update cascade,
   FOREIGN KEY (`location_id`) REFERENCES `location`(`id`) ON DELETE CASCADE on update cascade,
-  FOREIGN KEY (`language_id`) REFERENCES `language`(`id`) ON DELETE CASCADE on update cascade
+  FOREIGN KEY (`language_id`) REFERENCES `language`(`id`) ON DELETE CASCADE on update cascade,
+  FOREIGN KEY (`university_id`) REFERENCES `university`(`id`) ON DELETE CASCADE on update cascade
 ) AUTO_INCREMENT=1;
 
-INSERT INTO `user` (`name`,`surname`,`email`,`number`,`experience`,`password`,`reset_token`,`expiration_time`,`location_id`,`language_id`,`gender_id`)
+INSERT INTO `user` (`name`,`surname`,`email`,`number`,`experience`,`password`,`reset_token`,`expiration_time`,`location_id`,`language_id`,`gender_id`,`university_id`)
 VALUES	
-('Leke','Markaj','markaj.leka@gmail.com','044806543',20,'$2a$10$lAZ7fMTXoALYWY.C4rAs7u7Bdzz4qd7SIwAkWNOX5XQkTRe7vo4P.',null,0,1,1,1),
-('Loren','Markaj','markaj.loren@gmail.com','044333333',1,'$2a$10$lAZ7fMTXoALYWY.C4rAs7u7Bdzz4qd7SIwAkWNOX5XQkTRe7vo4P.',null,0,1,1,1),
-('Leon','Markaj','markaj.leon@gmail.com','044111111',15,'$2a$10$lAZ7fMTXoALYWY.C4rAs7u7Bdzz4qd7SIwAkWNOX5XQkTRe7vo4P.',null,0,1,1,1);
+('Leke','Markaj','markaj.leka@gmail.com','044806543',20,'$2a$10$lAZ7fMTXoALYWY.C4rAs7u7Bdzz4qd7SIwAkWNOX5XQkTRe7vo4P.',null,0,1,1,1,1),
+('Loren','Markaj','markaj.loren@gmail.com','044333333',1,'$2a$10$lAZ7fMTXoALYWY.C4rAs7u7Bdzz4qd7SIwAkWNOX5XQkTRe7vo4P.',null,0,1,1,1,1),
+('Leon','Markaj','markaj.leon@gmail.com','044111111',15,'$2a$10$lAZ7fMTXoALYWY.C4rAs7u7Bdzz4qd7SIwAkWNOX5XQkTRe7vo4P.',null,0,1,1,1,1);
 
 CREATE TABLE `roles` (
   `id` int(11) NOT NULL AUTO_INCREMENT, 

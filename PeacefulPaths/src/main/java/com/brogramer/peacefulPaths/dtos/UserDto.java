@@ -24,30 +24,21 @@ public class UserDto {
     private String number;
     private Location location;
     private int experience;
-    private String Gender;
-    private String University;
+    private Gender Gender;
+    private University university;
     private Collection<Roles> roles;
-
-    public String getGender() {
-        return Gender;
-    }
-
-    public void setGender(String gender) {
-        Gender = gender;
-    }
-
-    public String getUniversity() {
-        return University;
-    }
-
-    public void setUniversity(String university) {
-        University = university;
-    }
-
     private String resetToken;
     private Long expirationTime;
     private Gender gender;
     private Questionnaire questionnaire;
+
+    public University getUniversity() {
+        return university;
+    }
+
+    public void setUniversity(University university) {
+        this.university = university;
+    }
 
     public Questionnaire getQuestionnaire() {
         return questionnaire;

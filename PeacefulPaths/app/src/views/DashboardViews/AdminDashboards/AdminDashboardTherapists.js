@@ -22,11 +22,9 @@ function AdminDashboardTherapists({loading,error,...props}){
                     setData(response.data);
                 }
                 else{
-                    console.log("AAAAAAAAAAAAAAAAAAAAA ", response.data.roles.at(0).role)
                     history('/loginBoot');
                 }
             }).catch((e)=>{
-                console.log("BBBBBBBBBBBBBBBBBBBBBB ")
                 history('/loginBoot');
             })
         },[])
@@ -66,9 +64,10 @@ function AdminDashboardTherapists({loading,error,...props}){
         const handleEdit = (id) => {
             history(`/dashboard/adminDashboard/users/edit/${id}`);
         };
+
         const handleGenerateTherapistsClick = () => {
             console.log('Generate Therapists button clicked');
-             history('/registerBoot-therapist');
+             history("/dashboard/registerBoot-therapist");
         };
 
 
@@ -111,9 +110,8 @@ function AdminDashboardTherapists({loading,error,...props}){
                                                             <th>Location</th>
                                                             <th>Experience</th>
                                                             <th>Gender</th>
-                                                             <th>University</th>
-                                                             <th>Actions</th>
-
+                                                            <th>University</th>
+                                                            <th>Actions</th>
                                                         </tr>
                                                         </thead>
                                                         <tfoot>
@@ -124,7 +122,7 @@ function AdminDashboardTherapists({loading,error,...props}){
                                                             <th>Gender</th>
                                                             <th>Location</th>
                                                             <th>Experience</th>
-                                                             <th>Gender</th>
+                                                            <th>Gender</th>
                                                             <th>University</th>
                                                             <th>Actions</th>
                                                         </tr>
@@ -138,8 +136,8 @@ function AdminDashboardTherapists({loading,error,...props}){
                                                                     <td>{tempEmployee.gender.gender}</td>
                                                                     <td>{tempEmployee.location.location}</td>
                                                                     <td>{tempEmployee.experience}</td>
-                                                                    <td>{tempEmployee.Gender}</td>
-                                                                    <td>{tempEmployee.University}</td>
+                                                                    <td>{tempEmployee.gender.gender}</td>
+                                                                    <td>{tempEmployee.university.university}</td>
 
                                                                     <td>
                                                                         <button  className="btn btn-info btn-sm" onClick={() => handleEdit(tempEmployee.id)}>

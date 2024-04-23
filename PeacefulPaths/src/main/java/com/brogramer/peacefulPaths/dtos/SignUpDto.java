@@ -1,6 +1,6 @@
 package com.brogramer.peacefulPaths.dtos;
 
-import com.brogramer.peacefulPaths.entity.Questionnaire;
+import com.brogramer.peacefulPaths.entity.*;
 import jakarta.validation.constraints.NotEmpty;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
@@ -25,12 +25,27 @@ public class SignUpDto {
     @NotEmpty
     private String password;
 
-    @NotEmpty
-    private String Gender;
-    @NotEmpty
-    private String University;
+    private int experience;
+
+    private String number;
+
+    private Gender gender;
+
+    private Location location;
+
+    private Language language;
+
+    private University university;
+
     private Questionnaire questionnaire;
 
+    public Location getLocation() {
+        return location;
+    }
+
+    public Language getLanguage() {
+        return language;
+    }
 
     public String getName() {
         return name;
@@ -44,20 +59,12 @@ public class SignUpDto {
         return email;
     }
 
-    public String getUniversity() {
-        return University;
+    public University getUniversity() {
+        return university;
     }
 
-    public void setUniversity(String university) {
-        University = university;
-    }
-
-    public String getGender() {
-        return Gender;
-    }
-
-    public void setGender(String gender) {
-        Gender = gender;
+    public Gender getGender() {
+        return gender;
     }
 
     public String getPassword() {
@@ -68,8 +75,15 @@ public class SignUpDto {
         return email;
     }
 
-
     public Questionnaire getQuestionnaire() {
         return questionnaire;
+    }
+
+    public int getExperience() {
+        return experience;
+    }
+
+    public String getNumber() {
+        return number;
     }
 }

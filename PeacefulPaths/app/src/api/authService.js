@@ -132,7 +132,7 @@ export const userTherapistConnection=(authRequest)=>{
     })
 }
 export const registerTherapist = (authRequest) => {
-console.log("DATAAAAAAAAAAAAAAAAAAAa",authRequest)
+console.log("DATAa",authRequest)
     return axios({
         method: 'POST',
         url: `${process.env.hostUrl || 'http://localhost:8080'}/api/auth/registerTherapist`,

@@ -68,6 +68,7 @@ public class AuthController {
             userInfo.setLocation(userDetails.getLocation());
             userInfo.setGender(userDetails.getGender());
             userInfo.setLanguage(userDetails.getLanguage());
+            userInfo.setUniversity(userDetails.getUniversity());
         }
         userInfo.setExperience(userDetails.getExperience());
         userInfo.setResetToken(userDetails.getResetToken());

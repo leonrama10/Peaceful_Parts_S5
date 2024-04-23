@@ -38,10 +38,6 @@ public class User {
     @Min(value= 0,message = "Must be greater than or equal to 0!")
     @Column(name = "experience")
     private int experience;
-    @Column(name = "University")
-    private String University;
-    @Column(name = "Gender")
-    private String Gender;
 
     @Size(min=8,message = "Must be greater than or equal to 8!")
     @Column(name = "password")
@@ -84,6 +80,10 @@ public class User {
     @JoinColumn(name = "gender_id")
     private Gender gender;
 
+    @ManyToOne
+    @JoinColumn(name = "university_id")
+    private University university;
+
     @Transient
     private List<Roles> allRoles = new ArrayList<>();
 
@@ -108,6 +108,14 @@ public class User {
         allRoles.add(ROLE_THERAPIST);
         allRoles.add(ROLE_MANAGER);
         return allRoles;
+    }
+
+    public University getUniversity() {
+        return university;
+    }
+
+    public void setUniversity(University university) {
+        this.university = university;
     }
 
     public Language getLanguage() {
@@ -176,22 +184,6 @@ public class User {
 
     public String getSurname() {
         return surname;
-    }
-
-    public String getUniversity() {
-        return University;
-    }
-
-    public void setUniversity(String university) {
-        University = university;
-    }
-
-    public String getGender() {
-        return Gender;
-    }
-
-    public void setGender(String gender) {
-        Gender = gender;
     }
 
     public void setSurname(String surname) {
