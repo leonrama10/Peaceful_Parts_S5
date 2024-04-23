@@ -4,39 +4,53 @@ import '../../../css/sb-admin-2.min.css';
 import Questionnaire from "./Questionnaire";
 import RegisterBoot from "../RegisterBoot";
 import "../../../css/QuestionnaireForm.css";
-export default function GetStarted({loading,error,...props}){
+import {questionnaireAnswers} from "../../../api/authService";
+import {authenticate, authFailure, authSuccess} from "../../../redux/authActions";
+import {connect} from "react-redux";
+
+function GetStarted({loading,error,...props}){
 
     const history = useNavigate ();
+    const [selectedAnswer, setSelectedAnswer] = useState({
+        therapyType: '',
+        gender: null,
+        age: null,
+        identity: '',
+        relationshipStatus: '',
+        therapyHistory: '',
+        medicationHistory: '',
+        communication: '',
+        therapistGender: '',
+        therapistExpectations: '',
+        currentPhysicalHealth: '',
+        mentalState1: '',
+        mentalState2: '',
+        location: null,
+        language: null
+    });
 
     const questions = [
-//        {
-//            question: "Total number of oceans in the World is",
-//            answers: [{ text: "7" }, { text: "6" }, { text: "5", isCorrect: true }],
-//        },
         {
             question: "What type of therapy are you looking for?",
             answers: [
                 { text: "Individual (for myself)" },
-                { text: "Couples (for myself and my partner)", isCorrect: true },
+                { text: "Couples (for myself and my partner)"},
                 { text: "Teen (for my child)" },
-//                { text: "" },
             ],
             answerMethod: "button"  // kjo na tregon se jena tu e ba me button jo me drop down
         },
         {
             question: "What is your gender identity?",
             answers: [
-                { text: "Women" },
-//                { text: "" },
-//                { text: "" },
-                { text: "Man", isCorrect: true },
+                { text: "Man" },
+                { text: "Female"},
             ],
             answerMethod: "button"
         },
         {
            question: "Select your age?",
            answers: [
-                { text: "18", isCorrect: true },
+                { text: "18"},
                 { text: "19" },{ text: "20" },{ text: "21" },
                 { text: "22" },{ text: "23" }, { text: "24" },
                 { text: "25" },{ text: "26" },{ text: "27" },
@@ -55,7 +69,7 @@ export default function GetStarted({loading,error,...props}){
                 { text: "64" },{ text: "65" },{ text: "66" },
                 { text: "67" },{ text: "68" },{ text: "69" },
                 { text: "70" },{ text: "71" },{ text: "72" },
-                { text: "73" },{ text: "74" }, { text: "75" },
+                { text: "73" },{ text: "74" },{ text: "75" },
                 { text: "76" },{ text: "77" },{ text: "78" },
                 { text: "79" },{ text: "80" },{ text: "81" },
                 { text: "82" },{ text: "83" },{ text: "84" },
@@ -65,7 +79,6 @@ export default function GetStarted({loading,error,...props}){
                 { text: "94" },{ text: "95" },{ text: "96" },
                 { text: "97" },{ text: "98" },{ text: "99" },
 
-
              ],
              answerMethod: "dropdown"
         },
@@ -73,7 +86,7 @@ export default function GetStarted({loading,error,...props}){
             question: "How do you identify?",
             answers: [
                 { text: "Straight" },
-                { text: "Gay", isCorrect: true },
+                { text: "Gay"},
                 { text: "Lesbian" },
                 { text: "Prefer not to say" },
             ],
@@ -82,7 +95,7 @@ export default function GetStarted({loading,error,...props}){
         {
             question: "What is your relationship status?",
             answers: [
-                { text: "Single", isCorrect: true },
+                { text: "Single"},
                 { text: "In a relationship" },
                 { text: "Married" },
                 { text: "Divorced" },
@@ -92,78 +105,61 @@ export default function GetStarted({loading,error,...props}){
         {
             question: "Have you ever been in therapy before?",
             answers: [
-                { text: "No", isCorrect: true },
-                { text: "Yes" },
-//              { text: "" },
-//              { text: "" },
+                { text: "No"},
+                { text: "Yes" }
             ],
             answerMethod: "button"
         },
          {
-                    question: "Are you currently taking any medication?",
+           question: "Are you currently taking any medication?",
                     answers: [
                         { text: "No" },
-                        { text: "Yes", isCorrect: true },
-//                        { text: "" },
-//                        { text: "" },
+                        { text: "Yes"},
                     ],
                     answerMethod: "button"
-                },
-           {
+           },
+        {
               question: "How do you prefer to communicate with your therapist?",
               answers: [
                 { text: "Mostly via messaging" },
-                { text: "Mostly via phone", isCorrect: true },
+                { text: "Mostly via phone"},
                 { text: "video sessions" },
                 { text: "Not sure yet (decide later)" },
                ],
                answerMethod: "button"
-           },
+        },
                  {
                     question: "Are there any specific preferences for your therapist?",
                     answers: [
-                       { text: "Male therapist", isCorrect: true },
+                       { text: "Male therapist"},
                        { text: "Female therapist" },
-//                     { text: "" },
-//                     { text: "" },
                      ],
                      answerMethod: "button"
-                  },
+                 },
                  {
                     question: "What are your expectations from your therapist? A therapist who...?",
                     answers: [
-                        { text: "Listens", isCorrect: true },
+                        { text: "Listens"},
                         { text: "Explores my past" },
                         { text: "Teaches me new skills" },
                          { text: "I don't now" },
                       ],
                       answerMethod: "button"
-                  },
-                  {
+                 },
+                 {
                       question: "How would you rate your current physical health?",
                       answers: [
-                         { text: "Good", isCorrect: true },
+                         { text: "Good"},
                          { text: "Fair" },
                          { text: "Poor" },
-//                       { text: "" },
                       ],
                       answerMethod: "button"
-                   },
-                 {
-                   question: "Little interest or pleasure in doing things.",
-                   answers: [
-                      { text: "Not at all", isCorrect: true },
-                      { text: "Several days" },
-                      { text: "More than half the days" },
-                      { text: "Nearly every day" },
-                   ],
-                   answerMethod: "button"
                  },
             {
                question: "Feeling down, depressed or hopeless.",
                answers: [
                   { text: "Not at all" },
-                  { text: "Several days", isCorrect: true },
+                  { text: "Several days"},
                   { text: "More than half the days" },
                   { text: "Nearly every day" },
              ],
@@ -173,7 +169,7 @@ export default function GetStarted({loading,error,...props}){
                 question: "Thoughts that you would be better off dead or of hurting yourself in some way.",
                 answers: [
                    { text: "Not at all" },
-                   { text: "Several days", isCorrect: true },
+                   { text: "Several days"},
                    { text: "More than half the days" },
                    { text: "Nearly every day" },
                ],
@@ -182,16 +178,11 @@ export default function GetStarted({loading,error,...props}){
            {
                question: "Which country are you in?",
                answers: [
-                   { text: "Albania", isCorrect: true },
-                   { text: "Andorra" },
-                   { text: "Argentina" },
-                   { text: "Belgium" },
-                   { text: "Brazil" },
-                   { text: "Bulgaria" },
-                   { text: "Canada" },
-                   { text: "China" },
-                   { text: "Denmark" },
-                   { text: "Germany" },
+                   { text: "Kosovo"},
+                   { text: "Albania" },
+                   { text: "Montenegro" },
+                   { text: "North Macedonia" },
+                   { text: "Serbia" }
                 ],
                        answerMethod: "dropdown"
             },
@@ -199,33 +190,90 @@ export default function GetStarted({loading,error,...props}){
                 question: "What is your preferred language?",
                 answers: [
                      { text: "Albanian" },
-                     { text: "English", isCorrect: true },
-                     { text: "French" },
-                     { text: "German" },
+                     { text: "English"},
+                     { text: "Serbian" }
                  ],
                      answerMethod: "dropdown"
             },
     ];
 
-    const [currentQuestion, setCurrentQuestion] = useState(0);
-    const [isQuizOver, setIsQuizOver] = useState(false);
-    const [score, setScore] = useState(0);
-
-    const handleAnswerClick = (isCorrect) => {
-        // check score
-        if (isCorrect) setScore(score + 1);
-
-        const next = currentQuestion + 1;
-        if (next < questions.length) setCurrentQuestion(next);
-        else setIsQuizOver(true);
+    const genderToId = {
+        'Man': 1,
+        'Female': 2
     };
 
-    const handleResetClick = () => {
-        // fix: score not resetting
-        setScore(0);
+    const locationToId = {
+        'Kosovo': 1,
+        'Albania': 2,
+        'Montenegro': 3,
+        'North Macedonia': 4,
+        'Serbia': 5
+    };
 
-        setCurrentQuestion(0);
-        setIsQuizOver(false);
+    const languageToId = {
+        'Albanian': 1,
+        'English': 2,
+        'Serbian': 3
+    };
+    const [currentQuestion, setCurrentQuestion] = useState(0);
+    const [isQuizOver, setIsQuizOver] = useState(false);
+    const [questionnaire, setQuestionnaire] = useState({});
+    const [getStartedFinished, setGetStartedFinished] = useState(false);
+    const [questionIndex, setQuestionIndex] = useState(0);
+    const properties = ['therapyType', 'gender', 'age', 'identity', 'relationshipStatus', 'therapyHistory', 'medicationHistory', 'communication', 'therapistGender', 'therapistExpectations', 'currentPhysicalHealth', 'mentalState1', 'mentalState2', 'location', 'language'];
+
+    React.useEffect(() => {
+        if (questionIndex >= questions.length) {
+                questionnaireAnswers(selectedAnswer).then((response)=>{
+                    if(response.status===200){
+                        setQuestionnaire(response.data);
+                        setGetStartedFinished(true)
+                        setIsQuizOver(true);
+                    }
+                    else{
+                        console.log('Something LEKAAAAAAA!Please Try Again');
+                    }
+
+                }).catch((err)=>{
+
+                    if(err && err.response){
+
+                        switch(err.response.status){
+                            case 401:
+                                console.log("401 status");
+                                console.log("Authentication Failed.Bad Credentials");
+                                break;
+                            default:
+                                console.log('Something BABAAAAAA!Please Try Again');
+                        }
+                    }
+                    else{
+                        console.log("ERROR: ",err)
+                        console.log('Something NaNAAAAA!Please Try Again');
+                    }
+                });
+        }
+    }, [selectedAnswer, questionIndex, questions.length]);
+
+    const handleAnswerClick = (answer) => {
+        const property = properties[questionIndex];
+        let value = answer;
+
+        if (property === 'language') {
+            value = languageToId[answer];
+        }else if (property === 'location') {
+            value = locationToId[answer];
+        }else if (property === 'gender') {
+            value = genderToId[answer];
+        }
+
+        setSelectedAnswer(prevAnswers => ({ ...prevAnswers, [property]: value }));
+        setQuestionIndex(prevIndex => prevIndex + 1);
+
+        const next = currentQuestion + 1;
+        if (next < questions.length){
+            setCurrentQuestion(next);
+        }
     };
 
     return (
@@ -236,7 +284,7 @@ export default function GetStarted({loading,error,...props}){
                     <div className="card-body p-0">
                         <div className="row">
                                 {isQuizOver ? (
-                                    <RegisterBoot handleResetClick={handleResetClick} score={score}/>
+                                    <RegisterBoot questionnaire={questionnaire} getStartedFinished={getStartedFinished}/>
                                 ) : (
                                     <div className="QuestionnaireForm">
                                     <Questionnaire
@@ -253,4 +301,18 @@ export default function GetStarted({loading,error,...props}){
         </main>
     )
 }
+const mapStateToProps=({auth})=>{
+    console.log("state ",auth)
+    return {
+        loading:auth.loading,
+        error:auth.error
+    }}
+const mapDispatchToProps=(dispatch)=>{
 
+    return {
+        authenticate :()=> dispatch(authenticate()),
+        setUser:(data)=> dispatch(authSuccess(data)),
+        loginFailure:(message)=>dispatch(authFailure(message))
+    }
+}
+export default connect(mapStateToProps,mapDispatchToProps)(GetStarted);

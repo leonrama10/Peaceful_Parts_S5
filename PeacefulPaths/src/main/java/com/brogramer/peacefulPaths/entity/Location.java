@@ -16,6 +16,10 @@ public class Location {
     public Location() {
     }
 
+    public Location(Long id) {
+        this.id = id;
+    }
+
     public Location(Long id, String location) {
         this.id = id;
         this.location = location;

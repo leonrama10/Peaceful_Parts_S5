@@ -13,6 +13,8 @@ function UserProfile({loading,error,...props}){
     const history = useNavigate ();
     const [hideFilterMenu,setHideFilterMenu]=useState(true);
     const [data,setData]=useState({});
+    const [updateError,setUpdateError]=useState('');
+    const [updateSuccess,setUpdateSuccess]=useState('');
     const [values, setValues] = useState({
         id:0,
         email: '',
@@ -23,7 +25,9 @@ function UserProfile({loading,error,...props}){
         number:'',
         experience:0,
         location:{},
-        gender:{}
+        gender:{},
+        language:{},
+        questionnaire:{}
     });
 
     React.useEffect(()=>{
@@ -39,7 +43,9 @@ function UserProfile({loading,error,...props}){
                     roles: response.data.roles,
                     number:response.data.number,
                     location:response.data.location,
-                    gender:response.data.gender
+                    gender:response.data.gender,
+                    language:response.data.language,
+                    questionnaire:response.data.questionnaire
                 })
             }
             else{
@@ -61,9 +67,10 @@ function UserProfile({loading,error,...props}){
             if(response.status===201){
                 props.setUser(response.data);
                 history('/dashboard/userDashboard/profile');
+                setUpdateSuccess("Profile updated Successfully :)")
             }
             else{
-                props.loginFailure('Something LEKAAAAAAA!Please Try Again');
+                setUpdateError('Something LEKAAAAAAA!Please Try Again');
             }
 
         }).catch((err)=>{
@@ -73,17 +80,17 @@ function UserProfile({loading,error,...props}){
                 switch(err.response.status){
                     case 401:
                         console.log("401 status");
-                        props.loginFailure("Authentication Failed.Bad Credentials");
+                        setUpdateError("Authentication Failed.Bad Credentials");
                         break;
                     default:
-                        props.loginFailure('Something BABAAAAAA!Please Try Again');
+                        setUpdateError('Something BABAAAAAA!Please Try Again');
 
                 }
 
             }
             else{
                 console.log("ERROR: ",err)
-                props.loginFailure('Something NaNAAAAA!Please Try Again');
+                setUpdateError('Something NaNAAAAA!Please Try Again');
             }
 
         });
@@ -93,9 +100,10 @@ function UserProfile({loading,error,...props}){
         const { name, value } = e.target;
         setValues(values => ({
             ...values,
-            [name]: name === 'experience' ? Number(value) :
+            [name]:
                 name === 'gender' ? { id: Number(value.split('-')[0]), gender: value.split('-')[1] } :
-                    name === 'location' ? { id: Number(value.split('-')[0]), location: value.split('-')[1] } :
+                    name === 'location' ? { id: Number(value.split('-')[0]), location: value.split('-')[1] }:
+                        name === 'language' ? { id: Number(value.split('-')[0]), language: value.split('-')[1] }:
                         value
         }));
     };
@@ -122,9 +130,14 @@ function UserProfile({loading,error,...props}){
                                 <Row className="justify-content-md-center">
                                     <Col xs={12} md={6}>
                                         <h2>Account Information</h2>
-                                        { error &&
+                                        { updateError &&
                                             <Alert style={{marginTop:'20px'}} variant="danger">
-                                                {error}
+                                                {updateError}
+                                            </Alert>
+                                        }
+                                        { updateSuccess &&
+                                            <Alert style={{marginTop:'20px'}} variant="success">
+                                                {updateSuccess}
                                             </Alert>
                                         }
                                         <Form onSubmit={handleUpdate}>
@@ -148,7 +161,6 @@ function UserProfile({loading,error,...props}){
                                             <Form.Group controlId="formBasicGender">
                                                 <Form.Label>Gender</Form.Label>
                                                 <Form.Select name="gender" value={values.gender ? `${values.gender.id}-${values.gender.gender}` : ''} onChange={handleChange} required>
-                                                    {/*<option value="">Select Gender</option>*/}
                                                     <option value="1-M">Male</option>
                                                     <option value="2-F">Female</option>
                                                 </Form.Select>
@@ -162,10 +174,20 @@ function UserProfile({loading,error,...props}){
                                             <Form.Group controlId="formBasicAddress">
                                                 <Form.Label>Location</Form.Label>
                                                 <Form.Select name="location" value={values.location ? `${values.location.id}-${values.location.location}` : ''} onChange={handleChange} required>
-                                                    {/*<option value="">Select Location</option>*/}
-                                                    <option value="1-Zllakuqan">Zllakuqan</option>
-                                                    <option value="2-Los Angeles">Los Angeles</option>
-                                                    <option value="3-Chicago">Chicago</option>
+                                                    <option value="1-Kosovo">Kosovo</option>
+                                                    <option value="2-Albania">Albania</option>
+                                                    <option value="3-Montenegro">Montenegro</option>
+                                                    <option value="4-North Macedonia">North Macedonia</option>
+                                                    <option value="5-Serbia">Serbia</option>
+                                                </Form.Select>
+                                            </Form.Group>
+
+                                            <Form.Group controlId="formBasicLanguage">
+                                                <Form.Label>Language</Form.Label>
+                                                <Form.Select name="language" value={values.language ? `${values.language.id}-${values.language.language}` : ''} onChange={handleChange} required>
+                                                    <option value="1-Albanian">Kosovo</option>
+                                                    <option value="2-English">Albania</option>
+                                                    <option value="3-Serbian">Montenegro</option>
                                                 </Form.Select>
                                             </Form.Group>
 
@@ -197,9 +219,6 @@ function UserProfile({loading,error,...props}){
 
             </div>
 
-            {/*<a className="scroll-to-top rounded" href="#page-top">*/}
-            {/*    <i className="fas fa-angle-up"></i>*/}
-            {/*</a>*/}
 
             <div className="modal fade" id="logoutModal" tabIndex="-1" role="dialog" aria-labelledby="exampleModalLabel"
                  aria-hidden="true">

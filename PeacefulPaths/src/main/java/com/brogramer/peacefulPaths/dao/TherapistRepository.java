@@ -1,6 +1,5 @@
 package com.brogramer.peacefulPaths.dao;
 
-import com.brogramer.peacefulPaths.entity.Gender;
 import com.brogramer.peacefulPaths.entity.Roles;
 import com.brogramer.peacefulPaths.entity.User;
 import org.springframework.data.jpa.repository.JpaRepository;

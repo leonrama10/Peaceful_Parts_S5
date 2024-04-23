@@ -12,7 +12,8 @@ function AdminProfile({loading,error,...props}){
 
     const history = useNavigate ();
     const [data,setData]=useState({});
-
+    const [updateError,setUpdateError]=useState('');
+    const [updateSuccess,setUpdateSuccess]=useState('');
     const [values, setValues] = useState({
         id:0,
         email: '',
@@ -21,8 +22,9 @@ function AdminProfile({loading,error,...props}){
         password:'',
         roles:[],
         number:'',
-        experience:0,
-        location:''
+        location:{},
+        gender:{},
+        language:{}
     });
 
     React.useEffect(()=>{
@@ -37,8 +39,9 @@ function AdminProfile({loading,error,...props}){
                     password: response.data.password,
                     roles: response.data.roles,
                     number:response.data.number,
-                    experience:response.data.experience,
-                    location:response.data.location
+                    location:response.data.location,
+                    gender:response.data.gender,
+                    language:response.data.language,
                 })
             }
             else{
@@ -89,10 +92,13 @@ function AdminProfile({loading,error,...props}){
     };
 
     const handleChange = (e) => {
-        e.persist();
+        const { name, value } = e.target;
         setValues(values => ({
             ...values,
-            [e.target.name]: e.target.name === 'experience' ? Number(e.target.value) : e.target.value
+            [name]: name === 'gender' ? { id: Number(value.split('-')[0]), gender: value.split('-')[1] } :
+                    name === 'location' ? { id: Number(value.split('-')[0]), location: value.split('-')[1] }:
+                        name === 'language' ? { id: Number(value.split('-')[0]), language: value.split('-')[1] }:
+                            value
         }));
     };
 
@@ -117,9 +123,14 @@ function AdminProfile({loading,error,...props}){
                                 <Row className="justify-content-md-center">
                                     <Col xs={12} md={6}>
                                         <h2>Account Information</h2>
-                                        {error &&
-                                            <Alert style={{marginTop: '20px'}} variant="danger">
-                                                {error}
+                                        { updateError &&
+                                            <Alert style={{marginTop:'20px'}} variant="danger">
+                                                {updateError}
+                                            </Alert>
+                                        }
+                                        { updateSuccess &&
+                                            <Alert style={{marginTop:'20px'}} variant="success">
+                                                {updateSuccess}
                                             </Alert>
                                         }
                                         <Form onSubmit={handleUpdate}>
@@ -143,6 +154,14 @@ function AdminProfile({loading,error,...props}){
                                                               onChange={handleChange} required/>
                                             </Form.Group>
 
+                                            <Form.Group controlId="formBasicGender">
+                                                <Form.Label>Gender</Form.Label>
+                                                <Form.Select name="gender" value={values.gender ? `${values.gender.id}-${values.gender.gender}` : ''} onChange={handleChange} required>
+                                                    <option value="1-M">Male</option>
+                                                    <option value="2-F">Female</option>
+                                                </Form.Select>
+                                            </Form.Group>
+
                                             <Form.Group controlId="formBasicPhone">
                                                 <Form.Label>Phone</Form.Label>
                                                 <Form.Control type="tel" defaultValue={data.number}
@@ -151,14 +170,22 @@ function AdminProfile({loading,error,...props}){
 
                                             <Form.Group controlId="formBasicAddress">
                                                 <Form.Label>Location</Form.Label>
-                                                <Form.Control type="text" defaultValue={data.location}
-                                                              onChange={handleChange} name="location"/>
+                                                <Form.Select name="location" value={values.location ? `${values.location.id}-${values.location.location}` : ''} onChange={handleChange} required>
+                                                    <option value="1-Kosovo">Kosovo</option>
+                                                    <option value="2-Albania">Albania</option>
+                                                    <option value="3-Montenegro">Montenegro</option>
+                                                    <option value="4-North Macedonia">North Macedonia</option>
+                                                    <option value="5-Serbia">Serbia</option>
+                                                </Form.Select>
                                             </Form.Group>
 
-                                            <Form.Group controlId="formBasicAddress">
-                                                <Form.Label>Experience</Form.Label>
-                                                <Form.Control type="number" defaultValue={data.experience}
-                                                              onChange={handleChange} name="experience" min={0}/>
+                                            <Form.Group controlId="formBasicLanguage">
+                                                <Form.Label>Language</Form.Label>
+                                                <Form.Select name="language" value={values.language ? `${values.language.id}-${values.language.language}` : ''} onChange={handleChange} required>
+                                                    <option value="1-Albanian">Kosovo</option>
+                                                    <option value="2-English">Albania</option>
+                                                    <option value="3-Serbian">Montenegro</option>
+                                                </Form.Select>
                                             </Form.Group>
 
                                             <div className="text-left" style={{padding: '10px 0'}}>

@@ -15,27 +15,27 @@ const Questionnaire = ({ questions, currentQuestion, handleAnswerClick }) => {
                 </div>
             </div>
 
-       {questions[currentQuestion].answerMethod === "dropdown" && (
-                   <div className="answer">
-                       <select onChange={(event) => handleAnswerClick(event.target.value)}>
-                           <option value="">Select an answer</option>
-                           {questions[currentQuestion].answers.map(({ text }) => (
-                               <option key={text} value={text}>{text}</option>
-                           ))}
-                       </select>
-                   </div>
-               )}
+           {questions[currentQuestion].answerMethod === "dropdown" && (
+                       <div className="answer">
+                           <select onChange={(event) => handleAnswerClick(event.target.value)}>
+                               <option value="">Select an answer</option>
+                               {questions[currentQuestion].answers.map(({text}) => (
+                                   <option key={text} value={text}>{text}</option>
+                               ))}
+                           </select>
+                       </div>
+           )}
 
-               {questions[currentQuestion].answerMethod === "button" && (
-                   <div className="answer">
-                       {questions[currentQuestion].answers.map(({ text, isCorrect }) => (
-                           <button key={text} onClick={() => handleAnswerClick(isCorrect)}>
-                               {text}
-                           </button>
-                       ))}
-                   </div>
-               )}
-                </>
+           {questions[currentQuestion].answerMethod === "button" && (
+                       <div className="answer">
+                           {questions[currentQuestion].answers.map(({text}) => (
+                               <button key={text} onClick={() => handleAnswerClick(text)}>
+                                   {text}
+                               </button>
+                           ))}
+                       </div>
+           )}
+        </>
     );
 
 };

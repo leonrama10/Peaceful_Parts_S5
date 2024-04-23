@@ -11,6 +11,7 @@ import TherapistDashboardUsers from "./DashboardViews/TherapistDashboards/Therap
 import AdminDashboardTherapists from "./DashboardViews/AdminDashboards/AdminDashboardTherapists";
 import AdminDashboardAdmin from "./DashboardViews/AdminDashboards/AdminDashboardAdmin";
 import TherapistDashboard from "./DashboardViews/TherapistDashboards/TherapistDashboard";
+import TherapistProfile from "./DashboardViews/TherapistDashboards/TherapistProfile";
 import LoginBoot from "./DashboardViews/LoginBoot";
 import RegisterBoot from "./DashboardViews/RegisterBoot";
 import ForgotPasswordBoot from "./DashboardViews/ForgotPasswordBoot";
@@ -51,6 +52,7 @@ function Main() {
                 <Route path="/dashboard/adminDashboard/users/edit/:id" element={<EditUser />}/>
                 <Route path="/dashboard/therapistDashboard/users/edit/:id" element={<EditUser />}/>
                 <Route path="/dashboard/therapistDashboard" element={<TherapistDashboard />}/>
+                <Route path="/dashboard/therapistDashboard/profile" element={<TherapistProfile />}/>
                 <Route path="/dashboard/therapistDashboard/users" element={<TherapistDashboardUsers />}/>
                 <Route path="/dashboard/therapistDashboard/history" element={<TherapistClientHistory />}/>
                 <Route path="/dashboard/errorPage" element={<ErrorPage />}/>

@@ -1,14 +1,10 @@
 package com.brogramer.peacefulPaths.dtos;
 
-import com.brogramer.peacefulPaths.entity.Gender;
-import com.brogramer.peacefulPaths.entity.Location;
-import com.brogramer.peacefulPaths.entity.Roles;
-import jakarta.persistence.Transient;
+import com.brogramer.peacefulPaths.entity.*;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
-import org.springframework.security.core.GrantedAuthority;
 
 import java.util.Collection;
 
@@ -18,6 +14,7 @@ import java.util.Collection;
 @Builder
 public class UserDto {
 
+    private Language language;
     private int id;
     private String name;
     private String surname;
@@ -31,6 +28,23 @@ public class UserDto {
     private String resetToken;
     private Long expirationTime;
     private Gender gender;
+    private Questionnaire questionnaire;
+
+    public Questionnaire getQuestionnaire() {
+        return questionnaire;
+    }
+
+    public void setQuestionnaire(Questionnaire questionnaire) {
+        this.questionnaire = questionnaire;
+    }
+
+    public Language getLanguage() {
+        return language;
+    }
+
+    public void setLanguage(Language language) {
+        this.language = language;
+    }
 
     public Location getLocation() {
         return location;

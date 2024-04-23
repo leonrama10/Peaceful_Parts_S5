@@ -5,15 +5,23 @@ import {Link, useNavigate} from 'react-router-dom';
 import '../../css/sb-admin-2.min.css';
 import {Alert} from "reactstrap";
 import {authenticate, authFailure, authSuccess} from "../../redux/authActions";
+
 function RegisterBoot({loading,error,...props}){
 
+    React.useEffect(()=>{
+        if (!props.getStartedFinished){
+            props.loginFailure("Authentication Failed.")
+            history('/loginBoot');
+        }
+    },[])
     const history = useNavigate ();
-
+    const [registerFailure, setRegisterFailure] = useState('');
     const [values, setValues] = useState({
         email: '',
         name:'',
         surname:'',
-        password: ''
+        password: '',
+        questionnaire: props.questionnaire
     });
 
     const [confirmPassword, setConfirmPassword] = useState('')
@@ -27,9 +35,8 @@ function RegisterBoot({loading,error,...props}){
                     props.setUser(response.data);
                     history('/loginBoot');
                 } else {
-                    props.loginFailure('Something LEKAAAAAAA!Please Try Again');
+                    setRegisterFailure('Something LEKAAAAAAA!Please Try Again');
                 }
-
 
             }).catch((err) => {
 
@@ -38,21 +45,21 @@ function RegisterBoot({loading,error,...props}){
                     switch (err.response.status) {
                         case 401:
                             console.log("401 status");
-                            props.loginFailure("Authentication Failed.Bad Credentials");
+                            setRegisterFailure("Authentication Failed.Bad Credentials");
                             break;
                         default:
-                            props.loginFailure('Something BABAAAAAA!Please Try Again');
+                            setRegisterFailure('Something BABAAAAAA!Please Try Again');
 
                     }
 
                 } else {
                     console.log("ERROR: ", err)
-                    props.loginFailure('Something NaNAAAAA!Please Try Again');
+                    setRegisterFailure('Something NaNAAAAA!Please Try Again');
                 }
 
             });
         } else {
-            props.loginFailure('Passwords do not match!!!');
+            setRegisterFailure('Passwords do not match!!!');
         }
     }
 
@@ -88,9 +95,9 @@ function RegisterBoot({loading,error,...props}){
                                     <div className="text-center">
                                         <h1 className="h4 text-gray-900 mb-4">Create an Account!</h1>
                                     </div>
-                                    { error &&
+                                    { registerFailure &&
                                         <Alert style={{marginTop:'20px'}} variant="danger">
-                                            {error}
+                                            {registerFailure}
                                         </Alert>
                                     }
                                     <form className="user" onSubmit={handleSubmit}>

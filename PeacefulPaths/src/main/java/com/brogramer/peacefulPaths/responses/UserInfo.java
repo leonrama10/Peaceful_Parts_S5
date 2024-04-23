@@ -1,14 +1,12 @@
 package com.brogramer.peacefulPaths.responses;
 
-import com.brogramer.peacefulPaths.entity.Gender;
-import com.brogramer.peacefulPaths.entity.Location;
-import com.brogramer.peacefulPaths.entity.Roles;
-import org.springframework.security.core.GrantedAuthority;
+import com.brogramer.peacefulPaths.entity.*;
 
 import java.util.Collection;
 import java.util.List;
 
 public class UserInfo {
+
     private String email;
     private int id;
     private int experience;
@@ -22,6 +20,24 @@ public class UserInfo {
     private String resetToken;
     private Long expirationTime;
     private Gender gender;
+    private Language language;
+    private Questionnaire questionnaire;
+
+    public Questionnaire getQuestionnaire() {
+        return questionnaire;
+    }
+
+    public void setQuestionnaire(Questionnaire questionnaire) {
+        this.questionnaire = questionnaire;
+    }
+
+    public Language getLanguage() {
+        return language;
+    }
+
+    public void setLanguage(Language language) {
+        this.language = language;
+    }
 
     public List<Roles> getAllRoles() {
         return allRoles;

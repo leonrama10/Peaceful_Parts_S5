@@ -1,5 +1,6 @@
 package com.brogramer.peacefulPaths.dtos;
 
+import com.brogramer.peacefulPaths.entity.Questionnaire;
 import jakarta.validation.constraints.NotEmpty;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
@@ -24,6 +25,8 @@ public class SignUpDto {
     @NotEmpty
     private String password;
 
+    private Questionnaire questionnaire;
+
 
     public String getName() {
         return name;
@@ -45,4 +48,7 @@ public class SignUpDto {
         return email;
     }
 
+    public Questionnaire getQuestionnaire() {
+        return questionnaire;
+    }
 }

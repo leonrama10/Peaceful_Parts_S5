@@ -13,8 +13,10 @@ import DataTable from 'datatables.net-dt';
 import $ from 'jquery';
 import DashboardNav from "../DashboardNav";
 import SideBarTherapist from "../SideBars/SideBarTherapist";
+import {authenticate, authFailure, authSuccess} from "../../../redux/authActions";
+import {connect} from "react-redux";
 
-export default function TherapistClientHistory({loading,error,...props}){
+function TherapistClientHistory({loading,error,...props}){
 
     const history = useNavigate ();
     const [data,setData]=useState({});
@@ -158,3 +160,19 @@ export default function TherapistClientHistory({loading,error,...props}){
     )
 
 }
+
+const mapStateToProps = ({auth}) => {
+    console.log("state ", auth)
+    return {
+        loading: auth.loading,
+        error: auth.error
+    }
+}
+const mapDispatchToProps = (dispatch) => {
+    return {
+        authenticate: () => dispatch(authenticate()),
+        setUser: (data) => dispatch(authSuccess(data)),
+        loginFailure: (message) => dispatch(authFailure(message))
+    }
+}
+export default connect(mapStateToProps, mapDispatchToProps)(TherapistClientHistory);

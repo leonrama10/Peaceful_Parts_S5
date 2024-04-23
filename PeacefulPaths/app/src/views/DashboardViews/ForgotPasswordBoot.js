@@ -10,7 +10,7 @@ loadState("ResetPassword",false)
 function ForgotPasswordBoot({loading,error,...props}){
 
     const history = useNavigate ();
-
+    const [forgotPasswordFailure, setForgotPasswordFailure] = useState('');
     const [values, setValues] = useState({
         email: ''
     });
@@ -28,11 +28,11 @@ function ForgotPasswordBoot({loading,error,...props}){
                     history('/verifyPasswordInfo');
                 }
                 else{
-                    props.loginFailure('Email does not exist! Please Try Again');
+                    setForgotPasswordFailure('Email does not exist! Please Try Again');
                 }
             }
             else{
-                props.loginFailure('Something LEKAAAAAAA!Please Try Again');
+                setForgotPasswordFailure('Something LEKAAAAAAA!Please Try Again');
             }
         }).catch((err)=>{
 
@@ -41,15 +41,15 @@ function ForgotPasswordBoot({loading,error,...props}){
                 switch(err.response.status) {
                     case 401:
                         console.log("401 status");
-                        props.loginFailure("Authentication Failed.Bad Credentials");
+                        setForgotPasswordFailure("Authentication Failed.Bad Credentials");
                         break;
                     default:
-                        props.loginFailure('Something BABAAAAAA!Please Try Again');
+                        setForgotPasswordFailure('Something BABAAAAAA!Please Try Again');
                 }
             }
             else{
                 console.log("ERROR: ",err)
-                props.loginFailure('Something NaNAAAAA!Please Try Again');
+                setForgotPasswordFailure('Something NaNAAAAA!Please Try Again');
             }
         });
     }
@@ -83,9 +83,9 @@ function ForgotPasswordBoot({loading,error,...props}){
                                                 <p className="mb-4">We get it, stuff happens. Just enter your email address below
                                                     and we'll send you a link to reset your password!</p>
                                             </div>
-                                            { error &&
+                                            { forgotPasswordFailure &&
                                                 <Alert style={{marginTop:'20px'}} variant="danger">
-                                                    {error}
+                                                    {forgotPasswordFailure}
                                                 </Alert>
                                             }
                                             <form className="user" onSubmit={handleSubmit}>

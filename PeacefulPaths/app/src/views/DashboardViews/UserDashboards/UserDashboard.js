@@ -32,7 +32,6 @@ function UserDashboard({loading,error,...props}){
 
                 fetchUserTherapistConnectionData(response.data.id).then((response) => {
                     if (response.data.roles.at(0).role === 'ROLE_THERAPIST') {
-                        console.log("LEKAAAAAAAAAA")
                         setTherapistData({
                             id: response.data.id
                         });
@@ -45,7 +44,6 @@ function UserDashboard({loading,error,...props}){
 
                         if(!hideTherapists){
                             fetchAllTherapistNotConnectedData(response.data.id).then((response)=>{
-                                console.log("MARKAAAAAAAAAAAAAAAAJ")
                                 setAllUsers(response.data)
                             }).catch((e)=>{
                                 history('/loginBoot');
@@ -57,13 +55,10 @@ function UserDashboard({loading,error,...props}){
                     }
                 }).catch((e) => {
                         fetchAllTherapistData().then((response)=>{
-                            console.log("DAAAAAAAAAAAADA")
                             setAllUsers(response.data)
                         }).catch((e)=>{
                             history('/loginBoot');
                         })
-
-                    console.log("PPPPPPPPPPPPPPPPP")
                     connected = loadState("connected",false)
                     if (e.response) {
                         // The request was made and the server responded with a status code
@@ -86,7 +81,6 @@ function UserDashboard({loading,error,...props}){
             history('/loginBoot');
         });
     }, []);
-
 
     return (
         <main id="page-top">

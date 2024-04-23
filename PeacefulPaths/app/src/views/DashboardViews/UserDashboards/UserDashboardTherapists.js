@@ -19,7 +19,7 @@ function UserDashboardTherapists({loading,error,...props}){
     const history = useNavigate ();
     const [data,setData]=useState({});
     const [hideFilterMenu,setHideFilterMenu]=useState(true);
-
+    const [connectionFailure, setConnectionFailure] = useState('');
     const [therapistData, setTherapistData] = useState({
         id:0,
         email: '',
@@ -70,7 +70,7 @@ function UserDashboardTherapists({loading,error,...props}){
                     if (e.response) {
                         // The request was made and the server responded with a status code
                         // that falls out of the range of 2xx
-                        props.loginFailure(e.response.data);
+                        setConnectionFailure(e.response.data);
                         console.log(e.response.data); // This will log 'Connect with a therapist!!!'
                         console.log(e.response.status); // This will log 404 (NOT_FOUND)
                     } else if (e.request) {
@@ -80,8 +80,6 @@ function UserDashboardTherapists({loading,error,...props}){
                         // Something happened in setting up the request that triggered an Error
                         console.log('Error', e.message);
                     }
-                    // localStorage.clear();
-                    // history('/loginBoot');
                 });
             } else {
                 history('/loginBoot');
@@ -119,9 +117,9 @@ function UserDashboardTherapists({loading,error,...props}){
 
                         <DashboardNav data={data} setUser={props.setUser}/>
 
-                        { error &&
+                        { connectionFailure &&
                             <Alert style={{marginTop:'20px'}} variant="danger">
-                                {error}
+                                {connectionFailure}
                             </Alert>
                         }
 
@@ -199,7 +197,7 @@ const mapDispatchToProps = (dispatch) => {
     return {
         authenticate: () => dispatch(authenticate()),
         setUser: (data) => dispatch(authSuccess(data)),
-        loginFailure: (message) => dispatch(authFailure(message))
+        connectMessage: (message) => dispatch(authFailure(message))
     }
 }
 export default connect(mapStateToProps, mapDispatchToProps)(UserDashboardTherapists);

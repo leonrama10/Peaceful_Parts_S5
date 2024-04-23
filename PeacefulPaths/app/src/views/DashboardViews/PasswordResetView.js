@@ -11,7 +11,7 @@ function PasswordResetView({loading,error,...props}){
     const { token } = useParams();
     const paramResetToken = token;
     const history = useNavigate ();
-
+    const [passwordResetFailure, setPasswordResetFailure] = useState('');
     const [values, setValues] = useState({
         id:0,
         email: '',
@@ -63,16 +63,6 @@ function PasswordResetView({loading,error,...props}){
     },[])
 
 
-
-    //
-
-    // React.useEffect(()=>{
-    //     console.log("LEKAAAAAAAAAAAA",values.resetToken)
-    //     if (values.resetToken!==paramResetToken ){
-    //         history('/loginBoot');
-    //     }
-    // },[])
-
     console.log("YPPPPPPPPPPPPPPP ", values)
     const handleSubmit=(evt)=>{
         evt.preventDefault();
@@ -86,11 +76,11 @@ function PasswordResetView({loading,error,...props}){
                         history('/loginBoot');
                     }
                     else{
-                        props.loginFailure('Please Try Again!!!');
+                        setPasswordResetFailure('Please Try Again!!!');
                     }
                 }
                 else{
-                    props.loginFailure('Something LEKAAAAAAA!Please Try Again');
+                    setPasswordResetFailure('Something LEKAAAAAAA!Please Try Again');
                 }
             }).catch((err)=>{
 
@@ -99,19 +89,19 @@ function PasswordResetView({loading,error,...props}){
                     switch(err.response.status) {
                         case 401:
                             console.log("401 status");
-                            props.loginFailure("Authentication Failed.Bad Credentials");
+                            setPasswordResetFailure("Authentication Failed.Bad Credentials");
                             break;
                         default:
-                            props.loginFailure('Something BABAAAAAA!Please Try Again');
+                            setPasswordResetFailure('Something BABAAAAAA!Please Try Again');
                     }
                 }
                 else{
                     console.log("ERROR: ",err)
-                    props.loginFailure('Something NaNAAAAA!Please Try Again');
+                    setPasswordResetFailure('Something NaNAAAAA!Please Try Again');
                 }
             });
         } else {
-            props.loginFailure('Passwords do not match!!!');
+            setPasswordResetFailure('Passwords do not match!!!');
         }
     }
 
@@ -145,9 +135,9 @@ function PasswordResetView({loading,error,...props}){
                                         <div className="p-5">
                                             <div className="container">
                                                 <p className="h4 mb-4">Reset Password</p>
-                                                { error &&
+                                                { passwordResetFailure &&
                                                     <Alert style={{marginTop:'20px'}} variant="danger">
-                                                        {error}
+                                                        {passwordResetFailure}
                                                     </Alert>
                                                 }
                                                 <form onSubmit={handleSubmit}>

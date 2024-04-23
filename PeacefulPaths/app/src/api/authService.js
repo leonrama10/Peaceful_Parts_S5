@@ -14,7 +14,6 @@ export const userLogin=(authRequest)=>{
 }
 
 export const userRegister=(authRequest)=>{
-
     return axios({
         'method':'POST',
         'url':`${process.env.hostUrl||'http://localhost:8080'}/api/auth/register`,
@@ -236,6 +235,15 @@ export const therapistFilterByLocationNotConnected = (authRequest) => {
         headers: {
             'Authorization': 'Bearer ' + getToken()
         }
+    });
+};
+
+export const questionnaireAnswers = (authRequest) => {
+    console.log("AUTHHHHHHHHHHHHHHHHH" , authRequest)
+    return axios({
+        method: 'POST',
+        url: `${process.env.hostUrl || 'http://localhost:8080'}/api/auth/questionnaireAnswers`,
+        data:authRequest
     });
 };
 

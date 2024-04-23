@@ -329,10 +329,11 @@ function SideBarUser({loading,error,...props}){
                                 <div>
                                     <select onChange={(event) => handleFilterByLocation(event.target.value)}>
                                         <option value="">Select Location</option>
-                                        <option value="Zllakuqan">Zllakuqan</option>
-                                        <option value="Los Angeles">Los Angeles</option>
-                                        <option value="Chicago">Chicago</option>
-                                        {/* Add more locations as needed */}
+                                        <option value="Kosovo">Kosovo</option>
+                                        <option value="Albania">Albania</option>
+                                        <option value="Montenegro">Montenegro</option>
+                                        <option value="North Macedonia">North Macedonia</option>
+                                        <option value="Serbia">Serbia</option>
                                     </select>
                                 </div>
                             </Collapse>

@@ -5,6 +5,7 @@ import com.brogramer.peacefulPaths.dao.TherapistRepository;
 import com.brogramer.peacefulPaths.dtos.*;
 import com.brogramer.peacefulPaths.entity.Connection;
 import com.brogramer.peacefulPaths.entity.CustomUserDetails;
+import com.brogramer.peacefulPaths.entity.Roles;
 import com.brogramer.peacefulPaths.entity.User;
 import com.brogramer.peacefulPaths.responses.UserInfo;
 import com.brogramer.peacefulPaths.service.UserService;
@@ -13,13 +14,12 @@ import jakarta.validation.Valid;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
-import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.web.bind.annotation.*;
 
 import java.net.URI;
 import java.security.Principal;
-import java.util.List;
+import java.util.*;
 import java.util.stream.Collectors;
 
 @RestController
@@ -42,28 +42,72 @@ public class AuthController {
     }
 
     public List<UserInfo> getAllWithRole(String role) {
-        return userService.findAllByRole(role).stream().map(userDetails -> {
-            return convertToUserInfo(userDetails);
-        }).collect(Collectors.toList());
+        return userService.findAllByRole(role).stream().map(this::convertToUserInfo).collect(Collectors.toList());
     }
 
     public UserInfo convertToUserInfo(User userDetails) {
+
+        Collection<Roles> role;
+        Roles roleUser = new Roles(1,"ROLE_USER");
+
         UserInfo userInfo = new UserInfo();
         userInfo.setId(userDetails.getId());
         userInfo.setEmail(userDetails.getEmail());
         userInfo.setName(userDetails.getName());
         userInfo.setSurname(userDetails.getSurname());
+        role = userDetails.getRoles();
         userInfo.setRoles(userDetails.getRoles());
         userInfo.setPassword(userDetails.getPassword());
         userInfo.setNumber(userDetails.getNumber());
-        userInfo.setLocation(userDetails.getLocation());
+        if (role.contains(roleUser)) {
+            userInfo.setQuestionnaire(userDetails.getQuestionnaire());
+            userInfo.setLocation(userDetails.getQuestionnaire().getLocation());
+            userInfo.setGender(userDetails.getQuestionnaire().getGender());
+            userInfo.setLanguage(userDetails.getQuestionnaire().getLanguage());
+        }else {
+            userInfo.setLocation(userDetails.getLocation());
+            userInfo.setGender(userDetails.getGender());
+            userInfo.setLanguage(userDetails.getLanguage());
+        }
         userInfo.setExperience(userDetails.getExperience());
         userInfo.setResetToken(userDetails.getResetToken());
         userInfo.setExpirationTime(userDetails.getExpirationTime());
-        userInfo.setGender(userDetails.getGender());
+
         return userInfo;
     }
 
+    public User createUserFromDetails(User userDetails) {
+        User user = new User();
+        user.setId(userDetails.getId());
+        user.setEmail(userDetails.getEmail());
+        user.setName(userDetails.getName());
+        user.setSurname(userDetails.getSurname());
+        user.setRoles(userDetails.getRoles());
+        user.setPassword(userDetails.getPassword());
+        user.setNumber(userDetails.getNumber());
+        user.setLocation(userDetails.getLocation());
+        user.setExperience(userDetails.getExperience());
+        user.setGender(userDetails.getGender());
+        user.setLanguage(userDetails.getLanguage());
+        return user;
+    }
+
+    public User mapUserDetailsToUser(User userDetails) {
+        User user = new User();
+        user.setId(userDetails.getId());
+        user.setEmail(userDetails.getEmail());
+        user.setName(userDetails.getName());
+        user.setSurname(userDetails.getSurname());
+        user.setRoles(userDetails.getRoles());
+        user.setPassword(userDetails.getPassword());
+        user.setNumber(userDetails.getNumber());
+        user.setQuestionnaire(userDetails.getQuestionnaire());
+        user.setLocation(userDetails.getQuestionnaire().getLocation());
+        user.setExperience(userDetails.getExperience());
+        user.setGender(userDetails.getQuestionnaire().getGender());
+        user.setLanguage(userDetails.getQuestionnaire().getLanguage());
+        return user;
+    }
 
     @PostMapping("/auth/login")
     public ResponseEntity<UserDto> login(@RequestBody @Valid CredentialsDto credentialsDto) {
@@ -77,6 +121,11 @@ public class AuthController {
         UserDto createdUser = userService.register(user);
         createdUser.setToken(userAuthenticationProvider.createToken(user.getEmail()));
         return ResponseEntity.created(URI.create("/users/" + createdUser.getId())).body(createdUser);
+    }
+
+    @PostMapping("/auth/questionnaireAnswers")
+    public ResponseEntity<?>  questionnaireAnswers(@RequestBody @Valid QuestionnaireDto questionnaireDto){
+        return ResponseEntity.ok(questionnaireDto);
     }
 
     @PutMapping("/auth/update")
@@ -95,22 +144,35 @@ public class AuthController {
     public ResponseEntity<?> getUserInfo(Principal principal){
         CustomUserDetails userDetails = (CustomUserDetails) userDetailsService.loadUserByUsername(principal.getName());
 
+        Collection<Roles> role;
+        Roles roleUser = new Roles(1,"ROLE_USER");
+
         UserInfo userInfo = new UserInfo();
         userInfo.setId(userDetails.getId());
         userInfo.setEmail(userDetails.getUsername());
         userInfo.setName(userDetails.getName());
         userInfo.setSurname(userDetails.getSurname());
+        role = userDetails.getRoles();
         userInfo.setRoles(userDetails.getRoles());
         userInfo.setPassword(userDetails.getPassword());
         userInfo.setNumber(userDetails.getNumber());
-        userInfo.setLocation(userDetails.getLocation());
+        if (role.contains(roleUser)) {
+            userInfo.setQuestionnaire(userDetails.getQuestionnaire());
+            userInfo.setLocation(userDetails.getQuestionnaire().getLocation());
+            userInfo.setGender(userDetails.getQuestionnaire().getGender());
+            userInfo.setLanguage(userDetails.getQuestionnaire().getLanguage());
+        }else {
+            userInfo.setLocation(userDetails.getLocation());
+            userInfo.setGender(userDetails.getGender());
+            userInfo.setLanguage(userDetails.getLanguage());
+        }
         userInfo.setExperience(userDetails.getExperience());
         userInfo.setResetToken(userDetails.getResetToken());
         userInfo.setExpirationTime(userDetails.getExpirationTime());
-        userInfo.setGender(userDetails.getGender());
 
         return ResponseEntity.ok(userInfo);
     }
+
     @GetMapping("/auth/allUserinfo")
     public ResponseEntity<?> getAllUserInfo(){
         List<UserInfo> userInfos = getAllWithRole("ROLE_USER");
@@ -195,60 +257,21 @@ public class AuthController {
 
     @GetMapping("/auth/fetchAllUsersConnectedData/{id}")
     public ResponseEntity<?> fetchAllUsersConnectedData(@PathVariable int id){
-        List<User> userInfos = userService.findAllUsersConnectedById(id).stream().map(userDetails -> {
-            User user = new User();
-            user.setId(userDetails.getId());
-            user.setEmail(userDetails.getEmail());
-            user.setName(userDetails.getName());
-            user.setSurname(userDetails.getSurname());
-            user.setRoles(userDetails.getRoles());
-            user.setPassword(userDetails.getPassword());
-            user.setNumber(userDetails.getNumber());
-            user.setLocation(userDetails.getLocation());
-            user.setExperience(userDetails.getExperience());
-            user.setGender(userDetails.getGender());
-            return user;
-        }).collect(Collectors.toList());
+        List<User> userInfos = userService.findAllUsersConnectedById(id).stream().map(this::mapUserDetailsToUser).collect(Collectors.toList());
 
         return ResponseEntity.ok(userInfos);
     }
 
     @GetMapping("/auth/fetchAllUsersConnectedDataHistory/{id}")
     public ResponseEntity<?> fetchAllUsersConnectedDataHistory(@PathVariable int id){
-        List<User> userInfos = userService.findAllUsersConnectedHistoryById(id).stream().map(userDetails -> {
-            User user = new User();
-            user.setId(userDetails.getId());
-            user.setEmail(userDetails.getEmail());
-            user.setName(userDetails.getName());
-            user.setSurname(userDetails.getSurname());
-            user.setRoles(userDetails.getRoles());
-            user.setPassword(userDetails.getPassword());
-            user.setNumber(userDetails.getNumber());
-            user.setLocation(userDetails.getLocation());
-            user.setExperience(userDetails.getExperience());
-            user.setGender(userDetails.getGender());
-            return user;
-        }).collect(Collectors.toList());
+        List<User> userInfos = userService.findAllUsersConnectedHistoryById(id).stream().map(this::mapUserDetailsToUser).collect(Collectors.toList());
 
         return ResponseEntity.ok(userInfos);
     }
 
     @GetMapping("/auth/therapistFilterByGender/{gender}")
     public ResponseEntity<?> therapistFilterByGender(@PathVariable String gender) {
-        List<User> userInfos = userService.findAllTherapistsByGender(gender).stream().map(userDetails -> {
-            User user = new User();
-            user.setId(userDetails.getId());
-            user.setEmail(userDetails.getEmail());
-            user.setName(userDetails.getName());
-            user.setSurname(userDetails.getSurname());
-            user.setRoles(userDetails.getRoles());
-            user.setPassword(userDetails.getPassword());
-            user.setNumber(userDetails.getNumber());
-            user.setLocation(userDetails.getLocation());
-            user.setExperience(userDetails.getExperience());
-            user.setGender(userDetails.getGender());
-            return user;
-        }).collect(Collectors.toList());
+        List<User> userInfos = userService.findAllTherapistsByGender(gender).stream().map(this::createUserFromDetails).collect(Collectors.toList());
 
         return ResponseEntity.ok(userInfos);
     }
@@ -256,40 +279,14 @@ public class AuthController {
     @PostMapping("/auth/therapistFilterByGenderNotConnected")
     public ResponseEntity<?> therapistFilterByGenderNotConnected(@RequestBody @Valid FilterDto filterObject) {
         List<User> userInfos = userService.findAllTherapistsByGender(filterObject.getGender()).stream()
-                .filter(userInfo -> userInfo.getId() != filterObject.getTherapistId()).map(userDetails -> {
-            User user = new User();
-            user.setId(userDetails.getId());
-            user.setEmail(userDetails.getEmail());
-            user.setName(userDetails.getName());
-            user.setSurname(userDetails.getSurname());
-            user.setRoles(userDetails.getRoles());
-            user.setPassword(userDetails.getPassword());
-            user.setNumber(userDetails.getNumber());
-            user.setLocation(userDetails.getLocation());
-            user.setExperience(userDetails.getExperience());
-            user.setGender(userDetails.getGender());
-            return user;
-        }).collect(Collectors.toList());
+                .filter(userInfo -> userInfo.getId() != filterObject.getTherapistId()).map(this::createUserFromDetails).collect(Collectors.toList());
 
         return ResponseEntity.ok(userInfos);
     }
 
     @GetMapping("/auth/therapistFilterByExperience/{experience}")
     public ResponseEntity<?> therapistFilterByExperience(@PathVariable int experience){
-        List<User> userInfos = userService.findAllTherapistsByExperience(experience).stream().map(userDetails -> {
-            User user = new User();
-            user.setId(userDetails.getId());
-            user.setEmail(userDetails.getEmail());
-            user.setName(userDetails.getName());
-            user.setSurname(userDetails.getSurname());
-            user.setRoles(userDetails.getRoles());
-            user.setPassword(userDetails.getPassword());
-            user.setNumber(userDetails.getNumber());
-            user.setLocation(userDetails.getLocation());
-            user.setExperience(userDetails.getExperience());
-            user.setGender(userDetails.getGender());
-            return user;
-        }).collect(Collectors.toList());
+        List<User> userInfos = userService.findAllTherapistsByExperience(experience).stream().map(this::createUserFromDetails).collect(Collectors.toList());
 
         return ResponseEntity.ok(userInfos);
     }
@@ -297,20 +294,7 @@ public class AuthController {
     @PostMapping("/auth/therapistFilterByExperienceNotConnected")
     public ResponseEntity<?> therapistFilterByExperienceNotConnected(@RequestBody @Valid FilterDto filterObject){
         List<User> userInfos = userService.findAllTherapistsByExperience(filterObject.getExperience()).stream()
-                .filter(userInfo -> userInfo.getId() != filterObject.getTherapistId()).map(userDetails -> {
-            User user = new User();
-            user.setId(userDetails.getId());
-            user.setEmail(userDetails.getEmail());
-            user.setName(userDetails.getName());
-            user.setSurname(userDetails.getSurname());
-            user.setRoles(userDetails.getRoles());
-            user.setPassword(userDetails.getPassword());
-            user.setNumber(userDetails.getNumber());
-            user.setLocation(userDetails.getLocation());
-            user.setExperience(userDetails.getExperience());
-            user.setGender(userDetails.getGender());
-            return user;
-        }).collect(Collectors.toList());
+                .filter(userInfo -> userInfo.getId() != filterObject.getTherapistId()).map(this::createUserFromDetails).collect(Collectors.toList());
 
         return ResponseEntity.ok(userInfos);
     }
@@ -318,20 +302,7 @@ public class AuthController {
 
     @GetMapping("/auth/therapistFilterByLocation/{location}")
     public ResponseEntity<?> therapistFilterByLocation(@PathVariable String location){
-        List<User> userInfos = userService.findAllTherapistsByLocation(location).stream().map(userDetails -> {
-            User user = new User();
-            user.setId(userDetails.getId());
-            user.setEmail(userDetails.getEmail());
-            user.setName(userDetails.getName());
-            user.setSurname(userDetails.getSurname());
-            user.setRoles(userDetails.getRoles());
-            user.setPassword(userDetails.getPassword());
-            user.setNumber(userDetails.getNumber());
-            user.setLocation(userDetails.getLocation());
-            user.setExperience(userDetails.getExperience());
-            user.setGender(userDetails.getGender());
-            return user;
-        }).collect(Collectors.toList());
+        List<User> userInfos = userService.findAllTherapistsByLocation(location).stream().map(this::createUserFromDetails).collect(Collectors.toList());
 
         return ResponseEntity.ok(userInfos);
     }
@@ -339,21 +310,9 @@ public class AuthController {
     @PostMapping("/auth/therapistFilterByLocationNotConnected")
     public ResponseEntity<?> therapistFilterByLocationNotConnected(@RequestBody @Valid FilterDto filterObject){
         List<User> userInfos = userService.findAllTherapistsByLocation(filterObject.getLocation()).stream()
-                .filter(userInfo -> userInfo.getId() != filterObject.getTherapistId()).map(userDetails -> {
-            User user = new User();
-            user.setId(userDetails.getId());
-            user.setEmail(userDetails.getEmail());
-            user.setName(userDetails.getName());
-            user.setSurname(userDetails.getSurname());
-            user.setRoles(userDetails.getRoles());
-            user.setPassword(userDetails.getPassword());
-            user.setNumber(userDetails.getNumber());
-            user.setLocation(userDetails.getLocation());
-            user.setExperience(userDetails.getExperience());
-            user.setGender(userDetails.getGender());
-            return user;
-        }).collect(Collectors.toList());
+                .filter(userInfo -> userInfo.getId() != filterObject.getTherapistId()).map(this::createUserFromDetails).collect(Collectors.toList());
 
         return ResponseEntity.ok(userInfos);
     }
+
 }

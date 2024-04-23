@@ -2,12 +2,14 @@ package com.brogramer.peacefulPaths.service;
 
 import com.brogramer.peacefulPaths.dao.RoleDao;
 import com.brogramer.peacefulPaths.dao.TherapistRepository;
+import com.brogramer.peacefulPaths.dao.QuestionnaireRepository;
 import com.brogramer.peacefulPaths.dao.UserDao;
 import com.brogramer.peacefulPaths.dtos.CredentialsDto;
+import com.brogramer.peacefulPaths.dtos.QuestionnaireDto;
 import com.brogramer.peacefulPaths.dtos.SignUpDto;
 import com.brogramer.peacefulPaths.dtos.UserDto;
 import com.brogramer.peacefulPaths.entity.CustomUserDetails;
-import com.brogramer.peacefulPaths.entity.Gender;
+import com.brogramer.peacefulPaths.entity.Questionnaire;
 import com.brogramer.peacefulPaths.entity.Roles;
 import com.brogramer.peacefulPaths.entity.User;
 import com.brogramer.peacefulPaths.exceptions.AppException;
@@ -25,7 +27,6 @@ import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-
 import java.nio.CharBuffer;
 import java.util.*;
 
@@ -33,6 +34,7 @@ import java.util.*;
 public class UserService implements UserDetailsService {
 
     private final TherapistRepository userRepository;
+    private final QuestionnaireRepository questionnaireRepository;
     private final RoleDao roleDao;
     private final PasswordEncoder passwordEncoder;
     private final UserDao userDao;
@@ -40,11 +42,12 @@ public class UserService implements UserDetailsService {
     @Autowired
     private JavaMailSender javaMailSender;
 
-    public UserService(TherapistRepository userRepository, PasswordEncoder passwordEncoder,RoleDao roleDao,UserDao userDao) {
+    public UserService(TherapistRepository userRepository, PasswordEncoder passwordEncoder,RoleDao roleDao,UserDao userDao,QuestionnaireRepository questionnaireRepository) {
         this.userRepository = userRepository;
         this.passwordEncoder = passwordEncoder;
         this.roleDao = roleDao;
         this.userDao = userDao;
+        this.questionnaireRepository = questionnaireRepository;
     }
 
     public List<User> findAllByRole(String role) {
@@ -85,21 +88,31 @@ public class UserService implements UserDetailsService {
         User user = user1.get();
 
         UserDto userDto = new UserDto();
+        Collection<Roles> role;
+
+        Roles roleUser = new Roles(1,"ROLE_USER");
 
         userDto.setEmail(user.getEmail());
         userDto.setId(user.getId());
         userDto.setName(user.getName());
         userDto.setSurname(user.getSurname());
         userDto.setNumber(user.getNumber());
+        role = user.getRoles();
         userDto.setRoles(user.getRoles());
         userDto.setPassword(user.getPassword());
-        userDto.setLocation(user.getLocation());
+        if (role.contains(roleUser)) {
+            userDto.setLocation(user.getQuestionnaire().getLocation());
+            userDto.setGender(user.getQuestionnaire().getGender());
+            userDto.setLanguage(user.getQuestionnaire().getLanguage());
+        }else {
+            user.setLocation(userDto.getLocation());
+            user.setGender(userDto.getGender());
+            user.setLanguage(userDto.getLanguage());
+        }
         userDto.setExperience(user.getExperience());
 
         return userDto;
     }
-
-
 
     public UserDto login(CredentialsDto credentialsDto) {
         Optional<User> user1 = userRepository.findByEmail(credentialsDto.getEmail());
@@ -139,15 +152,25 @@ public class UserService implements UserDetailsService {
         collection.add(roleDao.findRoleByName("ROLE_USER"));
         user.setRoles(collection);
 
+        Questionnaire questionnaire = questionnaire(userDto.getQuestionnaire());
+        user.setQuestionnaire(questionnaire);
+
         User savedUser = userRepository.save(user);
 
         return convertToUserDto(savedUser);
+    }
+
+    public Questionnaire questionnaire(Questionnaire questionnaire) {
+        questionnaireRepository.save(questionnaire);
+        return questionnaire;
     }
 
     public UserDto update(UserDto userDto) {
         Optional<User> emailUser = userRepository.findByEmail(userDto.getEmail());
 
         User user = new User();
+        Collection<Roles> role;
+        Roles roleUser = new Roles(1,"ROLE_USER");
 
         if (emailUser.isPresent()){
             if (emailUser.get().getId()==userDto.getId()) {
@@ -161,12 +184,25 @@ public class UserService implements UserDetailsService {
                     user.setPassword(passwordEncoder.encode(CharBuffer.wrap(userDto.getPassword())));
                 }
                 user.setNumber(userDto.getNumber());
+                role = userDto.getRoles();
                 user.setRoles(userDto.getRoles());
-                user.setLocation(userDto.getLocation());
+                if (role.contains(roleUser)) {
+                    Questionnaire questionnaire = userDto.getQuestionnaire();
+                    questionnaire.setLocation(userDto.getLocation());
+                    questionnaire.setGender(userDto.getGender());
+                    questionnaire.setLanguage(userDto.getLanguage());
+
+                    questionnaireRepository.save(questionnaire);
+
+                    user.setQuestionnaire(questionnaire);
+                }else {
+                    user.setLocation(userDto.getLocation());
+                    user.setGender(userDto.getGender());
+                    user.setLanguage(userDto.getLanguage());
+                }
                 user.setExperience(userDto.getExperience());
                 user.setExpirationTime(userDto.getExpirationTime());
                 user.setResetToken(userDto.getResetToken());
-                user.setGender(userDto.getGender());
             }
             else {
                 throw new AppException("Login already exists", HttpStatus.BAD_REQUEST);
@@ -178,8 +214,22 @@ public class UserService implements UserDetailsService {
             user.setSurname(userDto.getSurname());
             user.setPassword(passwordEncoder.encode(CharBuffer.wrap(userDto.getPassword())));
             user.setNumber(userDto.getNumber());
+            role = userDto.getRoles();
             user.setRoles(userDto.getRoles());
-            user.setLocation(userDto.getLocation());
+            if (role.contains(roleUser)) {
+                Questionnaire questionnaire = userDto.getQuestionnaire();
+                questionnaire.setLocation(userDto.getLocation());
+                questionnaire.setGender(userDto.getGender());
+                questionnaire.setLanguage(userDto.getLanguage());
+
+                questionnaireRepository.save(questionnaire);
+
+                user.setQuestionnaire(questionnaire);
+            }else {
+                user.setLocation(userDto.getLocation());
+                user.setGender(userDto.getGender());
+                user.setLanguage(userDto.getLanguage());
+            }
             user.setExperience(userDto.getExperience());
             user.setExpirationTime(userDto.getExpirationTime());
             user.setResetToken(userDto.getResetToken());
@@ -189,7 +239,16 @@ public class UserService implements UserDetailsService {
 
         UserDto userDto1 = convertToUserDto(savedUser);
 
-        userDto1.setLocation(savedUser.getLocation());
+        if (role.contains(roleUser)) {
+            userDto1.setQuestionnaire(userDto.getQuestionnaire());
+            userDto1.getQuestionnaire().setLocation(userDto.getLocation());
+            userDto1.getQuestionnaire().setGender(userDto.getGender());
+            userDto1.getQuestionnaire().setLanguage(userDto.getLanguage());
+        }else {
+            userDto1.setLocation(userDto.getLocation());
+            userDto1.setGender(userDto.getGender());
+            userDto1.setLanguage(userDto.getLanguage());
+        }
         userDto1.setExperience(savedUser.getExperience());
         userDto1.setExpirationTime(savedUser.getExpirationTime());
         userDto1.setResetToken(savedUser.getResetToken());
@@ -202,7 +261,6 @@ public class UserService implements UserDetailsService {
         userDto.setToken(token);
         return userDto;
     }
-
 
     public void delete(int id) {
         User theUser = userRepository.findById(id)
@@ -327,5 +385,4 @@ public class UserService implements UserDetailsService {
 
         return new ArrayList<>(therapists);
     }
-
 }

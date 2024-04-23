@@ -1,6 +1,6 @@
 import React,{useState} from 'react';
 import {fetchUserData, fetchUserDataId, removeTherapist, userTherapistConnection} from '../../../api/authService';
-import {useNavigate, useParams} from 'react-router-dom';
+import {Link, useNavigate, useParams} from 'react-router-dom';
 import '../../../css/sb-admin-2.css';
 import DashboardNav from "../DashboardNav";
 import {authenticate, authFailure, authSuccess} from "../../../redux/authActions";
@@ -27,6 +27,7 @@ function TherapistCardInfo({loading,error,...props}){
         experience:0,
         location:{},
         gender:{},
+        language:{},
         allRoles:[]
     });
 
@@ -69,6 +70,7 @@ function TherapistCardInfo({loading,error,...props}){
                     experience:response.data.experience,
                     location:response.data.location,
                     gender:response.data.gender,
+                    language:response.data.language,
                     allRoles: response.data.allRoles
                 })
                 setUserTherapistValues(data => {
@@ -99,7 +101,7 @@ function TherapistCardInfo({loading,error,...props}){
                 history('/dashboard/userDashboard/therapists');
             }
             else{
-                props.loginFailure('Something LEKAAAAAAA!Please Try Again');
+                props.connectionFailure('Something LEKAAAAAAA!Please Try Again');
             }
 
         }).catch((err)=>{
@@ -109,18 +111,15 @@ function TherapistCardInfo({loading,error,...props}){
                 switch(err.response.status){
                     case 401:
                         console.log("401 status");
-                        props.loginFailure("U cant have two therapists at the same time!!!");
-                        // props.loginFailure("Authentication Failed.Bad Credentials");
+                        props.connectionFailure("U cant have two therapists at the same time!!!");
                         break;
                     default:
-                        props.loginFailure('Something BABAAAAAA!Please Try Again');
-
+                        props.connectionFailure('Something BABAAAAAA!Please Try Again');
                 }
-
             }
             else{
                 console.log("ERROR: ",err)
-                props.loginFailure('Something NaNAAAAA!Please Try Again');
+                props.connectionFailure('Something NaNAAAAA!Please Try Again');
             }
 
         });
@@ -156,12 +155,6 @@ function TherapistCardInfo({loading,error,...props}){
 
                         <div className="container-fluid">
 
-                            { error &&
-                                <Alert style={{marginTop:'20px'}} variant="danger">
-                                    {error}
-                                </Alert>
-                            }
-
                             <div className="card-details">
                                 <h3>Card {id} Details</h3>
                                 {/* Other card details */}
@@ -172,9 +165,15 @@ function TherapistCardInfo({loading,error,...props}){
                                 <p>Number: {therapistData.number}</p>
                                 <p>Experience: {therapistData.experience} years</p>
                                 <p>Location: {therapistData.location.location}</p>
+                                <p>Language: {therapistData.language.language}</p>
                             </div>
                             {!connected ? <button onClick={handleConnection}>Connect</button> :
-                                <button onClick={() => handleRemove(data.id)}>Remove Therapist</button>}
+                                <p>You already are connected with another therapist.
+                                    <br/>If you want to change your therapist,
+                                    you need to remove them first.
+                                    <br/>Click the link below so you can change your therapist:
+                                    <br/><Link to="/dashboard/userDashboard/therapists">Manage Therapists</Link></p>}
+
                         </div>
 
                     </div>
@@ -194,28 +193,6 @@ function TherapistCardInfo({loading,error,...props}){
             <a className="scroll-to-top rounded" href="#page-top">
                 <i className="fas fa-angle-up"></i>
             </a>
-
-            {/*<div className="modal fade" id="logoutModal" tabIndex="-1" role="dialog"*/}
-            {/*     aria-labelledby="exampleModalLabel"*/}
-            {/*     aria-hidden="true">*/}
-            {/*    <div className="modal-dialog" role="document">*/}
-            {/*        <div className="modal-content">*/}
-            {/*            <div className="modal-header">*/}
-            {/*                <h5 className="modal-title" id="exampleModalLabel">Ready to Leave?</h5>*/}
-            {/*                <button className="close" type="button" data-dismiss="modal" aria-label="Close">*/}
-            {/*                    <span aria-hidden="true">×</span>*/}
-            {/*                </button>*/}
-            {/*            </div>*/}
-            {/*            <div className="modal-body">Select "Logout" below if you are ready to end your current*/}
-            {/*                session.*/}
-            {/*            </div>*/}
-            {/*            <div className="modal-footer">*/}
-            {/*                <button className="btn btn-secondary" type="button" data-dismiss="modal">Cancel</button>*/}
-            {/*                <Link className="btn btn-primary" to="/loginBoot">Logout</Link>*/}
-            {/*            </div>*/}
-            {/*        </div>*/}
-            {/*    </div>*/}
-            {/*</div>*/}
 
             <script src="../../../vendor/jquery/jquery.min.js"></script>
             <script src="../../../vendor/bootstrap/js/bootstrap.bundle.min.js"></script>
@@ -244,7 +221,7 @@ const mapDispatchToProps = (dispatch) => {
     return {
         authenticate: () => dispatch(authenticate()),
         setUser: (data) => dispatch(authSuccess(data)),
-        loginFailure: (message) => dispatch(authFailure(message))
+        connectionFailure: (message) => dispatch(authFailure(message))
     }
 }
 export default connect(mapStateToProps, mapDispatchToProps)(TherapistCardInfo);
