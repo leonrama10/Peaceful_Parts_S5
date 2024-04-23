@@ -75,6 +75,16 @@ function RegisterBoot({loading,error,...props}){
 
     return (
             <main className="bg-gradient-primary">
+            <style>
+                          {`
+                          .bg-gradient-primary{
+                          height: 100%;
+                          }
+                            .container{
+                            height: auto;
+                            }
+                          `}
+                        </style>
 
             <div className="container">
 

@@ -230,7 +230,6 @@ export default function GetStarted({loading,error,...props}){
 
     return (
         <main className="bg-gradient-primary">
-        <p className="main-p">.</p>
             <div className="container">
                 <div className="card o-hidden border-0 shadow-lg my-5">
                     <div className="card-body p-0">
