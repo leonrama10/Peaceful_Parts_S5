@@ -23,6 +23,11 @@ import UserDashboard from "./DashboardViews/UserDashboards/UserDashboard";
 import TherapistCardInfo from "./DashboardViews/TherapistDashboards/TherapistCardInfo";
 import UserDashboardTherapists from "./DashboardViews/UserDashboards/UserDashboardTherapists";
 import GetStarted from "./DashboardViews/GetStartedDirectory/GetStarted";
+import RegisterBootTherapist from "./DashboardViews/RegisterBootTherapist";
+
+
+
+
 
 function Main() {
     const location = useLocation();
@@ -31,9 +36,12 @@ function Main() {
     return (
         <>
             {!isDashboard && <Header />}
-               <Routes>
+            <Routes>
+                <Route path="/admin-dashboard" element={<AdminDashboardTherapists />} />
+
                 <Route path="/loginBoot" element={<LoginBoot />}/>
                 <Route path="/registerBoot" element={<RegisterBoot />}/>
+                <Route path="/registerBoot-therapist" element={<RegisterBootTherapist />}/>  // TERAPIST
                 <Route path="/get-started" element={<GetStarted />}/>
                 <Route path="/forgotPassBoot" element={<ForgotPasswordBoot />}/>
                 <Route path="/verifyPasswordInfo" element={<VerifyPasswordInfo />}/>

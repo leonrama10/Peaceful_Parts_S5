@@ -11279,3 +11279,108 @@ footer.sticky-footer .copyright {
 body.sidebar-toggled footer.sticky-footer {
   width: 100%;
 }
+.gender-segmented-control {
+    display: flex;
+    border: 1px solid #black;
+    margin-top: 40px;
+    margin-bottom: 40px;
+}
+
+.gender-option {
+    flex: 1;
+    padding: 7px;
+    border: none;
+    background-color: #f8f9fa;
+    cursor: pointer;
+    transition: background-color 0.3s;
+}
+
+.gender-option.selected {
+    background-color: #007bff;
+    color: white;
+}
+
+.gender-option:not(:last-child) {
+    border-right: 1px solid #ccc;
+}
+
+.gender-option:focus {
+    outline: none;
+}
+.custom-dropdown {
+    margin: 20px 0;
+    font-family: Arial, sans-serif;
+}
+
+.custom-dropdown label {
+    display: block;
+    margin-bottom: 8px;
+    font-weight: bold;
+    color: #333;
+}
+
+.custom-dropdown select {
+    display: block;
+    width: 100%;
+    padding: 10px 15px;
+    font-size: 16px;
+    line-height: 1.5;
+    color: #444;
+    background-color: #ffffff;
+    background-image: none; /* Remove default arrow in Chrome and Firefox */
+    border: 2px solid #007bff; /* Custom border color */
+    border-radius: 4px; /* Rounded borders */
+    -webkit-appearance: none; /* Remove default style in iOS */
+    -moz-appearance: none;
+    appearance: none;
+    cursor: pointer;
+}
+
+.custom-dropdown select:focus {
+    border-color: #0056b3;
+    outline: none;
+    box-shadow: 0 0 0 3px rgba(0, 123, 255, 0.25);
+}
+
+/* Custom arrow */
+.custom-dropdown select {
+    background: url('data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" width="14" height="12" viewBox="0 0 4 5"><path fill="%23007bff" d="M2 0L0 2h4L2 0zm0 5L0 3h4l-2 2z"/></svg>') no-repeat;
+    background-position: right 10px top 50%, 0 0;
+    background-size: 12px auto;
+}
+
+/* Styles for when the select box is open/in-focus */
+.custom-dropdown select:focus {
+    background-position: right 10px top 50%, 0 0;
+}
+
+/* Adjust this path to use an arrow icon that matches your design */
+
+.experience-input-group {
+    position: relative;
+    margin-bottom: 20px; /* Space below this group */
+    display: flex;
+    align-items: center;
+}
+.experience-input {
+    flex-grow: 1;
+    padding-right: 160px; /* Provides enough spacing inside the input field to not overlap the 'years of work experience' text */
+}
+.experience-input-group .form-control-user {
+    padding-right: 50px; /* Make room for the "years" label inside the input */
+}
+.years-label {
+    position: absolute;
+    right: 10px; /* Position 'years of work experience' inside the input on the right */
+    color: #6c757d; /* Placeholder text color, adjust as needed */
+    background-color: transparent; /* Ensures the background doesn't block input */
+    pointer-events: none; /* Allows clicks to pass through to the input */
+}
+
+.years-label {
+    position: absolute;
+    right: 10px; /* Adjust as necessary */
+    color: #6c757d; /* Placeholder text color, adjust as needed */
+}
+
+

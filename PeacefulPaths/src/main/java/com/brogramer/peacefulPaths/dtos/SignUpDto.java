@@ -24,6 +24,11 @@ public class SignUpDto {
     @NotEmpty
     private String password;
 
+    @NotEmpty
+    private String Gender;
+    @NotEmpty
+    private String University;
+
 
     public String getName() {
         return name;
@@ -37,6 +42,22 @@ public class SignUpDto {
         return email;
     }
 
+    public String getUniversity() {
+        return University;
+    }
+
+    public void setUniversity(String university) {
+        University = university;
+    }
+
+    public String getGender() {
+        return Gender;
+    }
+
+    public void setGender(String gender) {
+        Gender = gender;
+    }
+
     public String getPassword() {
         return password;
     }
@@ -44,5 +65,6 @@ public class SignUpDto {
     public String getLogin() {
         return email;
     }
+
 
 }

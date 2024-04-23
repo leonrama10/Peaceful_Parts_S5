@@ -41,6 +41,10 @@ public class User {
     @Min(value= 0,message = "Must be greater than or equal to 0!")
     @Column(name = "experience")
     private int experience;
+    @Column(name = "University")
+    private String University;
+    @Column(name = "Gender")
+    private String Gender;
 
     @Size(min=8,message = "Must be greater than or equal to 8!")
     @Column(name = "password")
@@ -137,6 +141,22 @@ public class User {
 
     public String getSurname() {
         return surname;
+    }
+
+    public String getUniversity() {
+        return University;
+    }
+
+    public void setUniversity(String university) {
+        University = university;
+    }
+
+    public String getGender() {
+        return Gender;
+    }
+
+    public void setGender(String gender) {
+        Gender = gender;
     }
 
     public void setSurname(String surname) {

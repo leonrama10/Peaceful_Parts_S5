@@ -1,4 +1,5 @@
-import React,{useState} from 'react';
+
+import React,{useState,useEffect} from 'react';
 import {connect} from 'react-redux';
 import {userRegister} from '../../api/authService';
 import {Link, useNavigate} from 'react-router-dom';
@@ -13,64 +14,54 @@ function RegisterBoot({loading,error,...props}){
         email: '',
         name:'',
         surname:'',
-        password: ''
+        password: '',
+        confirmPassword: ''
     });
-
-    const [confirmPassword, setConfirmPassword] = useState('')
 
     const handleSubmit=(evt)=>{
         evt.preventDefault();
         props.authenticate();
-        if (values.password === confirmPassword) {
-            userRegister(values).then((response) => {
-                if (response.status === 201) {
-                    props.setUser(response.data);
-                    history('/loginBoot');
-                } else {
-                    props.loginFailure('Something LEKAAAAAAA!Please Try Again');
+
+        userRegister(values).then((response)=>{
+            if(response.status===201){
+                props.setUser(response.data);
+                history('/loginBoot');
+                console.log("RegisterBoot is rendered");
+            }
+            else{
+                props.loginFailure('Something LEKAAAAAAA!Please Try Again');
+            }
+
+
+        }).catch((err)=>{
+
+            if(err && err.response){
+
+                switch(err.response.status){
+                    case 401:
+                        console.log("401 status");
+                        props.loginFailure("Authentication Failed.Bad Credentials");
+                        break;
+                    default:
+                        props.loginFailure('Something BABAAAAAA!Please Try Again');
+
                 }
 
+            }
+            else{
+                console.log("ERROR: ",err)
+                props.loginFailure('Something NaNAAAAA!Please Try Again');
+            }
 
-            }).catch((err) => {
-
-                if (err && err.response) {
-
-                    switch (err.response.status) {
-                        case 401:
-                            console.log("401 status");
-                            props.loginFailure("Authentication Failed.Bad Credentials");
-                            break;
-                        default:
-                            props.loginFailure('Something BABAAAAAA!Please Try Again');
-
-                    }
-
-                } else {
-                    console.log("ERROR: ", err)
-                    props.loginFailure('Something NaNAAAAA!Please Try Again');
-                }
-
-            });
-        } else {
-            props.loginFailure('Passwords do not match!!!');
-        }
+        });
     }
 
     const handleChange = (e) => {
         e.persist();
-        if (e.target.name === 'password') {
-            setValues(values => ({
-                ...values,
-                [e.target.name]: e.target.value
-            }));
-        } else if (e.target.name === 'confirmPassword') {
-            setConfirmPassword(e.target.value);
-        } else {
-            setValues(values => ({
-                ...values,
-                [e.target.name]: e.target.value
-            }));
-        }
+        setValues(values => ({
+            ...values,
+            [e.target.name]: e.target.value
+        }));
     };
 
     return (
@@ -120,7 +111,7 @@ function RegisterBoot({loading,error,...props}){
                                             <div className="col-sm-6">
                                                 <input type="password" className="form-control form-control-user"
                                                        id="exampleRepeatPassword" placeholder="Repeat Password"
-                                                       value={confirmPassword}
+                                                       value={values.confirmPassword}
                                                        onChange={handleChange} name="confirmPassword" required/>
                                             </div>
                                         </div>
@@ -131,7 +122,7 @@ function RegisterBoot({loading,error,...props}){
                                     </form>
                                     <hr/>
                                     <div className="text-center">
-                                        <Link className="small" to="/forgotPassBoot">Forgot Password?</Link>
+                                        <Link className="small" to="forgotPassBoot">Forgot Password?</Link>
                                         </div>
                                         <div className="text-center">
                                             <Link className="small" to="/loginBoot">Already have an account? Login!</Link>
@@ -143,6 +134,7 @@ function RegisterBoot({loading,error,...props}){
                 </div>
 
             </div>
+
 
             <script src="../../vendor/jquery/jquery.min.js"></script>
             <script src="../../vendor/bootstrap/js/bootstrap.bundle.min.js"></script>

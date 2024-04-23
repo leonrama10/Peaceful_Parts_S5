@@ -27,6 +27,12 @@ function TherapistDashboard({loading,error,...props}){
         })
     },[])
 
+//    const handleGenerateTherapistsClick = () => {
+//            console.log('Generate Therapists clicked');
+//             history('/');
+//
+//}
+
 
     return (
         <main id="page-top">

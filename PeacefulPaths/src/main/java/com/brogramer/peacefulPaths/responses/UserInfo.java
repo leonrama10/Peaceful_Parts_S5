@@ -1,7 +1,6 @@
 package com.brogramer.peacefulPaths.responses;
 
 import com.brogramer.peacefulPaths.entity.Roles;
-import org.springframework.security.core.GrantedAuthority;
 
 import java.util.Collection;
 import java.util.List;
@@ -15,6 +14,8 @@ public class UserInfo {
     private String password;
     private String number;
     private String location;
+    private String Gender;
+    private String University;
     private Collection<Roles> roles;
     private List<Roles> allRoles;
     private String resetToken;
@@ -112,5 +113,21 @@ public class UserInfo {
 
     public void setExpirationTime(Long expirationTime) {
         this.expirationTime=expirationTime;
+    }
+
+    public String getGender() {
+        return Gender;
+    }
+
+    public void setGender(String gender) {
+        Gender = gender;
+    }
+
+    public String getUniversity() {
+        return University;
+    }
+
+    public void setUniversity(String university) {
+        University = university;
     }
 }

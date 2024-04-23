@@ -55,6 +55,15 @@ public class AuthController {
         return ResponseEntity.created(URI.create("/users/" + createdUser.getId())).body(createdUser);
     }
 
+
+    @PostMapping("/auth/registerTherapist")
+    public ResponseEntity<UserDto> registerTherapist(@RequestBody @Valid SignUpDto signUpDto) {
+        UserDto createdTherapist = userService.registerTherapist(signUpDto);
+        createdTherapist.setToken(userAuthenticationProvider.createToken(signUpDto.getEmail()));
+        return ResponseEntity.created(URI.create("/users/" + createdTherapist.getId())).body(createdTherapist);
+    }
+
+
     @PutMapping("/auth/update")
     public ResponseEntity<UserDto> update(@RequestBody @Valid UserDto user) {
         UserDto createdUser = userService.update(user);

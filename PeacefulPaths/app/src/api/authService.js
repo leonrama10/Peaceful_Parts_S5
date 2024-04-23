@@ -122,6 +122,18 @@ export const userTherapistConnection=(authRequest)=>{
         }
     })
 }
+export const registerTherapist = (authRequest) => {
+console.log("DATAAAAAAAAAAAAAAAAAAAa",authRequest)
+    return axios({
+        method: 'POST',
+        url: `${process.env.hostUrl || 'http://localhost:8080'}/api/auth/registerTherapist`,
+        data: authRequest,
+        headers:{
+              'Authorization':'Bearer '+getToken()
+        }
+    });
+};
+
 
 
 export const fetchUserTherapistConnectionData = (authRequest) => {

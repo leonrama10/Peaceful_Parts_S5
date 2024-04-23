@@ -1,12 +1,10 @@
 package com.brogramer.peacefulPaths.dtos;
 
 import com.brogramer.peacefulPaths.entity.Roles;
-import jakarta.persistence.Transient;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
-import org.springframework.security.core.GrantedAuthority;
 
 import java.util.Collection;
 
@@ -25,7 +23,26 @@ public class UserDto {
     private String number;
     private String location;
     private int experience;
+    private String Gender;
+    private String University;
     private Collection<Roles> roles;
+
+    public String getGender() {
+        return Gender;
+    }
+
+    public void setGender(String gender) {
+        Gender = gender;
+    }
+
+    public String getUniversity() {
+        return University;
+    }
+
+    public void setUniversity(String university) {
+        University = university;
+    }
+
     private String resetToken;
     private Long expirationTime;
 

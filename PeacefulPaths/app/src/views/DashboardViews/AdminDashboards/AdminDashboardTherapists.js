@@ -64,6 +64,11 @@
             setId(id);
             history(`/dashboard/adminDashboard/users/edit/${id}`);
         };
+        const handleGenerateTherapistsClick = () => {
+            console.log('Generate Therapists button clicked');
+             history('/registerBoot-therapist');
+        };
+
 
 
         return (
@@ -84,6 +89,12 @@
                                         <div className="card shadow mb-4">
                                             <div className="card-header py-3">
                                                 <h6 className="m-0 font-weight-bold text-primary">DataTables Example</h6>
+
+                                                <div className="text-center mb-4">
+                             <button className="btn btn-primary" type="button" onClick={handleGenerateTherapistsClick}>Generate Therapists</button>
+
+                                                </div>
+
                                             </div>
                                             <div className="card-body">
                                                 <div className="table-responsive">
@@ -96,7 +107,10 @@
                                                             <th>Number</th>
                                                             <th>Location</th>
                                                             <th>Experience</th>
-                                                            <th>Actions</th>
+                                                            <th>Gender</th>
+                                                             <th>University</th>
+                                                             <th>Actions</th>
+
                                                         </tr>
                                                         </thead>
                                                         <tfoot>
@@ -106,6 +120,8 @@
                                                             <th>Number</th>
                                                             <th>Location</th>
                                                             <th>Experience</th>
+                                                             <th>Gender</th>
+                                                            <th>University</th>
                                                             <th>Actions</th>
                                                         </tr>
                                                         </tfoot>
@@ -117,6 +133,9 @@
                                                                     <td>{tempEmployee.number}</td>
                                                                     <td>{tempEmployee.location}</td>
                                                                     <td>{tempEmployee.experience}</td>
+                                                                    <td>{tempEmployee.Gender}</td>
+                                                                    <td>{tempEmployee.University}</td>
+
                                                                     <td>
                                                                         <button  className="btn btn-info btn-sm" onClick={() => handleEdit(tempEmployee.id)}>
                                                                             Edit

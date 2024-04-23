@@ -27,7 +27,9 @@ function UserDashboardTherapists({loading,error,...props}){
         number:'',
         experience:0,
         location:'',
-        allRoles:[]
+        allRoles:[],
+         university: '',
+          gender: '',
     });
 
 
@@ -39,16 +41,18 @@ function UserDashboardTherapists({loading,error,...props}){
                 fetchUserTherapistConnectionData(response.data.id).then((response) => {
                     if (response.data.roles.at(0).role === 'ROLE_THERAPIST') {
                         setTherapistData({
-                            id: response.data.id,
-                            email: response.data.email,
-                            name: response.data.name,
-                            surname: response.data.surname,
-                            password: response.data.password,
-                            roles: response.data.roles,
-                            number: response.data.number,
-                            experience: response.data.experience,
-                            location: response.data.location,
-                            allRoles: response.data.allRoles
+                       id: response.data.id,
+                                            email: response.data.email,
+                                            name: response.data.name,
+                                            surname: response.data.surname,
+                                            password: response.data.password,
+                                            roles: response.data.roles,
+                                            number: response.data.number,
+                                            experience: response.data.experience,
+                                            location: response.data.location,
+                                            allRoles: response.data.allRoles,
+                                            University: response.data.University,
+                                            Gender: response.data.Gender,
                         });
                     } else {
                         console.log("AAAAAAAAAAAAAAAAAA");
