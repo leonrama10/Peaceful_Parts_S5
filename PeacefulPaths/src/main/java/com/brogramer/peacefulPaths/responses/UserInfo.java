@@ -1,11 +1,12 @@
 package com.brogramer.peacefulPaths.responses;
 
-import com.brogramer.peacefulPaths.entity.Roles;
+import com.brogramer.peacefulPaths.entity.*;
 
 import java.util.Collection;
 import java.util.List;
 
 public class UserInfo {
+
     private String email;
     private int id;
     private int experience;
@@ -16,10 +17,30 @@ public class UserInfo {
     private String location;
     private String Gender;
     private String University;
+    private Location location;
     private Collection<Roles> roles;
     private List<Roles> allRoles;
     private String resetToken;
     private Long expirationTime;
+    private Gender gender;
+    private Language language;
+    private Questionnaire questionnaire;
+
+    public Questionnaire getQuestionnaire() {
+        return questionnaire;
+    }
+
+    public void setQuestionnaire(Questionnaire questionnaire) {
+        this.questionnaire = questionnaire;
+    }
+
+    public Language getLanguage() {
+        return language;
+    }
+
+    public void setLanguage(Language language) {
+        this.language = language;
+    }
 
     public List<Roles> getAllRoles() {
         return allRoles;
@@ -37,11 +58,11 @@ public class UserInfo {
         return password;
     }
 
-    public String getLocation() {
+    public Location getLocation() {
         return location;
     }
 
-    public void setLocation(String location) {
+    public void setLocation(Location location) {
         this.location = location;
     }
 
@@ -129,5 +150,11 @@ public class UserInfo {
 
     public void setUniversity(String university) {
         University = university;
+    public Gender getGender() {
+        return gender;
+    }
+
+    public void setGender(Gender gender) {
+        this.gender=gender;
     }
 }

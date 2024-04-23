@@ -1,4 +1,4 @@
-    import React,{useState} from 'react';
+import React,{useState} from 'react';
     import {fetchUserData, userDelete, fetchAllTherapistData} from '../../../api/authService';
     import {useNavigate} from 'react-router-dom';
     import '../../../css/sb-admin-2.css';
@@ -7,13 +7,14 @@
     import $ from 'jquery';
     import SideBarAdmin from "../SideBars/SideBarAdmin";
     import DashboardNav from "../DashboardNav";
+    import {authenticate, authFailure, authSuccess} from "../../../redux/authActions";
+    import {connect} from "react-redux";
 
-    export default function AdminDashboardTherapists({loading,error,...props}){
+function AdminDashboardTherapists({loading,error,...props}){
 
         const history = useNavigate ();
         const [data,setData]=useState({});
         const [allUsers, setAllUsers] = useState([]);
-        const [id, setId] = useState(null);
 
         React.useEffect(()=>{
             fetchUserData().then((response)=>{
@@ -21,9 +22,11 @@
                     setData(response.data);
                 }
                 else{
+                    console.log("AAAAAAAAAAAAAAAAAAAAA ", response.data.roles.at(0).role)
                     history('/loginBoot');
                 }
             }).catch((e)=>{
+                console.log("BBBBBBBBBBBBBBBBBBBBBB ")
                 history('/loginBoot');
             })
         },[])
@@ -61,7 +64,6 @@
         }
 
         const handleEdit = (id) => {
-            setId(id);
             history(`/dashboard/adminDashboard/users/edit/${id}`);
         };
         const handleGenerateTherapistsClick = () => {
@@ -105,6 +107,7 @@
                                                             <th>Name</th>
                                                             <th>Email</th>
                                                             <th>Number</th>
+                                                            <th>Gender</th>
                                                             <th>Location</th>
                                                             <th>Experience</th>
                                                             <th>Gender</th>
@@ -118,6 +121,7 @@
                                                             <th>Name</th>
                                                             <th>Email</th>
                                                             <th>Number</th>
+                                                            <th>Gender</th>
                                                             <th>Location</th>
                                                             <th>Experience</th>
                                                              <th>Gender</th>
@@ -131,7 +135,8 @@
                                                                     <td>{tempEmployee.name} {tempEmployee.surname}</td>
                                                                     <td>{tempEmployee.email}</td>
                                                                     <td>{tempEmployee.number}</td>
-                                                                    <td>{tempEmployee.location}</td>
+                                                                    <td>{tempEmployee.gender.gender}</td>
+                                                                    <td>{tempEmployee.location.location}</td>
                                                                     <td>{tempEmployee.experience}</td>
                                                                     <td>{tempEmployee.Gender}</td>
                                                                     <td>{tempEmployee.University}</td>
@@ -203,15 +208,24 @@
 
                         <script src="../../../vendor/jquery/jquery.min.js"></script>
                         <script src="../../../vendor/bootstrap/js/bootstrap.bundle.min.js"></script>
-
                         <script src="../../../vendor/jquery-easing/jquery.easing.min.js"></script>
-
-                        {/*<script src="../../vendor/datatables/jquery.dataTables.min.js"></script>*/}
-                        {/*<script src="../../vendor/datatables/dataTables.bootstrap4.min.js"></script>*/}
-
-                        {/*<script src="../../js/demo/datatables-demo.js"></script>*/}
 
                     </main>
         )
 
     }
+    const mapStateToProps = ({auth}) => {
+        console.log("state ", auth)
+        return {
+            loading: auth.loading,
+            error: auth.error
+        }
+    }
+    const mapDispatchToProps = (dispatch) => {
+        return {
+            authenticate: () => dispatch(authenticate()),
+            setUser: (data) => dispatch(authSuccess(data)),
+            loginFailure: (message) => dispatch(authFailure(message))
+        }
+    }
+    export default connect(mapStateToProps, mapDispatchToProps)(AdminDashboardTherapists);

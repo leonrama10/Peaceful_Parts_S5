@@ -11,6 +11,7 @@ import TherapistDashboardUsers from "./DashboardViews/TherapistDashboards/Therap
 import AdminDashboardTherapists from "./DashboardViews/AdminDashboards/AdminDashboardTherapists";
 import AdminDashboardAdmin from "./DashboardViews/AdminDashboards/AdminDashboardAdmin";
 import TherapistDashboard from "./DashboardViews/TherapistDashboards/TherapistDashboard";
+import TherapistProfile from "./DashboardViews/TherapistDashboards/TherapistProfile";
 import LoginBoot from "./DashboardViews/LoginBoot";
 import RegisterBoot from "./DashboardViews/RegisterBoot";
 import ForgotPasswordBoot from "./DashboardViews/ForgotPasswordBoot";
@@ -20,7 +21,7 @@ import ErrorPage from "./DashboardViews/ErrorPage";
 import EditUser from "./DashboardViews/EditUser";
 import { useLocation } from 'react-router-dom';
 import UserDashboard from "./DashboardViews/UserDashboards/UserDashboard";
-import TherapistCardInfo from "./DashboardViews/TherapistDashboards/TherapistCardInfo";
+import TherapistCardInfo from "./DashboardViews/UserDashboards/TherapistCardInfo";
 import UserDashboardTherapists from "./DashboardViews/UserDashboards/UserDashboardTherapists";
 import GetStarted from "./DashboardViews/GetStartedDirectory/GetStarted";
 import RegisterBootTherapist from "./DashboardViews/RegisterBootTherapist";
@@ -28,6 +29,7 @@ import RegisterBootTherapist from "./DashboardViews/RegisterBootTherapist";
 
 
 
+import TherapistClientHistory from "./DashboardViews/TherapistDashboards/TherapistClientHistory";
 
 function Main() {
     const location = useLocation();
@@ -58,7 +60,9 @@ function Main() {
                 <Route path="/dashboard/adminDashboard/users/edit/:id" element={<EditUser />}/>
                 <Route path="/dashboard/therapistDashboard/users/edit/:id" element={<EditUser />}/>
                 <Route path="/dashboard/therapistDashboard" element={<TherapistDashboard />}/>
+                <Route path="/dashboard/therapistDashboard/profile" element={<TherapistProfile />}/>
                 <Route path="/dashboard/therapistDashboard/users" element={<TherapistDashboardUsers />}/>
+                <Route path="/dashboard/therapistDashboard/history" element={<TherapistClientHistory />}/>
                 <Route path="/dashboard/errorPage" element={<ErrorPage />}/>
                 <Route path="/" element={<Home />}/>
             </Routes>

@@ -6,16 +6,24 @@ import {Link, useNavigate} from 'react-router-dom';
 import '../../css/sb-admin-2.min.css';
 import {Alert} from "reactstrap";
 import {authenticate, authFailure, authSuccess} from "../../redux/authActions";
+
 function RegisterBoot({loading,error,...props}){
 
+    React.useEffect(()=>{
+        if (!props.getStartedFinished){
+            props.loginFailure("Authentication Failed.")
+            history('/loginBoot');
+        }
+    },[])
     const history = useNavigate ();
-
+    const [registerFailure, setRegisterFailure] = useState('');
     const [values, setValues] = useState({
         email: '',
         name:'',
         surname:'',
         password: '',
         confirmPassword: ''
+        questionnaire: props.questionnaire
     });
 
     const handleSubmit=(evt)=>{
@@ -54,6 +62,38 @@ function RegisterBoot({loading,error,...props}){
             }
 
         });
+        if (values.password === confirmPassword) {
+            userRegister(values).then((response) => {
+                if (response.status === 201) {
+                    props.setUser(response.data);
+                    history('/loginBoot');
+                } else {
+                    setRegisterFailure('Something LEKAAAAAAA!Please Try Again');
+                }
+
+            }).catch((err) => {
+
+                if (err && err.response) {
+
+                    switch (err.response.status) {
+                        case 401:
+                            console.log("401 status");
+                            setRegisterFailure("Authentication Failed.Bad Credentials");
+                            break;
+                        default:
+                            setRegisterFailure('Something BABAAAAAA!Please Try Again');
+
+                    }
+
+                } else {
+                    console.log("ERROR: ", err)
+                    setRegisterFailure('Something NaNAAAAA!Please Try Again');
+                }
+
+            });
+        } else {
+            setRegisterFailure('Passwords do not match!!!');
+        }
     }
 
     const handleChange = (e) => {
@@ -66,6 +106,16 @@ function RegisterBoot({loading,error,...props}){
 
     return (
             <main className="bg-gradient-primary">
+            <style>
+                          {`
+                          .bg-gradient-primary{
+                          height: 100%;
+                          }
+                            .container{
+                            height: auto;
+                            }
+                          `}
+                        </style>
 
             <div className="container">
 
@@ -79,9 +129,9 @@ function RegisterBoot({loading,error,...props}){
                                     <div className="text-center">
                                         <h1 className="h4 text-gray-900 mb-4">Create an Account!</h1>
                                     </div>
-                                    { error &&
+                                    { registerFailure &&
                                         <Alert style={{marginTop:'20px'}} variant="danger">
-                                            {error}
+                                            {registerFailure}
                                         </Alert>
                                     }
                                     <form className="user" onSubmit={handleSubmit}>

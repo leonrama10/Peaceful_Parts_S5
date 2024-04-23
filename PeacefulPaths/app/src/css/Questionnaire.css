@@ -21,5 +21,18 @@
     flex-direction: column;
     justify-content: space-between;
     row-gap: 15px;
-    width: 70%;
+    width: 40%;
 }
+
+.answer button{
+border-radius: 15px;
+background-color: #2e4057;
+color: white;
+}
+
+.answer button:hover{
+background-color: white;
+color: black;
+transition: 3ms;
+}
+

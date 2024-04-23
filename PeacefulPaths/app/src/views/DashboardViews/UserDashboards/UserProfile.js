@@ -1,29 +1,20 @@
 import React,{useState} from 'react';
 import {fetchUserData, userUpdate} from '../../../api/authService';
 import {Link, useNavigate} from 'react-router-dom';
-import {Container, Row, Col, Form, Button, Dropdown} from 'react-bootstrap';
+import {Container, Row, Col, Form, Button} from 'react-bootstrap';
 import {authenticate, authFailure, authSuccess} from "../../../redux/authActions";
 import '../../../css/sb-admin-2.min.css';
-import mail from "../../../img/mail.png"
-import arrow from "../../../img/arrow.png"
-import leftArrow from "../../../img/leftArrow.png"
-import bell from "../../../img/bell.png"
-import search from "../../../img/search.png"
-import accLogo from "../../../img/undraw_profile.svg"
-import navimg2 from "../../../img/undraw_profile_2.svg"
-import navimg1 from "../../../img/undraw_profile_1.svg"
-import navimg3 from "../../../img/undraw_profile_3.svg"
 import {Alert} from "reactstrap";
 import {connect} from "react-redux";
-import {saveState} from "../../../helper/sessionStorage";
 import DashboardNav from "../DashboardNav";
 import SideBarUser from "../SideBars/SideBarUser";
 function UserProfile({loading,error,...props}){
 
     const history = useNavigate ();
-
+    const [hideFilterMenu,setHideFilterMenu]=useState(true);
     const [data,setData]=useState({});
-
+    const [updateError,setUpdateError]=useState('');
+    const [updateSuccess,setUpdateSuccess]=useState('');
     const [values, setValues] = useState({
         id:0,
         email: '',
@@ -33,7 +24,10 @@ function UserProfile({loading,error,...props}){
         roles:[],
         number:'',
         experience:0,
-        location:''
+        location:{},
+        gender:{},
+        language:{},
+        questionnaire:{}
     });
 
     React.useEffect(()=>{
@@ -48,7 +42,10 @@ function UserProfile({loading,error,...props}){
                     password: response.data.password,
                     roles: response.data.roles,
                     number:response.data.number,
-                    location:response.data.location
+                    location:response.data.location,
+                    gender:response.data.gender,
+                    language:response.data.language,
+                    questionnaire:response.data.questionnaire
                 })
             }
             else{
@@ -70,9 +67,10 @@ function UserProfile({loading,error,...props}){
             if(response.status===201){
                 props.setUser(response.data);
                 history('/dashboard/userDashboard/profile');
+                setUpdateSuccess("Profile updated Successfully :)")
             }
             else{
-                props.loginFailure('Something LEKAAAAAAA!Please Try Again');
+                setUpdateError('Something LEKAAAAAAA!Please Try Again');
             }
 
         }).catch((err)=>{
@@ -82,30 +80,33 @@ function UserProfile({loading,error,...props}){
                 switch(err.response.status){
                     case 401:
                         console.log("401 status");
-                        props.loginFailure("Authentication Failed.Bad Credentials");
+                        setUpdateError("Authentication Failed.Bad Credentials");
                         break;
                     default:
-                        props.loginFailure('Something BABAAAAAA!Please Try Again');
+                        setUpdateError('Something BABAAAAAA!Please Try Again');
 
                 }
 
             }
             else{
                 console.log("ERROR: ",err)
-                props.loginFailure('Something NaNAAAAA!Please Try Again');
+                setUpdateError('Something NaNAAAAA!Please Try Again');
             }
 
         });
     };
 
     const handleChange = (e) => {
-        e.persist();
+        const { name, value } = e.target;
         setValues(values => ({
             ...values,
-            [e.target.name]: e.target.name === 'experience' ? Number(e.target.value) : e.target.value
+            [name]:
+                name === 'gender' ? { id: Number(value.split('-')[0]), gender: value.split('-')[1] } :
+                    name === 'location' ? { id: Number(value.split('-')[0]), location: value.split('-')[1] }:
+                        name === 'language' ? { id: Number(value.split('-')[0]), language: value.split('-')[1] }:
+                        value
         }));
     };
-
 
     return (
 
@@ -113,7 +114,7 @@ function UserProfile({loading,error,...props}){
 
             <div id="wrapper">
 
-                <SideBarUser />
+                <SideBarUser hideFilterMenu={hideFilterMenu}/>
 
                 <div id="content-wrapper" className="d-flex flex-column">
 
@@ -129,9 +130,14 @@ function UserProfile({loading,error,...props}){
                                 <Row className="justify-content-md-center">
                                     <Col xs={12} md={6}>
                                         <h2>Account Information</h2>
-                                        { error &&
+                                        { updateError &&
                                             <Alert style={{marginTop:'20px'}} variant="danger">
-                                                {error}
+                                                {updateError}
+                                            </Alert>
+                                        }
+                                        { updateSuccess &&
+                                            <Alert style={{marginTop:'20px'}} variant="success">
+                                                {updateSuccess}
                                             </Alert>
                                         }
                                         <Form onSubmit={handleUpdate}>
@@ -152,6 +158,14 @@ function UserProfile({loading,error,...props}){
                                                 <Form.Control type="email" name="email" defaultValue={data.email} onChange={handleChange} required/>
                                             </Form.Group>
 
+                                            <Form.Group controlId="formBasicGender">
+                                                <Form.Label>Gender</Form.Label>
+                                                <Form.Select name="gender" value={values.gender ? `${values.gender.id}-${values.gender.gender}` : ''} onChange={handleChange} required>
+                                                    <option value="1-M">Male</option>
+                                                    <option value="2-F">Female</option>
+                                                </Form.Select>
+                                            </Form.Group>
+
                                             <Form.Group controlId="formBasicPhone">
                                                 <Form.Label>Phone</Form.Label>
                                                 <Form.Control type="tel" defaultValue={data.number} onChange={handleChange} name="number"/>
@@ -159,7 +173,22 @@ function UserProfile({loading,error,...props}){
 
                                             <Form.Group controlId="formBasicAddress">
                                                 <Form.Label>Location</Form.Label>
-                                                <Form.Control type="text" defaultValue={data.location} onChange={handleChange} name="location"/>
+                                                <Form.Select name="location" value={values.location ? `${values.location.id}-${values.location.location}` : ''} onChange={handleChange} required>
+                                                    <option value="1-Kosovo">Kosovo</option>
+                                                    <option value="2-Albania">Albania</option>
+                                                    <option value="3-Montenegro">Montenegro</option>
+                                                    <option value="4-North Macedonia">North Macedonia</option>
+                                                    <option value="5-Serbia">Serbia</option>
+                                                </Form.Select>
+                                            </Form.Group>
+
+                                            <Form.Group controlId="formBasicLanguage">
+                                                <Form.Label>Language</Form.Label>
+                                                <Form.Select name="language" value={values.language ? `${values.language.id}-${values.language.language}` : ''} onChange={handleChange} required>
+                                                    <option value="1-Albanian">Kosovo</option>
+                                                    <option value="2-English">Albania</option>
+                                                    <option value="3-Serbian">Montenegro</option>
+                                                </Form.Select>
                                             </Form.Group>
 
                                             <div className="text-left" style={{padding:'10px 0'}}>
@@ -190,9 +219,6 @@ function UserProfile({loading,error,...props}){
 
             </div>
 
-            {/*<a className="scroll-to-top rounded" href="#page-top">*/}
-            {/*    <i className="fas fa-angle-up"></i>*/}
-            {/*</a>*/}
 
             <div className="modal fade" id="logoutModal" tabIndex="-1" role="dialog" aria-labelledby="exampleModalLabel"
                  aria-hidden="true">

@@ -71,10 +71,6 @@ public class CustomUserDetails implements UserDetails {
         return user.getRoles();
     }
 
-    public String getLocation() {
-        return user.getLocation();
-    }
-
     public int getExperience() {
         return user.getExperience();
     }
@@ -85,6 +81,22 @@ public class CustomUserDetails implements UserDetails {
 
     public Long getExpirationTime() {
         return user.getExpirationTime();
+    }
+
+    public Questionnaire getQuestionnaire() {
+        return user.getQuestionnaire();
+    }
+
+    public Gender getGender() {
+        return user.getGender();
+    }
+
+    public Location getLocation() {
+        return user.getLocation();
+    }
+
+    public Language getLanguage() {
+        return user.getLanguage();
     }
 }
 

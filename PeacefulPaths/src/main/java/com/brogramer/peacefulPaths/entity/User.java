@@ -35,9 +35,6 @@ public class User {
     @Column(name = "number")
     private String number;
 
-    @Column(name = "location")
-    private String location;
-
     @Min(value= 0,message = "Must be greater than or equal to 0!")
     @Column(name = "experience")
     private int experience;
@@ -65,12 +62,27 @@ public class User {
     @Column(name = "token")
     private String token;
 
-
     @ManyToMany(fetch = FetchType.EAGER, cascade = CascadeType.ALL)
     @JoinTable(name = "user_roles",
             joinColumns = @JoinColumn(name = "user_id"),
             inverseJoinColumns = @JoinColumn(name = "role_id"))
     private Collection<Roles> roles;
+
+    @ManyToOne
+    @JoinColumn(name = "questionnaire_id")
+    private Questionnaire questionnaire;
+
+    @ManyToOne
+    @JoinColumn(name = "language_id")
+    private Language language;
+
+    @ManyToOne
+    @JoinColumn(name = "location_id")
+    private Location location;
+
+    @ManyToOne
+    @JoinColumn(name = "gender_id")
+    private Gender gender;
 
     @Transient
     private List<Roles> allRoles = new ArrayList<>();
@@ -81,12 +93,11 @@ public class User {
 
     public User() {}
 
-    public User(String name, String surname, String email, String number,String location, int experience,Collection<Roles> roles,List<Roles> allRoles) {
+    public User(String name, String surname, String email, String number, int experience,Collection<Roles> roles,List<Roles> allRoles) {
         this.name = name;
         this.surname = surname;
         this.email = email;
         this.number = number;
-        this.location = location;
         this.experience = experience;
         this.roles = roles;
         this.allRoles = allRoles;
@@ -97,6 +108,38 @@ public class User {
         allRoles.add(ROLE_THERAPIST);
         allRoles.add(ROLE_MANAGER);
         return allRoles;
+    }
+
+    public Language getLanguage() {
+        return language;
+    }
+
+    public void setLanguage(Language language) {
+        this.language = language;
+    }
+
+    public Location getLocation() {
+        return location;
+    }
+
+    public void setLocation(Location location) {
+        this.location = location;
+    }
+
+    public Gender getGender() {
+        return gender;
+    }
+
+    public void setGender(Gender gender) {
+        this.gender = gender;
+    }
+
+    public Questionnaire getQuestionnaire() {
+        return questionnaire;
+    }
+
+    public void setQuestionnaire(Questionnaire questionnaire) {
+        this.questionnaire = questionnaire;
     }
 
     public String getToken() {
@@ -113,14 +156,6 @@ public class User {
 
     public void setRoles(Collection<Roles> roles) {
         this.roles = roles;
-    }
-
-    public String getLocation() {
-        return location;
-    }
-
-    public void setLocation(String location) {
-        this.location = location;
     }
 
     public int getId() {

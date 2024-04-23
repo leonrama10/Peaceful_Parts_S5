@@ -1,6 +1,6 @@
 package com.brogramer.peacefulPaths.dtos;
 
-import com.brogramer.peacefulPaths.entity.Roles;
+import com.brogramer.peacefulPaths.entity.*;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
@@ -14,6 +14,7 @@ import java.util.Collection;
 @Builder
 public class UserDto {
 
+    private Language language;
     private int id;
     private String name;
     private String surname;
@@ -21,7 +22,7 @@ public class UserDto {
     private String token;
     private String password;
     private String number;
-    private String location;
+    private Location location;
     private int experience;
     private String Gender;
     private String University;
@@ -45,12 +46,30 @@ public class UserDto {
 
     private String resetToken;
     private Long expirationTime;
+    private Gender gender;
+    private Questionnaire questionnaire;
 
-    public String getLocation() {
+    public Questionnaire getQuestionnaire() {
+        return questionnaire;
+    }
+
+    public void setQuestionnaire(Questionnaire questionnaire) {
+        this.questionnaire = questionnaire;
+    }
+
+    public Language getLanguage() {
+        return language;
+    }
+
+    public void setLanguage(Language language) {
+        this.language = language;
+    }
+
+    public Location getLocation() {
         return location;
     }
 
-    public void setLocation(String location) {
+    public void setLocation(Location location) {
         this.location = location;
     }
 
@@ -149,5 +168,13 @@ public class UserDto {
 
     public void setExpirationTime(Long expirationTime) {
         this.expirationTime = expirationTime;
+    }
+
+    public Gender getGender() {
+        return gender;
+    }
+
+    public void setGender(Gender gender) {
+        this.gender = gender;
     }
 }
