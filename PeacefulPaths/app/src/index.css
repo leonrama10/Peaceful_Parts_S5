@@ -45,12 +45,22 @@ nav a {
   margin: 0 15px;
 }
 
-footer {
+/*footer {
   background-color: #2e4057;
   color: #fff;
   text-align: center;
   padding: 1em;
   position: relative;
+  bottom: 0;
+  width: 100%;
+}*/
+
+footer{
+background-color: #2e4057;
+  color: #fff;
+  text-align: center;
+  padding: 1em;
+  position: fixed;
   bottom: 0;
   width: 100%;
 }

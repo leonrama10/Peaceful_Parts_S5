@@ -83,10 +83,10 @@ function LoginBoot({loading,error,...props}){
             <style>
                                       {`
                                       .bg-gradient-primary{
-                                      height: 100%;
+                                      height: 100vh;
                                       }
                                         .container{
-                                        height: auto;
+                                        height: 100vh;
                                         }
                                       `}
                                     </style>
