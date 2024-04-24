@@ -2,6 +2,7 @@ package com.brogramer.peacefulPaths.responses;
 
 import com.brogramer.peacefulPaths.entity.*;
 
+import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
 
@@ -21,7 +22,7 @@ public class UserInfo {
     private String resetToken;
     private Long expirationTime;
     private Gender gender;
-    private Language language;
+    private Collection<Language> language;
     private Questionnaire questionnaire;
 
     public Questionnaire getQuestionnaire() {
@@ -32,11 +33,11 @@ public class UserInfo {
         this.questionnaire = questionnaire;
     }
 
-    public Language getLanguage() {
+    public Collection<Language> getLanguage() {
         return language;
     }
 
-    public void setLanguage(Language language) {
+    public void setLanguage(Collection<Language> language) {
         this.language = language;
     }
 

@@ -147,6 +147,7 @@ public class UserService implements UserDetailsService {
         user.setEmail(userDto.getEmail());
         user.setName(userDto.getName());
         user.setSurname(userDto.getSurname());
+        user.setNumber(userDto.getNumber());
         user.setPassword(passwordEncoder.encode(CharBuffer.wrap(userDto.getPassword())));
         Collection<Roles> collection = new ArrayList<>();
         collection.add(roleDao.findRoleByName("ROLE_USER"));
@@ -246,6 +247,7 @@ public class UserService implements UserDetailsService {
 
                     user.setQuestionnaire(questionnaire);
                 }else {
+                    user.setUniversity(userDto.getUniversity());
                     user.setLocation(userDto.getLocation());
                     user.setGender(userDto.getGender());
                     user.setLanguage(userDto.getLanguage());
@@ -276,6 +278,7 @@ public class UserService implements UserDetailsService {
 
                 user.setQuestionnaire(questionnaire);
             }else {
+                user.setUniversity(userDto.getUniversity());
                 user.setLocation(userDto.getLocation());
                 user.setGender(userDto.getGender());
                 user.setLanguage(userDto.getLanguage());
@@ -295,6 +298,7 @@ public class UserService implements UserDetailsService {
             userDto1.getQuestionnaire().setGender(userDto.getGender());
             userDto1.getQuestionnaire().setLanguage(userDto.getLanguage());
         }else {
+            userDto1.setUniversity(userDto.getUniversity());
             userDto1.setLocation(userDto.getLocation());
             userDto1.setGender(userDto.getGender());
             userDto1.setLanguage(userDto.getLanguage());

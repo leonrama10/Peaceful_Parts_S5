@@ -9,10 +9,10 @@ import SideBarAdmin from "./SideBars/SideBarAdmin";
 import DashboardNav from "./DashboardNav";
 function RegisterBootTherapist({loading,error,...props}){
 
-
     const [userData,setUserData]=useState({});
     const history = useNavigate ();
     const [values, setValues] = useState({
+        id:0,
         email: '',
         name: '',
         surname: '',
@@ -20,7 +20,7 @@ function RegisterBootTherapist({loading,error,...props}){
         university: {},
         gender: {},
         location: {},
-        language: {},
+        language: [],
         experience: 0,
         number:''
     });
@@ -68,8 +68,7 @@ function RegisterBootTherapist({loading,error,...props}){
 
     const handleChange = (e) => {
         const { name, value } = e.target;
-
-        console.log(`${name} changed:`, value);
+        const languageObject = { id: Number(value.split('-')[0]), language: value.split('-')[1] };
 
         if (name === 'password') {
             setValues(values => ({
@@ -78,6 +77,18 @@ function RegisterBootTherapist({loading,error,...props}){
             }));
         } else if (name === 'confirmPassword') {
             setConfirmPassword(value);
+        } else if (name === 'language') {
+            if (values.language.some(lang => lang.id === languageObject.id)) {
+                setValues(values => ({
+                    ...values,
+                    [name]: values[name].filter(lang => lang.id !== languageObject.id)
+                }));
+            } else {
+                setValues(values => ({
+                    ...values,
+                    [name]: [...values[name], languageObject]
+                }));
+            }
         } else {
             setValues(values => ({
                 ...values,
@@ -85,8 +96,7 @@ function RegisterBootTherapist({loading,error,...props}){
                     name === 'gender' ? { id: Number(value.split('-')[0]), gender: value.split('-')[1] } :
                         name === 'location' ? { id: Number(value.split('-')[0]), location: value.split('-')[1] } :
                             name === 'university' ? { id: Number(value.split('-')[0]), university: value.split('-')[1] } :
-                                name === 'language' ? { id: Number(value.split('-')[0]), language: value.split('-')[1] } :
-                                    value
+                                value
             }));
         }
     };
@@ -181,20 +191,41 @@ function RegisterBootTherapist({loading,error,...props}){
                                                                </select>
                                                            </div>
 
-                                                           <div className="custom-dropdown">
-                                                               <label htmlFor="languageSelect">Language</label>
-                                                               <select
-                                                                   id="languageSelect"
-                                                                   name="language"
-                                                                   value={values.language ? `${values.language.id}-${values.language.language}` : ''}
-                                                                   onChange={handleChange}
-                                                                   required
-                                                               >
-                                                                   <option defaultValue="">Select your language</option>
-                                                                   <option value="1-Albanian">Albanian</option>
-                                                                   <option value="2-English">English</option>
-                                                                   <option value="3-Serbian">Serbian</option>
-                                                               </select>
+                                                           <div className="custom-checkboxes">
+                                                               <label>Language</label>
+                                                               <div>
+                                                                   <input
+                                                                       type="checkbox"
+                                                                       id="albanianCheckbox"
+                                                                       name="language"
+                                                                       value="1-Albanian"
+                                                                       checked={values.language.some(lang => lang.id === 1)}
+                                                                       onChange={handleChange}
+                                                                   />
+                                                                   <label htmlFor="albanianCheckbox">Albanian</label>
+                                                               </div>
+                                                               <div>
+                                                                   <input
+                                                                       type="checkbox"
+                                                                       id="albanianCheckbox"
+                                                                       name="language"
+                                                                       value="2-English"
+                                                                       checked={values.language.some(lang => lang.id === 2)}
+                                                                       onChange={handleChange}
+                                                                   />
+                                                                   <label htmlFor="englishCheckbox">English</label>
+                                                               </div>
+                                                               <div>
+                                                                   <input
+                                                                       type="checkbox"
+                                                                       id="albanianCheckbox"
+                                                                       name="language"
+                                                                       value="3-Serbian"
+                                                                       checked={values.language.some(lang => lang.id === 3)}
+                                                                       onChange={handleChange}
+                                                                   />
+                                                                   <label htmlFor="serbianCheckbox">Serbian</label>
+                                                               </div>
                                                            </div>
 
 

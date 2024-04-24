@@ -9,6 +9,9 @@ import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
+import java.util.ArrayList;
+import java.util.Collection;
+
 @Data
 @AllArgsConstructor
 @NoArgsConstructor
@@ -41,7 +44,7 @@ public class QuestionnaireDto {
 
     private String mentalState2;
 
-    private Language language;
+    private Collection<Language> language;
 
     private Location location;
 
@@ -151,11 +154,11 @@ public class QuestionnaireDto {
         this.mentalState2 = mentalState2;
     }
 
-    public Language getLanguage() {
+    public Collection<Language> getLanguage() {
         return language;
     }
 
-    public void setLanguage(Language language) {
+    public void setLanguage(Collection<Language> language) {
         this.language = language;
     }
 

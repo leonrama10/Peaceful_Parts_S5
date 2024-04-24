@@ -20,11 +20,12 @@ function AdminProfile({loading,error,...props}){
         name:'',
         surname:'',
         password:'',
-        roles:[],
         number:'',
         location:{},
         gender:{},
-        language:{}
+        language:[],
+        roles:[],
+        experience:0,
     });
 
     React.useEffect(()=>{
@@ -36,12 +37,13 @@ function AdminProfile({loading,error,...props}){
                     email: response.data.email,
                     name: response.data.name,
                     surname: response.data.surname,
-                    password: response.data.password,
                     roles: response.data.roles,
+                    password: response.data.password,
                     number:response.data.number,
                     location:response.data.location,
                     gender:response.data.gender,
                     language:response.data.language,
+                    experience:response.data.experience,
                 })
             }
             else{
@@ -93,13 +95,29 @@ function AdminProfile({loading,error,...props}){
 
     const handleChange = (e) => {
         const { name, value } = e.target;
-        setValues(values => ({
-            ...values,
-            [name]: name === 'gender' ? { id: Number(value.split('-')[0]), gender: value.split('-')[1] } :
-                    name === 'location' ? { id: Number(value.split('-')[0]), location: value.split('-')[1] }:
-                        name === 'language' ? { id: Number(value.split('-')[0]), language: value.split('-')[1] }:
+        const languageObject = { id: Number(value.split('-')[0]), language: value.split('-')[1] };
+
+        if (name === 'language') {
+            if (values.language.some(lang => lang.id === languageObject.id)) {
+                setValues(values => ({
+                    ...values,
+                    [name]: values[name].filter(lang => lang.id !== languageObject.id)
+                }));
+            } else {
+                setValues(values => ({
+                    ...values,
+                    [name]: [...values[name], languageObject]
+                }));
+            }
+        } else {
+            setValues(values => ({
+                ...values,
+                [name]: name === 'experience' ? Number(value) :
+                    name === 'gender' ? { id: Number(value.split('-')[0]), gender: value.split('-')[1] } :
+                        name === 'location' ? { id: Number(value.split('-')[0]), location: value.split('-')[1] } :
                             value
-        }));
+            }));
+        }
     };
 
     return (
@@ -179,14 +197,42 @@ function AdminProfile({loading,error,...props}){
                                                 </Form.Select>
                                             </Form.Group>
 
-                                            <Form.Group controlId="formBasicLanguage">
-                                                <Form.Label>Language</Form.Label>
-                                                <Form.Select name="language" value={values.language ? `${values.language.id}-${values.language.language}` : ''} onChange={handleChange} required>
-                                                    <option value="1-Albanian">Kosovo</option>
-                                                    <option value="2-English">Albania</option>
-                                                    <option value="3-Serbian">Montenegro</option>
-                                                </Form.Select>
-                                            </Form.Group>
+                                            <div className="custom-checkboxes">
+                                                <label>Language</label>
+                                                <div>
+                                                    <input
+                                                        type="checkbox"
+                                                        id="albanianCheckbox"
+                                                        name="language"
+                                                        value="1-Albanian"
+                                                        checked={values.language.some(lang => lang.id === 1)}
+                                                        onChange={handleChange}
+                                                    />
+                                                    <label htmlFor="albanianCheckbox">Albanian</label>
+                                                </div>
+                                                <div>
+                                                    <input
+                                                        type="checkbox"
+                                                        id="albanianCheckbox"
+                                                        name="language"
+                                                        value="2-English"
+                                                        checked={values.language.some(lang => lang.id === 2)}
+                                                        onChange={handleChange}
+                                                    />
+                                                    <label htmlFor="englishCheckbox">English</label>
+                                                </div>
+                                                <div>
+                                                    <input
+                                                        type="checkbox"
+                                                        id="albanianCheckbox"
+                                                        name="language"
+                                                        value="3-Serbian"
+                                                        checked={values.language.some(lang => lang.id === 3)}
+                                                        onChange={handleChange}
+                                                    />
+                                                    <label htmlFor="serbianCheckbox">Serbian</label>
+                                                </div>
+                                            </div>
 
                                             <div className="text-left" style={{padding: '10px 0'}}>
                                                 <Link className="small" to="/forgotPassBoot">Forgot Password?</Link>

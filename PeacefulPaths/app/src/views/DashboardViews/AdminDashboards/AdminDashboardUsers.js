@@ -89,9 +89,10 @@ function AdminDashboardUsers({loading,error,...props}){
                                                        cellSpacing="0">
                                                     <thead>
                                                     <tr>
+                                                        <th>Id</th>
                                                         <th>Name</th>
                                                         <th>Email</th>
-                                                        <th>Number</th>
+                                                        <th>Phone Number</th>
                                                         <th>Gender</th>
                                                         <th>Location</th>
                                                         <th>Actions</th>
@@ -99,9 +100,10 @@ function AdminDashboardUsers({loading,error,...props}){
                                                     </thead>
                                                     <tfoot>
                                                     <tr>
+                                                        <th>Id</th>
                                                         <th>Name</th>
                                                         <th>Email</th>
-                                                        <th>Number</th>
+                                                        <th>Phone Number</th>
                                                         <th>Gender</th>
                                                         <th>Location</th>
                                                         <th>Actions</th>
@@ -110,6 +112,7 @@ function AdminDashboardUsers({loading,error,...props}){
                                                     <tbody>
                                                         {allUsers.map((tempEmployee) => (
                                                             <tr key={tempEmployee.id}>
+                                                                <td>{tempEmployee.id}</td>
                                                                 <td>{tempEmployee.name} {tempEmployee.surname}</td>
                                                                 <td>{tempEmployee.email}</td>
                                                                 <td>{tempEmployee.number}</td>

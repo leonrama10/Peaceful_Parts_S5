@@ -22,11 +22,10 @@ function AdminDashboardAdmin({loading,error,...props}){
                 setData(response.data);
             }
             else{
-                console.log("AAAAAAAAAAAAAAAAAAAAA ", response.data.roles.at(0).role)
                 history('/loginBoot');
             }
         }).catch((e)=>{
-            console.log("BBBBBBBBBBBBBBBBBBBBBBBBBB")
+
             history('/loginBoot');
         })
     },[])
@@ -93,35 +92,35 @@ function AdminDashboardAdmin({loading,error,...props}){
                                                cellSpacing="0">
                                             <thead>
                                             <tr>
+                                                <th>Id</th>
                                                 <th>Name</th>
                                                 <th>Email</th>
-                                                <th>Number</th>
+                                                <th>Phone Number</th>
                                                 <th>Gender</th>
                                                 <th>Location</th>
-                                                <th>Experience</th>
                                                 <th>Actions</th>
                                             </tr>
                                             </thead>
                                             <tfoot>
                                             <tr>
+                                                <th>Id</th>
                                                 <th>Name</th>
                                                 <th>Email</th>
-                                                <th>Number</th>
+                                                <th>Phone Number</th>
                                                 <th>Gender</th>
                                                 <th>Location</th>
-                                                <th>Experience</th>
                                                 <th>Actions</th>
                                             </tr>
                                             </tfoot>
                                             <tbody>
                                             {allUsers.map((tempEmployee) => (
                                                 <tr key={tempEmployee.id}>
+                                                    <td>{tempEmployee.id}</td>
                                                     <td>{tempEmployee.name} {tempEmployee.surname}</td>
                                                     <td>{tempEmployee.email}</td>
                                                     <td>{tempEmployee.number}</td>
                                                     <td>{tempEmployee.gender.gender}</td>
                                                     <td>{tempEmployee.location.location}</td>
-                                                    <td>{tempEmployee.experience}</td>
                                                     <td>
                                                         <button className="btn btn-info btn-sm"
                                                                 onClick={() => handleEdit(tempEmployee.id)}>

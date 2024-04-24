@@ -68,9 +68,11 @@ public class User {
     @JoinColumn(name = "questionnaire_id")
     private Questionnaire questionnaire;
 
-    @ManyToOne
-    @JoinColumn(name = "language_id")
-    private Language language;
+    @ManyToMany(fetch = FetchType.EAGER, cascade = {CascadeType.MERGE, CascadeType.REMOVE, CascadeType.REFRESH, CascadeType.DETACH})
+    @JoinTable(name = "user_language",
+            joinColumns = @JoinColumn(name = "user_id"),
+            inverseJoinColumns = @JoinColumn(name = "language_id"))
+    private Collection<Language> language;
 
     @ManyToOne
     @JoinColumn(name = "location_id")
@@ -93,13 +95,24 @@ public class User {
 
     public User() {}
 
-    public User(String name, String surname, String email, String number, int experience,Collection<Roles> roles,List<Roles> allRoles) {
+    public User(int id, String name, String surname, String email, String number, int experience, String password, String confirmPassword, String resetToken, Long expirationTime, String token, Collection<Roles> roles, Questionnaire questionnaire, Collection<Language> language, Location location, Gender gender, University university, List<Roles> allRoles) {
+        this.id = id;
         this.name = name;
         this.surname = surname;
         this.email = email;
         this.number = number;
         this.experience = experience;
+        this.password = password;
+        this.confirmPassword = confirmPassword;
+        this.resetToken = resetToken;
+        this.expirationTime = expirationTime;
+        this.token = token;
         this.roles = roles;
+        this.questionnaire = questionnaire;
+        this.language = language;
+        this.location = location;
+        this.gender = gender;
+        this.university = university;
         this.allRoles = allRoles;
     }
 
@@ -118,11 +131,11 @@ public class User {
         this.university = university;
     }
 
-    public Language getLanguage() {
+    public Collection<Language> getLanguage() {
         return language;
     }
 
-    public void setLanguage(Language language) {
+    public void setLanguage(Collection<Language> language) {
         this.language = language;
     }
 

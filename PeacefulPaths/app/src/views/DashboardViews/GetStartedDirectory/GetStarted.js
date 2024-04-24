@@ -260,7 +260,7 @@ function GetStarted({loading,error,...props}){
         let value = answer;
 
         if (property === 'language') {
-            value = languageToId[answer];
+            value = [{ 'id': languageToId[answer], 'language': answer }];
         }else if (property === 'location') {
             value = locationToId[answer];
         }else if (property === 'gender') {

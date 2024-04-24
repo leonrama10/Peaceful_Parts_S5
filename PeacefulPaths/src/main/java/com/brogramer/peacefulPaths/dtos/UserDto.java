@@ -6,6 +6,7 @@ import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
+import java.util.ArrayList;
 import java.util.Collection;
 
 @Data
@@ -14,7 +15,7 @@ import java.util.Collection;
 @Builder
 public class UserDto {
 
-    private Language language;
+    private Collection<Language> language;
     private int id;
     private String name;
     private String surname;
@@ -48,11 +49,11 @@ public class UserDto {
         this.questionnaire = questionnaire;
     }
 
-    public Language getLanguage() {
+    public Collection<Language> getLanguage() {
         return language;
     }
 
-    public void setLanguage(Language language) {
+    public void setLanguage(Collection<Language> language) {
         this.language = language;
     }
 

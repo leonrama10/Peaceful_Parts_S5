@@ -2,6 +2,8 @@ package com.brogramer.peacefulPaths.entity;
 
 import jakarta.persistence.*;
 
+import java.util.Collection;
+
 @Entity
 @Table(name = "questionnaire")
 public class Questionnaire {
@@ -47,16 +49,19 @@ public class Questionnaire {
     private String mentalState2;
 
     @ManyToOne
-    @JoinColumn(name = "language_id")
-    private Language language;
-
-    @ManyToOne
     @JoinColumn(name = "location_id")
     private Location location;
 
     @ManyToOne
     @JoinColumn(name = "gender_id")
     private Gender gender;
+
+    @ManyToMany(fetch = FetchType.EAGER, cascade = {CascadeType.MERGE, CascadeType.REMOVE, CascadeType.REFRESH, CascadeType.DETACH})
+    @JoinTable(name = "questionnaire_language",
+            joinColumns = @JoinColumn(name = "questionnaire_id"),
+            inverseJoinColumns = @JoinColumn(name = "language_id"))
+    private Collection<Language> language;
+
 
     public Long getId() {
         return id;
@@ -162,11 +167,11 @@ public class Questionnaire {
         this.mentalState2 = mentalState2;
     }
 
-    public Language getLanguage() {
+    public Collection<Language> getLanguage() {
         return language;
     }
 
-    public void setLanguage(Language language) {
+    public void setLanguage(Collection<Language> language) {
         this.language = language;
     }
 

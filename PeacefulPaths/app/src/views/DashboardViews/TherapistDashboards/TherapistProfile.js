@@ -20,13 +20,13 @@ function TherapistProfile({loading,error,...props}){
         name:'',
         surname:'',
         password:'',
-        roles:[],
         number:'',
         experience:0,
         location:{},
         gender:{},
-        language:{},
-        questionnaire:{},
+        language:[],
+        roles:[],
+        university: {}
     });
 
     React.useEffect(()=>{
@@ -39,13 +39,13 @@ function TherapistProfile({loading,error,...props}){
                     name: response.data.name,
                     surname: response.data.surname,
                     password: response.data.password,
-                    roles: response.data.roles,
                     number:response.data.number,
                     location:response.data.location,
                     gender:response.data.gender,
                     language:response.data.language,
-                    questionnaire:response.data.questionnaire,
-                    experience:response.data.experience
+                    experience:response.data.experience,
+                    university:response.data.university,
+                    roles: response.data.roles
                 })
             }
             else{
@@ -98,14 +98,30 @@ function TherapistProfile({loading,error,...props}){
 
     const handleChange = (e) => {
         const { name, value } = e.target;
-        setValues(values => ({
-            ...values,
-            [name]: name === 'experience' ? Number(value) :
-                name === 'gender' ? { id: Number(value.split('-')[0]), gender: value.split('-')[1] } :
-                    name === 'location' ? { id: Number(value.split('-')[0]), location: value.split('-')[1] }:
-                        name === 'language' ? { id: Number(value.split('-')[0]), language: value.split('-')[1] }:
-                            value
-        }));
+        const languageObject = { id: Number(value.split('-')[0]), language: value.split('-')[1] };
+
+        if (name === 'language') {
+            if (values.language.some(lang => lang.id === languageObject.id)) {
+                setValues(values => ({
+                    ...values,
+                    [name]: values[name].filter(lang => lang.id !== languageObject.id)
+                }));
+            } else {
+                setValues(values => ({
+                    ...values,
+                    [name]: [...values[name], languageObject]
+                }));
+            }
+        } else {
+            setValues(values => ({
+                ...values,
+                [name]: name === 'experience' ? Number(value) :
+                    name === 'gender' ? { id: Number(value.split('-')[0]), gender: value.split('-')[1] } :
+                        name === 'location' ? { id: Number(value.split('-')[0]), location: value.split('-')[1] } :
+                            name === 'university' ? { id: Number(value.split('-')[0]), university: value.split('-')[1] } :
+                                value
+            }));
+        }
     };
 
     return (
@@ -182,14 +198,42 @@ function TherapistProfile({loading,error,...props}){
                                                 </Form.Select>
                                             </Form.Group>
 
-                                            <Form.Group controlId="formBasicLanguage">
-                                                <Form.Label>Language</Form.Label>
-                                                <Form.Select name="language" value={values.language ? `${values.language.id}-${values.language.language}` : ''} onChange={handleChange} required>
-                                                    <option value="1-Albanian">Kosovo</option>
-                                                    <option value="2-English">Albania</option>
-                                                    <option value="3-Serbian">Montenegro</option>
-                                                </Form.Select>
-                                            </Form.Group>
+                                            <div className="custom-checkboxes">
+                                                <label>Language</label>
+                                                <div>
+                                                    <input
+                                                        type="checkbox"
+                                                        id="albanianCheckbox"
+                                                        name="language"
+                                                        value="1-Albanian"
+                                                        checked={values.language.some(lang => lang.id === 1)}
+                                                        onChange={handleChange}
+                                                    />
+                                                    <label htmlFor="albanianCheckbox">Albanian</label>
+                                                </div>
+                                                <div>
+                                                    <input
+                                                        type="checkbox"
+                                                        id="albanianCheckbox"
+                                                        name="language"
+                                                        value="2-English"
+                                                        checked={values.language.some(lang => lang.id === 2)}
+                                                        onChange={handleChange}
+                                                    />
+                                                    <label htmlFor="englishCheckbox">English</label>
+                                                </div>
+                                                <div>
+                                                    <input
+                                                        type="checkbox"
+                                                        id="albanianCheckbox"
+                                                        name="language"
+                                                        value="3-Serbian"
+                                                        checked={values.language.some(lang => lang.id === 3)}
+                                                        onChange={handleChange}
+                                                    />
+                                                    <label htmlFor="serbianCheckbox">Serbian</label>
+                                                </div>
+                                            </div>
 
                                             <Form.Group controlId="formBasicAddress">
                                                 <Form.Label>Experience</Form.Label>
@@ -197,7 +241,7 @@ function TherapistProfile({loading,error,...props}){
                                                               onChange={handleChange} name="experience" min={0}/>
                                             </Form.Group>
 
-                                            <div className="text-left" style={{padding:'10px 0'}}>
+                                            <div className="text-left" style={{padding: '10px 0'}}>
                                                 <Link className="small" to="/forgotPassBoot">Forgot Password?</Link>
                                             </div>
 
@@ -216,7 +260,7 @@ function TherapistProfile({loading,error,...props}){
                     <footer className="sticky-footer bg-white">
                         <div className="container my-auto">
                             <div className="copyright text-center my-auto">
-                                <span style={{color:'grey'}}>Copyright &copy; PeacefulParts 2024</span>
+                                <span style={{color: 'grey'}}>Copyright &copy; PeacefulParts 2024</span>
                             </div>
                         </div>
                     </footer>
@@ -236,7 +280,9 @@ function TherapistProfile({loading,error,...props}){
                                 <span aria-hidden="true">×</span>
                             </button>
                         </div>
-                        <div className="modal-body">Select "Logout" below if you are ready to end your current session.</div>
+                        <div className="modal-body">Select "Logout" below if you are ready to end your current
+                            session.
+                        </div>
                         <div className="modal-footer">
                             <button className="btn btn-secondary" type="button" data-dismiss="modal">Cancel</button>
                             <Link className="btn btn-primary" to="/loginBoot">Logout</Link>

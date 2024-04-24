@@ -1,4 +1,4 @@
-import React,{useState} from 'react';
+import React, {useEffect, useState} from 'react';
 import {fetchUserData, fetchUserDataId, userUpdate} from '../../api/authService';
 import {Link, useNavigate, useParams} from 'react-router-dom';
 import {Container, Row, Col, Form, Button} from 'react-bootstrap';
@@ -26,14 +26,12 @@ function EditUser({loading,error,...props}){
         name:'',
         surname:'',
         password:'',
-        roles:[],
         number:'',
         experience:0,
         location:{},
         gender:{},
-        language:{},
+        language:[],
         questionnaire:{},
-        allRoles:[],
         university:{}
     });
 
@@ -119,17 +117,37 @@ function EditUser({loading,error,...props}){
         });
     };
 
+    useEffect(() => {
+        console.log("Current values state:", values);
+    }, [values]);
+
     const handleChange = (e) => {
         const { name, value } = e.target;
-        setValues(values => ({
-            ...values,
-            [name]: name === 'experience' ? Number(value) :
-                name === 'gender' ? { id: Number(value.split('-')[0]), gender: value.split('-')[1] } :
-                    name === 'location' ? { id: Number(value.split('-')[0]), location: value.split('-')[1] } :
-                        name === 'university' ? { id: Number(value.split('-')[0]), university: value.split('-')[1] } :
-                            name === 'language' ? { id: Number(value.split('-')[0]), language: value.split('-')[1] } :
+        const languageObject = { id: Number(value.split('-')[0]), language: value.split('-')[1] };
+
+
+        if (name === 'language') {
+            if (values.language.some(lang => lang.id === languageObject.id)) {
+                setValues(values => ({
+                    ...values,
+                    [name]: values[name].filter(lang => lang.id !== languageObject.id)
+                }));
+            } else {
+                setValues(values => ({
+                    ...values,
+                    [name]: [...values[name], languageObject]
+                }));
+            }
+        } else {
+            setValues(values => ({
+                ...values,
+                [name]: name === 'experience' ? Number(value) :
+                    name === 'gender' ? { id: Number(value.split('-')[0]), gender: value.split('-')[1] } :
+                        name === 'location' ? { id: Number(value.split('-')[0]), location: value.split('-')[1] } :
+                            name === 'university' ? { id: Number(value.split('-')[0]), university: value.split('-')[1] } :
                                 value
-        }));
+            }));
+        }
     };
 
 
@@ -222,20 +240,49 @@ function EditUser({loading,error,...props}){
                                                 </Form.Select>
                                             </Form.Group>
 
-                                            <Form.Group controlId="formBasicLanguage">
-                                                <Form.Label>Language</Form.Label>
-                                                <Form.Select name="language" value={values.language ? `${values.language.id}-${values.language.language}` : ''} onChange={handleChange} required>
-                                                    <option value="1-Albanian">Kosovo</option>
-                                                    <option value="2-English">Albania</option>
-                                                    <option value="3-Serbian">Montenegro</option>
-                                                </Form.Select>
-                                            </Form.Group>
+                                            <div className="custom-checkboxes">
+                                                <label>Language</label>
+                                                <div>
+                                                    <input
+                                                        type="checkbox"
+                                                        id="albanianCheckbox"
+                                                        name="language"
+                                                        value="1-Albanian"
+                                                        checked={values.language.some(lang => lang.id === 1)}
+                                                        onChange={handleChange}
+                                                    />
+                                                    <label htmlFor="albanianCheckbox">Albanian</label>
+                                                </div>
+                                                <div>
+                                                    <input
+                                                        type="checkbox"
+                                                        id="albanianCheckbox"
+                                                        name="language"
+                                                        value="2-English"
+                                                        checked={values.language.some(lang => lang.id === 2)}
+                                                        onChange={handleChange}
+                                                    />
+                                                    <label htmlFor="englishCheckbox">English</label>
+                                                </div>
+                                                <div>
+                                                    <input
+                                                        type="checkbox"
+                                                        id="albanianCheckbox"
+                                                        name="language"
+                                                        value="3-Serbian"
+                                                        checked={values.language.some(lang => lang.id === 3)}
+                                                        onChange={handleChange}
+                                                    />
+                                                    <label htmlFor="serbianCheckbox">Serbian</label>
+                                                </div>
+                                            </div>
 
-                                            {(userRole!=='ROLE_USER' || userRole!=='ROLE_ADMIN') && <Form.Group controlId="formBasicExperience">
-                                                <Form.Label>Experience</Form.Label>
-                                                <Form.Control type="number" defaultValue={data.experience}
-                                                              onChange={handleChange} name="experience" min={0}/>
-                                            </Form.Group>}
+                                            {(userRole !== 'ROLE_USER' || userRole !== 'ROLE_ADMIN') &&
+                                                <Form.Group controlId="formBasicExperience">
+                                                    <Form.Label>Experience</Form.Label>
+                                                    <Form.Control type="number" defaultValue={data.experience}
+                                                                  onChange={handleChange} name="experience" min={0}/>
+                                                </Form.Group>}
 
                                             <div className="text-left" style={{padding: '10px 0'}}>
                                                 <Link className="small" to="/forgotPassBoot">Forgot Password?</Link>

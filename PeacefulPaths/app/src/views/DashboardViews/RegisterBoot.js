@@ -24,6 +24,7 @@ function RegisterBoot({loading,error,...props}){
         surname:'',
         password: '',
         confirmPassword: '',
+        number: '',
         questionnaire: props.questionnaire
     });
 
@@ -31,38 +32,6 @@ function RegisterBoot({loading,error,...props}){
         evt.preventDefault();
         props.authenticate();
 
-        userRegister(values).then((response)=>{
-            if(response.status===201){
-                props.setUser(response.data);
-                history('/loginBoot');
-                console.log("RegisterBoot is rendered");
-            }
-            else{
-                props.loginFailure('Something LEKAAAAAAA!Please Try Again');
-            }
-
-
-        }).catch((err)=>{
-
-            if(err && err.response){
-
-                switch(err.response.status){
-                    case 401:
-                        console.log("401 status");
-                        props.loginFailure("Authentication Failed.Bad Credentials");
-                        break;
-                    default:
-                        props.loginFailure('Something BABAAAAAA!Please Try Again');
-
-                }
-
-            }
-            else{
-                console.log("ERROR: ",err)
-                props.loginFailure('Something NaNAAAAA!Please Try Again');
-            }
-
-        });
         if (values.password === confirmPassword) {
             userRegister(values).then((response) => {
                 if (response.status === 201) {
@@ -98,11 +67,23 @@ function RegisterBoot({loading,error,...props}){
     }
 
     const handleChange = (e) => {
-        e.persist();
-        setValues(values => ({
-            ...values,
-            [e.target.name]: e.target.value
-        }));
+        const { name, value } = e.target;
+
+        console.log(`${name} changed:`, value);
+
+        if (name === 'password') {
+            setValues(values => ({
+                ...values,
+                [name]: value
+            }));
+        } else if (name === 'confirmPassword') {
+            setConfirmPassword(value);
+        } else {
+            setValues(values => ({
+                ...values,
+                [name]: value
+            }));
+        }
     };
 
     return (
@@ -139,24 +120,36 @@ function RegisterBoot({loading,error,...props}){
                                         <div className="form-group row">
                                             <div className="col-sm-6 mb-3 mb-sm-0">
                                                 <input type="text" className="form-control form-control-user"
-                                                       id="exampleFirstName" name="name" value={values.name} onChange={handleChange}
+                                                       id="exampleFirstName" name="name" value={values.name}
+                                                       onChange={handleChange}
                                                        placeholder="First Name" required/>
                                             </div>
                                             <div className="col-sm-6">
                                                 <input type="text" className="form-control form-control-user"
-                                                       id="exampleLastName" name="surname" value={values.surname} onChange={handleChange}
+                                                       id="exampleLastName" name="surname" value={values.surname}
+                                                       onChange={handleChange}
                                                        placeholder="Last Name" required/>
                                             </div>
                                         </div>
                                         <div className="form-group">
-                                            <input type="email" className="form-control form-control-user" aria-describedby="emailHelp"
-                                                   id="exampleInputEmail" name="email" value={values.email} onChange={handleChange}
+                                            <input type="email" className="form-control form-control-user"
+                                                   aria-describedby="emailHelp"
+                                                   id="exampleInputEmail" name="email" value={values.email}
+                                                   onChange={handleChange}
                                                    placeholder="Email Address" required/>
+                                        </div>
+                                        <div className="form-group">
+                                            <input type="text" className="form-control form-control-user"
+                                                   aria-describedby="numberHelp"
+                                                   id="exampleInputNumber" name="number" value={values.number}
+                                                   onChange={handleChange}
+                                                   placeholder="Phone Number" required/>
                                         </div>
                                         <div className="form-group row">
                                             <div className="col-sm-6 mb-3 mb-sm-0">
                                                 <input type="password" className="form-control form-control-user"
-                                                       id="exampleInputPassword" placeholder="Password" value={values.password}
+                                                       id="exampleInputPassword" placeholder="Password"
+                                                       value={values.password}
                                                        onChange={handleChange} name="password" required/>
                                             </div>
                                             <div className="col-sm-6">
@@ -174,9 +167,9 @@ function RegisterBoot({loading,error,...props}){
                                     <hr/>
                                     <div className="text-center">
                                         <Link className="small" to="forgotPassBoot">Forgot Password?</Link>
-                                        </div>
-                                        <div className="text-center">
-                                            <Link className="small" to="/loginBoot">Already have an account? Login!</Link>
+                                    </div>
+                                    <div className="text-center">
+                                        <Link className="small" to="/loginBoot">Already have an account? Login!</Link>
                                         </div>
                                 </div>
                             </div>

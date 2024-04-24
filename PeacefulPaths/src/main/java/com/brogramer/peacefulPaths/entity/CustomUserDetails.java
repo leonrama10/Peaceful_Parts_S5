@@ -4,6 +4,7 @@ import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.core.userdetails.UserDetails;
 
+import java.util.ArrayList;
 import java.util.Collection;
 import java.util.stream.Collectors;
 
@@ -95,7 +96,7 @@ public class CustomUserDetails implements UserDetails {
         return user.getLocation();
     }
 
-    public Language getLanguage() {
+    public Collection<Language> getLanguage() {
         return user.getLanguage();
     }
 }

@@ -1,10 +1,7 @@
 import React,{useState} from 'react';
 import {
-    fetchAllUserData,
-    fetchAllUsersConnectedData,
     fetchAllUsersConnectedDataHistory,
-    fetchUserData,
-    userDelete
+    fetchUserData
 } from '../../../api/authService';
 import {useNavigate} from 'react-router-dom';
 import '../../../css/sb-admin-2.css';
@@ -76,6 +73,7 @@ function TherapistClientHistory({loading,error,...props}){
                                                cellSpacing="0">
                                             <thead>
                                             <tr>
+                                                <th>Id</th>
                                                 <th>Name</th>
                                                 <th>Email</th>
                                                 <th>Number</th>
@@ -85,6 +83,7 @@ function TherapistClientHistory({loading,error,...props}){
                                             </thead>
                                             <tfoot>
                                             <tr>
+                                                <th>Id</th>
                                                 <th>Name</th>
                                                 <th>Email</th>
                                                 <th>Number</th>
@@ -95,6 +94,7 @@ function TherapistClientHistory({loading,error,...props}){
                                             <tbody>
                                             {allUsers.map((tempEmployee) => (
                                                 <tr key={tempEmployee.id}>
+                                                    <td>{tempEmployee.id}</td>
                                                     <td>{tempEmployee.name} {tempEmployee.surname}</td>
                                                     <td>{tempEmployee.email}</td>
                                                     <td>{tempEmployee.number}</td>

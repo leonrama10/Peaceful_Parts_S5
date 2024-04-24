@@ -7,6 +7,8 @@ import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
+import java.util.ArrayList;
+
 @Data
 @AllArgsConstructor
 @NoArgsConstructor
@@ -33,18 +35,18 @@ public class SignUpDto {
 
     private Location location;
 
-    private Language language;
+    private ArrayList<Language> language;
 
     private University university;
 
     private Questionnaire questionnaire;
 
-    public Location getLocation() {
-        return location;
+    public ArrayList<Language> getLanguage() {
+        return language;
     }
 
-    public Language getLanguage() {
-        return language;
+    public Location getLocation() {
+        return location;
     }
 
     public String getName() {

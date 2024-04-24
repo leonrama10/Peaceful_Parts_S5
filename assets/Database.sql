@@ -60,7 +60,9 @@ INSERT INTO `university` (`university`)
 VALUES
 ('AAB'), ('UBT'), ('KAKTUS'), ('UNIVERSITETI I PRISHTINES');
 
+SET FOREIGN_KEY_CHECKS = 0;
 DROP TABLE IF EXISTS `questionnaire`;
+SET FOREIGN_KEY_CHECKS = 1;
 CREATE TABLE `questionnaire` (
     `id` INT AUTO_INCREMENT,
     `therapy_type` VARCHAR(255),
@@ -77,11 +79,9 @@ CREATE TABLE `questionnaire` (
     `mental_state_1` VARCHAR(255),
     `mental_state_2` VARCHAR(255),
     `location_id` int(11),
-    `language_id` int(11),
     PRIMARY KEY (`id`),
     FOREIGN KEY (`gender_id`) REFERENCES `gender`(`id`) ON DELETE CASCADE on update cascade,
-    FOREIGN KEY (`location_id`) REFERENCES `location`(`id`) ON DELETE CASCADE on update cascade,
-    FOREIGN KEY (`language_id`) REFERENCES `language`(`id`) ON DELETE CASCADE on update cascade
+    FOREIGN KEY (`location_id`) REFERENCES `location`(`id`) ON DELETE CASCADE on update cascade
 ) AUTO_INCREMENT=1;
 
 CREATE TABLE `user` (
@@ -96,22 +96,20 @@ CREATE TABLE `user` (
   `password` char(68) NOT NULL,
   `questionnaire_id` int(11),
   `location_id` int(11),
-  `language_id` int(11),
   `gender_id` int(11),
   `university_id` int(11),
   PRIMARY KEY (`id`),
   FOREIGN KEY (`questionnaire_id`) REFERENCES `questionnaire`(`id`) ON DELETE CASCADE on update cascade,
   FOREIGN KEY (`gender_id`) REFERENCES `gender`(`id`) ON DELETE CASCADE on update cascade,
   FOREIGN KEY (`location_id`) REFERENCES `location`(`id`) ON DELETE CASCADE on update cascade,
-  FOREIGN KEY (`language_id`) REFERENCES `language`(`id`) ON DELETE CASCADE on update cascade,
   FOREIGN KEY (`university_id`) REFERENCES `university`(`id`) ON DELETE CASCADE on update cascade
 ) AUTO_INCREMENT=1;
 
-INSERT INTO `user` (`name`,`surname`,`email`,`number`,`experience`,`password`,`reset_token`,`expiration_time`,`location_id`,`language_id`,`gender_id`,`university_id`)
+INSERT INTO `user` (`name`,`surname`,`email`,`number`,`experience`,`password`,`reset_token`,`expiration_time`,`location_id`,`gender_id`,`university_id`)
 VALUES	
-('Leke','Markaj','markaj.leka@gmail.com','044806543',20,'$2a$10$lAZ7fMTXoALYWY.C4rAs7u7Bdzz4qd7SIwAkWNOX5XQkTRe7vo4P.',null,0,1,1,1,1),
-('Loren','Markaj','markaj.loren@gmail.com','044333333',1,'$2a$10$lAZ7fMTXoALYWY.C4rAs7u7Bdzz4qd7SIwAkWNOX5XQkTRe7vo4P.',null,0,1,1,1,1),
-('Leon','Markaj','markaj.leon@gmail.com','044111111',15,'$2a$10$lAZ7fMTXoALYWY.C4rAs7u7Bdzz4qd7SIwAkWNOX5XQkTRe7vo4P.',null,0,1,1,1,1);
+('Leke','Markaj','markaj.leka@gmail.com','044806543',20,'$2a$10$lAZ7fMTXoALYWY.C4rAs7u7Bdzz4qd7SIwAkWNOX5XQkTRe7vo4P.',null,0,1,1,1),
+('Loren','Markaj','markaj.loren@gmail.com','044333333',1,'$2a$10$lAZ7fMTXoALYWY.C4rAs7u7Bdzz4qd7SIwAkWNOX5XQkTRe7vo4P.',null,0,1,1,1),
+('Leon','Markaj','markaj.leon@gmail.com','044111111',15,'$2a$10$lAZ7fMTXoALYWY.C4rAs7u7Bdzz4qd7SIwAkWNOX5XQkTRe7vo4P.',null,0,1,1,1);
 
 CREATE TABLE `roles` (
   `id` int(11) NOT NULL AUTO_INCREMENT, 
@@ -149,6 +147,49 @@ VALUES
 (1, 3),
 (2, 2),
 (3, 2);
+
+SET FOREIGN_KEY_CHECKS = 0;
+DROP TABLE IF EXISTS `user_language`;
+SET FOREIGN_KEY_CHECKS = 1;
+
+CREATE TABLE `user_language` (
+  `user_id` int(11) NOT NULL,
+  `language_id` int(11) NOT NULL,
+  
+  PRIMARY KEY (`user_id`,`language_id`),
+  
+  KEY `FK_LANGUAGE_idx` (`language_id`),
+  
+  CONSTRAINT `FK_USER_LANGUAGE` FOREIGN KEY (`user_id`) 
+  REFERENCES `user` (`id`) 
+  ON DELETE CASCADE ON UPDATE NO ACTION,
+  
+  CONSTRAINT `FK_LANGUAGE_USER` FOREIGN KEY (`language_id`) 
+  REFERENCES `language` (`id`) 
+  ON DELETE CASCADE ON UPDATE NO ACTION
+) ENGINE=InnoDB DEFAULT CHARSET=latin1;
+
+SET FOREIGN_KEY_CHECKS = 0;
+DROP TABLE IF EXISTS `questionnaire_language`;
+SET FOREIGN_KEY_CHECKS = 1;
+
+CREATE TABLE `questionnaire_language` (
+  `questionnaire_id` int(11) NOT NULL,
+  `language_id` int(11) NOT NULL,
+  
+  PRIMARY KEY (`questionnaire_id`,`language_id`),
+  
+  KEY `FK_LANGUAGE_idx` (`language_id`),
+  
+  CONSTRAINT `FK_QUESTIONNAIRE_LANGUAGE` FOREIGN KEY (`questionnaire_id`) 
+  REFERENCES `questionnaire` (`id`) 
+  ON DELETE CASCADE ON UPDATE NO ACTION,
+  
+  CONSTRAINT `FK_LANGUAGE_QUESTIONNAIRE` FOREIGN KEY (`language_id`) 
+  REFERENCES `language` (`id`) 
+  ON DELETE CASCADE ON UPDATE NO ACTION
+) ENGINE=InnoDB DEFAULT CHARSET=latin1;
+
 
 DROP TABLE IF EXISTS `user_connections`;
 
