@@ -5,7 +5,8 @@ import arrow from "../../../img/arrow.png";
 import {
     therapistFilterByExperience, therapistFilterByExperienceNotConnected,
     therapistFilterByGender, therapistFilterByGenderNotConnected,
-    therapistFilterByLocation, therapistFilterByLocationNotConnected
+    therapistFilterByLocation, therapistFilterByLocationNotConnected,
+    therapistFilterByLanguage,therapistFilterByLanguageNotConnected
 } from "../../../api/authService";
 import {authenticate, authFailure, authSuccess} from "../../../redux/authActions";
 import {connect} from "react-redux";
@@ -19,10 +20,14 @@ function SideBarUser({loading,error,...props}){
     const [openGenderFilter, setOpenGenderFilter] = useState(false);
     const [openExperienceFilter, setOpenExperienceFilter] = useState(false);
     const [openLocationFilter, setOpenLocationFilter] = useState(false);
+    const [openLanguageFilter, setOpenLanguageFilter] = useState(false);
+     const [selectedLanguage, setSelectedLanguage] = useState('');
 
     React.useEffect(() => {
         connected = loadState("connected",false)
         therapistId = loadState("therapistId",0)
+         console.log(connected, therapistId);
+
     }, []);
 
     function handleFilterByGender (gender){
@@ -96,6 +101,79 @@ function SideBarUser({loading,error,...props}){
             });
         }
     }
+
+      function handleFilterByLanguage (language){
+            connected = loadState("connected",false)
+            therapistId = loadState("therapistId",0)
+            const newFilterData = {
+                therapistId: therapistId,
+                language: language
+            };
+            if (!connected){
+                therapistFilterByLanguage(language).then((response)=>{
+                    if(response.status===200){
+                        props.setAllUsers(response.data)
+                        props.setHideTherapists(true);
+                    }
+                    else{
+                        props.loginFailure('Something LEKAAAAAAA!Please Try Again');
+                    }
+
+                }).catch((err)=>{
+
+                    if(err && err.response){
+
+                        switch(err.response.status){
+                            case 401:
+                                console.log("401 status");
+                                props.loginFailure("Authentication Failed.Bad Credentials");
+                                break;
+                            default:
+                                props.loginFailure('Something BABAAAAAA!Please Try Again');
+
+                        }
+
+                    }
+                    else{
+                        console.log("ERROR: ",err)
+                        props.loginFailure('Something NaNAAAAA!Please Try Again');
+                    }
+
+                });
+            }else {
+                therapistFilterByLanguageNotConnected(newFilterData).then((response)=>{
+                    if(response.status===200){
+                        props.setAllUsers(response.data)
+                        props.setHideTherapists(true);
+                    }
+                    else{
+                        props.loginFailure('Something LEKAAAAAAA!Please Try Again');
+                    }
+
+                }).catch((err)=>{
+
+                    if(err && err.response){
+
+                        switch(err.response.status){
+                            case 401:
+                                console.log("401 status");
+                                props.loginFailure("Authentication Failed.Bad Credentials");
+                                break;
+                            default:
+                                props.loginFailure('Something BABAAAAAA!Please Try Again');
+
+                        }
+
+                    }
+                    else{
+                        console.log("ERROR: ",err)
+                        props.loginFailure('Something NaNAAAAA!Please Try Again');
+                    }
+
+                });
+            }
+        }
+
 
     function handleFilterByExperience (experience){
         connected = loadState("connected",false)
@@ -336,8 +414,23 @@ function SideBarUser({loading,error,...props}){
                                         <option value="Serbia">Serbia</option>
                                     </select>
                                 </div>
+
                             </Collapse>
-                            {/*<button className="collapse-item">Filter By Language</button>*/}
+                            <button className="collapse-item"
+                             onClick={() => setOpenLanguageFilter(!openLanguageFilter)}>Filter By Language
+                                                </button>
+                                       <Collapse in={openLanguageFilter}>
+                                                            <div>
+                                                                <select onChange={(event) => therapistFilterByLanguage(event.target.value)}>
+                                                                    <option value="">Select Language</option>
+                                                                    <option value="Albanian">Albanian</option>
+                                                                    <option value="English">English</option>
+                                                                    <option value="Serbian">Serbian</option>
+                                                                </select>
+                                                            </div>
+                                                        </Collapse>
+
+
                         </div>
                     </div>
                 </Collapse>

@@ -1,11 +1,10 @@
 package com.brogramer.peacefulPaths.service;
 
+import com.brogramer.peacefulPaths.dao.QuestionnaireRepository;
 import com.brogramer.peacefulPaths.dao.RoleDao;
 import com.brogramer.peacefulPaths.dao.TherapistRepository;
-import com.brogramer.peacefulPaths.dao.QuestionnaireRepository;
 import com.brogramer.peacefulPaths.dao.UserDao;
 import com.brogramer.peacefulPaths.dtos.CredentialsDto;
-import com.brogramer.peacefulPaths.dtos.QuestionnaireDto;
 import com.brogramer.peacefulPaths.dtos.SignUpDto;
 import com.brogramer.peacefulPaths.dtos.UserDto;
 import com.brogramer.peacefulPaths.entity.CustomUserDetails;
@@ -494,4 +493,29 @@ public class UserService implements UserDetailsService {
 
         return new ArrayList<>(therapists);
     }
+    public Collection<User> findAllTherapistsByLanguageSpoken(String language) {
+        // Define the role for therapists
+        Collection<Roles> roles = new ArrayList<>();
+        roles.add(roleDao.findRoleByName("ROLE_THERAPIST"));
+
+        Collection<User> therapists = new ArrayList<>();
+        List<User> users = userRepository.findAllByRolesIn(roles);
+        for (User user : users) {
+            if (user.getQuestionnaire() != null &&
+                    user.getQuestionnaire().getLanguage() != null &&
+                    user.getQuestionnaire().getLanguage().stream()
+                            .anyMatch(lang -> lang.getLanguage().equalsIgnoreCase(language))) {
+                therapists.add(user);
+            }
+        }
+
+        return new ArrayList<>(therapists);
+    }
+
+
+
+
+
+
+
 }

@@ -64,7 +64,7 @@ public class TherapistSecurityConfig {
                         .requestMatchers(HttpMethod.DELETE, "/api/auth/deleteUser/{id}").hasAnyRole("ADMIN","THERAPIST")
                         .requestMatchers(HttpMethod.GET, "/api/auth/allAdminInfo").hasRole("ADMIN")
                         .requestMatchers(HttpMethod.GET, "/api/auth/allTherapistInfo").hasAnyRole("ADMIN","USER")
-                        .requestMatchers(HttpMethod.POST, "/api/auth/userTherapistConnection","/api/auth/therapistFilterByGenderNotConnected","/api/auth/therapistFilterByExperienceNotConnected","/api/auth/therapistFilterByLocationNotConnected").hasRole("USER")
+                        .requestMatchers(HttpMethod.POST, "/api/auth/userTherapistConnection","/api/auth/therapistFilterByGenderNotConnected","/api/auth/therapistFilterByExperienceNotConnected","/api/auth/therapistFilterByLocationNotConnected","/api/auth/therapistFilterByLanguageNotConnected","/api/auth/therapistFilterByLanguage").hasRole("USER")
                         .requestMatchers(HttpMethod.GET, "/api/auth/fetchUserTherapistConnectionData/{id}","/api/auth/therapistFilterByGender/{gender}","/api/auth/therapistFilterByExperience/{experience}","/api/auth/therapistFilterByLocation/{location}","/api/auth/fetchAllTherapistNotConnectedData/{id}").hasRole("USER")
                         .requestMatchers(HttpMethod.DELETE, "/api/auth/removeTherapist/{id}").hasRole("USER")
                         .requestMatchers(HttpMethod.GET,"/api/auth/fetchAllUsersConnectedDataHistory/{id}","/api/auth/fetchAllUsersConnectedData/{id}").hasRole("THERAPIST")

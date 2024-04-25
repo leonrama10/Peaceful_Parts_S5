@@ -15,6 +15,7 @@ public class FilterDto {
     private int experience;
     private String gender;
     private String location;
+    private String language;
 
     public String getLocation() {
         return location;
@@ -46,5 +47,9 @@ public class FilterDto {
 
     public void setGender(String gender) {
         this.gender = gender;
+    }
+
+    public String getLanguage() {
+        return language;
     }
 }

@@ -155,7 +155,7 @@ function RegisterBoot({loading,error,...props}){
                                             <div className="col-sm-6">
                                                 <input type="password" className="form-control form-control-user"
                                                        id="exampleRepeatPassword" placeholder="Repeat Password"
-                                                       value={values.confirmPassword}
+                                                       value={confirmPassword}
                                                        onChange={handleChange} name="confirmPassword" required/>
                                             </div>
                                         </div>
