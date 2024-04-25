@@ -11382,5 +11382,21 @@ body.sidebar-toggled footer.sticky-footer {
     right: 10px; /* Adjust as necessary */
     color: #6c757d; /* Placeholder text color, adjust as needed */
 }
+.date-of-birth-container {
+    display: flex;
+    gap: 5px;
+}
+
+.date-of-birth-input {
+    padding: 8px;
+    border: 1px solid #ccc;
+    border-radius: 4px;
+    font-size: 16px;
+}
+
+.date-of-birth-label {
+    font-size: 16px;
+    margin-right: 10px;
+}
 
 

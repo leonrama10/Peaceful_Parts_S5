@@ -110,6 +110,7 @@ function AdminDashboardTherapists({loading,error,...props}){
                                                             <th>Experience</th>
                                                             <th>Gender</th>
                                                             <th>University</th>
+                                                            <th>Date of Birth</th>
                                                             <th>Actions</th>
                                                         </tr>
                                                         </thead>
@@ -124,6 +125,7 @@ function AdminDashboardTherapists({loading,error,...props}){
                                                             <th>Experience</th>
                                                             <th>Gender</th>
                                                             <th>University</th>
+                                                             <th>Date of Birth</th>
                                                             <th>Actions</th>
                                                         </tr>
                                                         </tfoot>
@@ -139,6 +141,7 @@ function AdminDashboardTherapists({loading,error,...props}){
                                                                     <td>{tempEmployee.experience}</td>
                                                                     <td>{tempEmployee.gender.gender}</td>
                                                                     <td>{tempEmployee.university.university}</td>
+                                                                      <td>{tempEmployee.dateOfBirth}</td>
 
                                                                     <td>
                                                                         <button  className="btn btn-info btn-sm" onClick={() => handleEdit(tempEmployee.id)}>

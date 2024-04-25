@@ -6,8 +6,8 @@ import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
-import java.util.ArrayList;
 import java.util.Collection;
+import java.util.Date;
 
 @Data
 @AllArgsConstructor
@@ -32,9 +32,17 @@ public class UserDto {
     private Long expirationTime;
     private Gender gender;
     private Questionnaire questionnaire;
+    private Date dateOfBirth;
 
     public University getUniversity() {
         return university;
+    }
+    public Date getDateOfBirth() {
+        return dateOfBirth;
+    }
+
+    public void setDateOfBirth(Date dateOfBirth) {
+        this.dateOfBirth = dateOfBirth;
     }
 
     public void setUniversity(University university) {

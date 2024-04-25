@@ -209,6 +209,15 @@ public class AuthController {
     @GetMapping("/auth/allTherapistInfo")
     public ResponseEntity<?> getAllTherapistInfo(){
         List<UserInfo> therapistInfos = getAllWithRole("ROLE_THERAPIST");
+        List<UserInfo> therapistDataWithDOB = therapistInfos.stream()
+                .map(userInfo -> {
+                    User userDetails = userRepository.findById(userInfo.getId()).orElse(null);
+                    if (userDetails != null && userDetails.getDateOfBirth() != null) {
+                        userInfo.setDateOfBirth(userDetails.getDateOfBirth());
+                    }
+                    return userInfo;
+                })
+                .collect(Collectors.toList());
 
         return ResponseEntity.ok(therapistInfos);
     }

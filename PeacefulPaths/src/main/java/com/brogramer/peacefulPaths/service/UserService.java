@@ -74,6 +74,7 @@ public class UserService implements UserDetailsService {
         userDto1.setToken(savedUser.getToken());
         userDto1.setRoles(savedUser.getRoles());
         userDto1.setPassword(savedUser.getPassword());
+        userDto1.setDateOfBirth(savedUser.getDateOfBirth());
 
         return userDto1;
     }
@@ -180,6 +181,7 @@ public class UserService implements UserDetailsService {
         user.setName(userDto.getName());
         user.setSurname(userDto.getSurname());
         user.setExperience(userDto.getExperience());
+        user.setDateOfBirth(userDto.getDateOfBirth());
         // Encode the password
         user.setPassword(passwordEncoder.encode(CharBuffer.wrap(userDto.getPassword())));
         // Set gender and university from the DTO

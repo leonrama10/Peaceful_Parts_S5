@@ -148,6 +148,7 @@ console.log("DATAa",authRequest)
 
 export const registerTherapist = (authRequest) => {
 console.log("DATAa",authRequest)
+ console.log("Received date of birth: {}");
     return axios({
         method: 'POST',
         url: `${process.env.hostUrl || 'http://localhost:8080'}/api/auth/registerTherapist`,
@@ -295,4 +296,6 @@ export const questionnaireAnswers = (authRequest) => {
         data:authRequest
     });
 };
+
+
 

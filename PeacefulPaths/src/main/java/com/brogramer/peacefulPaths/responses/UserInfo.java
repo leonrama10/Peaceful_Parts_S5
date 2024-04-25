@@ -2,9 +2,10 @@ package com.brogramer.peacefulPaths.responses;
 
 import com.brogramer.peacefulPaths.entity.*;
 
-import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
+import java.util.Date;
+
 
 public class UserInfo {
 
@@ -15,6 +16,8 @@ public class UserInfo {
     private String surname;
     private String password;
     private String number;
+
+
     private University university;
     private Location location;
     private Collection<Roles> roles;
@@ -22,6 +25,7 @@ public class UserInfo {
     private String resetToken;
     private Long expirationTime;
     private Gender gender;
+    private Date dateOfBirth;
     private Collection<Language> language;
     private Questionnaire questionnaire;
 
@@ -39,6 +43,14 @@ public class UserInfo {
 
     public void setLanguage(Collection<Language> language) {
         this.language = language;
+    }
+
+    public Date getDateOfBirth() {
+        return dateOfBirth;
+    }
+
+    public void setDateOfBirth(Date dateOfBirth) {
+        this.dateOfBirth = dateOfBirth;
     }
 
     public List<Roles> getAllRoles() {
@@ -150,4 +162,6 @@ public class UserInfo {
     public void setGender(Gender gender) {
         this.gender=gender;
     }
+
+
 }

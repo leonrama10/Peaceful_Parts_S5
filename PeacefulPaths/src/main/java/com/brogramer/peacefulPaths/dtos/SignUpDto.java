@@ -8,6 +8,7 @@ import lombok.Data;
 import lombok.NoArgsConstructor;
 
 import java.util.ArrayList;
+import java.util.Date;
 
 @Data
 @AllArgsConstructor
@@ -28,6 +29,13 @@ public class SignUpDto {
     private String password;
 
     private int experience;
+    private Date dateOfBirth;
+    public Date getDateOfBirth() {
+        return dateOfBirth;
+    }
+    public void setDateOfBirth(Date dateOfBirth) {
+        this.dateOfBirth = dateOfBirth;
+    }
 
     private String number;
 

@@ -32,7 +32,8 @@ function EditUser({loading,error,...props}){
         gender:{},
         language:[],
         questionnaire:{},
-        university:{}
+        university:{},
+        dateOfBirth: ''
     });
 
     React.useEffect(()=>{
@@ -68,6 +69,7 @@ function EditUser({loading,error,...props}){
                     allRoles: response.data.allRoles,
                     questionnaire: response.data.questionnaire,
                     university: response.data.university,
+                    dateOfBirth: response.data.dateOfBirth
                 })
             userRole = loadState("userRole",'')
             saveState("userRole",response.data.roles.at(0).role);
@@ -191,6 +193,11 @@ function EditUser({loading,error,...props}){
                                                               defaultValue={data.surname} onChange={handleChange}
                                                               required/>
                                             </Form.Group>
+                                          <Form.Group controlId="formBasicDateOfBirth">
+                                              <Form.Label>Date of Birth</Form.Label>
+                                              <Form.Control type="text" value={values.dateOfBirth} readOnly />
+                                          </Form.Group>
+
 
                                             <Form.Group controlId="formBasicEmail">
                                                 <Form.Label>Email address</Form.Label>

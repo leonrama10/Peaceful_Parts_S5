@@ -8,6 +8,7 @@ import jakarta.validation.constraints.Size;
 
 import java.util.ArrayList;
 import java.util.Collection;
+import java.util.Date;
 import java.util.List;
 
 @Entity
@@ -50,6 +51,9 @@ public class User {
     @Column(name = "reset_token")
     private String resetToken;
 
+    @Temporal(TemporalType.DATE)  // Ensures only the date is stored, without time
+    @Column(name = "date_of_birth")
+    private Date dateOfBirth;
 
     @Column(name = "expiration_time")
     private Long expirationTime;
@@ -95,7 +99,7 @@ public class User {
 
     public User() {}
 
-    public User(int id, String name, String surname, String email, String number, int experience, String password, String confirmPassword, String resetToken, Long expirationTime, String token, Collection<Roles> roles, Questionnaire questionnaire, Collection<Language> language, Location location, Gender gender, University university, List<Roles> allRoles) {
+    public User(int id, String name, String surname, String email, String number, int experience, String password, String confirmPassword, String resetToken, Long expirationTime, String token, Collection<Roles> roles, Questionnaire questionnaire, Collection<Language> language, Location location, Gender gender, University university,Date dateOfBirth, List<Roles> allRoles) {
         this.id = id;
         this.name = name;
         this.surname = surname;
@@ -114,6 +118,7 @@ public class User {
         this.gender = gender;
         this.university = university;
         this.allRoles = allRoles;
+        this.dateOfBirth = dateOfBirth;
     }
 
     public List<Roles> getAllRoles() {
@@ -126,7 +131,13 @@ public class User {
     public University getUniversity() {
         return university;
     }
+    public Date getDateOfBirth() {
+        return dateOfBirth;
+    }
 
+    public void setDateOfBirth(Date dateOfBirth) {
+        this.dateOfBirth = dateOfBirth;
+    }
     public void setUniversity(University university) {
         this.university = university;
     }

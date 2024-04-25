@@ -22,7 +22,8 @@ function RegisterBootTherapist({loading,error,...props}){
         location: {},
         language: [],
         experience: 0,
-        number:''
+        number:'',
+        dateOfBirth: '',
     });
 
     useEffect(() => {
@@ -34,6 +35,9 @@ function RegisterBootTherapist({loading,error,...props}){
     const handleSubmit=(evt)=>{
         evt.preventDefault();
         props.authenticate();
+
+
+
         if (values.password === confirmPassword) {
             // hapi 1: registerAdmin
             registerTherapist(values).then((response) => {
@@ -90,7 +94,12 @@ function RegisterBootTherapist({loading,error,...props}){
                     [name]: [...values[name], languageObject]
                 }));
             }
-        } else {
+        }  else if (name === 'dateOfBirth') {
+                        setValues(prevValues => ({
+                            ...prevValues,
+                            [name]: value
+                        }));
+                    } else {
             setValues(values => ({
                 ...values,
                 [name]: name === 'experience' ? Number(value) :
@@ -150,6 +159,20 @@ function RegisterBootTherapist({loading,error,...props}){
                                                                           placeholder="Last Name" required/>
                                                                </div>
                                                            </div>
+
+                                                          <div className="date-of-birth-container">
+                                                                    <label htmlFor="dateOfBirth" className="date-of-birth-label">Date of Birth:</label>
+                                                                    <input
+                                                                        type="date"
+                                                                        id="dateOfBirth"
+                                                                        name="dateOfBirth"
+                                                                        value={values.dateOfBirth}
+                                                                        onChange={handleChange}
+                                                                        className="date-of-birth-input"
+                                                                        required
+                                                                    />
+                                                                </div>
+
                                                            <div className="custom-dropdown">
                                                                <label htmlFor="universitySelect">University
                                                                    Attended</label>
