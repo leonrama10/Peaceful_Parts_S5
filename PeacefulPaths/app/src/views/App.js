@@ -25,6 +25,7 @@ import TherapistCardInfo from "./DashboardViews/UserDashboards/TherapistCardInfo
 import UserDashboardTherapists from "./DashboardViews/UserDashboards/UserDashboardTherapists";
 import GetStarted from "./DashboardViews/GetStartedDirectory/GetStarted";
 import RegisterBootTherapist from "./DashboardViews/RegisterBootTherapist";
+import RegisterBootAdmin from "./DashboardViews/RegisterBootAdmin";
 
 
 
@@ -43,7 +44,8 @@ function Main() {
 
                 <Route path="/loginBoot" element={<LoginBoot />}/>
                 <Route path="/registerBoot" element={<RegisterBoot />}/>
-                <Route path="/dashboard/registerBoot-therapist" element={<RegisterBootTherapist />}/>  // TERAPIST
+                <Route path="/dashboard/registerBoot-therapist" element={<RegisterBootTherapist />}/>
+                <Route path="/dashboard/registerBoot-admin" element={<RegisterBootAdmin />}/>
                 <Route path="/get-started" element={<GetStarted />}/>
                 <Route path="/forgotPassBoot" element={<ForgotPasswordBoot />}/>
                 <Route path="/verifyPasswordInfo" element={<VerifyPasswordInfo />}/>

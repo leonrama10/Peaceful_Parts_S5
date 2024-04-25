@@ -133,6 +133,14 @@ public class AuthController {
     }
 
 
+    @PostMapping("/auth/registerAdmin")
+    public ResponseEntity<UserDto> registerAdmin(@RequestBody @Valid SignUpDto signUpDto) {
+        UserDto createdAdmin = userService.registerAdmin(signUpDto);
+        createdAdmin.setToken(userAuthenticationProvider.createToken(signUpDto.getEmail()));
+        return ResponseEntity.created(URI.create("/users/" + createdAdmin.getId())).body(createdAdmin);
+    }
+
+
     @PostMapping("/auth/questionnaireAnswers")
     public ResponseEntity<?>  questionnaireAnswers(@RequestBody @Valid QuestionnaireDto questionnaireDto){
         return ResponseEntity.ok(questionnaireDto);

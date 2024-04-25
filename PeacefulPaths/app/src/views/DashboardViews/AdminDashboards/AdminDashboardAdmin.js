@@ -67,6 +67,11 @@ function AdminDashboardAdmin({loading,error,...props}){
         history(`/dashboard/adminDashboard/users/edit/${id}`);
     };
 
+    const handleGenerateTherapistsClick = () => {
+                console.log('Generate Therapists button clicked');
+                 history("/dashboard/registerBoot-admin");
+            };
+
     return (
         <main id="page-top">
 
@@ -86,6 +91,11 @@ function AdminDashboardAdmin({loading,error,...props}){
                                 <div className="card-header py-3">
                                     <h6 className="m-0 font-weight-bold text-primary">DataTables Example</h6>
                                 </div>
+
+                                <div className="text-center mb-4">
+                                    <button className="btn btn-primary" type="button" onClick={handleGenerateTherapistsClick}>Generate Therapists</button>
+                                 </div>
+
                                 <div className="card-body">
                                     <div className="table-responsive">
                                         <table className="table table-bordered" id="dataTable" width="100%"

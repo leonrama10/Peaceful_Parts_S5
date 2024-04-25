@@ -216,6 +216,61 @@ public class UserService implements UserDetailsService {
     }
 
 
+
+
+    public UserDto registerAdmin(SignUpDto userDto) {
+        // Check if the user (Admin) already exists based on email
+        Optional<User> optionalUser = userRepository.findByEmail(userDto.getEmail());
+        if (optionalUser.isPresent()) {
+            throw new AppException("Login already exists", HttpStatus.BAD_REQUEST);
+        }
+
+        // Create a new User entity for the Admin
+        User user = new User();
+        user.setEmail(userDto.getEmail());
+        user.setNumber(userDto.getNumber());
+        user.setName(userDto.getName());
+        user.setSurname(userDto.getSurname());
+
+        // Encode the password
+        user.setPassword(passwordEncoder.encode(CharBuffer.wrap(userDto.getPassword())));
+        // Set gender and university from the DTO
+        user.setGender(userDto.getGender());
+
+
+
+
+        // Assign the ROLE_THERAPIST to this user
+        Collection<Roles> roles = new ArrayList<>();
+        roles.add(roleDao.findRoleByName("ROLE_ADMIN"));
+        user.setRoles(roles);
+
+        // Save the new therapist user to the database
+        User savedUser = userRepository.save(user);
+
+        // Create and return a DTO for the saved user
+        UserDto userDtoResult = new UserDto();
+        userDtoResult.setEmail(savedUser.getEmail());
+        userDtoResult.setId(savedUser.getId());
+        userDtoResult.setName(savedUser.getName());
+        userDtoResult.setSurname(savedUser.getSurname());
+        userDtoResult.setNumber(savedUser.getNumber());
+        userDtoResult.setToken(savedUser.getToken());
+        userDtoResult.setRoles(savedUser.getRoles());
+        userDtoResult.setPassword(savedUser.getPassword());
+
+        userDtoResult.setGender(savedUser.getGender());
+
+
+
+
+        return userDtoResult;
+    }
+
+
+
+
+
     public UserDto update(UserDto userDto) {
         Optional<User> emailUser = userRepository.findByEmail(userDto.getEmail());
 

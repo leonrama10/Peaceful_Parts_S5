@@ -131,6 +131,21 @@ export const userTherapistConnection=(authRequest)=>{
         }
     })
 }
+
+
+export const registerAdmin = (authRequest) => {
+console.log("DATAa",authRequest)
+    return axios({
+        method: 'POST',
+        url: `${process.env.hostUrl || 'http://localhost:8080'}/api/auth/registerAdmin`,
+        data: authRequest,
+        headers:{
+              'Authorization':'Bearer '+getToken()
+        }
+    });
+};
+
+
 export const registerTherapist = (authRequest) => {
 console.log("DATAa",authRequest)
     return axios({
