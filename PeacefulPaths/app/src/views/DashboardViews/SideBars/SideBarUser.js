@@ -110,7 +110,7 @@ function SideBarUser({loading,error,...props}){
                 language: language
             };
             if (!connected){
-                therapistFilterByLanguage(language).then((response)=>{
+                therapistFilterByLanguage(newFilterData).then((response)=>{
                     if(response.status===200){
                         props.setAllUsers(response.data)
                         props.setHideTherapists(true);
@@ -244,7 +244,6 @@ function SideBarUser({loading,error,...props}){
         }
 
     }
-
 
     function handleFilterByLocation (location){
         connected = loadState("connected",false)
@@ -414,23 +413,18 @@ function SideBarUser({loading,error,...props}){
                                         <option value="Serbia">Serbia</option>
                                     </select>
                                 </div>
-
                             </Collapse>
-                            <button className="collapse-item"
-                             onClick={() => setOpenLanguageFilter(!openLanguageFilter)}>Filter By Language
-                                                </button>
-                                       <Collapse in={openLanguageFilter}>
-                                                            <div>
-                                                                <select onChange={(event) => therapistFilterByLanguage(event.target.value)}>
-                                                                    <option value="">Select Language</option>
-                                                                    <option value="Albanian">Albanian</option>
-                                                                    <option value="English">English</option>
-                                                                    <option value="Serbian">Serbian</option>
-                                                                </select>
-                                                            </div>
-                                                        </Collapse>
-
-
+                            <button className="collapse-item" onClick={() => setOpenLanguageFilter(!openLanguageFilter)}>Filter By Language</button>
+                            <Collapse in={openLanguageFilter}>
+                                <div>
+                                    <select onChange={(event) => handleFilterByLanguage(event.target.value)}>
+                                        <option value="">Select Language</option>
+                                        <option value="Albanian">Albanian</option>
+                                        <option value="English">English</option>
+                                        <option value="Serbian">Serbian</option>
+                                    </select>
+                                </div>
+                            </Collapse>
                         </div>
                     </div>
                 </Collapse>
@@ -442,15 +436,15 @@ function SideBarUser({loading,error,...props}){
                 Addons
             </div>
 
-           {/* <li className="nav-item" style={{marginTop: "10px", marginBottom: "20px"}}>*/}
-           {/*     <a style={{*/}
-           {/*         textDecoration: "none",*/}
-           {/*         color: "white",*/}
-           {/*         fontSize: "13px",*/}
-           {/*         marginLeft: "20px",*/}
-           {/*         fontWeight: "550"*/}
-           {/*     }} href="#" data-toggle="collapse" data-target="#collapsePages"*/}
-           {/*aria-expanded="true" aria-controls="collapsePages">*/}
+            {/* <li className="nav-item" style={{marginTop: "10px", marginBottom: "20px"}}>*/}
+            {/*     <a style={{*/}
+            {/*         textDecoration: "none",*/}
+            {/*         color: "white",*/}
+            {/*         fontSize: "13px",*/}
+            {/*         marginLeft: "20px",*/}
+            {/*         fontWeight: "550"*/}
+            {/*     }} href="#" data-toggle="collapse" data-target="#collapsePages"*/}
+            {/*aria-expanded="true" aria-controls="collapsePages">*/}
            {/* <span>Pages</span>*/}
            {/* <img style={{marginLeft: "139px", width: "15px"}} src={arrow} alt="arrow"/>*/}
            {/*     </a>*/}

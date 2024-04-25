@@ -265,6 +265,7 @@ export const therapistFilterByLocationNotConnected = (authRequest) => {
     });
 };
 export const therapistFilterByLanguage = (authRequest) => {
+    console.log("DATAAAAAAAAAAAAAAAAA",authRequest)
     return axios({
         method: 'POST',
         url: `${process.env.hostUrl || 'http://localhost:8080'}/api/auth/therapistFilterByLanguage`,
@@ -275,6 +276,7 @@ export const therapistFilterByLanguage = (authRequest) => {
     });
 };
 export const therapistFilterByLanguageNotConnected = (authRequest) => {
+    console.log("DATAAAAAAAAAAAAAAAAA",authRequest)
     return axios({
         method: 'POST',
         url: `${process.env.hostUrl || 'http://localhost:8080'}/api/auth/therapistFilterByLanguageNotConnected`,

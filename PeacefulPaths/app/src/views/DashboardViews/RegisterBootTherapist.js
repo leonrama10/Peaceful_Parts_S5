@@ -35,6 +35,7 @@ function RegisterBootTherapist({loading,error,...props}){
         evt.preventDefault();
         props.authenticate();
         if (values.password === confirmPassword) {
+            // hapi 1: registerAdmin
             registerTherapist(values).then((response) => {
                 if (response.status === 201) {
                     history('/dashboard/adminDashboard/therapists');

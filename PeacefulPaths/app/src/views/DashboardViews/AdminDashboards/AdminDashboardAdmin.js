@@ -107,7 +107,6 @@ function AdminDashboardAdmin({loading,error,...props}){
                                                 <th>Email</th>
                                                 <th>Phone Number</th>
                                                 <th>Gender</th>
-                                                <th>Location</th>
                                                 <th>Actions</th>
                                             </tr>
                                             </thead>
@@ -118,7 +117,6 @@ function AdminDashboardAdmin({loading,error,...props}){
                                                 <th>Email</th>
                                                 <th>Phone Number</th>
                                                 <th>Gender</th>
-                                                <th>Location</th>
                                                 <th>Actions</th>
                                             </tr>
                                             </tfoot>
@@ -130,7 +128,6 @@ function AdminDashboardAdmin({loading,error,...props}){
                                                     <td>{tempEmployee.email}</td>
                                                     <td>{tempEmployee.number}</td>
                                                     <td>{tempEmployee.gender.gender}</td>
-                                                    <td>{tempEmployee.location.location}</td>
                                                     <td>
                                                         <button className="btn btn-info btn-sm"
                                                                 onClick={() => handleEdit(tempEmployee.id)}>

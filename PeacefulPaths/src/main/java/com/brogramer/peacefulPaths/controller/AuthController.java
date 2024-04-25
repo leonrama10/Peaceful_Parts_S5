@@ -334,8 +334,7 @@ public class AuthController {
     }
     @PostMapping("/auth/therapistFilterByLanguage")
     public ResponseEntity<?> therapistFilterByLanguage(@RequestBody @Valid FilterDto filterObject){
-        System.out.println("Received request to filter by language not connected: ");  // Debug log
-        List<UserInfo> userInfos = userService.findAllTherapistsByLanguageSpoken(filterObject.getLanguage()).stream()
+        List<UserInfo> userInfos = userService.findAllTherapistsByLanguage(filterObject.getLanguage()).stream()
                 .map(this::convertToUserInfo)
                 .collect(Collectors.toList());
         return ResponseEntity.ok(userInfos);
@@ -344,9 +343,7 @@ public class AuthController {
 
     @PostMapping("/auth/therapistFilterByLanguageNotConnected")
     public ResponseEntity<?> therapistFilterByLanguageNotConnected(@RequestBody @Valid FilterDto filterObject) {
-
-        List<UserInfo> userInfos = userService.findAllTherapistsByLanguageSpoken(filterObject.getLanguage()).stream()
-
+        List<UserInfo> userInfos = userService.findAllTherapistsByLanguage(filterObject.getLanguage()).stream()
                 .filter(userInfo -> userInfo.getId() != filterObject.getTherapistId())
                 .map(this::convertToUserInfo)
                 .collect(Collectors.toList());

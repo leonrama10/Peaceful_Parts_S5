@@ -165,6 +165,7 @@ public class UserService implements UserDetailsService {
         return questionnaire;
     }
 
+    // hapi 4: userService registerAdmin
     public UserDto registerTherapist(SignUpDto userDto) {
         // Check if the user (therapist) already exists based on email
         Optional<User> optionalUser = userRepository.findByEmail(userDto.getEmail());
@@ -493,18 +494,16 @@ public class UserService implements UserDetailsService {
 
         return new ArrayList<>(therapists);
     }
-    public Collection<User> findAllTherapistsByLanguageSpoken(String language) {
-        // Define the role for therapists
+    public Collection<User> findAllTherapistsByLanguage(String language) {
         Collection<Roles> roles = new ArrayList<>();
         roles.add(roleDao.findRoleByName("ROLE_THERAPIST"));
 
         Collection<User> therapists = new ArrayList<>();
         List<User> users = userRepository.findAllByRolesIn(roles);
         for (User user : users) {
-            if (user.getQuestionnaire() != null &&
-                    user.getQuestionnaire().getLanguage() != null &&
-                    user.getQuestionnaire().getLanguage().stream()
-                            .anyMatch(lang -> lang.getLanguage().equalsIgnoreCase(language))) {
+            if (user.getLanguage() != null &&
+                    user.getLanguage().stream()
+                            .anyMatch(lang -> lang.getLanguage().equals(language))) {
                 therapists.add(user);
             }
         }

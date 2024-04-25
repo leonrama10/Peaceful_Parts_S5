@@ -70,8 +70,6 @@ function AdminDashboardTherapists({loading,error,...props}){
              history("/dashboard/registerBoot-therapist");
         };
 
-
-
         return (
                     <main id="page-top">
 
