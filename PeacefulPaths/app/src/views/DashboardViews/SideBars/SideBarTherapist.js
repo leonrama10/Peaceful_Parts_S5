@@ -2,7 +2,6 @@ import React, {useState} from 'react';
 import { Link } from 'react-router-dom';
 import {Collapse} from "react-bootstrap";
 import arrow from "../../../img/arrow.png";
-import leftArrow from "../../../img/leftArrow.png";
 
 export default function SideBarTherapist(){
 

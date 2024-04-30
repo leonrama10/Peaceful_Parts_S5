@@ -2,7 +2,13 @@ import React, {useEffect, useState} from 'react';
 import {fetchUserData, fetchUserDataId, userUpdate} from '../../api/authService';
 import {Link, useNavigate, useParams} from 'react-router-dom';
 import {Container, Row, Col, Form, Button} from 'react-bootstrap';
-import {authenticate, authFailure, authSuccess} from "../../redux/authActions";
+import {
+    authenticate,
+    authFailure,
+    authSuccess,
+    setAdminAuthenticationState,
+    setTherapistAuthenticationState
+} from "../../redux/authActions";
 import '../../css/sb-admin-2.min.css';
 import {Alert} from "reactstrap";
 import {loadState, saveState} from "../../helper/sessionStorage";
@@ -12,6 +18,8 @@ import SideBarAdmin from "./SideBars/SideBarAdmin";
 import SideBarTherapist from "./SideBars/SideBarTherapist";
 let role;
 let userRole ;
+const isAdminAuthenticatedBoolean = loadState("isAdminAuthenticated",false)
+const isTherapistAuthenticatedBoolean = loadState("isTherapistAuthenticated",false)
 function EditUser({loading,error,...props}){
 
     const { id } = useParams();
@@ -36,23 +44,23 @@ function EditUser({loading,error,...props}){
         dateOfBirth: ''
     });
 
-    React.useEffect(()=>{
-        fetchUserData().then((response)=>{
-            if (response.data.roles.at(0).role === 'ROLE_ADMIN' || response.data.roles.at(0).role === 'ROLE_THERAPIST'){
-                setUserData(response.data);
-                role = loadState("role",'');
-            }
-            else{
+    useEffect(() => {
+        if(isAdminAuthenticatedBoolean ){
+            saveState("isAdminAuthenticated",isAdminAuthenticatedBoolean)
+            fetchUserData().then((response)=>{
+                if (response.data.roles.at(0).role === 'ROLE_ADMIN' || response.data.roles.at(0).role === 'ROLE_THERAPIST'){
+                    setUserData(response.data);
+                    role = loadState("role",'');
+                }
+                else{
+                    history('/loginBoot');
+                }
+            }).catch((e)=>{
+                localStorage.clear();
                 history('/loginBoot');
-            }
-        }).catch((e)=>{
-            localStorage.clear();
-            history('/loginBoot');
-        })
-    },[])
+            })
 
-    React.useEffect(()=>{
-        fetchUserDataId(idNumber).then((response)=>{
+            fetchUserDataId(idNumber).then((response)=>{
                 setData(response.data);
                 setValues({
                     id:response.data.id,
@@ -71,17 +79,143 @@ function EditUser({loading,error,...props}){
                     university: response.data.university,
                     dateOfBirth: response.data.dateOfBirth
                 })
-            userRole = loadState("userRole",'')
-            saveState("userRole",response.data.roles.at(0).role);
-        }).catch((e)=>{
-            localStorage.clear();
+                userRole = loadState("userRole",'')
+                saveState("userRole",response.data.roles.at(0).role);
+            }).catch((e)=>{
+                localStorage.clear();
+                history('/loginBoot');
+            })
+
+        }else if(props.isAdminAuthenticated){
+            saveState("isAdminAuthenticated",props.isAdminAuthenticated)
+            fetchUserData().then((response)=>{
+                if (response.data.roles.at(0).role === 'ROLE_ADMIN' || response.data.roles.at(0).role === 'ROLE_THERAPIST'){
+                    setUserData(response.data);
+                    role = loadState("role",'');
+                }
+                else{
+                    history('/loginBoot');
+                }
+            }).catch((e)=>{
+                localStorage.clear();
+                history('/loginBoot');
+            })
+
+            fetchUserDataId(idNumber).then((response)=>{
+                setData(response.data);
+                setValues({
+                    id:response.data.id,
+                    email: response.data.email,
+                    name: response.data.name,
+                    surname: response.data.surname,
+                    password: response.data.password,
+                    roles: response.data.roles,
+                    number:response.data.number,
+                    experience:response.data.experience,
+                    location:response.data.location,
+                    gender:response.data.gender,
+                    language:response.data.language,
+                    allRoles: response.data.allRoles,
+                    questionnaire: response.data.questionnaire,
+                    university: response.data.university,
+                    dateOfBirth: response.data.dateOfBirth
+                })
+                userRole = loadState("userRole",'')
+                saveState("userRole",response.data.roles.at(0).role);
+            }).catch((e)=>{
+                localStorage.clear();
+                history('/loginBoot');
+            })
+        }else if(isTherapistAuthenticatedBoolean){
+            saveState("isTherapistAuthenticated",isTherapistAuthenticatedBoolean)
+            fetchUserData().then((response)=>{
+                if (response.data.roles.at(0).role === 'ROLE_ADMIN' || response.data.roles.at(0).role === 'ROLE_THERAPIST'){
+                    setUserData(response.data);
+                    role = loadState("role",'');
+                }
+                else{
+                    history('/loginBoot');
+                }
+            }).catch((e)=>{
+                localStorage.clear();
+                history('/loginBoot');
+            })
+
+            fetchUserDataId(idNumber).then((response)=>{
+                setData(response.data);
+                setValues({
+                    id:response.data.id,
+                    email: response.data.email,
+                    name: response.data.name,
+                    surname: response.data.surname,
+                    password: response.data.password,
+                    roles: response.data.roles,
+                    number:response.data.number,
+                    experience:response.data.experience,
+                    location:response.data.location,
+                    gender:response.data.gender,
+                    language:response.data.language,
+                    allRoles: response.data.allRoles,
+                    questionnaire: response.data.questionnaire,
+                    university: response.data.university,
+                    dateOfBirth: response.data.dateOfBirth
+                })
+                userRole = loadState("userRole",'')
+                saveState("userRole",response.data.roles.at(0).role);
+            }).catch((e)=>{
+                localStorage.clear();
+                history('/loginBoot');
+            })
+        }else if(props.isTherapistAuthenticated){
+            saveState("isTherapistAuthenticated",props.isTherapistAuthenticated)
+            fetchUserData().then((response)=>{
+                if (response.data.roles.at(0).role === 'ROLE_ADMIN' || response.data.roles.at(0).role === 'ROLE_THERAPIST'){
+                    setUserData(response.data);
+                    role = loadState("role",'');
+                }
+                else{
+                    history('/loginBoot');
+                }
+            }).catch((e)=>{
+                localStorage.clear();
+                history('/loginBoot');
+            })
+
+            fetchUserDataId(idNumber).then((response)=>{
+                setData(response.data);
+                setValues({
+                    id:response.data.id,
+                    email: response.data.email,
+                    name: response.data.name,
+                    surname: response.data.surname,
+                    password: response.data.password,
+                    roles: response.data.roles,
+                    number:response.data.number,
+                    experience:response.data.experience,
+                    location:response.data.location,
+                    gender:response.data.gender,
+                    language:response.data.language,
+                    allRoles: response.data.allRoles,
+                    questionnaire: response.data.questionnaire,
+                    university: response.data.university,
+                    dateOfBirth: response.data.dateOfBirth
+                })
+                userRole = loadState("userRole",'')
+                saveState("userRole",response.data.roles.at(0).role);
+            }).catch((e)=>{
+                localStorage.clear();
+                history('/loginBoot');
+            })
+        }else{
+            props.loginFailure("Authentication Failed!!!");
             history('/loginBoot');
-        })
-    },[])
+        }
+    }, []);
+
+
 
     const handleUpdate = (e) => {
         e.preventDefault();
-
 
         userUpdate(values).then((response)=>{
             if(response.status===201){
@@ -118,10 +252,6 @@ function EditUser({loading,error,...props}){
             }
         });
     };
-
-    useEffect(() => {
-        console.log("Current values state:", values);
-    }, [values]);
 
     const handleChange = (e) => {
         const { name, value } = e.target;
@@ -364,15 +494,18 @@ const mapStateToProps = ({auth}) => {
     console.log("state ", auth)
     return {
         loading: auth.loading,
-        error: auth.error
+        error: auth.error,
+        isAdminAuthenticated: auth.isAdminAuthenticated,
+        isTherapistAuthenticated: auth.isTherapistAuthenticated
     }
 }
 const mapDispatchToProps = (dispatch) => {
-
     return {
         authenticate: () => dispatch(authenticate()),
         setUser: (data) => dispatch(authSuccess(data)),
-        loginFailure: (message) => dispatch(authFailure(message))
+        loginFailure: (message) => dispatch(authFailure(message)),
+        setAdminAuthenticationState: (boolean) => dispatch(setAdminAuthenticationState(boolean)),
+        setTherapistAuthenticationState: (boolean) => dispatch(setTherapistAuthenticationState(boolean))
     }
 }
 export default connect(mapStateToProps, mapDispatchToProps)(EditUser);

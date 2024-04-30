@@ -16,6 +16,7 @@ import jakarta.mail.MessagingException;
 import jakarta.mail.internet.MimeMessage;
 import jakarta.persistence.EntityNotFoundException;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.auditing.CurrentDateTimeProvider;
 import org.springframework.http.HttpStatus;
 import org.springframework.mail.javamail.JavaMailSender;
 import org.springframework.mail.javamail.MimeMessageHelper;
@@ -27,6 +28,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.nio.CharBuffer;
+import java.time.LocalDateTime;
 import java.util.*;
 
 @Service
@@ -74,7 +76,6 @@ public class UserService implements UserDetailsService {
         userDto1.setToken(savedUser.getToken());
         userDto1.setRoles(savedUser.getRoles());
         userDto1.setPassword(savedUser.getPassword());
-        userDto1.setDateOfBirth(savedUser.getDateOfBirth());
 
         return userDto1;
     }
@@ -148,6 +149,8 @@ public class UserService implements UserDetailsService {
         user.setName(userDto.getName());
         user.setSurname(userDto.getSurname());
         user.setNumber(userDto.getNumber());
+        LocalDateTime localDateTime = LocalDateTime.now();
+        user.setDateAdded(localDateTime);
         user.setPassword(passwordEncoder.encode(CharBuffer.wrap(userDto.getPassword())));
         Collection<Roles> collection = new ArrayList<>();
         collection.add(roleDao.findRoleByName("ROLE_USER"));
@@ -182,6 +185,8 @@ public class UserService implements UserDetailsService {
         user.setSurname(userDto.getSurname());
         user.setExperience(userDto.getExperience());
         user.setDateOfBirth(userDto.getDateOfBirth());
+        LocalDateTime localDateTime = LocalDateTime.now();
+        user.setDateAdded(localDateTime);
         // Encode the password
         user.setPassword(passwordEncoder.encode(CharBuffer.wrap(userDto.getPassword())));
         // Set gender and university from the DTO
@@ -217,9 +222,6 @@ public class UserService implements UserDetailsService {
         return userDtoResult;
     }
 
-
-
-
     public UserDto registerAdmin(SignUpDto userDto) {
         // Check if the user (Admin) already exists based on email
         Optional<User> optionalUser = userRepository.findByEmail(userDto.getEmail());
@@ -233,14 +235,12 @@ public class UserService implements UserDetailsService {
         user.setNumber(userDto.getNumber());
         user.setName(userDto.getName());
         user.setSurname(userDto.getSurname());
-
+        LocalDateTime localDateTime = LocalDateTime.now();
+        user.setDateAdded(localDateTime);
         // Encode the password
         user.setPassword(passwordEncoder.encode(CharBuffer.wrap(userDto.getPassword())));
         // Set gender and university from the DTO
         user.setGender(userDto.getGender());
-
-
-
 
         // Assign the ROLE_THERAPIST to this user
         Collection<Roles> roles = new ArrayList<>();
@@ -260,18 +260,10 @@ public class UserService implements UserDetailsService {
         userDtoResult.setToken(savedUser.getToken());
         userDtoResult.setRoles(savedUser.getRoles());
         userDtoResult.setPassword(savedUser.getPassword());
-
         userDtoResult.setGender(savedUser.getGender());
-
-
-
 
         return userDtoResult;
     }
-
-
-
-
 
     public UserDto update(UserDto userDto) {
         Optional<User> emailUser = userRepository.findByEmail(userDto.getEmail());
@@ -513,10 +505,7 @@ public class UserService implements UserDetailsService {
         return new ArrayList<>(therapists);
     }
 
-
-
-
-
-
+    //hapi 5: qtu masanej e kryn filtrimin, kqyrri metodat qe i kom perdor per filtrim qashtu si tngjajshme boni
+    // qtu tbjen 3 metoda mi bo
 
 }

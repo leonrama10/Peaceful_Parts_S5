@@ -1,4 +1,4 @@
-import React,{useState} from 'react';
+import React, {useEffect, useState} from 'react';
 import {
     fetchUserData,
     fetchUserTherapistConnectionData, removeTherapist
@@ -9,12 +9,30 @@ import '../../../css/myCss.css';
 import DashboardNav from "../DashboardNav";
 import SideBarUser from "../SideBars/SideBarUser";
 import {Alert} from "reactstrap";
-import {authenticate, authFailure, authSuccess} from "../../../redux/authActions";
+import {
+    authenticate,
+    authFailure,
+    authSuccess,
+    setUserAuthenticationState
+} from "../../../redux/authActions";
 import {connect} from "react-redux";
 import {loadState, saveState} from "../../../helper/sessionStorage";
-
 let connected = null;
+const isUserAuthenticatedBoolean = loadState("isUserAuthenticated",false)
 function UserDashboardTherapists({loading,error,...props}){
+
+    useEffect(() => {
+        if(!isUserAuthenticatedBoolean){
+            if (!props.isUserAuthenticated){
+                props.loginFailure("Authentication Failed!!!");
+                history('/loginBoot');
+            }else{
+                saveState("isUserAuthenticated",props.isUserAuthenticated)
+            }
+        }else{
+            saveState("isUserAuthenticated",isUserAuthenticatedBoolean)
+        }
+    }, []);
 
     const history = useNavigate ();
     const [data,setData]=useState({});
@@ -117,7 +135,7 @@ function UserDashboardTherapists({loading,error,...props}){
 
                     <div id="content">
 
-                        <DashboardNav data={data} setUser={props.setUser}/>
+                        <DashboardNav data={data} setUser={props.setUser} setUserAuthenticationState={props.setUserAuthenticationState}/>
 
                         { connectionFailure &&
                             <Alert style={{marginTop:'20px'}} variant="danger">
@@ -188,18 +206,21 @@ function UserDashboardTherapists({loading,error,...props}){
     )
 
 }
+
 const mapStateToProps = ({auth}) => {
     console.log("state ", auth)
     return {
         loading: auth.loading,
-        error: auth.error
+        error: auth.error,
+        isUserAuthenticated: auth.isUserAuthenticated
     }
 }
 const mapDispatchToProps = (dispatch) => {
     return {
         authenticate: () => dispatch(authenticate()),
         setUser: (data) => dispatch(authSuccess(data)),
-        connectMessage: (message) => dispatch(authFailure(message))
+        loginFailure: (message) => dispatch(authFailure(message)),
+        setUserAuthenticationState: (boolean) => dispatch(setUserAuthenticationState(boolean))
     }
 }
 export default connect(mapStateToProps, mapDispatchToProps)(UserDashboardTherapists);

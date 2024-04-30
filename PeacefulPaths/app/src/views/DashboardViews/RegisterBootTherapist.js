@@ -4,12 +4,33 @@ import {registerTherapist} from '../../api/authService';
 import {Link, useNavigate} from 'react-router-dom';
 import '../../css/sb-admin-2.min.css';
 import {Alert} from "reactstrap";
-import {authenticate, authFailure, authSuccess} from "../../redux/authActions";
+import {
+    authenticate,
+    authFailure,
+    authSuccess,
+    setAdminAuthenticationState
+} from "../../redux/authActions";
 import SideBarAdmin from "./SideBars/SideBarAdmin";
 import DashboardNav from "./DashboardNav";
+import {loadState, saveState} from "../../helper/sessionStorage";
+const isAdminAuthenticatedBoolean = loadState("isAdminAuthenticated",false)
 function RegisterBootTherapist({loading,error,...props}){
 
+    useEffect(() => {
+        if(!isAdminAuthenticatedBoolean){
+            if (!props.isAdminAuthenticated){
+                props.loginFailure("Authentication Failed!!!");
+                history('/loginBoot');
+            }else{
+                saveState("isAdminAuthenticated",props.isAdminAuthenticated)
+            }
+        }else{
+            saveState("isAdminAuthenticated",isAdminAuthenticatedBoolean)
+        }
+    }, []);
+
     const [userData,setUserData]=useState({});
+    const [registerTherapistError,setRegisterTherapistError]=useState('');
     const history = useNavigate ();
     const [values, setValues] = useState({
         id:0,
@@ -25,6 +46,7 @@ function RegisterBootTherapist({loading,error,...props}){
         number:'',
         dateOfBirth: '',
     });
+
 
     useEffect(() => {
       console.log("Current values state:", values);
@@ -44,7 +66,7 @@ function RegisterBootTherapist({loading,error,...props}){
                 if (response.status === 201) {
                     history('/dashboard/adminDashboard/therapists');
                 } else {
-                    props.loginFailure('Something LEKAAAAAAA!Please Try Again');
+                    setRegisterTherapistError('Something LEKAAAAAAA!Please Try Again');
                 }
 
 
@@ -55,19 +77,19 @@ function RegisterBootTherapist({loading,error,...props}){
                     switch (err.response.status) {
                         case 401:
                             console.log("401 status");
-                            props.loginFailure("Authentication Failed.Bad Credentials");
+                            setRegisterTherapistError("Authentication Failed.Bad Credentials");
                             break;
                         default:
-                            props.loginFailure('Something BABAAAAAA!Please Try Again');
+                            setRegisterTherapistError('Something BABAAAAAA!Please Try Again');
                     }
                 } else {
                     console.log("ERROR: ", err)
-                    props.loginFailure('Something NaNAAAAA!Please Try Again');
+                    setRegisterTherapistError('Something NaNAAAAA!Please Try Again');
                 }
 
             });
         } else {
-            props.loginFailure('Passwords do not match!!!');
+            setRegisterTherapistError('Passwords do not match!!!');
         }
     }
 
@@ -122,7 +144,7 @@ function RegisterBootTherapist({loading,error,...props}){
 
                    <div id="content">
 
-                       <DashboardNav data={userData} setUser={props.setUser}/>
+                       <DashboardNav data={userData} setUser={props.setUser} setAdminAuthenticationState={props.setAdminAuthenticationState}/>
 
                        <div className="container-fluid">
                            <div className="bg-gradient-primary">
@@ -135,9 +157,9 @@ function RegisterBootTherapist({loading,error,...props}){
                                                        <div className="text-center">
                                                            <h1 className="h4 text-gray-900 mb-4">Create an Account!</h1>
                                                        </div>
-                                                       {error &&
+                                                       {registerTherapistError &&
                                                            <Alert style={{marginTop: '20px'}} variant="danger">
-                                                               {error}
+                                                               {registerTherapistError}
                                                            </Alert>
                                                        }
                                                        <form className="user" onSubmit={handleSubmit}>
@@ -160,18 +182,20 @@ function RegisterBootTherapist({loading,error,...props}){
                                                                </div>
                                                            </div>
 
-                                                          <div className="date-of-birth-container">
-                                                                    <label htmlFor="dateOfBirth" className="date-of-birth-label">Date of Birth:</label>
-                                                                    <input
-                                                                        type="date"
-                                                                        id="dateOfBirth"
-                                                                        name="dateOfBirth"
-                                                                        value={values.dateOfBirth}
-                                                                        onChange={handleChange}
-                                                                        className="date-of-birth-input"
-                                                                        required
-                                                                    />
-                                                                </div>
+                                                           <div className="date-of-birth-container">
+                                                               <label htmlFor="dateOfBirth"
+                                                                      className="date-of-birth-label">Date of
+                                                                   Birth:</label>
+                                                               <input
+                                                                   type="date"
+                                                                   id="dateOfBirth"
+                                                                   name="dateOfBirth"
+                                                                   value={values.dateOfBirth}
+                                                                   onChange={handleChange}
+                                                                   className="date-of-birth-input"
+                                                                   required
+                                                               />
+                                                           </div>
 
                                                            <div className="custom-dropdown">
                                                                <label htmlFor="universitySelect">University
@@ -308,6 +332,128 @@ function RegisterBootTherapist({loading,error,...props}){
                                                                {/*    // <span className="years-label">years of work experience</span>}*/}
                                                            </div>
 
+                                                           <hr/>
+
+                                                           <label htmlFor="specializationSelect"><h4><b>What do they specialize
+                                                               in:</b></h4></label>
+
+                                                           <div className="custom-checkboxes">
+                                                               <label><h5><b>Therapy Type</b></h5></label>
+                                                               <div>
+                                                                   <input
+                                                                       type="checkbox"
+                                                                       id="IndividualCheckbox"
+                                                                       name="therapyType"
+                                                                       value="1-Individual"
+                                                                       // checked={values.therapyType.some(type => type.id === 1)}
+                                                                       onChange={handleChange}
+                                                                   />
+                                                                   <label htmlFor="IndividualCheckbox">Individual
+                                                                       Therapy</label>
+                                                               </div>
+                                                               <div>
+                                                                   <input
+                                                                       type="checkbox"
+                                                                       id="CouplesCheckbox"
+                                                                       name="therapyType"
+                                                                       value="2-Couples"
+                                                                       // checked={values.therapyType.some(type => type.id === 2)}
+                                                                       onChange={handleChange}
+                                                                   />
+                                                                   <label htmlFor="CouplesCheckbox">Couples
+                                                                       Therapy</label>
+                                                               </div>
+                                                               <div>
+                                                                   <input
+                                                                       type="checkbox"
+                                                                       id="TeenCheckbox"
+                                                                       name="therapyType"
+                                                                       value="3-Teen"
+                                                                       // checked={values.therapyType.some(type => type.id === 3)}
+                                                                       onChange={handleChange}
+                                                                   />
+                                                                   <label htmlFor="TeenCheckbox">Teen Therapy</label>
+                                                               </div>
+                                                           </div>
+
+                                                           <div className="custom-checkboxes">
+                                                               <label>
+                                                                   <h5><b>Identity Type</b></h5>
+                                                               </label>
+                                                               <div>
+                                                                   <input
+                                                                       type="checkbox"
+                                                                       id="straightCheckbox"
+                                                                       name="identityType"
+                                                                       value="1-Straight"
+                                                                       // checked={values.identityType.some(type => type.id === 1)}
+                                                                       onChange={handleChange}
+                                                                   />
+                                                                   <label htmlFor="straightCheckbox">Straight</label>
+                                                               </div>
+                                                               <div>
+                                                                   <input
+                                                                       type="checkbox"
+                                                                       id="gayCheckbox"
+                                                                       name="identityType"
+                                                                       value="2-Gay"
+                                                                       // checked={values.identityType.some(type => type.id === 2)}
+                                                                       onChange={handleChange}
+                                                                   />
+                                                                   <label htmlFor="gayCheckbox">Gay</label>
+                                                               </div>
+                                                               <div>
+                                                                   <input
+                                                                       type="checkbox"
+                                                                       id="lesbianCheckbox"
+                                                                       name="identityType"
+                                                                       value="3-Lesbian"
+                                                                       // checked={values.identityType.some(type => type.id === 3)}
+                                                                       onChange={handleChange}
+                                                                   />
+                                                                   <label htmlFor="lesbianCheckbox">Lesbian</label>
+                                                               </div>
+                                                           </div>
+
+                                                           <div className="custom-checkboxes">
+                                                               <label><h5><b>Therapist Type</b></h5></label>
+                                                               <div>
+                                                                   <input
+                                                                       type="checkbox"
+                                                                       id="listensCheckbox"
+                                                                       name="therapistType"
+                                                                       value="1-Listens"
+                                                                       // checked={values.therapistType.some(type => type.id === 1)}
+                                                                       onChange={handleChange}
+                                                                   />
+                                                                   <label htmlFor="listensCheckbox">A therapist that listens</label>
+                                                               </div>
+                                                               <div>
+                                                                   <input
+                                                                       type="checkbox"
+                                                                       id="exploresPastCheckbox"
+                                                                       name="therapistType"
+                                                                       value="2-ExploresPast"
+                                                                       // checked={values.therapistType.some(type => type.id === 2)}
+                                                                       onChange={handleChange}
+                                                                   />
+                                                                   <label htmlFor="exploresPastCheckbox">A therapist that explores the past</label>
+                                                               </div>
+                                                               <div>
+                                                                   <input
+                                                                       type="checkbox"
+                                                                       id="teachesSkillsCheckbox"
+                                                                       name="therapistType"
+                                                                       value="3-TeachesSkills"
+                                                                       // checked={values.therapistType.some(type => type.id === 3)}
+                                                                       onChange={handleChange}
+                                                                   />
+                                                                   <label htmlFor="teachesSkillsCheckbox">A therapist that teaches new skills</label>
+                                                               </div>
+                                                           </div>
+
+                                                           <hr/>
+
                                                            <div className="form-group">
                                                                <input type="email"
                                                                       className="form-control form-control-user"
@@ -365,16 +511,15 @@ function RegisterBootTherapist({loading,error,...props}){
                                                        </div>
                                                    </div>
                                                </div>
+                                               </div>
                                            </div>
-                                       </div></div>
+                                       </div>
                                    </div>
                                <script src="../../vendor/jquery/jquery.min.js"></script>
                                <script src="../../vendor/bootstrap/js/bootstrap.bundle.min.js"></script>
                                <script src="../../vendor/jquery-easing/jquery.easing.min.js"></script>
                                <script src="../../js/sb-admin-2.min.js"></script>
                            </div>
-
-
                        </div>
 
                        <footer className="sticky-footer bg-white">
@@ -393,7 +538,8 @@ function RegisterBootTherapist({loading,error,...props}){
                    <i className="fas fa-angle-up"></i>
                </a>
 
-               <div className="modal fade" id="logoutModal" tabIndex="-1" role="dialog" aria-labelledby="exampleModalLabel"
+               <div className="modal fade" id="logoutModal" tabIndex="-1" role="dialog"
+                    aria-labelledby="exampleModalLabel"
                     aria-hidden="true">
                    <div className="modal-dialog" role="document">
                        <div className="modal-content">
@@ -407,7 +553,7 @@ function RegisterBootTherapist({loading,error,...props}){
                                session.
                            </div>
                            <div className="modal-footer">
-                               <button className="btn btn-secondary" type="button" data-dismiss="modal">Cancel</button>
+                           <button className="btn btn-secondary" type="button" data-dismiss="modal">Cancel</button>
                                <Link className="btn btn-primary" to="/loginBoot">Logout</Link>
                            </div>
                        </div>
@@ -435,15 +581,16 @@ const mapStateToProps = ({auth}) => {
     console.log("state ", auth)
     return {
         loading: auth.loading,
-        error: auth.error
+        error: auth.error,
+        isAdminAuthenticated: auth.isAdminAuthenticated
     }
 }
 const mapDispatchToProps = (dispatch) => {
-
     return {
         authenticate: () => dispatch(authenticate()),
-        setUser:(data)=> dispatch(authSuccess(data)),
-        loginFailure:(message)=>dispatch(authFailure(message))
+        setUser: (data) => dispatch(authSuccess(data)),
+        loginFailure: (message) => dispatch(authFailure(message)),
+        setAdminAuthenticationState: (boolean) => dispatch(setAdminAuthenticationState(boolean))
     }
 }
 export default connect(mapStateToProps,mapDispatchToProps)(RegisterBootTherapist);

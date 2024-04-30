@@ -1,14 +1,34 @@
-import React,{useState} from 'react';
+import React, {useEffect, useState} from 'react';
 import {fetchUserData, userUpdate} from '../../../api/authService';
 import {Link, useNavigate} from 'react-router-dom';
 import {Container, Row, Col, Form, Button} from 'react-bootstrap';
-import {authenticate, authFailure, authSuccess} from "../../../redux/authActions";
+import {
+    authenticate,
+    authFailure,
+    authSuccess,
+    setTherapistAuthenticationState
+} from "../../../redux/authActions";
 import '../../../css/sb-admin-2.min.css';
 import {Alert} from "reactstrap";
 import {connect} from "react-redux";
 import DashboardNav from "../DashboardNav";
 import SideBarTherapist from "../SideBars/SideBarTherapist";
+import {loadState, saveState} from "../../../helper/sessionStorage";
+const isTherapistAuthenticatedBoolean = loadState("isTherapistAuthenticated",false)
 function TherapistProfile({loading,error,...props}){
+
+    useEffect(() => {
+        if(!isTherapistAuthenticatedBoolean){
+            if (!props.isTherapistAuthenticated){
+                props.loginFailure("Authentication Failed!!!");
+                history('/loginBoot');
+            }else{
+                saveState("isTherapistAuthenticated",props.isTherapistAuthenticated)
+            }
+        }else{
+            saveState("isTherapistAuthenticated",isTherapistAuthenticatedBoolean)
+        }
+    }, []);
 
     const history = useNavigate ();
     const [data,setData]=useState({});
@@ -136,7 +156,7 @@ function TherapistProfile({loading,error,...props}){
 
                     <div id="content">
 
-                        <DashboardNav data={data} setUser={props.setUser} />
+                        <DashboardNav data={data} setUser={props.setUser} setTherapistAuthenticationState={props.setTherapistAuthenticationState}/>
 
                         <div className="container-fluid">
 
@@ -306,17 +326,20 @@ function TherapistProfile({loading,error,...props}){
         </main>
     )
 }
-const mapStateToProps=({auth})=>{
-    console.log("state ",auth)
+const mapStateToProps = ({auth}) => {
+    console.log("state ", auth)
     return {
-        loading:auth.loading,
-        error:auth.error
-    }}
-const mapDispatchToProps=(dispatch)=>{
+        loading: auth.loading,
+        error: auth.error,
+        isTherapistAuthenticated: auth.isTherapistAuthenticated,
+    }
+}
+const mapDispatchToProps = (dispatch) => {
     return {
-        authenticate :()=> dispatch(authenticate()),
-        setUser:(data)=> dispatch(authSuccess(data)),
-        loginFailure:(message)=>dispatch(authFailure(message))
+        authenticate: () => dispatch(authenticate()),
+        setUser: (data) => dispatch(authSuccess(data)),
+        loginFailure: (message) => dispatch(authFailure(message)),
+        setTherapistAuthenticationState: (boolean) => dispatch(setTherapistAuthenticationState(boolean))
     }
 }
 export default connect(mapStateToProps,mapDispatchToProps)(TherapistProfile);

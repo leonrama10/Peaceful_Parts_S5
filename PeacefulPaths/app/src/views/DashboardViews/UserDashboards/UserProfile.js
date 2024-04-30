@@ -1,14 +1,34 @@
-import React,{useState} from 'react';
+import React, {useEffect, useState} from 'react';
 import {fetchUserData, userUpdate} from '../../../api/authService';
 import {Link, useNavigate} from 'react-router-dom';
 import {Container, Row, Col, Form, Button} from 'react-bootstrap';
-import {authenticate, authFailure, authSuccess} from "../../../redux/authActions";
+import {
+    authenticate,
+    authFailure,
+    authSuccess,
+    setUserAuthenticationState
+} from "../../../redux/authActions";
 import '../../../css/sb-admin-2.min.css';
 import {Alert} from "reactstrap";
 import {connect} from "react-redux";
 import DashboardNav from "../DashboardNav";
 import SideBarUser from "../SideBars/SideBarUser";
+import {loadState, saveState} from "../../../helper/sessionStorage";
+const isUserAuthenticatedBoolean = loadState("isUserAuthenticated",false)
 function UserProfile({loading,error,...props}){
+
+    useEffect(() => {
+        if(!isUserAuthenticatedBoolean){
+            if (!props.isUserAuthenticated){
+                props.loginFailure("Authentication Failed!!!");
+                history('/loginBoot');
+            }else{
+                saveState("isUserAuthenticated",props.isUserAuthenticated)
+            }
+        }else{
+            saveState("isUserAuthenticated",isUserAuthenticatedBoolean)
+        }
+    }, []);
 
     const history = useNavigate ();
     const [hideFilterMenu,setHideFilterMenu]=useState(true);
@@ -134,7 +154,7 @@ function UserProfile({loading,error,...props}){
 
                     <div id="content">
 
-                        <DashboardNav data={data} setUser={props.setUser} />
+                        <DashboardNav data={data} setUser={props.setUser} setUserAuthenticationState={props.setUserAuthenticationState}/>
 
                         <div className="container-fluid">
 
@@ -303,14 +323,16 @@ const mapStateToProps = ({auth}) => {
     console.log("state ", auth)
     return {
         loading: auth.loading,
-        error: auth.error
+        error: auth.error,
+        isUserAuthenticated: auth.isUserAuthenticated
     }
 }
 const mapDispatchToProps = (dispatch) => {
     return {
         authenticate: () => dispatch(authenticate()),
-        setUser:(data)=> dispatch(authSuccess(data)),
-        loginFailure:(message)=>dispatch(authFailure(message))
+        setUser: (data) => dispatch(authSuccess(data)),
+        loginFailure: (message) => dispatch(authFailure(message)),
+        setUserAuthenticationState: (boolean) => dispatch(setUserAuthenticationState(boolean))
     }
 }
 export default connect(mapStateToProps,mapDispatchToProps)(UserProfile);

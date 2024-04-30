@@ -317,6 +317,9 @@ function SideBarUser({loading,error,...props}){
         }
     }
 
+    // Hapi 2: krijoj 3 funksione si ma nalt veq pershtatja me qa osht e lypme,
+    // masanej funksionin e shton ne authService.js 6 funksione sepse mrena funksionit i ki 2 funksione qe i shkrun ne authService.js
+
     return (
 
         <ul className="navbar-nav bg-gradient-primary sidebar sidebar-dark accordion"
@@ -425,6 +428,7 @@ function SideBarUser({loading,error,...props}){
                                     </select>
                                 </div>
                             </Collapse>
+                            //HAPI 1: Shto 3 filter button tjt si qto tjerat, pershtatja vlerat. shtoj nalt 3 funksione per mu lidh me springboot
                         </div>
                     </div>
                 </Collapse>

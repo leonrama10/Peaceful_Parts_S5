@@ -10,20 +10,24 @@ export default function Home(){
                 }
 
                 .p2-home{
-                width: 300px;
-                font-size: 16px;
-                position: absolute;
-                right: 0px;
-                margin-top: 90px;
-                margin-right: 100px;
+                    width: 300px;
+                    font-size: 16px;
+                    position: absolute;
+                    top: 50%;
+                    left: 50%;
+                    transform: translate(-50%, -50%);
+                }
+                
+                .h2-home{
+                    width: 350px;
+                    position: absolute;
+                    top: 35%;
+                    left: 50%;
+                    transform: none;
+                    margin-top: 10px;
+                    transform: translate(-50%, -50%);
                 }
 
-                .h2-home{
-                width: 400px;
-                position: absolute;
-                right: 0px;
-                margin-top: 10px
-                }
               `}
             </style>
 

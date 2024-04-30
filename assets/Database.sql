@@ -88,6 +88,7 @@ CREATE TABLE `user` (
   `id` int(11) NOT NULL AUTO_INCREMENT,
   `name` varchar(45) DEFAULT NULL,
   `surname` varchar(45) DEFAULT NULL,
+  `date_of_birth` DATE DEFAULT NULL,
   `email` varchar(45) DEFAULT NULL,
   `number` varchar(9) DEFAULT NULL,
   `experience` int NOT NULL,
@@ -98,6 +99,7 @@ CREATE TABLE `user` (
   `location_id` int(11),
   `gender_id` int(11),
   `university_id` int(11),
+  `date_added` TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
   PRIMARY KEY (`id`),
   FOREIGN KEY (`questionnaire_id`) REFERENCES `questionnaire`(`id`) ON DELETE CASCADE on update cascade,
   FOREIGN KEY (`gender_id`) REFERENCES `gender`(`id`) ON DELETE CASCADE on update cascade,
@@ -105,11 +107,11 @@ CREATE TABLE `user` (
   FOREIGN KEY (`university_id`) REFERENCES `university`(`id`) ON DELETE CASCADE on update cascade
 ) AUTO_INCREMENT=1;
 
-INSERT INTO `user` (`name`,`surname`,`email`,`number`,`experience`,`password`,`reset_token`,`expiration_time`,`location_id`,`gender_id`,`university_id`)
-VALUES	
-('Leke','Markaj','markaj.leka@gmail.com','044806543',20,'$2a$10$lAZ7fMTXoALYWY.C4rAs7u7Bdzz4qd7SIwAkWNOX5XQkTRe7vo4P.',null,0,1,1,1),
-('Loren','Markaj','markaj.loren@gmail.com','044333333',1,'$2a$10$lAZ7fMTXoALYWY.C4rAs7u7Bdzz4qd7SIwAkWNOX5XQkTRe7vo4P.',null,0,1,1,1),
-('Leon','Markaj','markaj.leon@gmail.com','044111111',15,'$2a$10$lAZ7fMTXoALYWY.C4rAs7u7Bdzz4qd7SIwAkWNOX5XQkTRe7vo4P.',null,0,1,1,1);
+INSERT INTO `user` (`name`, `surname`, `email`, `number`, `experience`, `password`, `reset_token`, `expiration_time`, `location_id`, `gender_id`, `university_id`, `date_of_birth`)
+VALUES
+('Leke', 'Markaj', 'markaj.leka@gmail.com', '044806543', 20, '$2a$10$lAZ7fMTXoALYWY.C4rAs7u7Bdzz4qd7SIwAkWNOX5XQkTRe7vo4P.', NULL, 0, 1, 1, 1, '1992-05-15'),
+('Loren', 'Markaj', 'markaj.loren@gmail.com', '044333333', 1, '$2a$10$lAZ7fMTXoALYWY.C4rAs7u7Bdzz4qd7SIwAkWNOX5XQkTRe7vo4P.', NULL, 0, 1, 1, 1, '1995-08-20'),
+('Leon', 'Markaj', 'markaj.leon@gmail.com', '044111111', 15, '$2a$10$lAZ7fMTXoALYWY.C4rAs7u7Bdzz4qd7SIwAkWNOX5XQkTRe7vo4P.', NULL, 0, 1, 1, 1, '1988-03-10');
 
 CREATE TABLE `roles` (
   `id` int(11) NOT NULL AUTO_INCREMENT, 
@@ -168,6 +170,12 @@ CREATE TABLE `user_language` (
   REFERENCES `language` (`id`) 
   ON DELETE CASCADE ON UPDATE CASCADE
 ) ENGINE=InnoDB DEFAULT CHARSET=latin1;
+
+INSERT INTO `user_language` (user_id,language_id)
+VALUES 
+(2, 1),
+(2, 2),
+(3, 3);
 
 SET FOREIGN_KEY_CHECKS = 0;
 DROP TABLE IF EXISTS `questionnaire_language`;

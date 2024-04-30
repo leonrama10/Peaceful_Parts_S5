@@ -160,7 +160,6 @@ console.log("DATAa",authRequest)
 };
 
 
-
 export const fetchUserTherapistConnectionData = (authRequest) => {
     return axios({
         method: 'GET',
@@ -266,7 +265,6 @@ export const therapistFilterByLocationNotConnected = (authRequest) => {
     });
 };
 export const therapistFilterByLanguage = (authRequest) => {
-    console.log("DATAAAAAAAAAAAAAAAAA",authRequest)
     return axios({
         method: 'POST',
         url: `${process.env.hostUrl || 'http://localhost:8080'}/api/auth/therapistFilterByLanguage`,
@@ -277,7 +275,6 @@ export const therapistFilterByLanguage = (authRequest) => {
     });
 };
 export const therapistFilterByLanguageNotConnected = (authRequest) => {
-    console.log("DATAAAAAAAAAAAAAAAAA",authRequest)
     return axios({
         method: 'POST',
         url: `${process.env.hostUrl || 'http://localhost:8080'}/api/auth/therapistFilterByLanguageNotConnected`,
@@ -288,8 +285,9 @@ export const therapistFilterByLanguageNotConnected = (authRequest) => {
     });
 };
 
+//hapi 3: shtoj te 6 funskionet qtu pershtatje url me authController qysh jau len
+
 export const questionnaireAnswers = (authRequest) => {
-    console.log("AUTHHHHHHHHHHHHHHHHH" , authRequest)
     return axios({
         method: 'POST',
         url: `${process.env.hostUrl || 'http://localhost:8080'}/api/auth/questionnaireAnswers`,

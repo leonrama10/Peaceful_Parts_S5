@@ -1,4 +1,4 @@
-import React,{useState} from 'react';
+import React, {useEffect, useState} from 'react';
 import {fetchAllAdminData, fetchUserData, userDelete} from '../../../api/authService';
 import {useNavigate} from 'react-router-dom';
 import '../../../css/sb-admin-2.css';
@@ -7,10 +7,30 @@ import DataTable from 'datatables.net-dt';
 import $ from 'jquery';
 import DashboardNav from "../DashboardNav";
 import SideBarAdmin from "../SideBars/SideBarAdmin";
-import {authenticate, authFailure, authSuccess} from "../../../redux/authActions";
+import {
+    authenticate,
+    authFailure,
+    authSuccess,
+    setAdminAuthenticationState,
+    setAuthState, setTherapistAuthenticationState, setUserAuthenticationState
+} from "../../../redux/authActions";
 import {connect} from "react-redux";
-
+import {loadState, saveState} from "../../../helper/sessionStorage";
+const isAdminAuthenticatedBoolean = loadState("isAdminAuthenticated",false)
 function AdminDashboardAdmin({loading,error,...props}){
+
+    useEffect(() => {
+        if(!isAdminAuthenticatedBoolean){
+            if (!props.isAdminAuthenticated){
+                props.loginFailure("Authentication Failed!!!");
+                history('/loginBoot');
+            }else{
+                saveState("isAdminAuthenticated",props.isAdminAuthenticated)
+            }
+        }else{
+            saveState("isAdminAuthenticated",isAdminAuthenticatedBoolean)
+        }
+    }, []);
 
     const history = useNavigate ();
     const [data,setData]=useState({});
@@ -67,10 +87,9 @@ function AdminDashboardAdmin({loading,error,...props}){
         history(`/dashboard/adminDashboard/users/edit/${id}`);
     };
 
-    const handleGenerateTherapistsClick = () => {
-                console.log('Generate Therapists button clicked');
+    const handleGenerateAdminsClick = () => {
                  history("/dashboard/registerBoot-admin");
-            };
+    };
 
     return (
         <main id="page-top">
@@ -83,18 +102,19 @@ function AdminDashboardAdmin({loading,error,...props}){
 
                     <div id="content">
 
-                        <DashboardNav data={data} setUser={props.setUser} />
+                        <DashboardNav data={data} setUser={props.setUser} setAdminAuthenticationState={props.setAdminAuthenticationState}/>
 
                         <div className="container-fluid">
 
                             <div className="card shadow mb-4">
                                 <div className="card-header py-3">
                                     <h6 className="m-0 font-weight-bold text-primary">DataTables Example</h6>
+                                    <div className="text-center mb-4">
+                                        <button className="btn btn-primary" type="button"
+                                                onClick={handleGenerateAdminsClick}>Generate Admins
+                                        </button>
+                                    </div>
                                 </div>
-
-                                <div className="text-center mb-4">
-                                    <button className="btn btn-primary" type="button" onClick={handleGenerateTherapistsClick}>Generate Therapists</button>
-                                 </div>
 
                                 <div className="card-body">
                                     <div className="table-responsive">
@@ -107,6 +127,7 @@ function AdminDashboardAdmin({loading,error,...props}){
                                                 <th>Email</th>
                                                 <th>Phone Number</th>
                                                 <th>Gender</th>
+                                                <th>Date Added</th>
                                                 <th>Actions</th>
                                             </tr>
                                             </thead>
@@ -117,6 +138,7 @@ function AdminDashboardAdmin({loading,error,...props}){
                                                 <th>Email</th>
                                                 <th>Phone Number</th>
                                                 <th>Gender</th>
+                                                <th>Date Added</th>
                                                 <th>Actions</th>
                                             </tr>
                                             </tfoot>
@@ -128,6 +150,7 @@ function AdminDashboardAdmin({loading,error,...props}){
                                                     <td>{tempEmployee.email}</td>
                                                     <td>{tempEmployee.number}</td>
                                                     <td>{tempEmployee.gender.gender}</td>
+                                                    <td>{tempEmployee.dateAdded}</td>
                                                     <td>
                                                         <button className="btn btn-info btn-sm"
                                                                 onClick={() => handleEdit(tempEmployee.id)}>
@@ -180,14 +203,16 @@ const mapStateToProps = ({auth}) => {
     console.log("state ", auth)
     return {
         loading: auth.loading,
-        error: auth.error
+        error: auth.error,
+        isAdminAuthenticated: auth.isAdminAuthenticated
     }
 }
 const mapDispatchToProps = (dispatch) => {
     return {
         authenticate: () => dispatch(authenticate()),
         setUser: (data) => dispatch(authSuccess(data)),
-        loginFailure: (message) => dispatch(authFailure(message))
+        loginFailure: (message) => dispatch(authFailure(message)),
+        setAdminAuthenticationState: (boolean) => dispatch(setAdminAuthenticationState(boolean))
     }
 }
 export default connect(mapStateToProps, mapDispatchToProps)(AdminDashboardAdmin);

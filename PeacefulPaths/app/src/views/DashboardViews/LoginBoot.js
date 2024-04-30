@@ -3,7 +3,13 @@ import {connect} from 'react-redux';
 import {userLogin} from '../../api/authService';
 import {Link, useNavigate} from 'react-router-dom';
 import '../../css/sb-admin-2.min.css';
-import {authenticate, authFailure, authSuccess} from "../../redux/authActions";
+import {
+    authenticate,
+    authFailure,
+    authSuccess,
+    setAdminAuthenticationState,
+    setAuthState, setTherapistAuthenticationState, setUserAuthenticationState
+} from "../../redux/authActions";
 import {Alert} from "reactstrap";
 import {saveState} from "../../helper/sessionStorage";
 
@@ -32,14 +38,17 @@ function LoginBoot({loading,error,...props}){
                     if (response.data.roles.at(0).role === 'ROLE_ADMIN') {
                         saveState("loggedInState",true)
                         saveState("role",'ROLE_ADMIN')
+                        props.setAdminAuthenticationState(true)
                         history('/dashboard/adminDashboard');
                     }else if (response.data.roles.at(0).role === 'ROLE_USER') {
                         saveState("loggedInState",true)
                         saveState("role",'ROLE_USER')
+                        props.setUserAuthenticationState(true)
                         history('/dashboard/userDashboard');
                     } else if(response.data.roles.at(0).role === 'ROLE_THERAPIST'){
                         saveState("loggedInState",true)
                         saveState("role",'ROLE_THERAPIST')
+                        props.setTherapistAuthenticationState(true)
                          history('/dashboard/therapistDashboard');
                     }
                 }
@@ -81,15 +90,15 @@ function LoginBoot({loading,error,...props}){
     return (
             <main className="bg-gradient-primary">
             <style>
-                                      {`
-                                      .bg-gradient-primary{
-                                      height: 100vh;
-                                      }
-                                        .container{
-                                        height: 100vh;
-                                        }
-                                      `}
-                                    </style>
+            {`
+            .bg-gradient-primary{
+            height: 100vh;
+            }
+            .container{
+            height: 100vh;
+            }
+            `}
+            </style>
 
             <div className="container">
 
@@ -163,18 +172,24 @@ function LoginBoot({loading,error,...props}){
     )
 
 }
-const mapStateToProps=({auth})=>{
-    console.log("state ",auth)
+const mapStateToProps = ({auth}) => {
+    console.log("state ", auth)
     return {
-        loading:auth.loading,
-        error:auth.error
-    }}
-const mapDispatchToProps=(dispatch)=>{
-
+        loading: auth.loading,
+        error: auth.error,
+        isAdminAuthenticated: auth.isAdminAuthenticated,
+        isTherapistAuthenticated: auth.isTherapistAuthenticated,
+        isUserAuthenticated: auth.isUserAuthenticated
+    }
+}
+const mapDispatchToProps = (dispatch) => {
     return {
-        authenticate :()=> dispatch(authenticate()),
-        setUser:(data)=> dispatch(authSuccess(data)),
-        loginFailure:(message)=>dispatch(authFailure(message))
+        authenticate: () => dispatch(authenticate()),
+        setUser: (data) => dispatch(authSuccess(data)),
+        loginFailure: (message) => dispatch(authFailure(message)),
+        setAdminAuthenticationState: (boolean) => dispatch(setAdminAuthenticationState(boolean)),
+        setTherapistAuthenticationState: (boolean) => dispatch(setTherapistAuthenticationState(boolean)),
+        setUserAuthenticationState: (boolean) => dispatch(setUserAuthenticationState(boolean))
     }
 }
 export default connect(mapStateToProps,mapDispatchToProps)(LoginBoot);

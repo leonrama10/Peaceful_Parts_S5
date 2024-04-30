@@ -9,13 +9,21 @@ import navimg3 from "../../img/undraw_profile_3.svg";
 import accLogo from "../../img/undraw_profile.svg";
 import {saveState,loadState} from "../../helper/sessionStorage";
 
-
 export default function DashboardNav(props){
 
     const role = loadState("role",'')
     const [location, setLocation] = React.useState('');
 
     function logout()  {
+        if (role==='ROLE_ADMIN') {
+            props.setAdminAuthenticationState(false)
+            saveState("isAdminAuthenticated",'')
+        }else if (role==='ROLE_USER') {
+            props.setUserAuthenticationState(false)
+        }else if (role==='ROLE_THERAPIST') {
+            props.setTherapistAuthenticationState(false)
+            saveState("isTherapistAuthenticated",'')
+        }
         props.setUser({});
         saveState("loggedInState", false)
         saveState("role",'')

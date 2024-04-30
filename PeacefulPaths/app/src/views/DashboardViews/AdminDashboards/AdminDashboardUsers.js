@@ -1,4 +1,4 @@
-import React,{useState} from 'react';
+import React, {useEffect, useState} from 'react';
 import {fetchAllUserData, fetchUserData, userDelete} from '../../../api/authService';
 import {useNavigate} from 'react-router-dom';
 import '../../../css/sb-admin-2.css';
@@ -7,10 +7,29 @@ import DataTable from 'datatables.net-dt';
 import $ from 'jquery';
 import DashboardNav from "../DashboardNav";
 import SideBarAdmin from "../SideBars/SideBarAdmin";
-import {authenticate, authFailure, authSuccess} from "../../../redux/authActions";
+import {
+    authenticate,
+    authFailure,
+    authSuccess,
+    setAdminAuthenticationState
+} from "../../../redux/authActions";
 import {connect} from "react-redux";
-
+import {loadState, saveState} from "../../../helper/sessionStorage";
+const isAdminAuthenticatedBoolean = loadState("isAdminAuthenticated",false)
 function AdminDashboardUsers({loading,error,...props}){
+
+    useEffect(() => {
+        if(!isAdminAuthenticatedBoolean){
+            if (!props.isAdminAuthenticated){
+                props.loginFailure("Authentication Failed!!!");
+                history('/loginBoot');
+            }else{
+                saveState("isAdminAuthenticated",props.isAdminAuthenticated)
+            }
+        }else{
+            saveState("isAdminAuthenticated",isAdminAuthenticatedBoolean)
+        }
+    }, []);
 
     const history = useNavigate ();
     const [data,setData]=useState({});
@@ -75,7 +94,7 @@ function AdminDashboardUsers({loading,error,...props}){
 
                             <div id="content">
 
-                                <DashboardNav data={data} setUser={props.setUser} />
+                                <DashboardNav data={data} setUser={props.setUser} setAdminAuthenticationState={props.setAdminAuthenticationState}/>
 
                                 <div className="container-fluid">
 
@@ -95,6 +114,7 @@ function AdminDashboardUsers({loading,error,...props}){
                                                         <th>Phone Number</th>
                                                         <th>Gender</th>
                                                         <th>Location</th>
+                                                        <th>Date Added</th>
                                                         <th>Actions</th>
                                                     </tr>
                                                     </thead>
@@ -106,6 +126,7 @@ function AdminDashboardUsers({loading,error,...props}){
                                                         <th>Phone Number</th>
                                                         <th>Gender</th>
                                                         <th>Location</th>
+                                                        <th>Date Added</th>
                                                         <th>Actions</th>
                                                     </tr>
                                                     </tfoot>
@@ -118,6 +139,7 @@ function AdminDashboardUsers({loading,error,...props}){
                                                                 <td>{tempEmployee.number}</td>
                                                                 <td>{tempEmployee.gender.gender}</td>
                                                                 <td>{tempEmployee.location.location}</td>
+                                                                <td>{tempEmployee.dateAdded}</td>
                                                                 <td>
                                                                     <button className="btn btn-info btn-sm"
                                                                             onClick={() => handleEdit(tempEmployee.id)}>
@@ -198,14 +220,16 @@ const mapStateToProps = ({auth}) => {
     console.log("state ", auth)
     return {
         loading: auth.loading,
-        error: auth.error
+        error: auth.error,
+        isAdminAuthenticated: auth.isAdminAuthenticated
     }
 }
 const mapDispatchToProps = (dispatch) => {
     return {
         authenticate: () => dispatch(authenticate()),
         setUser: (data) => dispatch(authSuccess(data)),
-        loginFailure: (message) => dispatch(authFailure(message))
+        loginFailure: (message) => dispatch(authFailure(message)),
+        setAdminAuthenticationState: (boolean) => dispatch(setAdminAuthenticationState(boolean))
     }
 }
 export default connect(mapStateToProps, mapDispatchToProps)(AdminDashboardUsers);

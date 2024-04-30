@@ -4,25 +4,41 @@ import {registerAdmin} from '../../api/authService';
 import {Link, useNavigate} from 'react-router-dom';
 import '../../css/sb-admin-2.min.css';
 import {Alert} from "reactstrap";
-import {authenticate, authFailure, authSuccess} from "../../redux/authActions";
+import {
+    authenticate,
+    authFailure,
+    authSuccess,
+    setAdminAuthenticationState
+} from "../../redux/authActions";
 import SideBarAdmin from "./SideBars/SideBarAdmin";
 import DashboardNav from "./DashboardNav";
-
+import {loadState, saveState} from "../../helper/sessionStorage";
+const isAdminAuthenticatedBoolean = loadState("isAdminAuthenticated",false)
 function RegisterBootAdmin({loading,error,...props}){
+
+    useEffect(() => {
+        if(!isAdminAuthenticatedBoolean){
+            if (!props.isAdminAuthenticated){
+                props.loginFailure("Authentication Failed!!!");
+                history('/loginBoot');
+            }else{
+                saveState("isAdminAuthenticated",props.isAdminAuthenticated)
+            }
+        }else{
+            saveState("isAdminAuthenticated",isAdminAuthenticatedBoolean)
+        }
+    }, []);
 
     const [userData,setUserData]=useState({});
     const history = useNavigate ();
+    const [registerAdminError,setRegisterAdminError]=useState('');
     const [values, setValues] = useState({
         id:0,
         email: '',
         name: '',
         surname: '',
         password: '',
-
         gender: {},
-
-
-
         number:''
     });
 
@@ -40,7 +56,7 @@ function RegisterBootAdmin({loading,error,...props}){
                 if (response.status === 201) {
                     history('/dashboard/adminDashboard/admin');
                 } else {
-                    props.loginFailure('Something LEKAAAAAAA!Please Try Again');
+                    setRegisterAdminError('Something LEKAAAAAAA!Please Try Again');
                 }
 
 
@@ -51,19 +67,19 @@ function RegisterBootAdmin({loading,error,...props}){
                     switch (err.response.status) {
                         case 401:
                             console.log("401 status");
-                            props.loginFailure("Authentication Failed.Bad Credentials");
+                            setRegisterAdminError("Authentication Failed.Bad Credentials");
                             break;
                         default:
-                            props.loginFailure('Something BABAAAAAA!Please Try Again');
+                            setRegisterAdminError('Something BABAAAAAA!Please Try Again');
                     }
                 } else {
                     console.log("ERROR: ", err)
-                    props.loginFailure('Something NaNAAAAA!Please Try Again');
+                    setRegisterAdminError('Something NaNAAAAA!Please Try Again');
                 }
 
             });
         } else {
-            props.loginFailure('Passwords do not match!!!');
+            setRegisterAdminError('Passwords do not match!!!');
         }
     }
 
@@ -93,10 +109,7 @@ function RegisterBootAdmin({loading,error,...props}){
         } else {
             setValues(values => ({
                 ...values,
-                [name]:
-                    name === 'gender' ? { id: Number(value.split('-')[0]), gender: value.split('-')[1] } :
-
-                                value
+                [name]: name === 'gender' ? { id: Number(value.split('-')[0]), gender: value.split('-')[1] } : value
             }));
         }
     };
@@ -112,7 +125,7 @@ function RegisterBootAdmin({loading,error,...props}){
 
                    <div id="content">
 
-                       <DashboardNav data={userData} setUser={props.setUser}/>
+                       <DashboardNav data={userData} setUser={props.setUser} setAdminAuthenticationState={props.setAdminAuthenticationState}/>
 
                        <div className="container-fluid">
                            <div className="bg-gradient-primary">
@@ -125,9 +138,9 @@ function RegisterBootAdmin({loading,error,...props}){
                                                        <div className="text-center">
                                                            <h1 className="h4 text-gray-900 mb-4">Create an Account!</h1>
                                                        </div>
-                                                       {error &&
+                                                       {registerAdminError &&
                                                            <Alert style={{marginTop: '20px'}} variant="danger">
-                                                               {error}
+                                                               {registerAdminError}
                                                            </Alert>
                                                        }
                                                        <form className="user" onSubmit={handleSubmit}>
@@ -327,15 +340,16 @@ const mapStateToProps = ({auth}) => {
     console.log("state ", auth)
     return {
         loading: auth.loading,
-        error: auth.error
+        error: auth.error,
+        isAdminAuthenticated: auth.isAdminAuthenticated
     }
 }
 const mapDispatchToProps = (dispatch) => {
-
     return {
         authenticate: () => dispatch(authenticate()),
-        setUser:(data)=> dispatch(authSuccess(data)),
-        loginFailure:(message)=>dispatch(authFailure(message))
+        setUser: (data) => dispatch(authSuccess(data)),
+        loginFailure: (message) => dispatch(authFailure(message)),
+        setAdminAuthenticationState: (boolean) => dispatch(setAdminAuthenticationState(boolean))
     }
 }
 export default connect(mapStateToProps,mapDispatchToProps)(RegisterBootAdmin);

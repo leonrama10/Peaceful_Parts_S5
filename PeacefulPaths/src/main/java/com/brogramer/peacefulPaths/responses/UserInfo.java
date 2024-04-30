@@ -1,7 +1,12 @@
 package com.brogramer.peacefulPaths.responses;
 
 import com.brogramer.peacefulPaths.entity.*;
+import com.fasterxml.jackson.annotation.JsonFormat;
+import org.springframework.format.annotation.DateTimeFormat;
 
+import java.sql.Timestamp;
+import java.time.LocalDateTime;
+import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
 import java.util.Date;
@@ -16,8 +21,6 @@ public class UserInfo {
     private String surname;
     private String password;
     private String number;
-
-
     private University university;
     private Location location;
     private Collection<Roles> roles;
@@ -25,9 +28,12 @@ public class UserInfo {
     private String resetToken;
     private Long expirationTime;
     private Gender gender;
+    @JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "yyyy-MM-dd")
     private Date dateOfBirth;
     private Collection<Language> language;
     private Questionnaire questionnaire;
+    @JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "yyyy-MM-dd HH:mm:ss")
+    private LocalDateTime dateAdded;
 
     public Questionnaire getQuestionnaire() {
         return questionnaire;
@@ -163,5 +169,11 @@ public class UserInfo {
         this.gender=gender;
     }
 
+    public LocalDateTime getDateAdded() {
+        return dateAdded;
+    }
 
+    public void setDateAdded(LocalDateTime dateAdded) {
+        this.dateAdded = dateAdded;
+    }
 }

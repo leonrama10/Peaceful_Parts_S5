@@ -1,15 +1,33 @@
-import React,{useState} from 'react';
+import React, {useEffect, useState} from 'react';
 import {fetchUserData, fetchUserDataId, removeTherapist, userTherapistConnection} from '../../../api/authService';
 import {Link, useNavigate, useParams} from 'react-router-dom';
 import '../../../css/sb-admin-2.css';
 import DashboardNav from "../DashboardNav";
-import {authenticate, authFailure, authSuccess} from "../../../redux/authActions";
+import {
+    authenticate,
+    authFailure,
+    authSuccess,
+    setUserAuthenticationState
+} from "../../../redux/authActions";
 import {connect} from "react-redux";
 import SideBarUser from "../SideBars/SideBarUser";
-import {Alert} from "reactstrap";
 import {loadState, saveState} from "../../../helper/sessionStorage";
 let connected = null;
+const isUserAuthenticatedBoolean = loadState("isUserAuthenticated",false)
 function TherapistCardInfo({loading,error,...props}){
+
+    useEffect(() => {
+        if(!isUserAuthenticatedBoolean){
+            if (!props.isUserAuthenticated){
+                props.loginFailure("Authentication Failed!!!");
+                history('/loginBoot');
+            }else{
+                saveState("isUserAuthenticated",props.isUserAuthenticated)
+            }
+        }else{
+            saveState("isUserAuthenticated",isUserAuthenticatedBoolean)
+        }
+    }, []);
 
     const history = useNavigate ();
     const [data,setData]=useState({});
@@ -27,7 +45,7 @@ function TherapistCardInfo({loading,error,...props}){
         experience:0,
         location:{},
         gender:{},
-        language:{},
+        language:[],
         allRoles:[]
     });
 
@@ -125,20 +143,6 @@ function TherapistCardInfo({loading,error,...props}){
         });
     };
 
-    function handleRemove(id) {
-        removeTherapist(id).then((response)=>{
-            if(response.status===200){
-                saveState("connected",false)
-                history('/dashboard/userDashboard')
-            }
-            else{
-                //Add error on page if user cant be deleted
-                history('/loginBoot');
-            }
-        }).catch((err)=>{
-            history('/loginBoot');
-        });
-    }
 
     return (
         <main id="page-top">
@@ -151,12 +155,12 @@ function TherapistCardInfo({loading,error,...props}){
 
                     <div id="content">
 
-                        <DashboardNav data={data} setUser={props.setUser}/>
+                        <DashboardNav data={data} setUser={props.setUser} setUserAuthenticationState={props.setUserAuthenticationState}/>
 
                         <div className="container-fluid">
 
                             <div className="card-details">
-                                <h3>Card {id} Details</h3>
+                                <h3>Therapist Details</h3>
                                 {/* Other card details */}
                                 <p>Email: {therapistData.email}</p>
                                 <p>Name: {therapistData.name}</p>
@@ -165,7 +169,7 @@ function TherapistCardInfo({loading,error,...props}){
                                 <p>Number: {therapistData.number}</p>
                                 <p>Experience: {therapistData.experience} years</p>
                                 <p>Location: {therapistData.location.location}</p>
-                                <p>Language: {therapistData.language.language}</p>
+                                <p>Language: {therapistData.language.map(lang => lang.language).join(', ')}</p>
                             </div>
                             {!connected ? <button onClick={handleConnection}>Connect</button> :
                                 <p>You already are connected with another therapist.
@@ -214,14 +218,16 @@ const mapStateToProps = ({auth}) => {
     console.log("state ", auth)
     return {
         loading: auth.loading,
-        error: auth.error
+        error: auth.error,
+        isUserAuthenticated: auth.isUserAuthenticated
     }
 }
 const mapDispatchToProps = (dispatch) => {
     return {
         authenticate: () => dispatch(authenticate()),
         setUser: (data) => dispatch(authSuccess(data)),
-        connectionFailure: (message) => dispatch(authFailure(message))
+        connectionFailure: (message) => dispatch(authFailure(message)),
+        setUserAuthenticationState: (boolean) => dispatch(setUserAuthenticationState(boolean))
     }
 }
 export default connect(mapStateToProps, mapDispatchToProps)(TherapistCardInfo);

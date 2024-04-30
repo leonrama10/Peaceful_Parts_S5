@@ -69,10 +69,12 @@ public class AuthController {
             userInfo.setGender(userDetails.getGender());
             userInfo.setLanguage(userDetails.getLanguage());
             userInfo.setUniversity(userDetails.getUniversity());
+            userInfo.setDateOfBirth(userDetails.getDateOfBirth());
         }
         userInfo.setExperience(userDetails.getExperience());
         userInfo.setResetToken(userDetails.getResetToken());
         userInfo.setExpirationTime(userDetails.getExpirationTime());
+        userInfo.setDateAdded(userDetails.getDateAdded());
 
         return userInfo;
     }
@@ -104,9 +106,9 @@ public class AuthController {
         user.setNumber(userDetails.getNumber());
         user.setQuestionnaire(userDetails.getQuestionnaire());
         user.setLocation(userDetails.getQuestionnaire().getLocation());
-        user.setExperience(userDetails.getExperience());
         user.setGender(userDetails.getQuestionnaire().getGender());
         user.setLanguage(userDetails.getQuestionnaire().getLanguage());
+        user.setDateAdded(userDetails.getDateAdded());
         return user;
     }
 
@@ -209,15 +211,15 @@ public class AuthController {
     @GetMapping("/auth/allTherapistInfo")
     public ResponseEntity<?> getAllTherapistInfo(){
         List<UserInfo> therapistInfos = getAllWithRole("ROLE_THERAPIST");
-        List<UserInfo> therapistDataWithDOB = therapistInfos.stream()
-                .map(userInfo -> {
-                    User userDetails = userRepository.findById(userInfo.getId()).orElse(null);
-                    if (userDetails != null && userDetails.getDateOfBirth() != null) {
-                        userInfo.setDateOfBirth(userDetails.getDateOfBirth());
-                    }
-                    return userInfo;
-                })
-                .collect(Collectors.toList());
+//        List<UserInfo> therapistDataWithDOB = therapistInfos.stream()
+//                .map(userInfo -> {
+//                    User userDetails = userRepository.findById(userInfo.getId()).orElse(null);
+//                    if (userDetails != null && userDetails.getDateOfBirth() != null) {
+//                        userInfo.setDateOfBirth(userDetails.getDateOfBirth());
+//                    }
+//                    return userInfo;
+//                })
+//                .collect(Collectors.toList());
 
         return ResponseEntity.ok(therapistInfos);
     }
@@ -360,9 +362,7 @@ public class AuthController {
     }
 
 
-
-
-
+    // Hapi 4: shtoj 6 funskionet prej authService qe i ki bo
 
 
 }

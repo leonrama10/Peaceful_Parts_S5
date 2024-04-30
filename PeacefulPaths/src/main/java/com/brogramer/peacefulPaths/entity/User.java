@@ -5,7 +5,9 @@ import jakarta.validation.constraints.Min;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.Pattern;
 import jakarta.validation.constraints.Size;
+import org.springframework.format.annotation.DateTimeFormat;
 
+import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Date;
@@ -51,12 +53,16 @@ public class User {
     @Column(name = "reset_token")
     private String resetToken;
 
-    @Temporal(TemporalType.DATE)  // Ensures only the date is stored, without time
+    @Temporal(TemporalType.DATE)
     @Column(name = "date_of_birth")
     private Date dateOfBirth;
 
     @Column(name = "expiration_time")
     private Long expirationTime;
+
+    @DateTimeFormat(pattern = "yyyy,MM,dd,HH,mm,ss")
+    @Column(name = "date_added", columnDefinition="TIMESTAMP DEFAULT CURRENT_TIMESTAMP")
+    private LocalDateTime dateAdded;
 
     @Transient
     @Column(name = "token")
@@ -126,6 +132,14 @@ public class User {
         allRoles.add(ROLE_THERAPIST);
         allRoles.add(ROLE_MANAGER);
         return allRoles;
+    }
+
+    public LocalDateTime getDateAdded() {
+        return dateAdded;
+    }
+
+    public void setDateAdded(LocalDateTime dateAdded) {
+        this.dateAdded = dateAdded;
     }
 
     public University getUniversity() {

@@ -1,14 +1,34 @@
-import React,{useState} from 'react';
+import React, {useEffect, useState} from 'react';
 import {fetchUserData, userUpdate} from '../../../api/authService';
 import {Link, useNavigate} from 'react-router-dom';
 import {Container, Row, Col, Form, Button} from 'react-bootstrap';
-import {authenticate, authFailure, authSuccess} from "../../../redux/authActions";
+import {
+    authenticate,
+    authFailure,
+    authSuccess,
+    setAdminAuthenticationState
+} from "../../../redux/authActions";
 import '../../../css/sb-admin-2.min.css';
 import {Alert} from "reactstrap";
 import {connect} from "react-redux";
 import DashboardNav from "../DashboardNav";
 import SideBarAdmin from "../SideBars/SideBarAdmin";
+import {loadState, saveState} from "../../../helper/sessionStorage";
+const isAdminAuthenticatedBoolean = loadState("isAdminAuthenticated",false)
 function AdminProfile({loading,error,...props}){
+
+    useEffect(() => {
+        if(!isAdminAuthenticatedBoolean){
+            if (!props.isAdminAuthenticated){
+                props.loginFailure("Authentication Failed!!!");
+                history('/loginBoot');
+            }else{
+                saveState("isAdminAuthenticated",props.isAdminAuthenticated)
+            }
+        }else{
+            saveState("isAdminAuthenticated",isAdminAuthenticatedBoolean)
+        }
+    }, []);
 
     const history = useNavigate ();
     const [data,setData]=useState({});
@@ -131,7 +151,7 @@ function AdminProfile({loading,error,...props}){
 
                     <div id="content">
 
-                        <DashboardNav data={data} setUser={props.setUser}/>
+                        <DashboardNav data={data} setUser={props.setUser} setAdminAuthenticationState={props.setAdminAuthenticationState}/>
 
                         <div className="container-fluid">
 
@@ -307,15 +327,16 @@ const mapStateToProps = ({auth}) => {
     console.log("state ", auth)
     return {
         loading: auth.loading,
-        error: auth.error
+        error: auth.error,
+        isAdminAuthenticated: auth.isAdminAuthenticated
     }
 }
 const mapDispatchToProps = (dispatch) => {
-
     return {
         authenticate: () => dispatch(authenticate()),
         setUser: (data) => dispatch(authSuccess(data)),
-        loginFailure: (message) => dispatch(authFailure(message))
+        loginFailure: (message) => dispatch(authFailure(message)),
+        setAdminAuthenticationState: (boolean) => dispatch(setAdminAuthenticationState(boolean))
     }
 }
 export default connect(mapStateToProps, mapDispatchToProps)(AdminProfile);

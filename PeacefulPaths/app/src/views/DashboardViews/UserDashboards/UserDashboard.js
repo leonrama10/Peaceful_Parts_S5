@@ -1,4 +1,4 @@
-import React,{useState} from 'react';
+import React, {useEffect, useState} from 'react';
 import {
     fetchAllTherapistData,
     fetchAllTherapistNotConnectedData,
@@ -8,13 +8,32 @@ import {
 import {useNavigate} from 'react-router-dom';
 import '../../../css/sb-admin-2.css';
 import DashboardNav from "../DashboardNav";
-import {authenticate, authFailure, authSuccess} from "../../../redux/authActions";
+import {
+    authenticate,
+    authFailure,
+    authSuccess,
+    setUserAuthenticationState
+} from "../../../redux/authActions";
 import {connect} from "react-redux";
 import SideBarUser from "../SideBars/SideBarUser";
 import TherapistCards from "./TherapistCards";
 import {loadState, saveState} from "../../../helper/sessionStorage";
 let connected = null;
+const isUserAuthenticatedBoolean = loadState("isUserAuthenticated",false)
 function UserDashboard({loading,error,...props}){
+
+    useEffect(() => {
+        if(!isUserAuthenticatedBoolean){
+            if (!props.isUserAuthenticated){
+                props.loginFailure("Authentication Failed!!!");
+                history('/loginBoot');
+            }else{
+                saveState("isUserAuthenticated",props.isUserAuthenticated)
+            }
+        }else{
+            saveState("isUserAuthenticated",isUserAuthenticatedBoolean)
+        }
+    }, []);
 
     const history = useNavigate ();
     const [allUsers, setAllUsers] = useState([]);
@@ -93,7 +112,7 @@ function UserDashboard({loading,error,...props}){
 
                     <div id="content">
 
-                        <DashboardNav data={data} setUser={props.setUser}/>
+                        <DashboardNav data={data} setUser={props.setUser} setUserAuthenticationState={props.setUserAuthenticationState}/>
 
                         <div className="container-fluid">
 
@@ -118,28 +137,6 @@ function UserDashboard({loading,error,...props}){
                 <i className="fas fa-angle-up"></i>
             </a>
 
-            {/*<div className="modal fade" id="logoutModal" tabIndex="-1" role="dialog"*/}
-            {/*     aria-labelledby="exampleModalLabel"*/}
-            {/*     aria-hidden="true">*/}
-            {/*    <div className="modal-dialog" role="document">*/}
-            {/*        <div className="modal-content">*/}
-            {/*            <div className="modal-header">*/}
-            {/*                <h5 className="modal-title" id="exampleModalLabel">Ready to Leave?</h5>*/}
-            {/*                <button className="close" type="button" data-dismiss="modal" aria-label="Close">*/}
-            {/*                    <span aria-hidden="true">×</span>*/}
-            {/*                </button>*/}
-            {/*            </div>*/}
-            {/*            <div className="modal-body">Select "Logout" below if you are ready to end your current*/}
-            {/*                session.*/}
-            {/*            </div>*/}
-            {/*            <div className="modal-footer">*/}
-            {/*                <button className="btn btn-secondary" type="button" data-dismiss="modal">Cancel</button>*/}
-            {/*                <Link className="btn btn-primary" to="/loginBoot">Logout</Link>*/}
-            {/*            </div>*/}
-            {/*        </div>*/}
-            {/*    </div>*/}
-            {/*</div>*/}
-
             <script src="../../../vendor/jquery/jquery.min.js"></script>
             <script src="../../../vendor/bootstrap/js/bootstrap.bundle.min.js"></script>
 
@@ -160,14 +157,16 @@ const mapStateToProps = ({auth}) => {
     console.log("state ", auth)
     return {
         loading: auth.loading,
-        error: auth.error
+        error: auth.error,
+        isUserAuthenticated: auth.isUserAuthenticated
     }
 }
 const mapDispatchToProps = (dispatch) => {
     return {
         authenticate: () => dispatch(authenticate()),
         setUser: (data) => dispatch(authSuccess(data)),
-        loginFailure: (message) => dispatch(authFailure(message))
+        loginFailure: (message) => dispatch(authFailure(message)),
+        setUserAuthenticationState: (boolean) => dispatch(setUserAuthenticationState(boolean))
     }
 }
 export default connect(mapStateToProps, mapDispatchToProps)(UserDashboard);

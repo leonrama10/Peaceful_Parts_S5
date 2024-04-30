@@ -1,4 +1,12 @@
-import {AUTH_REQ,AUTH_SUCCESS,AUTH_FAILURE} from './types';
+import {
+    AUTH_REQ,
+    AUTH_SUCCESS,
+    AUTH_FAILURE,
+    AUTH_STATE,
+    ADMIN_AUTH_STATE,
+    THERAPIST_AUTH_STATE,
+    USER_AUTH_STATE
+} from './types';
 
 export const authenticate=()=>{
     return {
@@ -25,3 +33,23 @@ export const authFailure=(error)=>{
         payload:error
     }
 }
+
+export const setAdminAuthenticationState=(boolean)=>{
+    return {
+        type:ADMIN_AUTH_STATE,
+        payload:boolean
+    }
+}
+export const setTherapistAuthenticationState=(boolean)=>{
+    return {
+        type:THERAPIST_AUTH_STATE,
+        payload:boolean
+    }
+}
+export const setUserAuthenticationState=(boolean)=>{
+    return {
+        type:USER_AUTH_STATE,
+        payload:boolean
+    }
+}
+
