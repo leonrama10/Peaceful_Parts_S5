@@ -1,4 +1,3 @@
-import React from 'react';
 import axios from 'axios';
 
 const getToken=()=>{
@@ -84,8 +83,9 @@ export const fetchAllTherapistData = () => {
 
 export const fetchAllTherapistNotConnectedData = (authRequest) => {
     return axios({
-        method: 'GET',
-        url: `${process.env.hostUrl || 'http://localhost:8080'}/api/auth/fetchAllTherapistNotConnectedData/${authRequest}`,
+        method: 'POST',
+        url: `${process.env.hostUrl || 'http://localhost:8080'}/api/auth/fetchAllTherapistNotConnectedData`,
+        data:authRequest,
         headers: {
             'Authorization': 'Bearer ' + getToken()
         }
@@ -203,8 +203,9 @@ export const fetchAllUsersConnectedDataHistory = (authRequest) => {
 
 export const therapistFilterByGender = (authRequest) => {
     return axios({
-        method: 'GET',
-        url: `${process.env.hostUrl || 'http://localhost:8080'}/api/auth/therapistFilterByGender/${authRequest}`,
+        method: 'POST',
+        url: `${process.env.hostUrl || 'http://localhost:8080'}/api/auth/therapistFilterByGender`,
+        data:authRequest,
         headers: {
             'Authorization': 'Bearer ' + getToken()
         }
@@ -225,8 +226,9 @@ export const therapistFilterByGenderNotConnected = (authRequest) => {
 
 export const therapistFilterByExperience = (authRequest) => {
     return axios({
-        method: 'GET',
-        url: `${process.env.hostUrl || 'http://localhost:8080'}/api/auth/therapistFilterByExperience/${authRequest}`,
+        method: 'POST',
+        url: `${process.env.hostUrl || 'http://localhost:8080'}/api/auth/therapistFilterByExperience`,
+        data:authRequest,
         headers: {
             'Authorization': 'Bearer ' + getToken()
         }
@@ -246,8 +248,9 @@ export const therapistFilterByExperienceNotConnected = (authRequest) => {
 
 export const therapistFilterByLocation = (authRequest) => {
     return axios({
-        method: 'GET',
-        url: `${process.env.hostUrl || 'http://localhost:8080'}/api/auth/therapistFilterByLocation/${authRequest}`,
+        method: 'POST',
+        url: `${process.env.hostUrl || 'http://localhost:8080'}/api/auth/therapistFilterByLocation`,
+        data:authRequest,
         headers: {
             'Authorization': 'Bearer ' + getToken()
         }
@@ -264,6 +267,7 @@ export const therapistFilterByLocationNotConnected = (authRequest) => {
         }
     });
 };
+
 export const therapistFilterByLanguage = (authRequest) => {
     return axios({
         method: 'POST',
@@ -274,47 +278,6 @@ export const therapistFilterByLanguage = (authRequest) => {
         }
     });
 };
-
-
-
-export const therapistFilterByTherapy = (authRequest) => {
-    return axios({
-        method: 'POST',
-        url: `${process.env.hostUrl || 'http://localhost:8080'}/api/auth/therapistFilterByTherapy`,
-        data:authRequest,
-        headers: {
-            'Authorization': 'Bearer ' + getToken()
-        }
-    });
-};
-
-
-
-export const therapistFilterByIdentity = (authRequest) => {
-    return axios({
-        method: 'POST',
-        url: `${process.env.hostUrl || 'http://localhost:8080'}/api/auth/therapistFilterByIdentity`,
-        data:authRequest,
-        headers: {
-            'Authorization': 'Bearer ' + getToken()
-        }
-    });
-};
-
-
-
-export const therapistFilterByTherapistType = (authRequest) => {
-    return axios({
-        method: 'POST',
-        url: `${process.env.hostUrl || 'http://localhost:8080'}/api/auth/therapistFilterByTherapistType`,
-        data:authRequest,
-        headers: {
-            'Authorization': 'Bearer ' + getToken()
-        }
-    });
-};
-
-
 
 export const therapistFilterByLanguageNotConnected = (authRequest) => {
     return axios({
@@ -327,7 +290,71 @@ export const therapistFilterByLanguageNotConnected = (authRequest) => {
     });
 };
 
-//hapi 3: shtoj te 6 funskionet qtu pershtatje url me authController qysh jau len
+export const therapistFilterByTherapyType = (authRequest) => {
+    return axios({
+        method: 'POST',
+        url: `${process.env.hostUrl || 'http://localhost:8080'}/api/auth/therapistFilterByTherapy`,
+        data:authRequest,
+        headers: {
+            'Authorization': 'Bearer ' + getToken()
+        }
+    });
+};
+
+export const therapistFilterByTherapyTypeNotConnected = (authRequest) => {
+    return axios({
+        method: 'POST',
+        url: `${process.env.hostUrl || 'http://localhost:8080'}/api/auth/therapistFilterByTherapyNotConnected`,
+        data:authRequest,
+        headers: {
+            'Authorization': 'Bearer ' + getToken()
+        }
+    });
+};
+
+export const therapistFilterByIdentityType = (authRequest) => {
+    return axios({
+        method: 'POST',
+        url: `${process.env.hostUrl || 'http://localhost:8080'}/api/auth/therapistFilterByIdentityType`,
+        data:authRequest,
+        headers: {
+            'Authorization': 'Bearer ' + getToken()
+        }
+    });
+};
+
+export const therapistFilterByIdentityTypeNotConnected = (authRequest) => {
+    return axios({
+        method: 'POST',
+        url: `${process.env.hostUrl || 'http://localhost:8080'}/api/auth/therapistFilterByIdentityTypeNotConnected`,
+        data:authRequest,
+        headers: {
+            'Authorization': 'Bearer ' + getToken()
+        }
+    });
+};
+
+export const therapistFilterByTherapistType = (authRequest) => {
+    return axios({
+        method: 'POST',
+        url: `${process.env.hostUrl || 'http://localhost:8080'}/api/auth/therapistFilterByTherapistType`,
+        data:authRequest,
+        headers: {
+            'Authorization': 'Bearer ' + getToken()
+        }
+    });
+};
+
+export const therapistFilterByTherapistTypeNotConnected = (authRequest) => {
+    return axios({
+        method: 'POST',
+        url: `${process.env.hostUrl || 'http://localhost:8080'}/api/auth/therapistFilterByTherapistTypeNotConnected`,
+        data:authRequest,
+        headers: {
+            'Authorization': 'Bearer ' + getToken()
+        }
+    });
+};
 
 export const questionnaireAnswers = (authRequest) => {
     return axios({
@@ -337,5 +364,25 @@ export const questionnaireAnswers = (authRequest) => {
     });
 };
 
+export const therapistFilterByGetStarted = (authRequest) => {
+    return axios({
+        method: 'POST',
+        url: `${process.env.hostUrl || 'http://localhost:8080'}/api/auth/therapistFilterByGetStarted`,
+        data:authRequest,
+        headers: {
+            'Authorization': 'Bearer ' + getToken()
+        }
+    });
+};
 
+export const therapistFilterByGetStartedNotConnectedData = (authRequest) => {
+    return axios({
+        method: 'POST',
+        url: `${process.env.hostUrl || 'http://localhost:8080'}/api/auth/therapistFilterByGetStartedNotConnectedData`,
+        data:authRequest,
+        headers: {
+            'Authorization': 'Bearer ' + getToken()
+        }
+    });
+};
 

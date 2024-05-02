@@ -12,14 +12,16 @@ public class Questionnaire {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
-    @Column(name = "therapy_type")
-    private String therapyType;
+    @ManyToOne
+    @JoinColumn(name = "therapy_type_id")
+    private TherapyType therapyType;
 
     @Column(name = "age")
     private int age;
 
-    @Column(name = "identity")
-    private String identity;
+    @ManyToOne
+    @JoinColumn(name = "identity_type_id")
+    private IdentityType identityType;
 
     @Column(name = "relationship_status")
     private String relationshipStatus;
@@ -33,11 +35,13 @@ public class Questionnaire {
     @Column(name = "communication")
     private String communication;
 
-    @Column(name = "therapist_gender")
-    private String therapistGender;
+    @ManyToOne
+    @JoinColumn(name = "therapist_gender")
+    private Gender therapistGender;
 
-    @Column(name = "therapist_expectations")
-    private String therapistExpectations;
+    @ManyToOne
+    @JoinColumn(name = "therapist_type_id")
+    private TherapistType therapistType;
 
     @Column(name = "current_physical_health")
     private String currentPhysicalHealth;
@@ -71,11 +75,11 @@ public class Questionnaire {
         this.id = id;
     }
 
-    public String getTherapyType() {
+    public TherapyType getTherapyType() {
         return therapyType;
     }
 
-    public void setTherapyType(String therapyType) {
+    public void setTherapyType(TherapyType therapyType) {
         this.therapyType = therapyType;
     }
 
@@ -87,12 +91,12 @@ public class Questionnaire {
         this.age = age;
     }
 
-    public String getIdentity() {
-        return identity;
+    public IdentityType getIdentityType() {
+        return identityType;
     }
 
-    public void setIdentity(String identity) {
-        this.identity = identity;
+    public void setIdentityType(IdentityType identityType) {
+        this.identityType = identityType;
     }
 
     public String getRelationshipStatus() {
@@ -127,20 +131,20 @@ public class Questionnaire {
         this.communication = communication;
     }
 
-    public String getTherapistGender() {
+    public Gender getTherapistGender() {
         return therapistGender;
     }
 
-    public void setTherapistGender(String therapistGender) {
+    public void setTherapistGender(Gender therapistGender) {
         this.therapistGender = therapistGender;
     }
 
-    public String getTherapistExpectations() {
-        return therapistExpectations;
+    public TherapistType getTherapistType() {
+        return therapistType;
     }
 
-    public void setTherapistExpectations(String therapistExpectations) {
-        this.therapistExpectations = therapistExpectations;
+    public void setTherapistType(TherapistType therapistType) {
+        this.therapistType = therapistType;
     }
 
     public String getCurrentPhysicalHealth() {

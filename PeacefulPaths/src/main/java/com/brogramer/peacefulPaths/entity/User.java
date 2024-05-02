@@ -96,6 +96,11 @@ public class User {
     @JoinColumn(name = "university_id")
     private University university;
 
+    @ManyToOne
+    @JoinColumn(name = "therapist_info_id")
+    private TherapistInfo therapistInfo;
+
+
     @Transient
     private List<Roles> allRoles = new ArrayList<>();
 
@@ -105,7 +110,7 @@ public class User {
 
     public User() {}
 
-    public User(int id, String name, String surname, String email, String number, int experience, String password, String confirmPassword, String resetToken, Long expirationTime, String token, Collection<Roles> roles, Questionnaire questionnaire, Collection<Language> language, Location location, Gender gender, University university,Date dateOfBirth, List<Roles> allRoles) {
+    public User(int id, String name, String surname, String email, String number, int experience, String password, String confirmPassword, String resetToken, Date dateOfBirth, Long expirationTime, LocalDateTime dateAdded, String token, Collection<Roles> roles, Questionnaire questionnaire, Collection<Language> language, Location location, Gender gender, University university, TherapistInfo therapistInfo, List<Roles> allRoles) {
         this.id = id;
         this.name = name;
         this.surname = surname;
@@ -115,7 +120,9 @@ public class User {
         this.password = password;
         this.confirmPassword = confirmPassword;
         this.resetToken = resetToken;
+        this.dateOfBirth = dateOfBirth;
         this.expirationTime = expirationTime;
+        this.dateAdded = dateAdded;
         this.token = token;
         this.roles = roles;
         this.questionnaire = questionnaire;
@@ -123,8 +130,8 @@ public class User {
         this.location = location;
         this.gender = gender;
         this.university = university;
+        this.therapistInfo = therapistInfo;
         this.allRoles = allRoles;
-        this.dateOfBirth = dateOfBirth;
     }
 
     public List<Roles> getAllRoles() {
@@ -132,6 +139,14 @@ public class User {
         allRoles.add(ROLE_THERAPIST);
         allRoles.add(ROLE_MANAGER);
         return allRoles;
+    }
+
+    public TherapistInfo getTherapistInfo() {
+        return therapistInfo;
+    }
+
+    public void setTherapistInfo(TherapistInfo therapistInfo) {
+        this.therapistInfo = therapistInfo;
     }
 
     public LocalDateTime getDateAdded() {

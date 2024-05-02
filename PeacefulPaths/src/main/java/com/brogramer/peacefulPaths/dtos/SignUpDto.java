@@ -29,13 +29,8 @@ public class SignUpDto {
     private String password;
 
     private int experience;
+
     private Date dateOfBirth;
-    public Date getDateOfBirth() {
-        return dateOfBirth;
-    }
-    public void setDateOfBirth(Date dateOfBirth) {
-        this.dateOfBirth = dateOfBirth;
-    }
 
     private String number;
 
@@ -48,6 +43,28 @@ public class SignUpDto {
     private University university;
 
     private Questionnaire questionnaire;
+
+    private ArrayList<TherapistType> therapistType;
+
+    private ArrayList<TherapyType> therapyType;
+
+    private ArrayList<IdentityType> identityType;
+
+    public ArrayList<TherapistType> getTherapistType() {
+        return therapistType;
+    }
+
+    public ArrayList<TherapyType> getTherapyType() {
+        return therapyType;
+    }
+
+    public ArrayList<IdentityType> getIdentityType() {
+        return identityType;
+    }
+
+    public Date getDateOfBirth() {
+        return dateOfBirth;
+    }
 
     public ArrayList<Language> getLanguage() {
         return language;

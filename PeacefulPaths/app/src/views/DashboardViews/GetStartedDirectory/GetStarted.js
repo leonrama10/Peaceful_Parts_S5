@@ -15,13 +15,13 @@ function GetStarted({loading,error,...props}){
         therapyType: '',
         gender: null,
         age: null,
-        identity: '',
+        identityType: '',
         relationshipStatus: '',
         therapyHistory: '',
         medicationHistory: '',
         communication: '',
         therapistGender: '',
-        therapistExpectations: '',
+        therapistType: '',
         currentPhysicalHealth: '',
         mentalState1: '',
         mentalState2: '',
@@ -142,7 +142,7 @@ function GetStarted({loading,error,...props}){
                         { text: "Listens"},
                         { text: "Explores my past" },
                         { text: "Teaches me new skills" },
-                         { text: "I don't now" },
+                         { text: "I don't know" },
                       ],
                       answerMethod: "button"
                  },
@@ -202,6 +202,11 @@ function GetStarted({loading,error,...props}){
         'Female': 2
     };
 
+    const therapistGenderToId = {
+        'Male therapist': 1,
+        'Female therapist': 2
+    };
+
     const locationToId = {
         'Kosovo': 1,
         'Albania': 2,
@@ -215,14 +220,36 @@ function GetStarted({loading,error,...props}){
         'English': 2,
         'Serbian': 3
     };
+
+    const therapyTypeToId = {
+        'Individual (for myself)': 1,
+        'Couples (for myself and my partner)': 2,
+        'Teen (for my child)': 3
+    };
+
+    const identityTypeToId = {
+        'Straight': 1,
+        'Gay': 2,
+        'Lesbian': 3,
+        'Prefer not to say': 4
+    };
+
+    const therapistTypeToId = {
+        'Listens': 1,
+        'Explores my past': 2,
+        'Teaches me new skills': 3,
+        "I don't know": 4
+    };
+
     const [currentQuestion, setCurrentQuestion] = useState(0);
     const [isQuizOver, setIsQuizOver] = useState(false);
     const [questionnaire, setQuestionnaire] = useState({});
     const [getStartedFinished, setGetStartedFinished] = useState(false);
     const [questionIndex, setQuestionIndex] = useState(0);
-    const properties = ['therapyType', 'gender', 'age', 'identity', 'relationshipStatus', 'therapyHistory', 'medicationHistory', 'communication', 'therapistGender', 'therapistExpectations', 'currentPhysicalHealth', 'mentalState1', 'mentalState2', 'location', 'language'];
+    const properties = ['therapyType', 'gender', 'age', 'identityType', 'relationshipStatus', 'therapyHistory', 'medicationHistory', 'communication', 'therapistGender', 'therapistType', 'currentPhysicalHealth', 'mentalState1', 'mentalState2', 'location', 'language'];
 
     React.useEffect(() => {
+        console.log("LALAAAAAAAAAAAAAAAAA",selectedAnswer)
         if (questionIndex >= questions.length) {
                 questionnaireAnswers(selectedAnswer).then((response)=>{
                     if(response.status===200){
@@ -233,7 +260,6 @@ function GetStarted({loading,error,...props}){
                     else{
                         console.log('Something LEKAAAAAAA!Please Try Again');
                     }
-
                 }).catch((err)=>{
 
                     if(err && err.response){
@@ -265,6 +291,14 @@ function GetStarted({loading,error,...props}){
             value = locationToId[answer];
         }else if (property === 'gender') {
             value = genderToId[answer];
+        }else if (property === 'therapistGender') {
+            value = therapistGenderToId[answer];
+        }else if (property === 'therapyType') {
+            value = therapyTypeToId[answer];
+        }else if (property === 'identityType') {
+            value = identityTypeToId[answer];
+        }else if (property === 'therapistType') {
+            value = therapistTypeToId[answer];
         }
 
         setSelectedAnswer(prevAnswers => ({ ...prevAnswers, [property]: value }));

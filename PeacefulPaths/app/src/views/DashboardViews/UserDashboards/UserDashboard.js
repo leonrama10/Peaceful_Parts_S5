@@ -3,7 +3,7 @@ import {
     fetchAllTherapistData,
     fetchAllTherapistNotConnectedData,
     fetchUserData,
-    fetchUserTherapistConnectionData
+    fetchUserTherapistConnectionData, therapistFilterByGetStarted, therapistFilterByGetStartedNotConnectedData
 } from '../../../api/authService';
 import {useNavigate} from 'react-router-dom';
 import '../../../css/sb-admin-2.css';
@@ -48,7 +48,9 @@ function UserDashboard({loading,error,...props}){
         fetchUserData().then((response) => {
             if (response.data.roles.at(0).role === 'ROLE_USER') {
                 setData(response.data);
-
+                const newFilterUserData = {
+                    userId:response.data.id
+                };
                 fetchUserTherapistConnectionData(response.data.id).then((response) => {
                     if (response.data.roles.at(0).role === 'ROLE_THERAPIST') {
                         setTherapistData({
@@ -62,7 +64,11 @@ function UserDashboard({loading,error,...props}){
                         }
 
                         if(!hideTherapists){
-                            fetchAllTherapistNotConnectedData(response.data.id).then((response)=>{
+                            const newFilterData = {
+                                therapistId: response.data.id,
+                                userId:newFilterUserData.userId
+                            };
+                            therapistFilterByGetStartedNotConnectedData(newFilterData).then((response)=>{
                                 setAllUsers(response.data)
                             }).catch((e)=>{
                                 history('/loginBoot');
@@ -73,11 +79,11 @@ function UserDashboard({loading,error,...props}){
                         history('/loginBoot');
                     }
                 }).catch((e) => {
-                        fetchAllTherapistData().then((response)=>{
-                            setAllUsers(response.data)
-                        }).catch((e)=>{
-                            history('/loginBoot');
-                        })
+                    therapistFilterByGetStarted(newFilterUserData).then((response)=>{
+                        setAllUsers(response.data)
+                    }).catch((e)=>{
+                        history('/loginBoot');
+                    })
                     connected = loadState("connected",false)
                     if (e.response) {
                         // The request was made and the server responded with a status code

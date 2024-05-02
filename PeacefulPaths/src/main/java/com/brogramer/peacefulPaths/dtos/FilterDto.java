@@ -12,10 +12,14 @@ import lombok.NoArgsConstructor;
 public class FilterDto {
 
     private int therapistId;
+    private int userId;
     private int experience;
     private String gender;
     private String location;
     private String language;
+    private String therapyType;
+    private String identityType;
+    private String therapistType;
 
     public String getLocation() {
         return location;
@@ -41,6 +45,18 @@ public class FilterDto {
         this.therapistId = therapistId;
     }
 
+    public int getUserId() {
+        return userId;
+    }
+
+    public void setUserId(int userId) {
+        this.userId = userId;
+    }
+
+    public void setLanguage(String language) {
+        this.language = language;
+    }
+
     public String getGender() {
         return gender;
     }
@@ -51,5 +67,17 @@ public class FilterDto {
 
     public String getLanguage() {
         return language;
+    }
+
+    public String getTherapyType() {
+        return therapyType;
+    }
+
+    public String getIdentityType() {
+        return identityType;
+    }
+
+    public String getTherapistType() {
+        return therapistType;
     }
 }

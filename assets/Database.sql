@@ -61,26 +61,162 @@ VALUES
 ('AAB'), ('UBT'), ('KAKTUS'), ('UNIVERSITETI I PRISHTINES');
 
 SET FOREIGN_KEY_CHECKS = 0;
+DROP TABLE IF EXISTS `therapy_type`;
+SET FOREIGN_KEY_CHECKS = 1;
+CREATE TABLE `therapy_type` (
+  `id` int(11) NOT NULL AUTO_INCREMENT,
+  `therapy_type` varchar(35) NOT NULL,
+  PRIMARY KEY (`id`)
+) AUTO_INCREMENT=1;
+
+INSERT INTO `therapy_type` (`therapy_type`)
+VALUES
+('Individual'), ('Couples'), ('Teen');
+
+SET FOREIGN_KEY_CHECKS = 0;
+DROP TABLE IF EXISTS `identity_type`;
+SET FOREIGN_KEY_CHECKS = 1;
+CREATE TABLE `identity_type` (
+  `id` int(11) NOT NULL AUTO_INCREMENT,
+  `identity_type` varchar(35) NOT NULL,
+  PRIMARY KEY (`id`)
+) AUTO_INCREMENT=1;
+
+INSERT INTO `identity_type` (`identity_type`)
+VALUES
+('Straight'), ('Gay'), ('Lesbian'),('Prefer not to say');
+
+SET FOREIGN_KEY_CHECKS = 0;
+DROP TABLE IF EXISTS `therapist_type`;
+SET FOREIGN_KEY_CHECKS = 1;
+CREATE TABLE `therapist_type` (
+  `id` int(11) NOT NULL AUTO_INCREMENT,
+  `therapist_type` varchar(35) NOT NULL,
+  PRIMARY KEY (`id`)
+) AUTO_INCREMENT=1;
+
+INSERT INTO `therapist_type` (`therapist_type`)
+VALUES
+('Listens'), ('ExploresPast'), ('TeachesSkills'),('I dont know');
+
+SET FOREIGN_KEY_CHECKS = 0;
+DROP TABLE IF EXISTS `therapist_info`;
+SET FOREIGN_KEY_CHECKS = 1;
+CREATE TABLE `therapist_info` (
+    `id` INT AUTO_INCREMENT,
+    PRIMARY KEY (`id`)
+) AUTO_INCREMENT=1;
+
+INSERT INTO `therapist_info` (`id`)
+VALUES
+(1), (2);
+
+SET FOREIGN_KEY_CHECKS = 0;
+DROP TABLE IF EXISTS `therapist_info_therapy_type`;
+SET FOREIGN_KEY_CHECKS = 1;
+
+CREATE TABLE `therapist_info_therapy_type` (
+  `therapist_info_id` int(11) NOT NULL,
+  `therapy_type_id` int(11) NOT NULL,
+  
+  PRIMARY KEY (`therapist_info_id`,`therapy_type_id`),
+  
+  KEY `FK_THERAPY_TYPE_idx` (`therapy_type_id`),
+  
+  CONSTRAINT `FK_THERAPIST_INFO_THERAPY_TYPE` FOREIGN KEY (`therapist_info_id`) 
+  REFERENCES `therapist_info` (`id`) 
+  ON DELETE CASCADE ON UPDATE CASCADE,
+  
+  CONSTRAINT `FK_THERAPY_TYPE_THERAPIST_INFO` FOREIGN KEY (`therapy_type_id`) 
+  REFERENCES `therapy_type` (`id`) 
+  ON DELETE CASCADE ON UPDATE CASCADE
+) ENGINE=InnoDB DEFAULT CHARSET=latin1;
+
+INSERT INTO `therapist_info_therapy_type` (therapist_info_id,therapy_type_id)
+VALUES 
+(1, 1),
+(1, 2),
+(2, 3);
+
+SET FOREIGN_KEY_CHECKS = 0;
+DROP TABLE IF EXISTS `therapist_info_identity_type`;
+SET FOREIGN_KEY_CHECKS = 1;
+
+CREATE TABLE `therapist_info_identity_type` (
+  `therapist_info_id` int(11) NOT NULL,
+  `identity_type_id` int(11) NOT NULL,
+  
+  PRIMARY KEY (`therapist_info_id`,`identity_type_id`),
+  
+  KEY `FK_IDENTITY_TYPE_idx` (`identity_type_id`),
+  
+  CONSTRAINT `FK_THERAPIST_INFO_IDENTITY_TYPE` FOREIGN KEY (`therapist_info_id`) 
+  REFERENCES `therapist_info` (`id`) 
+  ON DELETE CASCADE ON UPDATE CASCADE,
+  
+  CONSTRAINT `FK_IDENTITY_TYPE_THERAPIST_INFO` FOREIGN KEY (`identity_type_id`) 
+  REFERENCES `identity_type` (`id`) 
+  ON DELETE CASCADE ON UPDATE CASCADE
+) ENGINE=InnoDB DEFAULT CHARSET=latin1;
+
+INSERT INTO `therapist_info_identity_type` (therapist_info_id,identity_type_id)
+VALUES 
+(1, 1),
+(1, 2),
+(2, 3);
+
+SET FOREIGN_KEY_CHECKS = 0;
+DROP TABLE IF EXISTS `therapist_info_therapist_type`;
+SET FOREIGN_KEY_CHECKS = 1;
+
+CREATE TABLE `therapist_info_therapist_type` (
+  `therapist_info_id` int(11) NOT NULL,
+  `therapist_type_id` int(11) NOT NULL,
+  
+  PRIMARY KEY (`therapist_info_id`,`therapist_type_id`),
+  
+  KEY `FK_IDENTITY_TYPE_idx` (`therapist_type_id`),
+  
+  CONSTRAINT `FK_THERAPIST_INFO_THERAPIST_TYPE` FOREIGN KEY (`therapist_info_id`) 
+  REFERENCES `therapist_info` (`id`) 
+  ON DELETE CASCADE ON UPDATE CASCADE,
+  
+  CONSTRAINT `FK_THERAPIST_TYPE_THERAPIST_INFO` FOREIGN KEY (`therapist_type_id`) 
+  REFERENCES `therapist_type` (`id`) 
+  ON DELETE CASCADE ON UPDATE CASCADE
+) ENGINE=InnoDB DEFAULT CHARSET=latin1;
+
+INSERT INTO `therapist_info_therapist_type` (therapist_info_id,therapist_type_id)
+VALUES 
+(1, 1),
+(1, 2),
+(2, 3);
+
+SET FOREIGN_KEY_CHECKS = 0;
 DROP TABLE IF EXISTS `questionnaire`;
 SET FOREIGN_KEY_CHECKS = 1;
 CREATE TABLE `questionnaire` (
     `id` INT AUTO_INCREMENT,
-    `therapy_type` VARCHAR(255),
+    `therapy_type_id`  int(11),
     `gender_id` int(11),
     `age` int(2),
-    `identity` VARCHAR(255),
+    `identity_type_id`int(11),
     `relationship_status` VARCHAR(255),
     `therapy_history` VARCHAR(255),
     `medication_history` VARCHAR(255),
     `communication` VARCHAR(255),
-    `therapist_gender` VARCHAR(255),
-    `therapist_expectations` VARCHAR(255),
+    `therapist_gender` int(11),
+    `therapist_type_id` int(11),
     `current_physical_health` VARCHAR(255),
     `mental_state_1` VARCHAR(255),
     `mental_state_2` VARCHAR(255),
     `location_id` int(11),
     PRIMARY KEY (`id`),
     FOREIGN KEY (`gender_id`) REFERENCES `gender`(`id`) ON DELETE CASCADE on update cascade,
+    FOREIGN KEY (`identity_type_id`) REFERENCES `identity_type`(`id`) ON DELETE CASCADE on update cascade,
+    FOREIGN KEY (`therapy_type_id`) REFERENCES `therapy_type`(`id`) ON DELETE CASCADE on update cascade,
+    FOREIGN KEY (`therapist_type_id`) REFERENCES `therapist_type`(`id`) ON DELETE CASCADE on update cascade,
+    FOREIGN KEY (`therapist_gender`) REFERENCES `gender`(`id`) ON DELETE CASCADE on update cascade,
     FOREIGN KEY (`location_id`) REFERENCES `location`(`id`) ON DELETE CASCADE on update cascade
 ) AUTO_INCREMENT=1;
 
@@ -96,22 +232,29 @@ CREATE TABLE `user` (
   `expiration_time` long,
   `password` char(68) NOT NULL,
   `questionnaire_id` int(11),
+  `therapist_info_id` int(11),
   `location_id` int(11),
   `gender_id` int(11),
   `university_id` int(11),
   `date_added` TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
   PRIMARY KEY (`id`),
   FOREIGN KEY (`questionnaire_id`) REFERENCES `questionnaire`(`id`) ON DELETE CASCADE on update cascade,
+  FOREIGN KEY (`therapist_info_id`) REFERENCES `therapist_info`(`id`) ON DELETE CASCADE on update cascade,
   FOREIGN KEY (`gender_id`) REFERENCES `gender`(`id`) ON DELETE CASCADE on update cascade,
   FOREIGN KEY (`location_id`) REFERENCES `location`(`id`) ON DELETE CASCADE on update cascade,
   FOREIGN KEY (`university_id`) REFERENCES `university`(`id`) ON DELETE CASCADE on update cascade
 ) AUTO_INCREMENT=1;
 
+-- Admin-- 
 INSERT INTO `user` (`name`, `surname`, `email`, `number`, `experience`, `password`, `reset_token`, `expiration_time`, `location_id`, `gender_id`, `university_id`, `date_of_birth`)
 VALUES
-('Leke', 'Markaj', 'markaj.leka@gmail.com', '044806543', 20, '$2a$10$lAZ7fMTXoALYWY.C4rAs7u7Bdzz4qd7SIwAkWNOX5XQkTRe7vo4P.', NULL, 0, 1, 1, 1, '1992-05-15'),
-('Loren', 'Markaj', 'markaj.loren@gmail.com', '044333333', 1, '$2a$10$lAZ7fMTXoALYWY.C4rAs7u7Bdzz4qd7SIwAkWNOX5XQkTRe7vo4P.', NULL, 0, 1, 1, 1, '1995-08-20'),
-('Leon', 'Markaj', 'markaj.leon@gmail.com', '044111111', 15, '$2a$10$lAZ7fMTXoALYWY.C4rAs7u7Bdzz4qd7SIwAkWNOX5XQkTRe7vo4P.', NULL, 0, 1, 1, 1, '1988-03-10');
+('Leke', 'Markaj', 'markaj.leka@gmail.com', '044806543', 20, '$2a$10$lAZ7fMTXoALYWY.C4rAs7u7Bdzz4qd7SIwAkWNOX5XQkTRe7vo4P.', NULL, 0, 1, 1, 1, '1992-05-15');
+
+-- Therapist -- 
+INSERT INTO `user` (`name`, `surname`, `email`, `number`, `experience`, `password`, `reset_token`, `expiration_time`, `location_id`, `gender_id`, `university_id`, `date_of_birth`,`therapist_info_id`)
+VALUES
+('Loren', 'Markaj', 'markaj.loren@gmail.com', '044333333', 1, '$2a$10$lAZ7fMTXoALYWY.C4rAs7u7Bdzz4qd7SIwAkWNOX5XQkTRe7vo4P.', NULL, 0, 1, 1, 1, '1995-08-20',1),
+('Leon', 'Markaj', 'markaj.leon@gmail.com', '044111111', 15, '$2a$10$lAZ7fMTXoALYWY.C4rAs7u7Bdzz4qd7SIwAkWNOX5XQkTRe7vo4P.', NULL, 0, 2, 2, 2, '1988-03-10',2);
 
 CREATE TABLE `roles` (
   `id` int(11) NOT NULL AUTO_INCREMENT, 

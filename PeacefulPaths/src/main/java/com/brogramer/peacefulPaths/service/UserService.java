@@ -1,16 +1,11 @@
 package com.brogramer.peacefulPaths.service;
 
-import com.brogramer.peacefulPaths.dao.QuestionnaireRepository;
-import com.brogramer.peacefulPaths.dao.RoleDao;
-import com.brogramer.peacefulPaths.dao.TherapistRepository;
-import com.brogramer.peacefulPaths.dao.UserDao;
+import com.brogramer.peacefulPaths.dao.*;
 import com.brogramer.peacefulPaths.dtos.CredentialsDto;
+import com.brogramer.peacefulPaths.dtos.FilterDto;
 import com.brogramer.peacefulPaths.dtos.SignUpDto;
 import com.brogramer.peacefulPaths.dtos.UserDto;
-import com.brogramer.peacefulPaths.entity.CustomUserDetails;
-import com.brogramer.peacefulPaths.entity.Questionnaire;
-import com.brogramer.peacefulPaths.entity.Roles;
-import com.brogramer.peacefulPaths.entity.User;
+import com.brogramer.peacefulPaths.entity.*;
 import com.brogramer.peacefulPaths.exceptions.AppException;
 import jakarta.mail.MessagingException;
 import jakarta.mail.internet.MimeMessage;
@@ -36,6 +31,7 @@ public class UserService implements UserDetailsService {
 
     private final TherapistRepository userRepository;
     private final QuestionnaireRepository questionnaireRepository;
+    private final TherapistInfoRepository therapistInfoRepository;
     private final RoleDao roleDao;
     private final PasswordEncoder passwordEncoder;
     private final UserDao userDao;
@@ -43,12 +39,13 @@ public class UserService implements UserDetailsService {
     @Autowired
     private JavaMailSender javaMailSender;
 
-    public UserService(TherapistRepository userRepository, PasswordEncoder passwordEncoder,RoleDao roleDao,UserDao userDao,QuestionnaireRepository questionnaireRepository) {
+    public UserService(TherapistRepository userRepository, PasswordEncoder passwordEncoder,RoleDao roleDao,UserDao userDao,QuestionnaireRepository questionnaireRepository,TherapistInfoRepository therapistInfoRepository) {
         this.userRepository = userRepository;
         this.passwordEncoder = passwordEncoder;
         this.roleDao = roleDao;
         this.userDao = userDao;
         this.questionnaireRepository = questionnaireRepository;
+        this.therapistInfoRepository = therapistInfoRepository;
     }
 
     public List<User> findAllByRole(String role) {
@@ -169,15 +166,12 @@ public class UserService implements UserDetailsService {
         return questionnaire;
     }
 
-    // hapi 4: userService registerAdmin
     public UserDto registerTherapist(SignUpDto userDto) {
-        // Check if the user (therapist) already exists based on email
         Optional<User> optionalUser = userRepository.findByEmail(userDto.getEmail());
         if (optionalUser.isPresent()) {
             throw new AppException("Login already exists", HttpStatus.BAD_REQUEST);
         }
 
-        // Create a new User entity for the therapist
         User user = new User();
         user.setEmail(userDto.getEmail());
         user.setNumber(userDto.getNumber());
@@ -187,23 +181,25 @@ public class UserService implements UserDetailsService {
         user.setDateOfBirth(userDto.getDateOfBirth());
         LocalDateTime localDateTime = LocalDateTime.now();
         user.setDateAdded(localDateTime);
-        // Encode the password
         user.setPassword(passwordEncoder.encode(CharBuffer.wrap(userDto.getPassword())));
-        // Set gender and university from the DTO
         user.setGender(userDto.getGender());
         user.setUniversity(userDto.getUniversity());
         user.setLocation(userDto.getLocation());
         user.setLanguage(userDto.getLanguage());
-
-        // Assign the ROLE_THERAPIST to this user
         Collection<Roles> roles = new ArrayList<>();
         roles.add(roleDao.findRoleByName("ROLE_THERAPIST"));
         user.setRoles(roles);
+        TherapistInfo therapistInfo = new TherapistInfo();
+        therapistInfo.setTherapistType(userDto.getTherapistType());
+        therapistInfo.setTherapyType(userDto.getTherapyType());
+        therapistInfo.setIdentityType(userDto.getIdentityType());
 
-        // Save the new therapist user to the database
+        therapistInfoRepository.save(therapistInfo);
+
+        user.setTherapistInfo(therapistInfo);
+
         User savedUser = userRepository.save(user);
 
-        // Create and return a DTO for the saved user
         UserDto userDtoResult = new UserDto();
         userDtoResult.setEmail(savedUser.getEmail());
         userDtoResult.setId(savedUser.getId());
@@ -488,12 +484,14 @@ public class UserService implements UserDetailsService {
 
         return new ArrayList<>(therapists);
     }
+
     public Collection<User> findAllTherapistsByLanguage(String language) {
         Collection<Roles> roles = new ArrayList<>();
         roles.add(roleDao.findRoleByName("ROLE_THERAPIST"));
 
         Collection<User> therapists = new ArrayList<>();
         List<User> users = userRepository.findAllByRolesIn(roles);
+
         for (User user : users) {
             if (user.getLanguage() != null &&
                     user.getLanguage().stream()
@@ -506,19 +504,46 @@ public class UserService implements UserDetailsService {
     }
 
 
+    public Collection<User> findAllTherapistsByGetStarted(int userId) {
+        Collection<Roles> roles = new ArrayList<>();
+        roles.add(roleDao.findRoleByName("ROLE_THERAPIST"));
 
+        Collection<User> therapists = new ArrayList<>();
+        List<User> theTherapists = userRepository.findAllByRolesIn(roles);
 
+        Optional<User> optionalUser = userRepository.findById(userId);
 
-    public Collection<User> findAllTherapistsByTherapy(String therapy) {
+        if (optionalUser.isPresent()) {
+            User user = optionalUser.get();
+            for (User therapist : theTherapists) {
+                if (therapist.getGender().getGender().equals(user.getQuestionnaire().getTherapistGender().getGender())) {
+                    if (therapist.getTherapistInfo().getTherapyType().stream()
+                            .anyMatch(type -> type.getTherapyType().equals(user.getQuestionnaire().getTherapyType().getTherapyType()))){
+                        if (therapist.getTherapistInfo().getIdentityType().stream()
+                                .anyMatch(type -> type.getIdentityType().equals(user.getQuestionnaire().getIdentityType().getIdentityType()))){
+                            if (therapist.getTherapistInfo().getTherapistType().stream()
+                                    .anyMatch(type -> type.getTherapistType().equals(user.getQuestionnaire().getTherapistType().getTherapistType()))){
+                                therapists.add(therapist);
+                            }
+                        }
+                    }
+                }
+            }
+        }
+
+        return new ArrayList<>(therapists);
+    }
+
+    public Collection<User> findAllTherapistsByTherapyType(String therapyType) {
         Collection<Roles> roles = new ArrayList<>();
         roles.add(roleDao.findRoleByName("ROLE_THERAPIST"));
 
         Collection<User> therapists = new ArrayList<>();
         List<User> users = userRepository.findAllByRolesIn(roles);
         for (User user : users) {
-            if (user.getTherapy() != null &&
-                    user.getTherapy().stream()
-                            .anyMatch(lang -> lang.getTherapy().equals(Therapy))) {
+            if (user.getTherapistInfo().getTherapyType() != null &&
+                    user.getTherapistInfo().getTherapyType().stream()
+                            .anyMatch(type -> type.getTherapyType().equals(therapyType))) {
                 therapists.add(user);
             }
         }
@@ -526,16 +551,16 @@ public class UserService implements UserDetailsService {
         return new ArrayList<>(therapists);
     }
 
-    public Collection<User> findAllTherapistsByIdentity(String identity) {
+    public Collection<User> findAllTherapistsByIdentityType(String identityType) {
         Collection<Roles> roles = new ArrayList<>();
         roles.add(roleDao.findRoleByName("ROLE_THERAPIST"));
 
         Collection<User> therapists = new ArrayList<>();
         List<User> users = userRepository.findAllByRolesIn(roles);
         for (User user : users) {
-            if (user.getIdentity() != null &&
-                    user.getIdentity().stream()
-                            .anyMatch(lang -> lang.getIdentity().equals(Identity))) {
+            if (user.getTherapistInfo().getIdentityType() != null &&
+                    user.getTherapistInfo().getIdentityType().stream()
+                            .anyMatch(type -> type.getIdentityType().equals(identityType))) {
                 therapists.add(user);
             }
         }
@@ -550,17 +575,13 @@ public class UserService implements UserDetailsService {
         Collection<User> therapists = new ArrayList<>();
         List<User> users = userRepository.findAllByRolesIn(roles);
         for (User user : users) {
-            if (user.getTherapistType() != null &&
-                    user.getTherapistType().stream()
-                            .anyMatch(lang -> lang.getTherapistType().equals(TherapistType))) {
+            if (user.getTherapistInfo().getTherapistType() != null &&
+                    user.getTherapistInfo().getTherapistType().stream()
+                            .anyMatch(type -> type.getTherapistType().equals(therapistType))) {
                 therapists.add(user);
             }
         }
 
         return new ArrayList<>(therapists);
     }
-
-    //hapi 5: qtu masanej e kryn filtrimin, kqyrri metodat qe i kom perdor per filtrim qashtu si tngjajshme boni
-    // qtu tbjen 3 metoda mi bo
-
 }

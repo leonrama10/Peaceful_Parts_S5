@@ -24,7 +24,7 @@ public class QuestionnaireDto {
 
     private int age;
 
-    private String identity;
+    private String identityType;
 
     private String relationshipStatus;
 
@@ -34,9 +34,9 @@ public class QuestionnaireDto {
 
     private String communication;
 
-    private String therapistGender;
+    private Gender therapistGender;
 
-    private String therapistExpectations;
+    private String therapistType;
 
     private String currentPhysicalHealth;
 
@@ -74,12 +74,20 @@ public class QuestionnaireDto {
         this.age = age;
     }
 
-    public String getIdentity() {
-        return identity;
+    public String getIdentityType() {
+        return identityType;
     }
 
-    public void setIdentity(String identity) {
-        this.identity = identity;
+    public void setIdentityType(String identityType) {
+        this.identityType = identityType;
+    }
+
+    public String getTherapistType() {
+        return therapistType;
+    }
+
+    public void setTherapistType(String therapistType) {
+        this.therapistType = therapistType;
     }
 
     public String getRelationshipStatus() {
@@ -114,21 +122,14 @@ public class QuestionnaireDto {
         this.communication = communication;
     }
 
-    public String getTherapistGender() {
+    public Gender getTherapistGender() {
         return therapistGender;
     }
 
-    public void setTherapistGender(String therapistGender) {
+    public void setTherapistGender(Gender therapistGender) {
         this.therapistGender = therapistGender;
     }
 
-    public String getTherapistExpectations() {
-        return therapistExpectations;
-    }
-
-    public void setTherapistExpectations(String therapistExpectations) {
-        this.therapistExpectations = therapistExpectations;
-    }
 
     public String getCurrentPhysicalHealth() {
         return currentPhysicalHealth;

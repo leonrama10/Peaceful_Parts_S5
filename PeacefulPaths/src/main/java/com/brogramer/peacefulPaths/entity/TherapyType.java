@@ -3,15 +3,15 @@ package com.brogramer.peacefulPaths.entity;
 import jakarta.persistence.*;
 
 @Entity
-@Table(name = "therapytype")
+@Table(name = "therapy_type")
 public class TherapyType {
 
     @Id
-    @GeneratedValue(strategy = therapytype.IDENTITY)
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
-    @Column(name = "therapytype")
-    private String therapytype;
+    @Column(name = "therapy_type")
+    private String therapyType;
 
     public TherapyType() {}
 
@@ -19,17 +19,17 @@ public class TherapyType {
         this.id = id;
     }
 
-    public TherapyType(Long id, String therapytype) {
+    public TherapyType(Long id, String therapyType) {
         this.id = id;
-        this.therapytype = therapytype;
+        this.therapyType = therapyType;
     }
 
     public String getTherapyType() {
-        return therapytype;
+        return therapyType;
     }
 
-    public void setGender(String therapytype) {
-        this.therapytype = therapytype;
+    public void setTherapyType(String therapyType) {
+        this.therapyType = therapyType;
     }
 
     public Long getId() {

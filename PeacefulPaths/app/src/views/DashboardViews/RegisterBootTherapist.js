@@ -42,6 +42,9 @@ function RegisterBootTherapist({loading,error,...props}){
         gender: {},
         location: {},
         language: [],
+        therapistType: [],
+        therapyType: [],
+        identityType: [],
         experience: 0,
         number:'',
         dateOfBirth: '',
@@ -96,6 +99,9 @@ function RegisterBootTherapist({loading,error,...props}){
     const handleChange = (e) => {
         const { name, value } = e.target;
         const languageObject = { id: Number(value.split('-')[0]), language: value.split('-')[1] };
+        const therapistTypeObject = { id: Number(value.split('-')[0]), therapistType: value.split('-')[1] };
+        const therapyTypeObject = { id: Number(value.split('-')[0]), therapyType: value.split('-')[1] };
+        const identityTypeObject = { id: Number(value.split('-')[0]), identityType: value.split('-')[1] };
 
         if (name === 'password') {
             setValues(values => ({
@@ -116,12 +122,49 @@ function RegisterBootTherapist({loading,error,...props}){
                     [name]: [...values[name], languageObject]
                 }));
             }
+
+        } else if (name === 'therapistType') {
+            if (values.therapistType.some(type => type.id === therapistTypeObject.id)) {
+                setValues(values => ({
+                    ...values,
+                    [name]: values[name].filter(type => type.id !== therapistTypeObject.id)
+                }));
+            } else {
+                setValues(values => ({
+                    ...values,
+                    [name]: [...values[name], therapistTypeObject]
+                }));
+            }
+        } else if (name === 'therapyType') {
+            if (values.therapyType.some(type => type.id === therapyTypeObject.id)) {
+                setValues(values => ({
+                    ...values,
+                    [name]: values[name].filter(type => type.id !== therapyTypeObject.id)
+                }));
+            } else {
+                setValues(values => ({
+                    ...values,
+                    [name]: [...values[name], therapyTypeObject]
+                }));
+            }
+        } else if (name === 'identityType') {
+            if (values.identityType.some(type => type.id === identityTypeObject.id)) {
+                setValues(values => ({
+                    ...values,
+                    [name]: values[name].filter(type => type.id !== identityTypeObject.id)
+                }));
+            } else {
+                setValues(values => ({
+                    ...values,
+                    [name]: [...values[name], identityTypeObject]
+                }));
+            }
         }  else if (name === 'dateOfBirth') {
                         setValues(prevValues => ({
                             ...prevValues,
                             [name]: value
                         }));
-                    } else {
+        } else {
             setValues(values => ({
                 ...values,
                 [name]: name === 'experience' ? Number(value) :
@@ -345,7 +388,7 @@ function RegisterBootTherapist({loading,error,...props}){
                                                                        id="IndividualCheckbox"
                                                                        name="therapyType"
                                                                        value="1-Individual"
-                                                                       // checked={values.therapyType.some(type => type.id === 1)}
+                                                                       checked={values.therapyType.some(type => type.id === 1)}
                                                                        onChange={handleChange}
                                                                    />
                                                                    <label htmlFor="IndividualCheckbox">Individual
@@ -357,7 +400,7 @@ function RegisterBootTherapist({loading,error,...props}){
                                                                        id="CouplesCheckbox"
                                                                        name="therapyType"
                                                                        value="2-Couples"
-                                                                       // checked={values.therapyType.some(type => type.id === 2)}
+                                                                       checked={values.therapyType.some(type => type.id === 2)}
                                                                        onChange={handleChange}
                                                                    />
                                                                    <label htmlFor="CouplesCheckbox">Couples
@@ -369,7 +412,7 @@ function RegisterBootTherapist({loading,error,...props}){
                                                                        id="TeenCheckbox"
                                                                        name="therapyType"
                                                                        value="3-Teen"
-                                                                       // checked={values.therapyType.some(type => type.id === 3)}
+                                                                       checked={values.therapyType.some(type => type.id === 3)}
                                                                        onChange={handleChange}
                                                                    />
                                                                    <label htmlFor="TeenCheckbox">Teen Therapy</label>
@@ -386,7 +429,7 @@ function RegisterBootTherapist({loading,error,...props}){
                                                                        id="straightCheckbox"
                                                                        name="identityType"
                                                                        value="1-Straight"
-                                                                       // checked={values.identityType.some(type => type.id === 1)}
+                                                                       checked={values.identityType.some(type => type.id === 1)}
                                                                        onChange={handleChange}
                                                                    />
                                                                    <label htmlFor="straightCheckbox">Straight</label>
@@ -397,7 +440,7 @@ function RegisterBootTherapist({loading,error,...props}){
                                                                        id="gayCheckbox"
                                                                        name="identityType"
                                                                        value="2-Gay"
-                                                                       // checked={values.identityType.some(type => type.id === 2)}
+                                                                       checked={values.identityType.some(type => type.id === 2)}
                                                                        onChange={handleChange}
                                                                    />
                                                                    <label htmlFor="gayCheckbox">Gay</label>
@@ -408,7 +451,7 @@ function RegisterBootTherapist({loading,error,...props}){
                                                                        id="lesbianCheckbox"
                                                                        name="identityType"
                                                                        value="3-Lesbian"
-                                                                       // checked={values.identityType.some(type => type.id === 3)}
+                                                                       checked={values.identityType.some(type => type.id === 3)}
                                                                        onChange={handleChange}
                                                                    />
                                                                    <label htmlFor="lesbianCheckbox">Lesbian</label>
@@ -423,7 +466,7 @@ function RegisterBootTherapist({loading,error,...props}){
                                                                        id="listensCheckbox"
                                                                        name="therapistType"
                                                                        value="1-Listens"
-                                                                       // checked={values.therapistType.some(type => type.id === 1)}
+                                                                       checked={values.therapistType.some(type => type.id === 1)}
                                                                        onChange={handleChange}
                                                                    />
                                                                    <label htmlFor="listensCheckbox">A therapist that listens</label>
@@ -434,7 +477,7 @@ function RegisterBootTherapist({loading,error,...props}){
                                                                        id="exploresPastCheckbox"
                                                                        name="therapistType"
                                                                        value="2-ExploresPast"
-                                                                       // checked={values.therapistType.some(type => type.id === 2)}
+                                                                       checked={values.therapistType.some(type => type.id === 2)}
                                                                        onChange={handleChange}
                                                                    />
                                                                    <label htmlFor="exploresPastCheckbox">A therapist that explores the past</label>
@@ -445,7 +488,7 @@ function RegisterBootTherapist({loading,error,...props}){
                                                                        id="teachesSkillsCheckbox"
                                                                        name="therapistType"
                                                                        value="3-TeachesSkills"
-                                                                       // checked={values.therapistType.some(type => type.id === 3)}
+                                                                       checked={values.therapistType.some(type => type.id === 3)}
                                                                        onChange={handleChange}
                                                                    />
                                                                    <label htmlFor="teachesSkillsCheckbox">A therapist that teaches new skills</label>
