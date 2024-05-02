@@ -23,6 +23,10 @@ function SideBarUser({loading,error,...props}){
     const [openLanguageFilter, setOpenLanguageFilter] = useState(false);
      const [selectedLanguage, setSelectedLanguage] = useState('');
 
+     const [openTherapyFilter, setOpenTherapyFilter] = useState(false);
+     const [openIdentityFilter, setOpenIdentityFilter] = useState(false);
+     const [openTherapistTypeFilter, setOpenTherapistTypeFilter] = useState(false);
+
     React.useEffect(() => {
         connected = loadState("connected",false)
         therapistId = loadState("therapistId",0)
@@ -101,6 +105,236 @@ function SideBarUser({loading,error,...props}){
             });
         }
     }
+
+
+
+    function handleFilterByTherapy (therapy){
+            connected = loadState("connected",false)
+            therapistId = loadState("therapistId",0)
+            const newFilterData = {
+                therapistId: therapistId,
+                therapy: therapy
+            };
+            if (!connected){
+                therapistFilterByTherapy(therapy).then((response)=>{
+                    if(response.status===200){
+                        props.setAllUsers(response.data)
+                        props.setHideTherapists(true);
+                    }
+                    else{
+                        props.loginFailure('Something LEKAAAAAAA!Please Try Again');
+                    }
+
+                }).catch((err)=>{
+
+                    if(err && err.response){
+
+                        switch(err.response.status){
+                            case 401:
+                                console.log("401 status");
+                                props.loginFailure("Authentication Failed.Bad Credentials");
+                                break;
+                            default:
+                                props.loginFailure('Something BABAAAAAA!Please Try Again');
+
+                        }
+
+                    }
+                    else{
+                        console.log("ERROR: ",err)
+                        props.loginFailure('Something NaNAAAAA!Please Try Again');
+                    }
+
+                });
+            }else {
+                therapistFilterByTherapyNotConnected(newFilterData).then((response)=>{
+                    if(response.status===200){
+                        props.setAllUsers(response.data)
+                        props.setHideTherapists(true);
+                    }
+                    else{
+                        props.loginFailure('Something LEKAAAAAAA!Please Try Again');
+                    }
+
+                }).catch((err)=>{
+
+                    if(err && err.response){
+
+                        switch(err.response.status){
+                            case 401:
+                                console.log("401 status");
+                                props.loginFailure("Authentication Failed.Bad Credentials");
+                                break;
+                            default:
+                                props.loginFailure('Something BABAAAAAA!Please Try Again');
+
+                        }
+
+                    }
+                    else{
+                        console.log("ERROR: ",err)
+                        props.loginFailure('Something NaNAAAAA!Please Try Again');
+                    }
+
+                });
+            }
+        }
+
+
+
+
+
+        function handleFilterByIdentity (identity){
+                    connected = loadState("connected",false)
+                    therapistId = loadState("therapistId",0)
+                    const newFilterData = {
+                        therapistId: therapistId,
+                        identity: identity
+                    };
+                    if (!connected){
+                        therapistFilterByIdentity(identity).then((response)=>{
+                            if(response.status===200){
+                                props.setAllUsers(response.data)
+                                props.setHideTherapists(true);
+                            }
+                            else{
+                                props.loginFailure('Something LEKAAAAAAA!Please Try Again');
+                            }
+
+                        }).catch((err)=>{
+
+                            if(err && err.response){
+
+                                switch(err.response.status){
+                                    case 401:
+                                        console.log("401 status");
+                                        props.loginFailure("Authentication Failed.Bad Credentials");
+                                        break;
+                                    default:
+                                        props.loginFailure('Something BABAAAAAA!Please Try Again');
+
+                                }
+
+                            }
+                            else{
+                                console.log("ERROR: ",err)
+                                props.loginFailure('Something NaNAAAAA!Please Try Again');
+                            }
+
+                        });
+                    }else {
+                        therapistFilterByIdentityNotConnected(newFilterData).then((response)=>{
+                            if(response.status===200){
+                                props.setAllUsers(response.data)
+                                props.setHideTherapists(true);
+                            }
+                            else{
+                                props.loginFailure('Something LEKAAAAAAA!Please Try Again');
+                            }
+
+                        }).catch((err)=>{
+
+                            if(err && err.response){
+
+                                switch(err.response.status){
+                                    case 401:
+                                        console.log("401 status");
+                                        props.loginFailure("Authentication Failed.Bad Credentials");
+                                        break;
+                                    default:
+                                        props.loginFailure('Something BABAAAAAA!Please Try Again');
+
+                                }
+
+                            }
+                            else{
+                                console.log("ERROR: ",err)
+                                props.loginFailure('Something NaNAAAAA!Please Try Again');
+                            }
+
+                        });
+                    }
+                }
+
+
+
+
+
+                function handleFilterByTherapistType (therapistType){
+                                    connected = loadState("connected",false)
+                                    therapistId = loadState("therapistId",0)
+                                    const newFilterData = {
+                                        therapistId: therapistId,
+                                        therapistType: therapistType
+                                    };
+                                    if (!connected){
+                                        therapistFilterByTherapistType(therapistType).then((response)=>{
+                                            if(response.status===200){
+                                                props.setAllUsers(response.data)
+                                                props.setHideTherapists(true);
+                                            }
+                                            else{
+                                                props.loginFailure('Something LEKAAAAAAA!Please Try Again');
+                                            }
+
+                                        }).catch((err)=>{
+
+                                            if(err && err.response){
+
+                                                switch(err.response.status){
+                                                    case 401:
+                                                        console.log("401 status");
+                                                        props.loginFailure("Authentication Failed.Bad Credentials");
+                                                        break;
+                                                    default:
+                                                        props.loginFailure('Something BABAAAAAA!Please Try Again');
+
+                                                }
+
+                                            }
+                                            else{
+                                                console.log("ERROR: ",err)
+                                                props.loginFailure('Something NaNAAAAA!Please Try Again');
+                                            }
+
+                                        });
+                                    }else {
+                                        therapistFilterByTherapistTypeNotConnected(newFilterData).then((response)=>{
+                                            if(response.status===200){
+                                                props.setAllUsers(response.data)
+                                                props.setHideTherapists(true);
+                                            }
+                                            else{
+                                                props.loginFailure('Something LEKAAAAAAA!Please Try Again');
+                                            }
+
+                                        }).catch((err)=>{
+
+                                            if(err && err.response){
+
+                                                switch(err.response.status){
+                                                    case 401:
+                                                        console.log("401 status");
+                                                        props.loginFailure("Authentication Failed.Bad Credentials");
+                                                        break;
+                                                    default:
+                                                        props.loginFailure('Something BABAAAAAA!Please Try Again');
+
+                                                }
+
+                                            }
+                                            else{
+                                                console.log("ERROR: ",err)
+                                                props.loginFailure('Something NaNAAAAA!Please Try Again');
+                                            }
+
+                                        });
+                                    }
+                                }
+
+
+
+
 
       function handleFilterByLanguage (language){
             connected = loadState("connected",false)
@@ -428,7 +662,50 @@ function SideBarUser({loading,error,...props}){
                                     </select>
                                 </div>
                             </Collapse>
-                            //HAPI 1: Shto 3 filter button tjt si qto tjerat, pershtatja vlerat. shtoj nalt 3 funksione per mu lidh me springboot
+                            //HAPI :
+
+                            <button className="collapse-item"
+                                     onClick={() => setOpenTherapyFilter(!openTherapyFilter)}>Filter By Location
+                            </button>
+                            <Collapse in={openTherapyFilter}>
+                                   <div>
+                                       <select onChange={(event) => handleFilterByTherapy(event.target.value)}>
+                                              <option value="">Therapy Type</option>
+                                              <option value="Individual therapy">Kosovo</option>
+                                              <option value="Couples therapy">Albania</option>
+                                              <option value="Teen therapy">Montenegro</option>
+                                       </select>
+                                   </div>
+                            </Collapse>
+
+                            <button className="collapse-item"
+                                                                 onClick={() => setOpenIdentityFilter(!openIdentityFilter)}>Filter By Location
+                                                        </button>
+                                                        <Collapse in={openIdentityFilter}>
+                                                               <div>
+                                                                   <select onChange={(event) => handleFilterByIdentity(event.target.value)}>
+                                                                          <option value="">Identity Type</option>
+                                                                          <option value="Straight">Kosovo</option>
+                                                                          <option value="Gay">Albania</option>
+                                                                          <option value="Lesbian">Montenegro</option>
+                                                                   </select>
+                                                               </div>
+                            </Collapse>
+
+                            <button className="collapse-item"
+                                                                 onClick={() => setOpenTherapistTypeFilter(!openTherapistTypeFilter)}>Filter By Location
+                                                        </button>
+                                                        <Collapse in={openTherapistTypeFilter}>
+                                                               <div>
+                                                                   <select onChange={(event) => handleFilterByTherapistType(event.target.value)}>
+                                                                          <option value="">Therapist Type</option>
+                                                                          <option value="A therapist that listens">Kosovo</option>
+                                                                          <option value="A therapist that explores my past">Albania</option>
+                                                                          <option value="A therapist that teaches new skills">Montenegro</option>
+                                                                   </select>
+                                                               </div>
+                            </Collapse>
+
                         </div>
                     </div>
                 </Collapse>

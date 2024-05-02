@@ -362,6 +362,34 @@ public class AuthController {
     }
 
 
+
+    @PostMapping("/auth/therapistFilterByTherapyNotConnected")
+    public ResponseEntity<?> therapistFilterByTherapyNotConnected(@RequestBody @Valid FilterDto filterObject) {
+        List<UserInfo> userInfos = userService.findAllTherapistsByTherapy(filterObject.getTherapy()).stream()
+                .filter(userInfo -> userInfo.getId() != filterObject.getTherapistId())
+                .map(this::convertToUserInfo)
+                .collect(Collectors.toList());
+        return ResponseEntity.ok(userInfos);
+    }
+
+    @PostMapping("/auth/therapistFilterByIdentityNotConnected")
+    public ResponseEntity<?> therapistFilterByIdentityNotConnected(@RequestBody @Valid FilterDto filterObject) {
+        List<UserInfo> userInfos = userService.findAllTherapistsByIdentity(filterObject.getIdentity()).stream()
+                .filter(userInfo -> userInfo.getId() != filterObject.getTherapistId())
+                .map(this::convertToUserInfo)
+                .collect(Collectors.toList());
+        return ResponseEntity.ok(userInfos);
+    }
+
+    @PostMapping("/auth/therapistFilterByTherapistTypeNotConnected")
+    public ResponseEntity<?> therapistFilterByTherapistTypeNotConnected(@RequestBody @Valid FilterDto filterObject) {
+        List<UserInfo> userInfos = userService.findAllTherapistsByTherapistType(filterObject.getTherapistType()).stream()
+                .filter(userInfo -> userInfo.getId() != filterObject.getTherapistId())
+                .map(this::convertToUserInfo)
+                .collect(Collectors.toList());
+        return ResponseEntity.ok(userInfos);
+    }
+
     // Hapi 4: shtoj 6 funskionet prej authService qe i ki bo
 
 

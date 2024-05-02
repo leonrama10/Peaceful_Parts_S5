@@ -274,6 +274,48 @@ export const therapistFilterByLanguage = (authRequest) => {
         }
     });
 };
+
+
+
+export const therapistFilterByTherapy = (authRequest) => {
+    return axios({
+        method: 'POST',
+        url: `${process.env.hostUrl || 'http://localhost:8080'}/api/auth/therapistFilterByTherapy`,
+        data:authRequest,
+        headers: {
+            'Authorization': 'Bearer ' + getToken()
+        }
+    });
+};
+
+
+
+export const therapistFilterByIdentity = (authRequest) => {
+    return axios({
+        method: 'POST',
+        url: `${process.env.hostUrl || 'http://localhost:8080'}/api/auth/therapistFilterByIdentity`,
+        data:authRequest,
+        headers: {
+            'Authorization': 'Bearer ' + getToken()
+        }
+    });
+};
+
+
+
+export const therapistFilterByTherapistType = (authRequest) => {
+    return axios({
+        method: 'POST',
+        url: `${process.env.hostUrl || 'http://localhost:8080'}/api/auth/therapistFilterByTherapistType`,
+        data:authRequest,
+        headers: {
+            'Authorization': 'Bearer ' + getToken()
+        }
+    });
+};
+
+
+
 export const therapistFilterByLanguageNotConnected = (authRequest) => {
     return axios({
         method: 'POST',

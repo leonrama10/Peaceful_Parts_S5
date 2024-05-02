@@ -505,6 +505,61 @@ public class UserService implements UserDetailsService {
         return new ArrayList<>(therapists);
     }
 
+
+
+
+
+    public Collection<User> findAllTherapistsByTherapy(String therapy) {
+        Collection<Roles> roles = new ArrayList<>();
+        roles.add(roleDao.findRoleByName("ROLE_THERAPIST"));
+
+        Collection<User> therapists = new ArrayList<>();
+        List<User> users = userRepository.findAllByRolesIn(roles);
+        for (User user : users) {
+            if (user.getTherapy() != null &&
+                    user.getTherapy().stream()
+                            .anyMatch(lang -> lang.getTherapy().equals(Therapy))) {
+                therapists.add(user);
+            }
+        }
+
+        return new ArrayList<>(therapists);
+    }
+
+    public Collection<User> findAllTherapistsByIdentity(String identity) {
+        Collection<Roles> roles = new ArrayList<>();
+        roles.add(roleDao.findRoleByName("ROLE_THERAPIST"));
+
+        Collection<User> therapists = new ArrayList<>();
+        List<User> users = userRepository.findAllByRolesIn(roles);
+        for (User user : users) {
+            if (user.getIdentity() != null &&
+                    user.getIdentity().stream()
+                            .anyMatch(lang -> lang.getIdentity().equals(Identity))) {
+                therapists.add(user);
+            }
+        }
+
+        return new ArrayList<>(therapists);
+    }
+
+    public Collection<User> findAllTherapistsByTherapistType(String therapistType) {
+        Collection<Roles> roles = new ArrayList<>();
+        roles.add(roleDao.findRoleByName("ROLE_THERAPIST"));
+
+        Collection<User> therapists = new ArrayList<>();
+        List<User> users = userRepository.findAllByRolesIn(roles);
+        for (User user : users) {
+            if (user.getTherapistType() != null &&
+                    user.getTherapistType().stream()
+                            .anyMatch(lang -> lang.getTherapistType().equals(TherapistType))) {
+                therapists.add(user);
+            }
+        }
+
+        return new ArrayList<>(therapists);
+    }
+
     //hapi 5: qtu masanej e kryn filtrimin, kqyrri metodat qe i kom perdor per filtrim qashtu si tngjajshme boni
     // qtu tbjen 3 metoda mi bo
 
