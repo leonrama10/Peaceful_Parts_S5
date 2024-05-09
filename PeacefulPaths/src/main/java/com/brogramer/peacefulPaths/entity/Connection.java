@@ -47,7 +47,4 @@ public class Connection {
     public void setTherapistId(int therapistId) {
         this.therapistId = therapistId;
     }
-// Constructors, getters, setters, and other methods
-
-    // Additional fields or methods specific to the Connection entity can be added here
 }

@@ -66,6 +66,13 @@ function TherapistClientHistory({loading,error,...props}){
         }
     }, [allUsers]);
 
+    const handleClientInfo = (id) => {
+        history(`/dashboard/therapistDashboard/users/info/${id}`);
+    };
+
+    const handleNotes = (id) => {
+        history(`/dashboard/therapistDashboard/users/oldNotesHistory/${id}`);
+    };
 
     return (
         <main id="page-top">
@@ -99,6 +106,7 @@ function TherapistClientHistory({loading,error,...props}){
                                                 <th>Gender</th>
                                                 <th>Location</th>
                                                 <th>Date Added</th>
+                                                <th>Actions</th>
                                             </tr>
                                             </thead>
                                             <tfoot>
@@ -110,6 +118,7 @@ function TherapistClientHistory({loading,error,...props}){
                                                 <th>Gender</th>
                                                 <th>Location</th>
                                                 <th>Date Added</th>
+                                                <th>Actions</th>
                                             </tr>
                                             </tfoot>
                                             <tbody>
@@ -122,6 +131,18 @@ function TherapistClientHistory({loading,error,...props}){
                                                     <td>{tempEmployee.gender.gender}</td>
                                                     <td>{tempEmployee.location.location}</td>
                                                     <td>{tempEmployee.dateAdded}</td>
+                                                    <td>
+                                                        <button className="btn btn-info btn-sm"
+                                                                onClick={() => handleClientInfo(tempEmployee.id)}>
+                                                            Info
+                                                        </button>
+
+                                                        <button style={{marginLeft: "5px"}}
+                                                                className="btn btn-warning btn-sm"
+                                                                onClick={() => handleNotes(tempEmployee.id)}>
+                                                            Notes
+                                                        </button>
+                                                    </td>
                                                 </tr>
                                             ))}
                                             </tbody>
@@ -159,7 +180,7 @@ function TherapistClientHistory({loading,error,...props}){
                         <div className="modal-header">
                             <h5 className="modal-title" id="exampleModalLabel">Ready to Leave?</h5>
                             <button className="close" type="button" data-dismiss="modal" aria-label="Close">
-                                <span aria-hidden="true">×</span>
+                            <span aria-hidden="true">×</span>
                             </button>
                         </div>
                         <div className="modal-body">Select "Logout" below if you are ready to end your current

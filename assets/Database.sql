@@ -365,3 +365,127 @@ CREATE TABLE `user_connections_history` (
   FOREIGN KEY (`connected_user_id`) REFERENCES `user`(`id`) ON DELETE CASCADE
 ) AUTO_INCREMENT=1;
 
+SET FOREIGN_KEY_CHECKS = 0;
+DROP TABLE IF EXISTS `point`;
+SET FOREIGN_KEY_CHECKS = 1;
+CREATE TABLE `point` (
+    `id` INT AUTO_INCREMENT,
+    `point` varchar(1000),
+    PRIMARY KEY (`id`)
+) AUTO_INCREMENT=1;
+
+SET FOREIGN_KEY_CHECKS = 0;
+DROP TABLE IF EXISTS `main_points`;
+SET FOREIGN_KEY_CHECKS = 1;
+CREATE TABLE `main_points` (
+    `id` INT AUTO_INCREMENT,
+    PRIMARY KEY (`id`)
+) AUTO_INCREMENT=1;
+
+SET FOREIGN_KEY_CHECKS = 0;
+DROP TABLE IF EXISTS `main_points_point`;
+SET FOREIGN_KEY_CHECKS = 1;
+CREATE TABLE `main_points_point` (
+  `main_points_id` int(11) NOT NULL,
+  `point_id` int(11) NOT NULL,
+  
+  PRIMARY KEY (`main_points_id`,`point_id`),
+  
+  KEY `FK_POINT_idx` (`point_id`),
+  
+  CONSTRAINT `FK_MAINPOINTS_POINT` FOREIGN KEY (`main_points_id`) 
+  REFERENCES `main_points` (`id`) 
+  ON DELETE CASCADE ON UPDATE CASCADE,
+  
+  CONSTRAINT `FK_POINT_MAINPOINTS` FOREIGN KEY (`point_id`) 
+  REFERENCES `point` (`id`) 
+  ON DELETE CASCADE ON UPDATE CASCADE
+) ENGINE=InnoDB DEFAULT CHARSET=latin1;
+
+SET FOREIGN_KEY_CHECKS = 0;
+DROP TABLE IF EXISTS `notes`;
+SET FOREIGN_KEY_CHECKS = 1;
+CREATE TABLE `notes` (
+    `id` INT AUTO_INCREMENT,
+    `notes_text` varchar(1000),
+    `patient_mood_before` int(10),
+    `patient_mood_after` int(10),
+    `main_points_id` int(11),
+    `date_added` TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    PRIMARY KEY (`id`),
+    FOREIGN KEY (`main_points_id`) REFERENCES `main_points`(`id`) ON DELETE CASCADE
+) AUTO_INCREMENT=1;
+
+SET FOREIGN_KEY_CHECKS = 0;
+DROP TABLE IF EXISTS `therapist_notes`;
+SET FOREIGN_KEY_CHECKS = 1;
+CREATE TABLE `therapist_notes` (
+    `id` INT AUTO_INCREMENT,
+    `notes_id` int(11) NOT NULL,
+    `client_id` int(11) NOT NULL,
+	`therapist_id` int(11) NOT NULL,
+    `date_added` TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    PRIMARY KEY (`id`),
+    FOREIGN KEY (`client_id`) REFERENCES `user`(`id`) ON DELETE CASCADE ,
+    FOREIGN KEY (`notes_id`) REFERENCES `notes`(`id`) ON DELETE CASCADE on update cascade,
+	FOREIGN KEY (`therapist_id`) REFERENCES `user`(`id`) ON DELETE CASCADE
+) AUTO_INCREMENT=1;
+
+SET FOREIGN_KEY_CHECKS = 0;
+DROP TABLE IF EXISTS `therapist_notes_history`;
+SET FOREIGN_KEY_CHECKS = 1;
+CREATE TABLE `therapist_notes_history` (
+    `id` INT AUTO_INCREMENT,
+    `notes_id` int(11),
+    `client_id` int(11) NOT NULL,
+	`therapist_id` int(11) NOT NULL,
+    `date_added` TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    PRIMARY KEY (`id`),
+    FOREIGN KEY (`notes_id`) REFERENCES `notes`(`id`) ON DELETE CASCADE on update cascade,
+	FOREIGN KEY (`client_id`) REFERENCES `user`(`id`) ON DELETE CASCADE,
+	FOREIGN KEY (`therapist_id`) REFERENCES `user`(`id`) ON DELETE CASCADE
+) AUTO_INCREMENT=1;
+
+SET FOREIGN_KEY_CHECKS = 0;
+DROP TABLE IF EXISTS `weekdays`;
+SET FOREIGN_KEY_CHECKS = 1;
+CREATE TABLE `weekdays` (
+    `id` INT AUTO_INCREMENT,
+    `day` varchar(25) NOT NULL,
+    PRIMARY KEY (id)
+);
+
+INSERT INTO `weekdays` (`day`)
+VALUES
+('Monday'), ('Tuesday'), ('Wednesday'),('Thursday'),('Friday'),('Saturday'),('Sunday');
+
+SET FOREIGN_KEY_CHECKS = 0;
+DROP TABLE IF EXISTS `therapist_work_days`;
+SET FOREIGN_KEY_CHECKS = 1;
+CREATE TABLE `therapist_work_days` (
+    `id` INT AUTO_INCREMENT,
+    `therapist_id` INT(11),
+    `start_time` TIME NOT NULL,
+    `end_time` TIME NOT NULL,
+    PRIMARY KEY (id)
+);
+
+SET FOREIGN_KEY_CHECKS = 0;
+DROP TABLE IF EXISTS `therapist_work_days_weekdays`;
+SET FOREIGN_KEY_CHECKS = 1;
+CREATE TABLE `therapist_work_days_weekdays` (
+  `therapist_work_days_id` int(11) NOT NULL,
+  `weekdays_id` int(11) NOT NULL,
+  
+  PRIMARY KEY (`therapist_work_days_id`,`weekdays_id`),
+  
+  KEY `FK_WEEKDAYS_idx` (`weekdays_id`),
+  
+  CONSTRAINT `FK_THERAPY_WORK_DAYS_WEEKDAYS` FOREIGN KEY (`therapist_work_days_id`) 
+  REFERENCES `therapist_work_days` (`id`) 
+  ON DELETE CASCADE ON UPDATE CASCADE,
+  
+  CONSTRAINT `FK_WEEKDAYS_THERAPY_WORK_DAYS` FOREIGN KEY (`weekdays_id`) 
+  REFERENCES `weekdays` (`id`) 
+  ON DELETE CASCADE ON UPDATE CASCADE
+) ENGINE=InnoDB DEFAULT CHARSET=latin1;

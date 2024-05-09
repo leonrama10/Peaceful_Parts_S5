@@ -1,7 +1,9 @@
 package com.brogramer.peacefulPaths.dao;
 
+import com.brogramer.peacefulPaths.dtos.NoteDto;
 import com.brogramer.peacefulPaths.entity.Roles;
 import com.brogramer.peacefulPaths.entity.User;
+import com.brogramer.peacefulPaths.responses.UserInfo;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Modifying;
 import org.springframework.data.jpa.repository.Query;

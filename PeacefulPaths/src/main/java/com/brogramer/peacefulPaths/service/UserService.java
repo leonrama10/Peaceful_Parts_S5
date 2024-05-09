@@ -1,17 +1,13 @@
 package com.brogramer.peacefulPaths.service;
 
 import com.brogramer.peacefulPaths.dao.*;
-import com.brogramer.peacefulPaths.dtos.CredentialsDto;
-import com.brogramer.peacefulPaths.dtos.FilterDto;
-import com.brogramer.peacefulPaths.dtos.SignUpDto;
-import com.brogramer.peacefulPaths.dtos.UserDto;
+import com.brogramer.peacefulPaths.dtos.*;
 import com.brogramer.peacefulPaths.entity.*;
 import com.brogramer.peacefulPaths.exceptions.AppException;
 import jakarta.mail.MessagingException;
 import jakarta.mail.internet.MimeMessage;
 import jakarta.persistence.EntityNotFoundException;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.data.auditing.CurrentDateTimeProvider;
 import org.springframework.http.HttpStatus;
 import org.springframework.mail.javamail.JavaMailSender;
 import org.springframework.mail.javamail.MimeMessageHelper;
@@ -32,6 +28,12 @@ public class UserService implements UserDetailsService {
     private final TherapistRepository userRepository;
     private final QuestionnaireRepository questionnaireRepository;
     private final TherapistInfoRepository therapistInfoRepository;
+    private final NoteRepository noteRepository;
+    private final TherapistNotesRepository therapistNotesRepository;
+    private final TherapistNotesHistoryRepository therapistNotesHistoryRepository;
+    private final TherapistWorkDaysRepository therapistWorkDaysRepository;
+    private final MainPointsRepository mainPointsRepository;
+    private final PointRepository pointRepository;
     private final RoleDao roleDao;
     private final PasswordEncoder passwordEncoder;
     private final UserDao userDao;
@@ -39,13 +41,19 @@ public class UserService implements UserDetailsService {
     @Autowired
     private JavaMailSender javaMailSender;
 
-    public UserService(TherapistRepository userRepository, PasswordEncoder passwordEncoder,RoleDao roleDao,UserDao userDao,QuestionnaireRepository questionnaireRepository,TherapistInfoRepository therapistInfoRepository) {
+    public UserService(TherapistRepository userRepository, PasswordEncoder passwordEncoder,RoleDao roleDao,UserDao userDao,QuestionnaireRepository questionnaireRepository,TherapistInfoRepository therapistInfoRepository,NoteRepository noteRepository,TherapistNotesRepository therapistNotesRepository,MainPointsRepository mainPointsRepository,PointRepository pointRepository,TherapistNotesHistoryRepository therapistNotesHistoryRepository,TherapistWorkDaysRepository therapistWorkDaysRepository) {
         this.userRepository = userRepository;
         this.passwordEncoder = passwordEncoder;
         this.roleDao = roleDao;
         this.userDao = userDao;
         this.questionnaireRepository = questionnaireRepository;
         this.therapistInfoRepository = therapistInfoRepository;
+        this.noteRepository = noteRepository;
+        this.therapistNotesRepository = therapistNotesRepository;
+        this.therapistNotesHistoryRepository = therapistNotesHistoryRepository;
+        this.mainPointsRepository = mainPointsRepository;
+        this.pointRepository = pointRepository;
+        this.therapistWorkDaysRepository = therapistWorkDaysRepository;
     }
 
     public List<User> findAllByRole(String role) {
@@ -583,5 +591,88 @@ public class UserService implements UserDetailsService {
         }
 
         return new ArrayList<>(therapists);
+    }
+
+    public void addNewNote(NoteDto noteDto) {
+        List<String> mainPointsList = new ArrayList<>(noteDto.getMainPoints());
+
+        Collection<Point> pointCollection = new ArrayList<>();
+        Point savedPoint;
+        for (String pointString : mainPointsList){
+            Point point = new Point();
+            point.setPoint(pointString);
+            savedPoint = pointRepository.save(point);
+            pointCollection.add(savedPoint);
+        }
+
+        MainPoints mainPoints = new MainPoints();
+        mainPoints.setPoint(pointCollection);
+        mainPointsRepository.save(mainPoints);
+
+        Notes notes = new Notes();
+        notes.setNotesText(noteDto.getNotesText());
+        notes.setMainPoints(mainPoints);
+        notes.setPatientMoodAfter(noteDto.getPatientMoodAfter());
+        notes.setPatientMoodBefore(noteDto.getPatientMoodBefore());
+
+        Notes savedNote = noteRepository.save(notes);
+
+        TherapistNotes therapistNotes = new TherapistNotes();
+        therapistNotes.setNotes(savedNote);
+        therapistNotes.setTherapistId(noteDto.getTherapistId());
+        therapistNotes.setClientId(noteDto.getClientId());
+
+        therapistNotesRepository.save(therapistNotes);
+
+        TherapistNotesHistory therapistNotesHistory = new TherapistNotesHistory();
+        therapistNotesHistory.setNotes(savedNote);
+        therapistNotesHistory.setTherapistId(noteDto.getTherapistId());
+        therapistNotesHistory.setClientId(noteDto.getClientId());
+
+        therapistNotesHistoryRepository.save(therapistNotesHistory);
+    }
+
+    public Collection<Notes> findAllClientTherapistConnectedNotes(NoteDto noteDto) {
+        List<Notes> notes = therapistNotesRepository.findNotesIdByClientIdAndTherapistId(noteDto.getClientId(),noteDto.getTherapistId());
+
+        List<Notes> notesFetched = new ArrayList<>();
+        for (Notes note : notes) {
+            Optional<Notes> optionalNote = noteRepository.findById(Math.toIntExact(note.getId()));
+            if (optionalNote.isPresent()) {
+                notesFetched.add(optionalNote.get());
+            }
+        }
+
+        return notesFetched;
+    }
+
+    public Collection<Notes> findAllClientTherapistConnectedNotesHistory(NoteDto noteDto) {
+        List<Notes> notes = therapistNotesHistoryRepository.findNotesHistoryIdByClientIdAndTherapistId(noteDto.getClientId(),noteDto.getTherapistId());
+
+        List<Notes> notesFetched = new ArrayList<>();
+        for (Notes note : notes) {
+            Optional<Notes> optionalNote = noteRepository.findById(Math.toIntExact(note.getId()));
+            if (optionalNote.isPresent()) {
+                notesFetched.add(optionalNote.get());
+            }
+        }
+
+        return notesFetched;
+    }
+
+
+    public Collection<TherapistWorkDays> fetchAvailableSlots(TherapistWorkDaysDto therapistWorkDaysDto) {
+
+        return therapistWorkDaysRepository.findAllById(Collections.singleton(therapistWorkDaysDto.getTherapistId()));
+    }
+
+    public void selectWorkDays(TherapistWorkDaysDto therapistWorkDaysDto) {
+        TherapistWorkDays therapistWorkDays = new TherapistWorkDays();
+        therapistWorkDays.setTherapistId(therapistWorkDaysDto.getTherapistId());
+        therapistWorkDays.setStartTime(therapistWorkDaysDto.getStartTime());
+        therapistWorkDays.setEndTime(therapistWorkDaysDto.getEndTime());
+        therapistWorkDays.setWeekdays(therapistWorkDaysDto.getDays());
+
+        therapistWorkDaysRepository.save(therapistWorkDays);
     }
 }

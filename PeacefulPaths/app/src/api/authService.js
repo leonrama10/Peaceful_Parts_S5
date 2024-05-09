@@ -386,3 +386,58 @@ export const therapistFilterByGetStartedNotConnectedData = (authRequest) => {
     });
 };
 
+export const addNewNote = (authRequest) => {
+    return axios({
+        method: 'POST',
+        url: `${process.env.hostUrl || 'http://localhost:8080'}/api/auth/addNewNote`,
+        data:authRequest,
+        headers: {
+            'Authorization': 'Bearer ' + getToken()
+        }
+    });
+};
+
+export const fetchOldNotes = (authRequest) => {
+    return axios({
+        method: 'POST',
+        url: `${process.env.hostUrl || 'http://localhost:8080'}/api/auth/fetchOldNotes`,
+        data:authRequest,
+        headers: {
+            'Authorization': 'Bearer ' + getToken()
+        }
+    });
+};
+
+export const fetchOldNotesHistory = (authRequest) => {
+    return axios({
+        method: 'POST',
+        url: `${process.env.hostUrl || 'http://localhost:8080'}/api/auth/fetchOldNotesHistory`,
+        data:authRequest,
+        headers: {
+            'Authorization': 'Bearer ' + getToken()
+        }
+    });
+};
+
+export const fetchAvailableSlots = (authRequest) => {
+    return axios({
+        method: 'POST',
+        url: `${process.env.hostUrl || 'http://localhost:8080'}/api/auth/fetchAvailableSlots`,
+        data:authRequest,
+        headers: {
+            'Authorization': 'Bearer ' + getToken()
+        }
+    });
+};
+
+export const selectWorkDays = (authRequest) => {
+    console.log("LEKAAAAA",authRequest)
+    return axios({
+        method: 'POST',
+        url: `${process.env.hostUrl || 'http://localhost:8080'}/api/auth/selectWorkDays`,
+        data:authRequest,
+        headers: {
+            'Authorization': 'Bearer ' + getToken()
+        }
+    });
+};

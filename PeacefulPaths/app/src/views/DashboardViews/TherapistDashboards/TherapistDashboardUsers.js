@@ -76,8 +76,12 @@ function TherapistDashboardUsers({loading,error,...props}){
         });
     }
 
-    const handleEdit = (id) => {
-        history(`/dashboard/therapistDashboard/users/edit/${id}`);
+    const handleClientInfo = (id) => {
+        history(`/dashboard/therapistDashboard/users/info/${id}`);
+    };
+
+    const handleNotes = (id) => {
+        history(`/dashboard/therapistDashboard/users/notesDashboard/${id}`);
     };
 
 
@@ -139,12 +143,20 @@ function TherapistDashboardUsers({loading,error,...props}){
                                                                 <td>{tempEmployee.location.location}</td>
                                                                 <td>{tempEmployee.dateAdded}</td>
                                                                 <td>
-                                                                    <button  className="btn btn-info btn-sm" onClick={() => handleEdit(tempEmployee.id)}>
-                                                                        Edit
+                                                                    <button className="btn btn-info btn-sm"
+                                                                            onClick={() => handleClientInfo(tempEmployee.id)}>
+                                                                        Info
+                                                                    </button>
+                                                                    
+                                                                    <button style={{marginLeft: "5px"}} className="btn btn-warning btn-sm"
+                                                                            onClick={() => handleNotes(tempEmployee.id)}>
+                                                                        Notes
                                                                     </button>
 
-                                                                    <button  style={{marginLeft:"5px"}} className="btn btn-danger btn-sm" onClick={() => handleDelete(tempEmployee.id)} >
-                                                                        Delete
+                                                                    <button style={{marginLeft: "5px"}}
+                                                                            className="btn btn-danger btn-sm"
+                                                                            onClick={() => handleDelete(tempEmployee.id)}>
+                                                                        Remove
                                                                     </button>
                                                                 </td>
                                                             </tr>

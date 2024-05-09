@@ -1,5 +1,6 @@
 import React, {useEffect, useState} from 'react';
 import {
+    fetchAvailableSlots,
     fetchUserData,
     fetchUserTherapistConnectionData, removeTherapist
 } from '../../../api/authService';
@@ -38,6 +39,9 @@ function UserDashboardTherapists({loading,error,...props}){
     const [data,setData]=useState({});
     const [hideFilterMenu,setHideFilterMenu]=useState(true);
     const [connectionFailure, setConnectionFailure] = useState('');
+    const [date, setDate] = useState('');
+    const [time, setTime] = useState('');
+    const [availableSlots, setAvailableSlots] = useState([]);
     const [therapistData, setTherapistData] = useState({
         id:0,
         email: '',
@@ -81,6 +85,16 @@ function UserDashboardTherapists({loading,error,...props}){
                         }else {
                             saveState("connected",true)
                         }
+
+                        const newSessionData = {
+                            therapistId: response.data.id
+                        };
+
+                        fetchAvailableSlots(newSessionData).then((response) => {
+                            setAvailableSlots(response.data);
+                        }).catch((e) => {
+                            history('/loginBoot');
+                        });
                     } else {
                         localStorage.clear();
                         history('/loginBoot');
@@ -124,6 +138,10 @@ function UserDashboardTherapists({loading,error,...props}){
         });
     }
 
+    function handleSubmit() {
+
+    }
+
     return (
         <main id="page-top">
 
@@ -152,6 +170,17 @@ function UserDashboardTherapists({loading,error,...props}){
                                     <p className="card-text">Gender: {therapistData.gender.gender}</p>
                                     <p className="card-text">Experience: {therapistData.experience} years</p>
                                     <p className="card-text">Location: {therapistData.location.location}</p>
+                                    <p className="card-text">Select next session date and time:</p>
+                                    <p className="card-text">Select next session date and time:</p>
+                                    <form onSubmit={handleSubmit}>
+                                        <label htmlFor="sessionDate">Date:</label><br/>
+                                        <input type="date" id="sessionDate" value={date}
+                                               onChange={e => setDate(e.target.value)}/><br/>
+                                        {/*show the list of hours that are not booked for the selected date*/}
+                                        {/*VERY IMPORTANT!!!!!!!!!!!!!!!!!!!!!!!!!!!!*/}
+                                    </form>
+                                    <br/>
+
                                     <button onClick={() => handleRemove(data.id)}>Remove Therapist</button>
                                 </div>
                             </div>}

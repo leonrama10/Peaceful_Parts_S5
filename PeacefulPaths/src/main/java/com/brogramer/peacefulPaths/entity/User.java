@@ -49,7 +49,6 @@ public class User {
     @Transient
     private String confirmPassword;
 
-
     @Column(name = "reset_token")
     private String resetToken;
 
@@ -319,6 +318,4 @@ public class User {
                 ", roles=" + roles +
                 '}';
     }
-
-
 }

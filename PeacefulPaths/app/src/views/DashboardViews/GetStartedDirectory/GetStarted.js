@@ -249,7 +249,6 @@ function GetStarted({loading,error,...props}){
     const properties = ['therapyType', 'gender', 'age', 'identityType', 'relationshipStatus', 'therapyHistory', 'medicationHistory', 'communication', 'therapistGender', 'therapistType', 'currentPhysicalHealth', 'mentalState1', 'mentalState2', 'location', 'language'];
 
     React.useEffect(() => {
-        console.log("LALAAAAAAAAAAAAAAAAA",selectedAnswer)
         if (questionIndex >= questions.length) {
                 questionnaireAnswers(selectedAnswer).then((response)=>{
                     if(response.status===200){

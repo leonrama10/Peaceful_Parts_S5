@@ -61,8 +61,6 @@ function RegisterBootTherapist({loading,error,...props}){
         evt.preventDefault();
         props.authenticate();
 
-
-
         if (values.password === confirmPassword) {
             // hapi 1: registerAdmin
             registerTherapist(values).then((response) => {
@@ -71,8 +69,6 @@ function RegisterBootTherapist({loading,error,...props}){
                 } else {
                     setRegisterTherapistError('Something LEKAAAAAAA!Please Try Again');
                 }
-
-
             }).catch((err) => {
 
                 if (err && err.response) {
@@ -122,7 +118,6 @@ function RegisterBootTherapist({loading,error,...props}){
                     [name]: [...values[name], languageObject]
                 }));
             }
-
         } else if (name === 'therapistType') {
             if (values.therapistType.some(type => type.id === therapistTypeObject.id)) {
                 setValues(values => ({
@@ -159,11 +154,6 @@ function RegisterBootTherapist({loading,error,...props}){
                     [name]: [...values[name], identityTypeObject]
                 }));
             }
-        }  else if (name === 'dateOfBirth') {
-                        setValues(prevValues => ({
-                            ...prevValues,
-                            [name]: value
-                        }));
         } else {
             setValues(values => ({
                 ...values,
@@ -250,7 +240,7 @@ function RegisterBootTherapist({loading,error,...props}){
                                                                    onChange={handleChange}
                                                                    required
                                                                >
-                                                                   <option defaultValue="">Select your university
+                                                                   <option defaultValue="">Select the university
                                                                    </option>
                                                                    <option value="1-AAB">AAB</option>
                                                                    <option value="2-UBT">UBT</option>
@@ -272,7 +262,7 @@ function RegisterBootTherapist({loading,error,...props}){
                                                                    onChange={handleChange}
                                                                    required
                                                                >
-                                                                   <option defaultValue="">Select your location</option>
+                                                                   <option defaultValue="">Select the location</option>
                                                                    <option value="1-Kosovo">Kosovo</option>
                                                                    <option value="2-Albania">Albania</option>
                                                                    <option value="3-Montenegro">Montenegro</option>
@@ -362,8 +352,9 @@ function RegisterBootTherapist({loading,error,...props}){
                                                                </button>
                                                            </div>
 
-
+                                                           <label><b>Years of work experience</b></label>
                                                            <div className="form-group experience-input-group">
+
                                                                <input type="number"
                                                                       className="form-control form-control-user"
                                                                       id="exampleExperience" name="experience"
@@ -377,7 +368,8 @@ function RegisterBootTherapist({loading,error,...props}){
 
                                                            <hr/>
 
-                                                           <label htmlFor="specializationSelect"><h4><b>What do they specialize
+                                                           <label htmlFor="specializationSelect"><h4><b>What do they
+                                                               specialize
                                                                in:</b></h4></label>
 
                                                            <div className="custom-checkboxes">
@@ -469,7 +461,8 @@ function RegisterBootTherapist({loading,error,...props}){
                                                                        checked={values.therapistType.some(type => type.id === 1)}
                                                                        onChange={handleChange}
                                                                    />
-                                                                   <label htmlFor="listensCheckbox">A therapist that listens</label>
+                                                                   <label htmlFor="listensCheckbox">A therapist that
+                                                                       listens</label>
                                                                </div>
                                                                <div>
                                                                    <input
@@ -480,7 +473,8 @@ function RegisterBootTherapist({loading,error,...props}){
                                                                        checked={values.therapistType.some(type => type.id === 2)}
                                                                        onChange={handleChange}
                                                                    />
-                                                                   <label htmlFor="exploresPastCheckbox">A therapist that explores the past</label>
+                                                                   <label htmlFor="exploresPastCheckbox">A therapist
+                                                                       that explores the past</label>
                                                                </div>
                                                                <div>
                                                                    <input
@@ -491,7 +485,8 @@ function RegisterBootTherapist({loading,error,...props}){
                                                                        checked={values.therapistType.some(type => type.id === 3)}
                                                                        onChange={handleChange}
                                                                    />
-                                                                   <label htmlFor="teachesSkillsCheckbox">A therapist that teaches new skills</label>
+                                                                   <label htmlFor="teachesSkillsCheckbox">A therapist
+                                                                       that teaches new skills</label>
                                                                </div>
                                                            </div>
 
@@ -543,15 +538,6 @@ function RegisterBootTherapist({loading,error,...props}){
                                                            </button>
                                                        </form>
                                                        <hr/>
-                                                       <div className="text-center">
-                                                           <Link className="small" to="/forgotPassBoot">Forgot
-                                                               Password?</Link>
-                                                       </div>
-                                                       <div className="text-center">
-                                                           <Link className="small" to="/loginBoot">Already have an
-                                                               account?
-                                                               Login!</Link>
-                                                       </div>
                                                    </div>
                                                </div>
                                                </div>

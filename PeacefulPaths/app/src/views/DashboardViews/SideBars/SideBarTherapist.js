@@ -49,6 +49,7 @@ export default function SideBarTherapist(){
                     <div id="collapse-text">
                         <div className="bg-white py-2 collapse-inner rounded">
                             <h6 className="collapse-header">Custom Components:</h6>
+                            <Link className="collapse-item" to="/dashboard/therapistDashboard/workDays">Manage Work Days</Link>
                             <Link className="collapse-item" to="/dashboard/therapistDashboard/users">Manage Clients</Link>
                             <Link className="collapse-item" to="/dashboard/therapistDashboard/history">Client History</Link>
                         </div>
@@ -59,9 +60,9 @@ export default function SideBarTherapist(){
 
             <hr className="sidebar-divider"/>
 
-            <div className="sidebar-heading">
-                Addons
-            </div>
+            {/*<div className="sidebar-heading">*/}
+            {/*    Addons*/}
+            {/*</div>*/}
 
             {/*<li className="nav-item" style={{marginTop: "10px", marginBottom: "20px"}}>*/}
             {/*    <a style={{*/}

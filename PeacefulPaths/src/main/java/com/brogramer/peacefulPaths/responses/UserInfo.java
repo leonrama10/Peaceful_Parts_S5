@@ -34,6 +34,13 @@ public class UserInfo {
     private Questionnaire questionnaire;
     @JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "yyyy-MM-dd HH:mm:ss")
     private LocalDateTime dateAdded;
+    private Collection<TherapyType> therapyType;
+    private TherapyType therapyTypeUser;
+    private Collection<TherapistType> therapistType;
+    private TherapistType therapistTypeUser;
+    private Collection<IdentityType> identityType;
+    private IdentityType identityTypeUser;
+    private Gender therapistGender;
 
     public Questionnaire getQuestionnaire() {
         return questionnaire;
@@ -175,5 +182,61 @@ public class UserInfo {
 
     public void setDateAdded(LocalDateTime dateAdded) {
         this.dateAdded = dateAdded;
+    }
+
+    public Collection<TherapyType> getTherapyType() {
+        return therapyType;
+    }
+
+    public void setTherapyType(Collection<TherapyType> therapyType) {
+        this.therapyType = therapyType;
+    }
+
+    public Collection<TherapistType> getTherapistType() {
+        return therapistType;
+    }
+
+    public void setTherapistType(Collection<TherapistType> therapistType) {
+        this.therapistType = therapistType;
+    }
+
+    public Collection<IdentityType> getIdentityType() {
+        return identityType;
+    }
+
+    public void setIdentityType(Collection<IdentityType> identityType) {
+        this.identityType = identityType;
+    }
+
+    public TherapyType getTherapyTypeUser() {
+        return therapyTypeUser;
+    }
+
+    public void setTherapyTypeUser(TherapyType therapyTypeUser) {
+        this.therapyTypeUser = therapyTypeUser;
+    }
+
+    public TherapistType getTherapistTypeUser() {
+        return therapistTypeUser;
+    }
+
+    public void setTherapistTypeUser(TherapistType therapistTypeUser) {
+        this.therapistTypeUser = therapistTypeUser;
+    }
+
+    public IdentityType getIdentityTypeUser() {
+        return identityTypeUser;
+    }
+
+    public void setIdentityTypeUser(IdentityType identityTypeUser) {
+        this.identityTypeUser = identityTypeUser;
+    }
+
+    public Gender getTherapistGender() {
+        return therapistGender;
+    }
+
+    public void setTherapistGender(Gender therapistGender) {
+        this.therapistGender = therapistGender;
     }
 }

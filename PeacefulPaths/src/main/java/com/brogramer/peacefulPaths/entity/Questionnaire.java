@@ -66,7 +66,6 @@ public class Questionnaire {
             inverseJoinColumns = @JoinColumn(name = "language_id"))
     private Collection<Language> language;
 
-
     public Long getId() {
         return id;
     }

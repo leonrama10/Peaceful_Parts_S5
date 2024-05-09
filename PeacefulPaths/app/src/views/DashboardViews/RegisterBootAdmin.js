@@ -58,8 +58,6 @@ function RegisterBootAdmin({loading,error,...props}){
                 } else {
                     setRegisterAdminError('Something LEKAAAAAAA!Please Try Again');
                 }
-
-
             }).catch((err) => {
 
                 if (err && err.response) {
@@ -259,15 +257,6 @@ function RegisterBootAdmin({loading,error,...props}){
                                                            </button>
                                                        </form>
                                                        <hr/>
-                                                       <div className="text-center">
-                                                           <Link className="small" to="/forgotPassBoot">Forgot
-                                                               Password?</Link>
-                                                       </div>
-                                                       <div className="text-center">
-                                                           <Link className="small" to="/loginBoot">Already have an
-                                                               account?
-                                                               Login!</Link>
-                                                       </div>
                                                    </div>
                                                </div>
                                            </div>
@@ -298,26 +287,6 @@ function RegisterBootAdmin({loading,error,...props}){
                    <i className="fas fa-angle-up"></i>
                </a>
 
-               <div className="modal fade" id="logoutModal" tabIndex="-1" role="dialog" aria-labelledby="exampleModalLabel"
-                    aria-hidden="true">
-                   <div className="modal-dialog" role="document">
-                       <div className="modal-content">
-                           <div className="modal-header">
-                               <h5 className="modal-title" id="exampleModalLabel">Ready to Leave?</h5>
-                               <button className="close" type="button" data-dismiss="modal" aria-label="Close">
-                                   <span aria-hidden="true">×</span>
-                               </button>
-                           </div>
-                           <div className="modal-body">Select "Logout" below if you are ready to end your current
-                               session.
-                           </div>
-                           <div className="modal-footer">
-                               <button className="btn btn-secondary" type="button" data-dismiss="modal">Cancel</button>
-                               <Link className="btn btn-primary" to="/loginBoot">Logout</Link>
-                           </div>
-                       </div>
-                   </div>
-               </div>
 
            </div>
                <script src="../../vendor/jquery/jquery.min.js"></script>

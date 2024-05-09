@@ -3,10 +3,7 @@ package com.brogramer.peacefulPaths.controller;
 import com.brogramer.peacefulPaths.config.UserAuthenticationProvider;
 import com.brogramer.peacefulPaths.dao.TherapistRepository;
 import com.brogramer.peacefulPaths.dtos.*;
-import com.brogramer.peacefulPaths.entity.Connection;
-import com.brogramer.peacefulPaths.entity.CustomUserDetails;
-import com.brogramer.peacefulPaths.entity.Roles;
-import com.brogramer.peacefulPaths.entity.User;
+import com.brogramer.peacefulPaths.entity.*;
 import com.brogramer.peacefulPaths.responses.UserInfo;
 import com.brogramer.peacefulPaths.service.UserService;
 import jakarta.mail.MessagingException;
@@ -49,6 +46,7 @@ public class AuthController {
 
         Collection<Roles> role;
         Roles roleUser = new Roles(1,"ROLE_USER");
+        Roles roleTherapist = new Roles(2,"ROLE_THERAPIST");
 
         UserInfo userInfo = new UserInfo();
         userInfo.setId(userDetails.getId());
@@ -63,13 +61,24 @@ public class AuthController {
             userInfo.setQuestionnaire(userDetails.getQuestionnaire());
             userInfo.setLocation(userDetails.getQuestionnaire().getLocation());
             userInfo.setGender(userDetails.getQuestionnaire().getGender());
+            userInfo.setTherapistGender(userDetails.getQuestionnaire().getTherapistGender());
             userInfo.setLanguage(userDetails.getQuestionnaire().getLanguage());
-        }else {
+            userInfo.setTherapyTypeUser(userDetails.getQuestionnaire().getTherapyType());
+            userInfo.setIdentityTypeUser(userDetails.getQuestionnaire().getIdentityType());
+            userInfo.setTherapistTypeUser(userDetails.getQuestionnaire().getTherapistType());
+        }else if(role.contains(roleTherapist)){
             userInfo.setLocation(userDetails.getLocation());
             userInfo.setGender(userDetails.getGender());
             userInfo.setLanguage(userDetails.getLanguage());
             userInfo.setUniversity(userDetails.getUniversity());
             userInfo.setDateOfBirth(userDetails.getDateOfBirth());
+            userInfo.setTherapyType(userDetails.getTherapistInfo().getTherapyType());
+            userInfo.setTherapistType(userDetails.getTherapistInfo().getTherapistType());
+            userInfo.setIdentityType(userDetails.getTherapistInfo().getIdentityType());
+        }else{
+            userInfo.setLocation(userDetails.getLocation());
+            userInfo.setGender(userDetails.getGender());
+            userInfo.setLanguage(userDetails.getLanguage());
         }
         userInfo.setExperience(userDetails.getExperience());
         userInfo.setResetToken(userDetails.getResetToken());
@@ -77,6 +86,23 @@ public class AuthController {
         userInfo.setDateAdded(userDetails.getDateAdded());
 
         return userInfo;
+    }
+
+
+
+    public NoteDto convertToNoteDto(Notes notes) {
+        NoteDto noteDto = new NoteDto();
+        noteDto.setNotesText(notes.getNotesText());
+        Collection<String> pointCollection = new ArrayList<>();
+        for (Point point : notes.getMainPoints().getPoint()){
+            String pointString = point.getPoint();
+            pointCollection.add(pointString);
+        }
+        noteDto.setMainPoints(pointCollection);
+        noteDto.setPatientMoodAfter(notes.getPatientMoodAfter());
+        noteDto.setPatientMoodBefore(notes.getPatientMoodBefore());
+
+        return noteDto;
     }
 
     public User createUserFromDetails(User userDetails) {
@@ -95,8 +121,8 @@ public class AuthController {
         return user;
     }
 
-    public User mapUserDetailsToUser(User userDetails) {
-        User user = new User();
+    public UserInfo mapUserDetailsToUser(User userDetails) {
+        UserInfo user = new UserInfo();
         user.setId(userDetails.getId());
         user.setEmail(userDetails.getEmail());
         user.setName(userDetails.getName());
@@ -110,6 +136,17 @@ public class AuthController {
         user.setLanguage(userDetails.getQuestionnaire().getLanguage());
         user.setDateAdded(userDetails.getDateAdded());
         return user;
+    }
+
+    private TherapistWorkDaysDto convertToTherapySessionDto(TherapistWorkDays therapistWorkDays) {
+        TherapistWorkDaysDto therapistWorkDaysDto = new TherapistWorkDaysDto();
+
+        therapistWorkDaysDto.setTherapistId(therapistWorkDays.getTherapistId());
+        therapistWorkDaysDto.setDays(therapistWorkDays.getWeekdays());
+        therapistWorkDaysDto.setStartTime(therapistWorkDays.getStartTime());
+        therapistWorkDaysDto.setEndTime(therapistWorkDays.getEndTime());
+
+        return therapistWorkDaysDto;
     }
 
     @PostMapping("/auth/login")
@@ -273,14 +310,14 @@ public class AuthController {
 
     @GetMapping("/auth/fetchAllUsersConnectedData/{id}")
     public ResponseEntity<?> fetchAllUsersConnectedData(@PathVariable int id){
-        List<User> userInfos = userService.findAllUsersConnectedById(id).stream().map(this::mapUserDetailsToUser).collect(Collectors.toList());
+        List<UserInfo> userInfos = userService.findAllUsersConnectedById(id).stream().map(this::mapUserDetailsToUser).collect(Collectors.toList());
 
         return ResponseEntity.ok(userInfos);
     }
 
     @GetMapping("/auth/fetchAllUsersConnectedDataHistory/{id}")
     public ResponseEntity<?> fetchAllUsersConnectedDataHistory(@PathVariable int id){
-        List<User> userInfos = userService.findAllUsersConnectedHistoryById(id).stream().map(this::mapUserDetailsToUser).collect(Collectors.toList());
+        List<UserInfo> userInfos = userService.findAllUsersConnectedHistoryById(id).stream().map(this::mapUserDetailsToUser).collect(Collectors.toList());
 
         return ResponseEntity.ok(userInfos);
     }
@@ -422,6 +459,40 @@ public class AuthController {
                 .map(this::convertToUserInfo)
                 .collect(Collectors.toList());
         return ResponseEntity.ok(userInfos);
+    }
+
+    @PostMapping("/auth/addNewNote")
+    public void addNewNote(@RequestBody @Valid NoteDto noteDto) {
+        userService.addNewNote(noteDto);
+    }
+
+    @PostMapping("/auth/fetchOldNotes")
+    public ResponseEntity<?> fetchOldNotes(@RequestBody @Valid NoteDto noteDto) {
+        List<NoteDto> noteDtoList = userService.findAllClientTherapistConnectedNotes(noteDto).stream()
+                .map(this::convertToNoteDto)
+                .collect(Collectors.toList());
+        return ResponseEntity.ok(noteDtoList);
+    }
+
+    @PostMapping("/auth/fetchOldNotesHistory")
+    public ResponseEntity<?> fetchOldNotesHistory(@RequestBody @Valid NoteDto noteDto) {
+        List<NoteDto> noteDtoList = userService.findAllClientTherapistConnectedNotesHistory(noteDto).stream()
+                .map(this::convertToNoteDto)
+                .collect(Collectors.toList());
+        return ResponseEntity.ok(noteDtoList);
+    }
+
+    @PostMapping("/auth/fetchAvailableSlots")
+    public ResponseEntity<?> fetchAvailableSlots(@RequestBody @Valid TherapistWorkDaysDto therapistWorkDaysDto) {
+        List<TherapistWorkDaysDto> noteDtoList = userService.fetchAvailableSlots(therapistWorkDaysDto).stream()
+                .map(this::convertToTherapySessionDto)
+                .collect(Collectors.toList());
+        return ResponseEntity.ok(noteDtoList);
+    }
+
+    @PostMapping("/auth/selectWorkDays")
+    public void selectWorkDays(@RequestBody @Valid TherapistWorkDaysDto therapistWorkDaysDto) {
+        userService.selectWorkDays(therapistWorkDaysDto);
     }
 
 }
