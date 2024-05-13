@@ -419,19 +419,7 @@ export const fetchOldNotesHistory = (authRequest) => {
     });
 };
 
-export const fetchAvailableSlots = (authRequest) => {
-    return axios({
-        method: 'POST',
-        url: `${process.env.hostUrl || 'http://localhost:8080'}/api/auth/fetchAvailableSlots`,
-        data:authRequest,
-        headers: {
-            'Authorization': 'Bearer ' + getToken()
-        }
-    });
-};
-
 export const selectWorkDays = (authRequest) => {
-    console.log("LEKAAAAA",authRequest)
     return axios({
         method: 'POST',
         url: `${process.env.hostUrl || 'http://localhost:8080'}/api/auth/selectWorkDays`,
@@ -441,3 +429,114 @@ export const selectWorkDays = (authRequest) => {
         }
     });
 };
+
+export const fetchBookedHours = (authRequest) => {
+    return axios({
+        method: 'POST',
+        url: `${process.env.hostUrl || 'http://localhost:8080'}/api/auth/fetchBookedHours`,
+        data:authRequest,
+        headers: {
+            'Authorization': 'Bearer ' + getToken()
+        }
+    });
+};
+
+export const bookSession = (authRequest) => {
+    return axios({
+        method: 'POST',
+        url: `${process.env.hostUrl || 'http://localhost:8080'}/api/auth/bookSession`,
+        data:authRequest,
+        headers: {
+            'Authorization': 'Bearer ' + getToken()
+        }
+    });
+};
+
+export const fetchBookings = (authRequest) => {
+    return axios({
+        method: 'POST',
+        url: `${process.env.hostUrl || 'http://localhost:8080'}/api/auth/fetchBookings`,
+        data:authRequest,
+        headers: {
+            'Authorization': 'Bearer ' + getToken()
+        }
+    });
+};
+
+export const fetchWorkDays = (authRequest) => {
+    return axios({
+        method: 'POST',
+        url: `${process.env.hostUrl || 'http://localhost:8080'}/api/auth/fetchWorkDays`,
+        data:authRequest,
+        headers: {
+            'Authorization': 'Bearer ' + getToken()
+        }
+    });
+};
+
+export const fetchWorkHours = (authRequest) => {
+    return axios({
+        method: 'POST',
+        url: `${process.env.hostUrl || 'http://localhost:8080'}/api/auth/fetchWorkHours`,
+        data:authRequest,
+        headers: {
+            'Authorization': 'Bearer ' + getToken()
+        }
+    });
+};
+
+export const fetchNextBooking = (authRequest) => {
+    return axios({
+        method: 'POST',
+        url: `${process.env.hostUrl || 'http://localhost:8080'}/api/auth/fetchNextBooking`,
+        data:authRequest,
+        headers: {
+            'Authorization': 'Bearer ' + getToken()
+        }
+    });
+};
+
+export const cancelBooking = (authRequest) => {
+    return axios({
+        method: 'DELETE',
+        url: `${process.env.hostUrl || 'http://localhost:8080'}/api/auth/cancelBooking`,
+        data:authRequest,
+        headers: {
+            'Authorization': 'Bearer ' + getToken()
+        }
+    });
+};
+
+export const fetchBookingByBookingId = (authRequest) => {
+    return axios({
+        method: 'POST',
+        url: `${process.env.hostUrl || 'http://localhost:8080'}/api/auth/fetchBookingByBookingId`,
+        data:authRequest,
+        headers: {
+            'Authorization': 'Bearer ' + getToken()
+        }
+    });
+};
+
+export const updateBookingSession = (authRequest) => {
+    return axios({
+        method: 'PUT',
+        url: `${process.env.hostUrl || 'http://localhost:8080'}/api/auth/updateBookingSession`,
+        data:authRequest,
+        headers: {
+            'Authorization': 'Bearer ' + getToken()
+        }
+    });
+};
+
+export const fetchBookedHoursInEdit = (authRequest) => {
+    return axios({
+        method: 'POST',
+        url: `${process.env.hostUrl || 'http://localhost:8080'}/api/auth/fetchBookedHoursInEdit`,
+        data:authRequest,
+        headers: {
+            'Authorization': 'Bearer ' + getToken()
+        }
+    });
+};
+

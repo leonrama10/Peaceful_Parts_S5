@@ -6,6 +6,7 @@ import org.springframework.security.core.userdetails.UserDetails;
 
 import java.util.ArrayList;
 import java.util.Collection;
+import java.util.Date;
 import java.util.stream.Collectors;
 
 public class CustomUserDetails implements UserDetails {
@@ -98,6 +99,18 @@ public class CustomUserDetails implements UserDetails {
 
     public Collection<Language> getLanguage() {
         return user.getLanguage();
+    }
+
+    public University getUniversity() {
+        return user.getUniversity();
+    }
+
+    public TherapistInfo getTherapistInfo() {
+        return user.getTherapistInfo();
+    }
+
+    public Date getDateOfBirth() {
+        return user.getDateOfBirth();
     }
 }
 

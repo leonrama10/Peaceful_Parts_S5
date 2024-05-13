@@ -21,6 +21,58 @@ VALUES
 ('M'), ('F'),('O');
 
 SET FOREIGN_KEY_CHECKS = 0;
+DROP TABLE IF EXISTS `relationship_status`;
+SET FOREIGN_KEY_CHECKS = 1;
+CREATE TABLE `relationship_status` (
+  `id` int(11) NOT NULL AUTO_INCREMENT,
+  `answer` varchar(35) NOT NULL,
+  PRIMARY KEY (`id`)
+) AUTO_INCREMENT=1;
+
+INSERT INTO `relationship_status` (`answer`)
+VALUES
+('Single'), ('In a relationship'),('Married'),('Divorced');
+
+SET FOREIGN_KEY_CHECKS = 0;
+DROP TABLE IF EXISTS `therapy_history`;
+SET FOREIGN_KEY_CHECKS = 1;
+CREATE TABLE `therapy_history` (
+  `id` int(11) NOT NULL AUTO_INCREMENT,
+  `answer` varchar(3) NOT NULL,
+  PRIMARY KEY (`id`)
+) AUTO_INCREMENT=1;
+
+INSERT INTO `therapy_history` (`answer`)
+VALUES
+('Yes'), ('No');
+
+SET FOREIGN_KEY_CHECKS = 0;
+DROP TABLE IF EXISTS `medication_history`;
+SET FOREIGN_KEY_CHECKS = 1;
+CREATE TABLE `medication_history` (
+  `id` int(11) NOT NULL AUTO_INCREMENT,
+  `answer` varchar(3) NOT NULL,
+  PRIMARY KEY (`id`)
+) AUTO_INCREMENT=1;
+
+INSERT INTO `medication_history` (`answer`)
+VALUES
+('Yes'), ('No');
+
+SET FOREIGN_KEY_CHECKS = 0;
+DROP TABLE IF EXISTS `communication`;
+SET FOREIGN_KEY_CHECKS = 1;
+CREATE TABLE `communication` (
+  `id` int(11) NOT NULL AUTO_INCREMENT,
+  `answer` varchar(35) NOT NULL,
+  PRIMARY KEY (`id`)
+) AUTO_INCREMENT=1;
+
+INSERT INTO `communication` (`answer`)
+VALUES
+('Mostly via messaging'), ('Mostly via phone'),('Video sessions'),('Not sure yet (decide later)');
+
+SET FOREIGN_KEY_CHECKS = 0;
 DROP TABLE IF EXISTS `location`;
 SET FOREIGN_KEY_CHECKS = 1;
 
@@ -98,6 +150,45 @@ CREATE TABLE `therapist_type` (
 INSERT INTO `therapist_type` (`therapist_type`)
 VALUES
 ('Listens'), ('ExploresPast'), ('TeachesSkills'),('I dont know');
+
+SET FOREIGN_KEY_CHECKS = 0;
+DROP TABLE IF EXISTS `physical_health`;
+SET FOREIGN_KEY_CHECKS = 1;
+CREATE TABLE `physical_health` (
+  `id` int(11) NOT NULL AUTO_INCREMENT,
+  `answer` varchar(35) NOT NULL,
+  PRIMARY KEY (`id`)
+) AUTO_INCREMENT=1;
+
+INSERT INTO `physical_health` (`answer`)
+VALUES
+('Good'), ('Fair'), ('Poor');
+
+SET FOREIGN_KEY_CHECKS = 0;
+DROP TABLE IF EXISTS `mental_state_1`;
+SET FOREIGN_KEY_CHECKS = 1;
+CREATE TABLE `mental_state_1` (
+  `id` int(11) NOT NULL AUTO_INCREMENT,
+  `answer` varchar(35) NOT NULL,
+  PRIMARY KEY (`id`)
+) AUTO_INCREMENT=1;
+
+INSERT INTO `mental_state_1` (`answer`)
+VALUES
+('Not at all'), ('Several days'), ('More than half the days'),('Nearly every day');
+
+SET FOREIGN_KEY_CHECKS = 0;
+DROP TABLE IF EXISTS `mental_state_2`;
+SET FOREIGN_KEY_CHECKS = 1;
+CREATE TABLE `mental_state_2` (
+  `id` int(11) NOT NULL AUTO_INCREMENT,
+  `answer` varchar(35) NOT NULL,
+  PRIMARY KEY (`id`)
+) AUTO_INCREMENT=1;
+
+INSERT INTO `mental_state_2` (`answer`)
+VALUES
+('Not at all'), ('Several days'), ('More than half the days'),('Nearly every day');
 
 SET FOREIGN_KEY_CHECKS = 0;
 DROP TABLE IF EXISTS `therapist_info`;
@@ -201,17 +292,24 @@ CREATE TABLE `questionnaire` (
     `gender_id` int(11),
     `age` int(2),
     `identity_type_id`int(11),
-    `relationship_status` VARCHAR(255),
-    `therapy_history` VARCHAR(255),
-    `medication_history` VARCHAR(255),
-    `communication` VARCHAR(255),
     `therapist_gender` int(11),
     `therapist_type_id` int(11),
-    `current_physical_health` VARCHAR(255),
-    `mental_state_1` VARCHAR(255),
-    `mental_state_2` VARCHAR(255),
+    `relationship_status_id` int(11),
+    `therapy_history_id` int(11),
+    `medication_history_id` int(11),
+    `communication_id` int(11),
+    `physical_health_id` int(11),
+    `mental_state_1_id` int(11),
+    `mental_state_2_id` int(11),
     `location_id` int(11),
     PRIMARY KEY (`id`),
+    FOREIGN KEY (`mental_state_2_id`) REFERENCES `mental_state_2`(`id`) ON DELETE CASCADE on update cascade,
+    FOREIGN KEY (`mental_state_1_id`) REFERENCES `mental_state_1`(`id`) ON DELETE CASCADE on update cascade,
+    FOREIGN KEY (`physical_health_id`) REFERENCES `physical_health`(`id`) ON DELETE CASCADE on update cascade,
+    FOREIGN KEY (`communication_id`) REFERENCES `communication`(`id`) ON DELETE CASCADE on update cascade,
+    FOREIGN KEY (`medication_history_id`) REFERENCES `medication_history`(`id`) ON DELETE CASCADE on update cascade,
+    FOREIGN KEY (`therapy_history_id`) REFERENCES `therapy_history`(`id`) ON DELETE CASCADE on update cascade,
+    FOREIGN KEY (`relationship_status_id`) REFERENCES `relationship_status`(`id`) ON DELETE CASCADE on update cascade,
     FOREIGN KEY (`gender_id`) REFERENCES `gender`(`id`) ON DELETE CASCADE on update cascade,
     FOREIGN KEY (`identity_type_id`) REFERENCES `identity_type`(`id`) ON DELETE CASCADE on update cascade,
     FOREIGN KEY (`therapy_type_id`) REFERENCES `therapy_type`(`id`) ON DELETE CASCADE on update cascade,
@@ -460,13 +558,24 @@ VALUES
 ('Monday'), ('Tuesday'), ('Wednesday'),('Thursday'),('Friday'),('Saturday'),('Sunday');
 
 SET FOREIGN_KEY_CHECKS = 0;
+DROP TABLE IF EXISTS `workhours`;
+SET FOREIGN_KEY_CHECKS = 1;
+CREATE TABLE `workhours` (
+    `id` INT AUTO_INCREMENT,
+    `hour` Time NOT NULL,
+    PRIMARY KEY (id)
+);
+
+INSERT INTO `workhours` (`hour`)
+VALUES
+('01:00'), ('02:00'), ('03:00'),('04:00'),('05:00'),('06:00'),('07:00'),('08:00'),('09:00'),('10:00'),('11:00'),('12:00'),('13:00'),('14:00'),('15:00'),('16:00'),('17:00'),('18:00'),('19:00'),('20:00'),('21:00'),('22:00'),('23:00'),('00:00');
+
+SET FOREIGN_KEY_CHECKS = 0;
 DROP TABLE IF EXISTS `therapist_work_days`;
 SET FOREIGN_KEY_CHECKS = 1;
 CREATE TABLE `therapist_work_days` (
     `id` INT AUTO_INCREMENT,
     `therapist_id` INT(11),
-    `start_time` TIME NOT NULL,
-    `end_time` TIME NOT NULL,
     PRIMARY KEY (id)
 );
 
@@ -489,3 +598,37 @@ CREATE TABLE `therapist_work_days_weekdays` (
   REFERENCES `weekdays` (`id`) 
   ON DELETE CASCADE ON UPDATE CASCADE
 ) ENGINE=InnoDB DEFAULT CHARSET=latin1;
+
+SET FOREIGN_KEY_CHECKS = 0;
+DROP TABLE IF EXISTS `therapist_work_days_workhours`;
+SET FOREIGN_KEY_CHECKS = 1;
+CREATE TABLE `therapist_work_days_workhours` (
+  `therapist_work_days_id` int(11) NOT NULL,
+  `workhours_id` int(11) NOT NULL,
+  
+  PRIMARY KEY (`therapist_work_days_id`,`workhours_id`),
+  
+  KEY `FK_WORKHOURS_idx` (`workhours_id`),
+  
+  CONSTRAINT `FK_THERAPY_WORK_DAYS_WORKDAYS` FOREIGN KEY (`therapist_work_days_id`) 
+  REFERENCES `therapist_work_days` (`id`) 
+  ON DELETE CASCADE ON UPDATE CASCADE,
+  
+  CONSTRAINT `FK_WORKDAYS_THERAPY_WORK_DAYS` FOREIGN KEY (`workhours_id`) 
+  REFERENCES `workhours` (`id`) 
+  ON DELETE CASCADE ON UPDATE CASCADE
+) ENGINE=InnoDB DEFAULT CHARSET=latin1;
+
+
+SET FOREIGN_KEY_CHECKS = 0;
+DROP TABLE IF EXISTS `bookings`;
+SET FOREIGN_KEY_CHECKS = 1;
+CREATE TABLE `bookings` (
+    `id` INT AUTO_INCREMENT,
+    `client_id` int(11),
+    `date` Date NOT NULL,
+    `hour` TIME NOT NULL,
+    `therapist_work_days_id` int(11), 
+    PRIMARY KEY (id),
+    FOREIGN KEY (`therapist_work_days_id`) REFERENCES `therapist_work_days`(`id`) ON DELETE CASCADE on update cascade
+);

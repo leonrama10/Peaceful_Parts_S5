@@ -19,8 +19,13 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.nio.CharBuffer;
+import java.time.DayOfWeek;
+import java.time.LocalDate;
 import java.time.LocalDateTime;
+import java.time.LocalTime;
+import java.time.format.DateTimeFormatter;
 import java.util.*;
+import java.util.stream.Collectors;
 
 @Service
 public class UserService implements UserDetailsService {
@@ -33,6 +38,7 @@ public class UserService implements UserDetailsService {
     private final TherapistNotesHistoryRepository therapistNotesHistoryRepository;
     private final TherapistWorkDaysRepository therapistWorkDaysRepository;
     private final MainPointsRepository mainPointsRepository;
+    private final BookingsRepository bookingsRepository;
     private final PointRepository pointRepository;
     private final RoleDao roleDao;
     private final PasswordEncoder passwordEncoder;
@@ -40,8 +46,9 @@ public class UserService implements UserDetailsService {
 
     @Autowired
     private JavaMailSender javaMailSender;
+    @Autowired
 
-    public UserService(TherapistRepository userRepository, PasswordEncoder passwordEncoder,RoleDao roleDao,UserDao userDao,QuestionnaireRepository questionnaireRepository,TherapistInfoRepository therapistInfoRepository,NoteRepository noteRepository,TherapistNotesRepository therapistNotesRepository,MainPointsRepository mainPointsRepository,PointRepository pointRepository,TherapistNotesHistoryRepository therapistNotesHistoryRepository,TherapistWorkDaysRepository therapistWorkDaysRepository) {
+    public UserService(TherapistRepository userRepository, PasswordEncoder passwordEncoder,RoleDao roleDao,UserDao userDao,QuestionnaireRepository questionnaireRepository,TherapistInfoRepository therapistInfoRepository,NoteRepository noteRepository,TherapistNotesRepository therapistNotesRepository,MainPointsRepository mainPointsRepository,PointRepository pointRepository,TherapistNotesHistoryRepository therapistNotesHistoryRepository,TherapistWorkDaysRepository therapistWorkDaysRepository,BookingsRepository bookingsRepository) {
         this.userRepository = userRepository;
         this.passwordEncoder = passwordEncoder;
         this.roleDao = roleDao;
@@ -54,6 +61,7 @@ public class UserService implements UserDetailsService {
         this.mainPointsRepository = mainPointsRepository;
         this.pointRepository = pointRepository;
         this.therapistWorkDaysRepository = therapistWorkDaysRepository;
+        this.bookingsRepository = bookingsRepository;
     }
 
     public List<User> findAllByRole(String role) {
@@ -275,6 +283,7 @@ public class UserService implements UserDetailsService {
         User user = new User();
         Collection<Roles> role;
         Roles roleUser = new Roles(1,"ROLE_USER");
+        Roles roleTherapist = new Roles(2,"ROLE_THERAPIST");
 
         if (emailUser.isPresent()){
             if (emailUser.get().getId()==userDto.getId()) {
@@ -288,24 +297,45 @@ public class UserService implements UserDetailsService {
                     user.setPassword(passwordEncoder.encode(CharBuffer.wrap(userDto.getPassword())));
                 }
                 user.setNumber(userDto.getNumber());
+                user.setGender(userDto.getGender());
                 role = userDto.getRoles();
                 user.setRoles(userDto.getRoles());
                 if (role.contains(roleUser)) {
                     Questionnaire questionnaire = userDto.getQuestionnaire();
                     questionnaire.setLocation(userDto.getLocation());
-                    questionnaire.setGender(userDto.getGender());
                     questionnaire.setLanguage(userDto.getLanguage());
+                    questionnaire.setTherapistGender(userDto.getTherapistGender());
+                    questionnaire.setTherapyHistory(userDto.getTherapyHistory());
+                    questionnaire.setTherapyType(userDto.getTherapyTypeUser());
+                    questionnaire.setIdentityType(userDto.getIdentityTypeUser());
+                    questionnaire.setTherapistType(userDto.getTherapistTypeUser());
+                    questionnaire.setCommunication(userDto.getCommunication());
+                    questionnaire.setMedicationHistory(userDto.getMedicationHistory());
+                    questionnaire.setMentalState1(userDto.getMentalState1());
+                    questionnaire.setMentalState2(userDto.getMentalState2());
+                    questionnaire.setPhysicalHealth(userDto.getPhysicalHealth());
+                    questionnaire.setRelationshipStatus(userDto.getRelationshipStatus());
 
                     questionnaireRepository.save(questionnaire);
 
                     user.setQuestionnaire(questionnaire);
-                }else {
+                }else if(role.contains(roleTherapist)){
                     user.setUniversity(userDto.getUniversity());
+                    user.setDateOfBirth(userDto.getDateOfBirth());
                     user.setLocation(userDto.getLocation());
-                    user.setGender(userDto.getGender());
+
                     user.setLanguage(userDto.getLanguage());
+                    user.setExperience(userDto.getExperience());
+
+                    TherapistInfo therapistInfo = userDto.getTherapistInfo();
+                    therapistInfo.setTherapistType(userDto.getTherapistTypeTherapist());
+                    therapistInfo.setTherapyType(userDto.getTherapyTypeTherapist());
+                    therapistInfo.setIdentityType(userDto.getIdentityTypeTherapist());
+
+                    therapistInfoRepository.save(therapistInfo);
+
+                    user.setTherapistInfo(therapistInfo);
                 }
-                user.setExperience(userDto.getExperience());
                 user.setExpirationTime(userDto.getExpirationTime());
                 user.setResetToken(userDto.getResetToken());
             }
@@ -319,24 +349,44 @@ public class UserService implements UserDetailsService {
             user.setSurname(userDto.getSurname());
             user.setPassword(passwordEncoder.encode(CharBuffer.wrap(userDto.getPassword())));
             user.setNumber(userDto.getNumber());
+            user.setGender(userDto.getGender());
             role = userDto.getRoles();
             user.setRoles(userDto.getRoles());
             if (role.contains(roleUser)) {
                 Questionnaire questionnaire = userDto.getQuestionnaire();
                 questionnaire.setLocation(userDto.getLocation());
-                questionnaire.setGender(userDto.getGender());
                 questionnaire.setLanguage(userDto.getLanguage());
+                questionnaire.setTherapistGender(userDto.getTherapistGender());
+                questionnaire.setTherapyHistory(userDto.getTherapyHistory());
+                questionnaire.setTherapyType(userDto.getTherapyTypeUser());
+                questionnaire.setIdentityType(userDto.getIdentityTypeUser());
+                questionnaire.setTherapistType(userDto.getTherapistTypeUser());
+                questionnaire.setCommunication(userDto.getCommunication());
+                questionnaire.setMedicationHistory(userDto.getMedicationHistory());
+                questionnaire.setMentalState1(userDto.getMentalState1());
+                questionnaire.setMentalState2(userDto.getMentalState2());
+                questionnaire.setPhysicalHealth(userDto.getPhysicalHealth());
+                questionnaire.setRelationshipStatus(userDto.getRelationshipStatus());
 
                 questionnaireRepository.save(questionnaire);
 
                 user.setQuestionnaire(questionnaire);
-            }else {
+            }else if(role.contains(roleTherapist)){
                 user.setUniversity(userDto.getUniversity());
+                user.setDateOfBirth(userDto.getDateOfBirth());
                 user.setLocation(userDto.getLocation());
-                user.setGender(userDto.getGender());
                 user.setLanguage(userDto.getLanguage());
+                user.setExperience(userDto.getExperience());
+
+                TherapistInfo therapistInfo = userDto.getTherapistInfo();
+                therapistInfo.setTherapistType(userDto.getTherapistTypeTherapist());
+                therapistInfo.setTherapyType(userDto.getTherapyTypeTherapist());
+                therapistInfo.setIdentityType(userDto.getIdentityTypeTherapist());
+
+                therapistInfoRepository.save(therapistInfo);
+
+                user.setTherapistInfo(therapistInfo);
             }
-            user.setExperience(userDto.getExperience());
             user.setExpirationTime(userDto.getExpirationTime());
             user.setResetToken(userDto.getResetToken());
         }
@@ -346,15 +396,33 @@ public class UserService implements UserDetailsService {
         UserDto userDto1 = convertToUserDto(savedUser);
 
         if (role.contains(roleUser)) {
-            userDto1.setQuestionnaire(userDto.getQuestionnaire());
-            userDto1.getQuestionnaire().setLocation(userDto.getLocation());
-            userDto1.getQuestionnaire().setGender(userDto.getGender());
-            userDto1.getQuestionnaire().setLanguage(userDto.getLanguage());
-        }else {
-            userDto1.setUniversity(userDto.getUniversity());
-            userDto1.setLocation(userDto.getLocation());
-            userDto1.setGender(userDto.getGender());
-            userDto1.setLanguage(userDto.getLanguage());
+            userDto1.setQuestionnaire(savedUser.getQuestionnaire());
+            userDto1.getQuestionnaire().setLocation(savedUser.getLocation());
+            userDto1.getQuestionnaire().setGender(savedUser.getGender());
+            userDto1.getQuestionnaire().setLanguage(savedUser.getLanguage());
+            userDto1.getQuestionnaire().setLanguage(savedUser.getLanguage());
+            userDto1.getQuestionnaire().setTherapistGender(userDto.getTherapistGender());
+            userDto1.getQuestionnaire().setTherapyHistory(userDto.getTherapyHistory());
+            userDto1.getQuestionnaire().setTherapyType(userDto.getTherapyTypeUser());
+            userDto1.getQuestionnaire().setIdentityType(userDto.getIdentityTypeUser());
+            userDto1.getQuestionnaire().setTherapistType(userDto.getTherapistTypeUser());
+            userDto1.getQuestionnaire().setCommunication(userDto.getCommunication());
+            userDto1.getQuestionnaire().setMedicationHistory(userDto.getMedicationHistory());
+            userDto1.getQuestionnaire().setMentalState1(userDto.getMentalState1());
+            userDto1.getQuestionnaire().setMentalState2(userDto.getMentalState2());
+            userDto1.getQuestionnaire().setPhysicalHealth(userDto.getPhysicalHealth());
+            userDto1.getQuestionnaire().setRelationshipStatus(userDto.getRelationshipStatus());
+        }else if (role.contains(roleTherapist)){
+            userDto1.setUniversity(savedUser.getUniversity());
+            userDto1.setLocation(savedUser.getLocation());
+            userDto1.setGender(savedUser.getGender());
+            userDto1.setLanguage(savedUser.getLanguage());
+            TherapistInfo therapistInfo = savedUser.getTherapistInfo();
+            userDto1.setTherapistTypeTherapist(therapistInfo.getTherapistType());
+            userDto1.setTherapyTypeTherapist(therapistInfo.getTherapyType());
+            userDto1.setIdentityTypeTherapist(therapistInfo.getIdentityType());
+        }else{
+            userDto1.setGender(savedUser.getGender());
         }
         userDto1.setExperience(savedUser.getExperience());
         userDto1.setExpirationTime(savedUser.getExpirationTime());
@@ -667,12 +735,203 @@ public class UserService implements UserDetailsService {
     }
 
     public void selectWorkDays(TherapistWorkDaysDto therapistWorkDaysDto) {
+        TherapistWorkDays therapistWorkDaysFetched = therapistWorkDaysRepository.findByTherapistId(therapistWorkDaysDto.getTherapistId());
+
         TherapistWorkDays therapistWorkDays = new TherapistWorkDays();
-        therapistWorkDays.setTherapistId(therapistWorkDaysDto.getTherapistId());
-        therapistWorkDays.setStartTime(therapistWorkDaysDto.getStartTime());
-        therapistWorkDays.setEndTime(therapistWorkDaysDto.getEndTime());
-        therapistWorkDays.setWeekdays(therapistWorkDaysDto.getDays());
+
+        if (therapistWorkDaysFetched==null) {
+            therapistWorkDays.setTherapistId(therapistWorkDaysDto.getTherapistId());
+            therapistWorkDays.setWorkhours(therapistWorkDaysDto.getWorkhours());
+            therapistWorkDays.setWeekdays(therapistWorkDaysDto.getDays());
+        }else {
+            therapistWorkDays.setId(therapistWorkDaysFetched.getId());
+            therapistWorkDays.setTherapistId(therapistWorkDaysDto.getTherapistId());
+            therapistWorkDays.setWorkhours(therapistWorkDaysDto.getWorkhours());
+            therapistWorkDays.setWeekdays(therapistWorkDaysDto.getDays());
+        }
 
         therapistWorkDaysRepository.save(therapistWorkDays);
+    }
+
+    public List<Workhours> fetchBookedHours(BookingsDto bookingsDto) {
+        TherapistWorkDays therapistWorkDays = therapistWorkDaysRepository.findByTherapistId(bookingsDto.getTherapistId());
+
+        List<Workhours> workhoursFetched = new ArrayList<>(therapistWorkDays.getWorkhours());
+
+        List<Weekdays> weekdaysFetched = new ArrayList<>(therapistWorkDays.getWeekdays());
+        boolean weekdaysBoolean = false;
+
+        LocalDate date = bookingsDto.getDate();
+
+        // Get the day of the week from the date
+        DayOfWeek dayOfWeek = date.getDayOfWeek();
+        String dayName = dayOfWeek.name();
+
+        for (Weekdays weekday : weekdaysFetched) {
+            if (weekday.getDay().equalsIgnoreCase(dayName)) {
+                weekdaysBoolean = true;
+                break;
+            }
+        }
+
+        if (weekdaysBoolean) {
+            // Convert the fetched work hours to a set for faster lookup
+            Set<LocalTime> workhoursSet = workhoursFetched.stream()
+                    .map(Workhours::getHour)  // replace with your method to get the hour from Workhours object
+                    .collect(Collectors.toSet());
+
+            List<Bookings> bookings = bookingsRepository.fetchBookedHours(bookingsDto.getDate(), bookingsDto.getTherapistId());
+
+            List<Workhours> workhoursFiltered = new ArrayList<>();
+            if (bookings.isEmpty()) {
+                return workhoursFetched;
+            } else {
+                for (Bookings booking : bookings) {
+                    if (booking.getClientId() == bookingsDto.getClientId()) {
+                        return new ArrayList<>();
+                    }
+                }
+
+                for (Bookings booking : bookings) {
+                    LocalTime bookingHour = booking.getHour();  // replace with your method to get the hour from Booking object
+
+                    // If the booking hour is not in the work hours set, add it to the filtered bookings
+                    for (LocalTime hour : workhoursSet) {
+                        if (!hour.equals(bookingHour)) {
+                            Workhours workhour = new Workhours();  // replace with your method to create a new Workhours object
+                            workhour.setHour(hour);  // replace with your method to set the hour of a Workhours object
+                            workhoursFiltered.add(workhour);
+                        }
+                    }
+                }
+            }
+
+            workhoursFiltered.sort(Comparator.comparing(Workhours::getHour));
+
+            return workhoursFiltered;
+        }
+
+        return new ArrayList<>();
+    }
+
+    public void bookSession(BookingsDto bookingsDto) {
+        TherapistWorkDays therapistWorkDays = therapistWorkDaysRepository.findByTherapistId(bookingsDto.getTherapistId());
+
+        Bookings booking = new Bookings();
+        booking.setTherapistWorkDays(therapistWorkDays);
+        booking.setDate(bookingsDto.getDate());
+        booking.setHour(bookingsDto.getHour());
+        booking.setClientId(bookingsDto.getClientId());
+
+        bookingsRepository.save(booking);
+    }
+
+    public Collection<Bookings> fetchByClientIdAndTherapistId(BookingsDto bookingsDto) {
+        return bookingsRepository.fetchBookingsClientIdAndTherapistId(bookingsDto.getClientId(),bookingsDto.getTherapistId());
+    }
+
+    public Collection<Weekdays> fetchWorkDays(WeekdaysDto weekdaysDto) {
+        TherapistWorkDays therapistWorkDays = therapistWorkDaysRepository.findByTherapistId(weekdaysDto.getTherapistId());
+
+        if (therapistWorkDays==null){
+            return new ArrayList<>();
+        }
+
+        return therapistWorkDays.getWeekdays();
+    }
+
+    public Collection<Workhours> fetchWorkHours(WeekdaysDto weekdaysDto) {
+        TherapistWorkDays therapistWorkDays = therapistWorkDaysRepository.findByTherapistId(weekdaysDto.getTherapistId());
+
+        if (therapistWorkDays==null){
+            return new ArrayList<>();
+        }
+
+        return therapistWorkDays.getWorkhours();
+    }
+
+    public Bookings fetchNextBooking(BookingsDto bookingsDto) {
+         Optional<Bookings> bookingsOptional = bookingsRepository.fetchNextBookingByClientIdAndTherapistId(bookingsDto.getClientId(),bookingsDto.getTherapistId());
+
+        return bookingsOptional.orElse(null);
+
+    }
+
+    public void cancelBooking(BookingsDto bookingsDto) {
+        bookingsRepository.deleteById(bookingsDto.getBookingId());
+    }
+
+    public Bookings fetchBookingByBookingId(BookingsDto bookingsDto) {
+        Optional<Bookings> bookingsOptional = bookingsRepository.findById(bookingsDto.getBookingId());
+
+        return bookingsOptional.orElse(null);
+    }
+
+    public void updateBookingSession(BookingsDto bookingsDto) {
+        TherapistWorkDays therapistWorkDays = therapistWorkDaysRepository.findByTherapistId(bookingsDto.getTherapistId());
+
+        Bookings booking = new Bookings();
+        booking.setId(bookingsDto.getBookingId());
+        booking.setTherapistWorkDays(therapistWorkDays);
+        booking.setDate(bookingsDto.getDate());
+        booking.setHour(bookingsDto.getHour());
+        booking.setClientId(bookingsDto.getClientId());
+
+        bookingsRepository.save(booking);
+    }
+
+    public List<Workhours> fetchBookedHoursInEdit(BookingsDto bookingsDto) {
+        TherapistWorkDays therapistWorkDays = therapistWorkDaysRepository.findByTherapistId(bookingsDto.getTherapistId());
+
+        List<Workhours> workhoursFetched = new ArrayList<>(therapistWorkDays.getWorkhours());
+
+        List<Weekdays> weekdaysFetched = new ArrayList<>(therapistWorkDays.getWeekdays());
+        boolean weekdaysBoolean = false;
+
+        LocalDate date = bookingsDto.getDate();
+
+        // Get the day of the week from the date
+        DayOfWeek dayOfWeek = date.getDayOfWeek();
+        String dayName = dayOfWeek.name();
+
+        for (Weekdays weekday : weekdaysFetched) {
+            if (weekday.getDay().equalsIgnoreCase(dayName)) {
+                weekdaysBoolean = true;
+                break;
+            }
+        }
+
+        if (weekdaysBoolean) {
+            // Convert the fetched work hours to a set for faster lookup
+            Set<LocalTime> workhoursSet = workhoursFetched.stream()
+                    .map(Workhours::getHour)  // replace with your method to get the hour from Workhours object
+                    .collect(Collectors.toSet());
+
+            List<Bookings> bookings = bookingsRepository.fetchBookedHours(bookingsDto.getDate(), bookingsDto.getTherapistId());
+
+            List<Workhours> workhoursFiltered = new ArrayList<>();
+            if (bookings.isEmpty()) {
+                return workhoursFetched;
+            } else {
+                for (Bookings booking : bookings) {
+                    LocalTime bookingHour = booking.getHour();  // replace with your method to get the hour from Booking object
+
+                    // If the booking hour is not in the work hours set, add it to the filtered bookings
+                    for (LocalTime hour : workhoursSet) {
+                        if (!hour.equals(bookingHour)) {
+                            Workhours workhour = new Workhours();  // replace with your method to create a new Workhours object
+                            workhour.setHour(hour);  // replace with your method to set the hour of a Workhours object
+                            workhoursFiltered.add(workhour);
+                        }
+                    }
+                }
+            }
+
+            workhoursFiltered.sort(Comparator.comparing(Workhours::getHour));
+
+            return workhoursFiltered;
+        }
+
+        return new ArrayList<>();
     }
 }

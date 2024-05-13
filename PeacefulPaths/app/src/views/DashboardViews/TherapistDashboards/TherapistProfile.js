@@ -46,7 +46,12 @@ function TherapistProfile({loading,error,...props}){
         gender:{},
         language:[],
         roles:[],
-        university: {}
+        university: {},
+        therapistInfo: [],
+        therapistTypeTherapist: [],
+        therapyTypeTherapist: [],
+        identityTypeTherapist: [],
+        dateOfBirth: '',
     });
 
     React.useEffect(()=>{
@@ -65,7 +70,12 @@ function TherapistProfile({loading,error,...props}){
                     language:response.data.language,
                     experience:response.data.experience,
                     university:response.data.university,
-                    roles: response.data.roles
+                    roles: response.data.roles,
+                    therapistInfo: response.data.therapistInfo,
+                    therapistTypeTherapist: response.data.therapistTypeTherapist,
+                    therapyTypeTherapist: response.data.therapyTypeTherapist,
+                    identityTypeTherapist: response.data.identityTypeTherapist,
+                    dateOfBirth: response.data.dateOfBirth
                 })
             }
             else{
@@ -119,6 +129,9 @@ function TherapistProfile({loading,error,...props}){
     const handleChange = (e) => {
         const { name, value } = e.target;
         const languageObject = { id: Number(value.split('-')[0]), language: value.split('-')[1] };
+        const therapistTypeObject = { id: Number(value.split('-')[0]), therapistType: value.split('-')[1] };
+        const therapyTypeObject = { id: Number(value.split('-')[0]), therapyType: value.split('-')[1] };
+        const identityTypeObject = { id: Number(value.split('-')[0]), identityType: value.split('-')[1] };
 
         if (name === 'language') {
             if (values.language.some(lang => lang.id === languageObject.id)) {
@@ -130,6 +143,42 @@ function TherapistProfile({loading,error,...props}){
                 setValues(values => ({
                     ...values,
                     [name]: [...values[name], languageObject]
+                }));
+            }
+        } else if (name === 'therapistTypeTherapist') {
+            if (values.therapistTypeTherapist.some(type => type.id === therapistTypeObject.id)) {
+                setValues(values => ({
+                    ...values,
+                    [name]: values[name].filter(type => type.id !== therapistTypeObject.id)
+                }));
+            } else {
+                setValues(values => ({
+                    ...values,
+                    [name]: [...values[name], therapistTypeObject]
+                }));
+            }
+        } else if (name === 'therapyTypeTherapist') {
+            if (values.therapyTypeTherapist.some(type => type.id === therapyTypeObject.id)) {
+                setValues(values => ({
+                    ...values,
+                    [name]: values[name].filter(type => type.id !== therapyTypeObject.id)
+                }));
+            } else {
+                setValues(values => ({
+                    ...values,
+                    [name]: [...values[name], therapyTypeObject]
+                }));
+            }
+        } else if (name === 'identityTypeTherapist') {
+            if (values.identityTypeTherapist.some(type => type.id === identityTypeObject.id)) {
+                setValues(values => ({
+                    ...values,
+                    [name]: values[name].filter(type => type.id !== identityTypeObject.id)
+                }));
+            } else {
+                setValues(values => ({
+                    ...values,
+                    [name]: [...values[name], identityTypeObject]
                 }));
             }
         } else {
@@ -158,7 +207,7 @@ function TherapistProfile({loading,error,...props}){
 
                         <DashboardNav data={data} setUser={props.setUser} setTherapistAuthenticationState={props.setTherapistAuthenticationState}/>
 
-                        <div className="container-fluid">
+                        <div className="container-fluid" style={{marginBottom: '50px'}}>
 
                             {/*ADD ACCOUNT FEATURES HERE: */}
 
@@ -177,39 +226,54 @@ function TherapistProfile({loading,error,...props}){
                                             </Alert>
                                         }
                                         <Form onSubmit={handleUpdate}>
+                                            <br/>
                                             <Form.Group controlId="formName">
                                                 <Form.Label>Name</Form.Label>
                                                 <Form.Control type="text" name="name"
-                                                              defaultValue={data.name} onChange={handleChange} required/>
+                                                              defaultValue={data.name} onChange={handleChange}
+                                                              required/>
                                             </Form.Group>
-
+                                            <br/>
                                             <Form.Group controlId="formSurname">
                                                 <Form.Label>Surname</Form.Label>
                                                 <Form.Control type="text" name="surname"
-                                                              defaultValue={data.surname} onChange={handleChange} required/>
+                                                              defaultValue={data.surname} onChange={handleChange}
+                                                              required/>
                                             </Form.Group>
-
+                                            <br/>
                                             <Form.Group controlId="formBasicEmail">
                                                 <Form.Label>Email address</Form.Label>
-                                                <Form.Control type="email" name="email" defaultValue={data.email} onChange={handleChange} required/>
+                                                <Form.Control type="email" name="email" defaultValue={data.email}
+                                                              onChange={handleChange} required/>
                                             </Form.Group>
-
+                                            <br/>
                                             <Form.Group controlId="formBasicGender">
                                                 <Form.Label>Gender</Form.Label>
-                                                <Form.Select name="gender" value={values.gender ? `${values.gender.id}-${values.gender.gender}` : ''} onChange={handleChange} required>
+                                                <Form.Select name="gender"
+                                                             value={values.gender ? `${values.gender.id}-${values.gender.gender}` : ''}
+                                                             onChange={handleChange} required>
                                                     <option value="1-M">Male</option>
                                                     <option value="2-F">Female</option>
                                                 </Form.Select>
                                             </Form.Group>
-
+                                            <br/>
+                                            <Form.Group controlId="formBasicDateOfBirth">
+                                                <Form.Label>Phone</Form.Label>
+                                                <Form.Control type="date" defaultValue={values.dateOfBirth}
+                                                              onChange={handleChange} name="dateOfBirth"/>
+                                            </Form.Group>
+                                            <br/>
                                             <Form.Group controlId="formBasicPhone">
                                                 <Form.Label>Phone</Form.Label>
-                                                <Form.Control type="tel" defaultValue={data.number} onChange={handleChange} name="number"/>
+                                                <Form.Control type="tel" defaultValue={data.number}
+                                                              onChange={handleChange} name="number"/>
                                             </Form.Group>
-
+                                            <br/>
                                             <Form.Group controlId="formBasicAddress">
                                                 <Form.Label>Location</Form.Label>
-                                                <Form.Select name="location" value={values.location ? `${values.location.id}-${values.location.location}` : ''} onChange={handleChange} required>
+                                                <Form.Select name="location"
+                                                             value={values.location ? `${values.location.id}-${values.location.location}` : ''}
+                                                             onChange={handleChange} required>
                                                     <option value="1-Kosovo">Kosovo</option>
                                                     <option value="2-Albania">Albania</option>
                                                     <option value="3-Montenegro">Montenegro</option>
@@ -217,7 +281,7 @@ function TherapistProfile({loading,error,...props}){
                                                     <option value="5-Serbia">Serbia</option>
                                                 </Form.Select>
                                             </Form.Group>
-
+                                            <br/>
                                             <div className="custom-checkboxes">
                                                 <label>Language</label>
                                                 <div>
@@ -253,17 +317,152 @@ function TherapistProfile({loading,error,...props}){
                                                     />
                                                     <label htmlFor="serbianCheckbox">Serbian</label>
                                                 </div>
+                                                <i>You can select more than one!</i>
                                             </div>
-
+                                            <br/>
                                             <Form.Group controlId="formBasicAddress">
-                                                <Form.Label>Experience</Form.Label>
+                                                <Form.Label>Years of experience</Form.Label>
                                                 <Form.Control type="number" defaultValue={data.experience}
                                                               onChange={handleChange} name="experience" min={0}/>
                                             </Form.Group>
+                                            <br/>
+                                            <hr/>
+                                            <br/>
+                                            <div><label htmlFor="specializationSelect"><h2>What do I
+                                                specialize
+                                                in:</h2></label>
+
+                                                <div className="custom-checkboxes">
+                                                    <label><h5>Therapy type:</h5></label>
+                                                    <div>
+                                                        <input
+                                                            type="checkbox"
+                                                            id="IndividualCheckbox"
+                                                            name="therapyTypeTherapist"
+                                                            value="1-Individual"
+                                                            checked={values.therapyTypeTherapist.some(type => type.id === 1)}
+                                                            onChange={handleChange}
+                                                        />
+                                                        <label htmlFor="IndividualCheckbox">Individual
+                                                            Therapy</label>
+                                                    </div>
+                                                    <div>
+                                                        <input
+                                                            type="checkbox"
+                                                            id="CouplesCheckbox"
+                                                            name="therapyTypeTherapist"
+                                                            value="2-Couples"
+                                                            checked={values.therapyTypeTherapist.some(type => type.id === 2)}
+                                                            onChange={handleChange}
+                                                        />
+                                                        <label htmlFor="CouplesCheckbox">Couples
+                                                            Therapy</label>
+                                                    </div>
+                                                    <div>
+                                                        <input
+                                                            type="checkbox"
+                                                            id="TeenCheckbox"
+                                                            name="therapyTypeTherapist"
+                                                            value="3-Teen"
+                                                            checked={values.therapyTypeTherapist.some(type => type.id === 3)}
+                                                            onChange={handleChange}
+                                                        />
+                                                        <label htmlFor="TeenCheckbox">Teen Therapy</label>
+                                                    </div>
+                                                </div>
+                                                <br/>
+                                                <div className="custom-checkboxes">
+                                                    <label><h5>Therapist type:</h5></label>
+                                                    <div>
+                                                        <input
+                                                            type="checkbox"
+                                                            id="listensCheckbox"
+                                                            name="therapistTypeTherapist"
+                                                            value="1-Listens"
+                                                            checked={values.therapistTypeTherapist.some(type => type.id === 1)}
+                                                            onChange={handleChange}
+                                                        />
+                                                        <label htmlFor="listensCheckbox">A therapist that
+                                                            listens</label>
+                                                    </div>
+                                                    <div>
+                                                        <input
+                                                            type="checkbox"
+                                                            id="exploresPastCheckbox"
+                                                            name="therapistTypeTherapist"
+                                                            value="2-ExploresPast"
+                                                            checked={values.therapistTypeTherapist.some(type => type.id === 2)}
+                                                            onChange={handleChange}
+                                                        />
+                                                        <label htmlFor="exploresPastCheckbox">A therapist
+                                                            that explores the past</label>
+                                                    </div>
+                                                    <div>
+                                                        <input
+                                                            type="checkbox"
+                                                            id="teachesSkillsCheckbox"
+                                                            name="therapistTypeTherapist"
+                                                            value="3-TeachesSkills"
+                                                            checked={values.therapistTypeTherapist.some(type => type.id === 3)}
+                                                            onChange={handleChange}
+                                                        />
+                                                        <label htmlFor="teachesSkillsCheckbox">A therapist
+                                                            that teaches new skills</label>
+                                                    </div>
+                                                </div>
+
+                                                <br/>
+
+                                                <div className="custom-checkboxes">
+                                                    <label>
+                                                        <h5>Identity type:</h5>
+                                                    </label>
+                                                    <div>
+                                                        <input
+                                                            type="checkbox"
+                                                            id="straightCheckbox"
+                                                            name="identityTypeTherapist"
+                                                            value="1-Straight"
+                                                            checked={values.identityTypeTherapist.some(type => type.id === 1)}
+                                                            onChange={handleChange}
+                                                        />
+                                                        <label htmlFor="straightCheckbox">Straight</label>
+                                                    </div>
+                                                    <div>
+                                                        <input
+                                                            type="checkbox"
+                                                            id="gayCheckbox"
+                                                            name="identityTypeTherapist"
+                                                            value="2-Gay"
+                                                            checked={values.identityTypeTherapist.some(type => type.id === 2)}
+                                                            onChange={handleChange}
+                                                        />
+                                                        <label htmlFor="gayCheckbox">Gay</label>
+                                                    </div>
+                                                    <div>
+                                                        <input
+                                                            type="checkbox"
+                                                            id="lesbianCheckbox"
+                                                            name="identityTypeTherapist"
+                                                            value="3-Lesbian"
+                                                            checked={values.identityTypeTherapist.some(type => type.id === 3)}
+                                                            onChange={handleChange}
+                                                        />
+                                                        <label htmlFor="lesbianCheckbox">Lesbian</label>
+                                                    </div>
+                                                </div>
+                                                <i>You can select more than one!</i>
+                                            </div>
+
+                                            <br/>
+                                            <hr/>
 
                                             <div className="text-left" style={{padding: '10px 0'}}>
-                                                <Link className="small" to="/forgotPassBoot">Forgot Password?</Link>
+                                                <Link className="small" to="/forgotPassBoot">Change Password</Link>
                                             </div>
+
+                                            <hr/>
+                                            <br/>
 
                                             <Button variant="primary" type="submit">
                                                 Update Information
@@ -277,38 +476,8 @@ function TherapistProfile({loading,error,...props}){
 
                     </div>
 
-                    <footer className="sticky-footer bg-white">
-                        <div className="container my-auto">
-                            <div className="copyright text-center my-auto">
-                                <span style={{color: 'grey'}}>Copyright &copy; PeacefulParts 2024</span>
-                            </div>
-                        </div>
-                    </footer>
-
                 </div>
 
-            </div>
-
-
-            <div className="modal fade" id="logoutModal" tabIndex="-1" role="dialog" aria-labelledby="exampleModalLabel"
-                 aria-hidden="true">
-                <div className="modal-dialog" role="document">
-                    <div className="modal-content">
-                        <div className="modal-header">
-                            <h5 className="modal-title" id="exampleModalLabel">Ready to Leave?</h5>
-                            <button className="close" type="button" data-dismiss="modal" aria-label="Close">
-                                <span aria-hidden="true">×</span>
-                            </button>
-                        </div>
-                        <div className="modal-body">Select "Logout" below if you are ready to end your current
-                            session.
-                        </div>
-                        <div className="modal-footer">
-                            <button className="btn btn-secondary" type="button" data-dismiss="modal">Cancel</button>
-                            <Link className="btn btn-primary" to="/loginBoot">Logout</Link>
-                        </div>
-                    </div>
-                </div>
             </div>
 
             <script src="../../../vendor/jquery/jquery.min.js"></script>
@@ -326,6 +495,7 @@ function TherapistProfile({loading,error,...props}){
         </main>
     )
 }
+
 const mapStateToProps = ({auth}) => {
     console.log("state ", auth)
     return {

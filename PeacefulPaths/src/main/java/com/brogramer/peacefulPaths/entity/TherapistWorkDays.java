@@ -1,14 +1,9 @@
 package com.brogramer.peacefulPaths.entity;
 
-import java.time.LocalTime;
 import java.util.Collection;
 
 import jakarta.persistence.*;
-import lombok.Getter;
-import lombok.Setter;
 
-@Setter
-@Getter
 @Entity
 @Table(name = "therapist_work_days")
 public class TherapistWorkDays {
@@ -26,11 +21,11 @@ public class TherapistWorkDays {
             inverseJoinColumns = @JoinColumn(name = "weekdays_id"))
     private Collection<Weekdays> weekdays;
 
-    @Column(name = "start_time")
-    private LocalTime startTime;
-
-    @Column(name = "end_time")
-    private LocalTime endTime;
+    @ManyToMany(fetch = FetchType.EAGER, cascade = {CascadeType.MERGE, CascadeType.REMOVE, CascadeType.REFRESH, CascadeType.DETACH})
+    @JoinTable(name = "therapist_work_days_workhours",
+            joinColumns = @JoinColumn(name = "therapist_work_days_id"),
+            inverseJoinColumns = @JoinColumn(name = "workhours_id"))
+    private Collection<Workhours> workhours;
 
     public TherapistWorkDays() {}
 
@@ -38,11 +33,42 @@ public class TherapistWorkDays {
         this.id = id;
     }
 
-    public TherapistWorkDays(Long id, int therapistId, Collection<Weekdays> weekdays, LocalTime startTime, LocalTime endTime) {
+    public TherapistWorkDays(Long id, int therapistId, Collection<Weekdays> weekdays, Collection<Workhours> workhours) {
         this.id = id;
         this.therapistId = therapistId;
         this.weekdays = weekdays;
-        this.startTime = startTime;
-        this.endTime = endTime;
+        this.workhours = workhours;
+    }
+
+    public Long getId() {
+        return id;
+    }
+
+    public void setId(Long id) {
+        this.id = id;
+    }
+
+    public int getTherapistId() {
+        return therapistId;
+    }
+
+    public void setTherapistId(int therapistId) {
+        this.therapistId = therapistId;
+    }
+
+    public Collection<Weekdays> getWeekdays() {
+        return weekdays;
+    }
+
+    public void setWeekdays(Collection<Weekdays> weekdays) {
+        this.weekdays = weekdays;
+    }
+
+    public Collection<Workhours> getWorkhours() {
+        return workhours;
+    }
+
+    public void setWorkhours(Collection<Workhours> workhours) {
+        this.workhours = workhours;
     }
 }

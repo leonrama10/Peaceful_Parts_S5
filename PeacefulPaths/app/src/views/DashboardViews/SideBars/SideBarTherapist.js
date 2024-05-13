@@ -49,7 +49,7 @@ export default function SideBarTherapist(){
                     <div id="collapse-text">
                         <div className="bg-white py-2 collapse-inner rounded">
                             <h6 className="collapse-header">Custom Components:</h6>
-                            <Link className="collapse-item" to="/dashboard/therapistDashboard/workDays">Manage Work Days</Link>
+                            <Link className="collapse-item" to="/dashboard/therapistDashboard/workDaysDashboard">Manage Work Days</Link>
                             <Link className="collapse-item" to="/dashboard/therapistDashboard/users">Manage Clients</Link>
                             <Link className="collapse-item" to="/dashboard/therapistDashboard/history">Client History</Link>
                         </div>
@@ -63,30 +63,6 @@ export default function SideBarTherapist(){
             {/*<div className="sidebar-heading">*/}
             {/*    Addons*/}
             {/*</div>*/}
-
-            {/*<li className="nav-item" style={{marginTop: "10px", marginBottom: "20px"}}>*/}
-            {/*    <a style={{*/}
-            {/*        textDecoration: "none",*/}
-            {/*        color: "white",*/}
-            {/*        fontSize: "13px",*/}
-            {/*        marginLeft: "20px",*/}
-            {/*        fontWeight: "550"*/}
-            {/*    }} href="#" data-toggle="collapse" data-target="#collapsePages"*/}
-            {/*       aria-expanded="true" aria-controls="collapsePages">*/}
-            {/*        <span>Pages</span>*/}
-            {/*        <img style={{marginLeft: "139px", width: "15px"}} src={arrow} alt="arrow"/>*/}
-            {/*    </a>*/}
-            {/*    <div id="collapsePages" className="collapse" aria-labelledby="headingPages"*/}
-            {/*         data-parent="#accordionSidebar">*/}
-            {/*        <div className="bg-white py-2 collapse-inner rounded">*/}
-            {/*            <h6 className="collapse-header">Login Screens:</h6>*/}
-
-            {/*            <div className="collapse-divider"></div>*/}
-            {/*            <h6 className="collapse-header">Other Pages:</h6>*/}
-
-            {/*        </div>*/}
-            {/*    </div>*/}
-            {/*</li>*/}
 
             <hr className="sidebar-divider d-none d-md-block"/>
 

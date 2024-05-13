@@ -23,17 +23,21 @@ public class Questionnaire {
     @JoinColumn(name = "identity_type_id")
     private IdentityType identityType;
 
-    @Column(name = "relationship_status")
-    private String relationshipStatus;
+    @ManyToOne
+    @JoinColumn(name = "relationship_status_id")
+    private RelationshipStatus relationshipStatus;
 
-    @Column(name = "therapy_history")
-    private String therapyHistory;
+    @ManyToOne
+    @JoinColumn(name = "therapy_history_id")
+    private TherapyHistory therapyHistory;
 
-    @Column(name = "medication_history")
-    private String medicationHistory;
+    @ManyToOne
+    @JoinColumn(name = "medication_history_id")
+    private MedicationHistory medicationHistory;
 
-    @Column(name = "communication")
-    private String communication;
+    @ManyToOne
+    @JoinColumn(name = "communication_id")
+    private Communication communication;
 
     @ManyToOne
     @JoinColumn(name = "therapist_gender")
@@ -43,14 +47,17 @@ public class Questionnaire {
     @JoinColumn(name = "therapist_type_id")
     private TherapistType therapistType;
 
-    @Column(name = "current_physical_health")
-    private String currentPhysicalHealth;
+    @ManyToOne
+    @JoinColumn(name = "physical_health_id")
+    private PhysicalHealth physicalHealth;
 
-    @Column(name = "mental_state_1")
-    private String mentalState1;
+    @ManyToOne
+    @JoinColumn(name = "mental_state_1_id")
+    private MentalState1 mentalState1;
 
-    @Column(name = "mental_state_2")
-    private String mentalState2;
+    @ManyToOne
+    @JoinColumn(name = "mental_state_2_id")
+    private MentalState2 mentalState2;
 
     @ManyToOne
     @JoinColumn(name = "location_id")
@@ -65,6 +72,32 @@ public class Questionnaire {
             joinColumns = @JoinColumn(name = "questionnaire_id"),
             inverseJoinColumns = @JoinColumn(name = "language_id"))
     private Collection<Language> language;
+
+    public Questionnaire() {
+    }
+
+    public Questionnaire(Long id) {
+        this.id = id;
+    }
+
+    public Questionnaire(Long id, TherapyType therapyType, int age, IdentityType identityType, RelationshipStatus relationshipStatus, TherapyHistory therapyHistory, MedicationHistory medicationHistory, Communication communication, Gender therapistGender, TherapistType therapistType, PhysicalHealth physicalHealth, MentalState1 mentalState1, MentalState2 mentalState2, Location location, Gender gender, Collection<Language> language) {
+        this.id = id;
+        this.therapyType = therapyType;
+        this.age = age;
+        this.identityType = identityType;
+        this.relationshipStatus = relationshipStatus;
+        this.therapyHistory = therapyHistory;
+        this.medicationHistory = medicationHistory;
+        this.communication = communication;
+        this.therapistGender = therapistGender;
+        this.therapistType = therapistType;
+        this.physicalHealth = physicalHealth;
+        this.mentalState1 = mentalState1;
+        this.mentalState2 = mentalState2;
+        this.location = location;
+        this.gender = gender;
+        this.language = language;
+    }
 
     public Long getId() {
         return id;
@@ -98,38 +131,6 @@ public class Questionnaire {
         this.identityType = identityType;
     }
 
-    public String getRelationshipStatus() {
-        return relationshipStatus;
-    }
-
-    public void setRelationshipStatus(String relationshipStatus) {
-        this.relationshipStatus = relationshipStatus;
-    }
-
-    public String getTherapyHistory() {
-        return therapyHistory;
-    }
-
-    public void setTherapyHistory(String therapyHistory) {
-        this.therapyHistory = therapyHistory;
-    }
-
-    public String getMedicationHistory() {
-        return medicationHistory;
-    }
-
-    public void setMedicationHistory(String medicationHistory) {
-        this.medicationHistory = medicationHistory;
-    }
-
-    public String getCommunication() {
-        return communication;
-    }
-
-    public void setCommunication(String communication) {
-        this.communication = communication;
-    }
-
     public Gender getTherapistGender() {
         return therapistGender;
     }
@@ -144,30 +145,6 @@ public class Questionnaire {
 
     public void setTherapistType(TherapistType therapistType) {
         this.therapistType = therapistType;
-    }
-
-    public String getCurrentPhysicalHealth() {
-        return currentPhysicalHealth;
-    }
-
-    public void setCurrentPhysicalHealth(String currentPhysicalHealth) {
-        this.currentPhysicalHealth = currentPhysicalHealth;
-    }
-
-    public String getMentalState1() {
-        return mentalState1;
-    }
-
-    public void setMentalState1(String mentalState1) {
-        this.mentalState1 = mentalState1;
-    }
-
-    public String getMentalState2() {
-        return mentalState2;
-    }
-
-    public void setMentalState2(String mentalState2) {
-        this.mentalState2 = mentalState2;
     }
 
     public Collection<Language> getLanguage() {
@@ -194,6 +171,60 @@ public class Questionnaire {
         this.gender = gender;
     }
 
+    public RelationshipStatus getRelationshipStatus() {
+        return relationshipStatus;
+    }
 
+    public void setRelationshipStatus(RelationshipStatus relationshipStatus) {
+        this.relationshipStatus = relationshipStatus;
+    }
+
+    public TherapyHistory getTherapyHistory() {
+        return therapyHistory;
+    }
+
+    public void setTherapyHistory(TherapyHistory therapyHistory) {
+        this.therapyHistory = therapyHistory;
+    }
+
+    public MedicationHistory getMedicationHistory() {
+        return medicationHistory;
+    }
+
+    public void setMedicationHistory(MedicationHistory medicationHistory) {
+        this.medicationHistory = medicationHistory;
+    }
+
+    public Communication getCommunication() {
+        return communication;
+    }
+
+    public void setCommunication(Communication communication) {
+        this.communication = communication;
+    }
+
+    public PhysicalHealth getPhysicalHealth() {
+        return physicalHealth;
+    }
+
+    public void setPhysicalHealth(PhysicalHealth physicalHealth) {
+        this.physicalHealth = physicalHealth;
+    }
+
+    public MentalState1 getMentalState1() {
+        return mentalState1;
+    }
+
+    public void setMentalState1(MentalState1 mentalState1) {
+        this.mentalState1 = mentalState1;
+    }
+
+    public MentalState2 getMentalState2() {
+        return mentalState2;
+    }
+
+    public void setMentalState2(MentalState2 mentalState2) {
+        this.mentalState2 = mentalState2;
+    }
 }
 

@@ -1,6 +1,6 @@
 import React, {useEffect, useState} from 'react';
-import {fetchUserData} from '../../../api/authService';
-import {useNavigate, useParams} from 'react-router-dom';
+import {fetchUserData, fetchWorkDays, fetchWorkHours, selectWorkDays} from '../../../api/authService';
+import {Link, useNavigate} from 'react-router-dom';
 import {
     authenticate,
     authFailure,
@@ -14,12 +14,16 @@ import DashboardNav from "../DashboardNav";
 import SideBarTherapist from "../SideBars/SideBarTherapist";
 let role;
 const isTherapistAuthenticatedBoolean = loadState("isTherapistAuthenticated",false)
-function TherapistNotesDashboard({loading,error,...props}){
+function TherapistCurrentWorkDays({loading,error,...props}){
 
-    const { id } = useParams();
-    const idNumber = Number(id);
     const history = useNavigate ();
     const [userData,setUserData]=useState({});
+    const [workDays,setWorkDays]=useState([]);
+    const [info,setInfo]=useState(false);
+    const [workHours,setWorkHours]=useState({
+        startTime:'',
+        endTime:''
+    });
 
     useEffect(() => {
         if(isTherapistAuthenticatedBoolean){
@@ -28,6 +32,29 @@ function TherapistNotesDashboard({loading,error,...props}){
                 if (response.data.roles.at(0).role === 'ROLE_THERAPIST'){
                     setUserData(response.data);
                     role = loadState("role",'');
+
+                    fetchWorkDays({therapistId: response.data.id}).then((response)=>{
+                        setWorkDays(response.data)
+                    }).catch((e)=>{
+                        localStorage.clear();
+                        history('/loginBoot');
+                    })
+
+                    fetchWorkHours({therapistId: response.data.id}).then((response)=>{
+                        if (response.data.length === 0){
+                            console.log("IIIIIIIII", response.data)
+                            setInfo(true)
+                        }else {
+                            console.log("SSSSSSSSSSSSSSSS", response.data)
+                            setWorkHours({
+                                startTime: response.data[0].hour,
+                                endTime: response.data[response.data.length - 1].hour
+                            });
+                        }
+                    }).catch((e)=>{
+                        localStorage.clear();
+                        history('/loginBoot');
+                    })
                 }
                 else{
                     history('/loginBoot');
@@ -42,6 +69,29 @@ function TherapistNotesDashboard({loading,error,...props}){
                 if (response.data.roles.at(0).role === 'ROLE_THERAPIST'){
                     setUserData(response.data);
                     role = loadState("role",'');
+
+                    fetchWorkDays({therapistId: response.data.id}).then((response)=>{
+                        setWorkDays(response.data)
+                    }).catch((e)=>{
+                        localStorage.clear();
+                        history('/loginBoot');
+                    })
+
+                    fetchWorkHours({therapistId: response.data.id}).then((response)=>{
+                        if (response.data.length === 0){
+                            console.log("GGGGGGGGGG", response.data)
+                            setInfo(true)
+                        }else {
+                            console.log("TTTTTTTTTTTT", response.data)
+                            setWorkHours({
+                                startTime: response.data[0].hour,
+                                endTime: response.data[response.data.length - 1].hour
+                            });
+                        }
+                    }).catch((e)=>{
+                        localStorage.clear();
+                        history('/loginBoot');
+                    })
                 }
                 else{
                     history('/loginBoot');
@@ -56,14 +106,11 @@ function TherapistNotesDashboard({loading,error,...props}){
         }
     }, []);
 
-
-    function showOldNotes() {
-        history(`/dashboard/therapistDashboard/users/oldNotes/${idNumber}`);
-    }
-
-    function addNewNote() {
-        history(`/dashboard/therapistDashboard/users/addNotes/${idNumber}`);
-    }
+    const formatTime = (timeArray) => {
+        const hours = timeArray[0];
+        const mins = timeArray[1];
+        return `${hours < 10 ? '0' + hours : hours}:${mins < 10 ? '0' + mins : mins}`;
+    };
 
     return (
         <main id="page-top" style={{height: '100%'}}>
@@ -78,16 +125,31 @@ function TherapistNotesDashboard({loading,error,...props}){
 
                         <DashboardNav data={userData} setUser={props.setUser} setTherapistAuthenticationState={props.setTherapistAuthenticationState}/>
 
-                        <div className="container-fluid" style={{marginBottom: '100px'}}>
+                        {!info ? <div className="container-fluid" style={{marginBottom: '100px'}}>
+                            <h4>Work Days:</h4>
+                            {workDays.map((workDay, index) => {
+                                // Access the day property from the workDay object
+                                const day = workDay.day;
 
-                            <button onClick={showOldNotes}>Show Previous Notes</button>
-                            <button onClick={addNewNote}>Add New Note</button>
+                                // Return a paragraph element with the day
+                                return (
+                                    <p key={index}>{day}</p>
+                                );
+                            })}
+                            <br/>
+                            <h4>From:</h4>
+                            <p>{formatTime(workHours.startTime)}</p>
 
-                        </div>
+                            <br/>
+                            <h4>To:</h4>
+                            <p>{formatTime(workHours.endTime)}</p>
+                        </div>:<p>You need to set your work days and hours first: <Link to="/dashboard/therapistDashboard/addNewWorkDays">Click here to set them.</Link></p>
+                        }
+
                     </div>
 
                     <footer className="bg-white">
-                    <div className="container my-auto">
+                        <div className="container my-auto">
                             <div className="copyright text-center my-auto">
                                 <span style={{color: 'grey'}}>Copyright © PeacefulParts 2024</span>
                             </div>
@@ -134,4 +196,4 @@ const mapDispatchToProps = (dispatch) => {
         setTherapistAuthenticationState: (boolean) => dispatch(setTherapistAuthenticationState(boolean))
     }
 }
-export default connect(mapStateToProps, mapDispatchToProps)(TherapistNotesDashboard);
+export default connect(mapStateToProps, mapDispatchToProps)(TherapistCurrentWorkDays);

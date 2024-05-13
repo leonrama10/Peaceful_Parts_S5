@@ -43,7 +43,7 @@ function GetStarted({loading,error,...props}){
             question: "What is your gender identity?",
             answers: [
                 { text: "Man" },
-                { text: "Female"},
+                { text: "Woman"},
             ],
             answerMethod: "button"
         },
@@ -105,16 +105,16 @@ function GetStarted({loading,error,...props}){
         {
             question: "Have you ever been in therapy before?",
             answers: [
-                { text: "No"},
-                { text: "Yes" }
+                { text: "Yes"},
+                { text: "No" }
             ],
             answerMethod: "button"
         },
          {
            question: "Are you currently taking any medication?",
                     answers: [
-                        { text: "No" },
-                        { text: "Yes"},
+                        { text: "Yes" },
+                        { text: "No"},
                     ],
                     answerMethod: "button"
            },
@@ -123,7 +123,7 @@ function GetStarted({loading,error,...props}){
               answers: [
                 { text: "Mostly via messaging" },
                 { text: "Mostly via phone"},
-                { text: "video sessions" },
+                { text: "Video sessions" },
                 { text: "Not sure yet (decide later)" },
                ],
                answerMethod: "button"
@@ -185,7 +185,7 @@ function GetStarted({loading,error,...props}){
                    { text: "Serbia" }
                 ],
                        answerMethod: "dropdown"
-            },
+           },
             {
                 question: "What is your preferred language?",
                 answers: [
@@ -199,7 +199,7 @@ function GetStarted({loading,error,...props}){
 
     const genderToId = {
         'Man': 1,
-        'Female': 2
+        'Woman': 2
     };
 
     const therapistGenderToId = {
@@ -241,12 +241,57 @@ function GetStarted({loading,error,...props}){
         "I don't know": 4
     };
 
+    const relationshipStatusToId = {
+        'Single': 1,
+        'In a relationship': 2,
+        'Married': 3,
+        "Divorced": 4
+    };
+
+    const therapyHistoryToId = {
+        'Yes': 1,
+        'No': 2
+    };
+
+    const medicationHistoryToId = {
+        'Yes': 1,
+        'No': 2
+    };
+
+    const communicationToId = {
+        'Mostly via messaging': 1,
+        'Mostly via phone': 2,
+        'Video sessions': 3,
+        'Not sure yet (decide later)': 4
+    };
+
+    const physicalHealthToId = {
+        'Good': 1,
+        'Fair': 2,
+        'Poor': 3
+    };
+
+    const mentalState1ToId = {
+        'Not at all': 1,
+        'Several days': 2,
+        'More than half the days': 3,
+        'Nearly every day': 4
+    };
+
+    const mentalState2ToId = {
+        'Not at all': 1,
+        'Several days': 2,
+        'More than half the days': 3,
+        'Nearly every day': 4
+    };
+
+
     const [currentQuestion, setCurrentQuestion] = useState(0);
     const [isQuizOver, setIsQuizOver] = useState(false);
     const [questionnaire, setQuestionnaire] = useState({});
     const [getStartedFinished, setGetStartedFinished] = useState(false);
     const [questionIndex, setQuestionIndex] = useState(0);
-    const properties = ['therapyType', 'gender', 'age', 'identityType', 'relationshipStatus', 'therapyHistory', 'medicationHistory', 'communication', 'therapistGender', 'therapistType', 'currentPhysicalHealth', 'mentalState1', 'mentalState2', 'location', 'language'];
+    const properties = ['therapyType', 'gender', 'age', 'identityType', 'relationshipStatus', 'therapyHistory', 'medicationHistory', 'communication', 'therapistGender', 'therapistType', 'physicalHealth', 'mentalState1', 'mentalState2', 'location', 'language'];
 
     React.useEffect(() => {
         if (questionIndex >= questions.length) {
@@ -287,17 +332,31 @@ function GetStarted({loading,error,...props}){
         if (property === 'language') {
             value = [{ 'id': languageToId[answer], 'language': answer }];
         }else if (property === 'location') {
-            value = locationToId[answer];
+            value = { 'id': locationToId[answer], 'location': answer };
         }else if (property === 'gender') {
-            value = genderToId[answer];
+            value = { 'id': genderToId[answer], 'gender': answer };
         }else if (property === 'therapistGender') {
-            value = therapistGenderToId[answer];
+            value = { 'id': therapistGenderToId[answer], 'therapistGender': answer };
         }else if (property === 'therapyType') {
-            value = therapyTypeToId[answer];
+            value = { 'id': therapyTypeToId[answer], 'therapyType': answer };
         }else if (property === 'identityType') {
-            value = identityTypeToId[answer];
+            value = { 'id': identityTypeToId[answer], 'identityType': answer };
         }else if (property === 'therapistType') {
-            value = therapistTypeToId[answer];
+            value = { 'id': therapistTypeToId[answer], 'therapistType': answer };
+        }else if (property === 'relationshipStatus') {
+            value = { 'id': relationshipStatusToId[answer], 'answer': answer };
+        }else if (property === 'therapyHistory') {
+            value = { 'id': therapyHistoryToId[answer], 'answer': answer };
+        }else if (property === 'medicationHistory') {
+            value = { 'id': medicationHistoryToId[answer], 'answer': answer };
+        }else if (property === 'communication') {
+            value = { 'id': communicationToId[answer], 'answer': answer };
+        }else if (property === 'physicalHealth') {
+            value = { 'id': physicalHealthToId[answer], 'answer': answer };
+        }else if (property === 'mentalState1') {
+            value = { 'id': mentalState1ToId[answer], 'answer': answer };
+        }else if (property === 'mentalState2') {
+            value = { 'id': mentalState2ToId[answer], 'answer': answer };
         }
 
         setSelectedAnswer(prevAnswers => ({ ...prevAnswers, [property]: value }));

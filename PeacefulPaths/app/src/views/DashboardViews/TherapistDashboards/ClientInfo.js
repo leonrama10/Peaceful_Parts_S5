@@ -38,7 +38,6 @@ function ClientInfo({loading,error,...props}){
         therapistGender:{},
         language:[],
         questionnaire:{},
-        university:{},
         dateOfBirth: '',
         therapistTypeUser: {},
         therapyTypeUser: {},
@@ -78,7 +77,6 @@ function ClientInfo({loading,error,...props}){
                     language:response.data.language,
                     allRoles: response.data.allRoles,
                     questionnaire: response.data.questionnaire,
-                    university: response.data.university,
                     dateOfBirth: response.data.dateOfBirth,
                     therapistTypeUser: response.data.therapistTypeUser,
                     therapyTypeUser: response.data.therapyTypeUser,
@@ -122,7 +120,6 @@ function ClientInfo({loading,error,...props}){
                     language:response.data.language,
                     allRoles: response.data.allRoles,
                     questionnaire: response.data.questionnaire,
-                    university: response.data.university,
                     dateOfBirth: response.data.dateOfBirth,
                     therapistTypeUser: response.data.therapistTypeUser,
                     therapyTypeUser: response.data.therapyTypeUser,
@@ -155,7 +152,7 @@ function ClientInfo({loading,error,...props}){
 
                         <DashboardNav data={userData} setUser={props.setUser}/>
 
-                        <div className="container-fluid" style={{marginBottom: '100px'}}>
+                        <div className="container-fluid" style={{marginBottom: '50px'}}>
 
                             <Container>
                                 <Row className="justify-content-md-center">
@@ -308,7 +305,6 @@ function ClientInfo({loading,error,...props}){
                                                     <Form.Control type="text" value={values.questionnaire.mentalState2}
                                                                   readOnly/>
                                                 </Form.Group>
-
                                             </div>
                                         </Form>
                                     </Col>
@@ -316,14 +312,6 @@ function ClientInfo({loading,error,...props}){
                             </Container>
                         </div>
                     </div>
-
-                    <footer className="bg-white">
-                        <div className="container my-auto">
-                            <div className="copyright text-center my-auto">
-                                <span style={{color: 'grey'}}>Copyright © PeacefulParts 2024</span>
-                            </div>
-                        </div>
-                    </footer>
 
                 </div>
 

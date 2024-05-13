@@ -34,13 +34,29 @@ public class UserInfo {
     private Questionnaire questionnaire;
     @JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "yyyy-MM-dd HH:mm:ss")
     private LocalDateTime dateAdded;
-    private Collection<TherapyType> therapyType;
+    private Collection<TherapyType> therapyTypeTherapist;
     private TherapyType therapyTypeUser;
-    private Collection<TherapistType> therapistType;
+    private Collection<TherapistType> therapistTypeTherapist;
     private TherapistType therapistTypeUser;
-    private Collection<IdentityType> identityType;
+    private Collection<IdentityType> identityTypeTherapist;
     private IdentityType identityTypeUser;
     private Gender therapistGender;
+    private TherapyHistory therapyHistory;
+    private Communication communication;
+    private MedicationHistory medicationHistory;
+    private MentalState1 mentalState1;
+    private MentalState2 mentalState2;
+    private PhysicalHealth physicalHealth;
+    private RelationshipStatus relationshipStatus;
+    private TherapistInfo therapistInfo;
+
+    public Gender getTherapistGender() {
+        return therapistGender;
+    }
+
+    public void setTherapistGender(Gender therapistGender) {
+        this.therapistGender = therapistGender;
+    }
 
     public Questionnaire getQuestionnaire() {
         return questionnaire;
@@ -184,28 +200,28 @@ public class UserInfo {
         this.dateAdded = dateAdded;
     }
 
-    public Collection<TherapyType> getTherapyType() {
-        return therapyType;
+    public Collection<TherapyType> getTherapyTypeTherapist() {
+        return therapyTypeTherapist;
     }
 
-    public void setTherapyType(Collection<TherapyType> therapyType) {
-        this.therapyType = therapyType;
+    public void setTherapyTypeTherapist(Collection<TherapyType> therapyTypeTherapist) {
+        this.therapyTypeTherapist = therapyTypeTherapist;
     }
 
-    public Collection<TherapistType> getTherapistType() {
-        return therapistType;
+    public Collection<TherapistType> getTherapistTypeTherapist() {
+        return therapistTypeTherapist;
     }
 
-    public void setTherapistType(Collection<TherapistType> therapistType) {
-        this.therapistType = therapistType;
+    public void setTherapistTypeTherapist(Collection<TherapistType> therapistTypeTherapist) {
+        this.therapistTypeTherapist = therapistTypeTherapist;
     }
 
-    public Collection<IdentityType> getIdentityType() {
-        return identityType;
+    public Collection<IdentityType> getIdentityTypeTherapist() {
+        return identityTypeTherapist;
     }
 
-    public void setIdentityType(Collection<IdentityType> identityType) {
-        this.identityType = identityType;
+    public void setIdentityTypeTherapist(Collection<IdentityType> identityTypeTherapist) {
+        this.identityTypeTherapist = identityTypeTherapist;
     }
 
     public TherapyType getTherapyTypeUser() {
@@ -232,11 +248,69 @@ public class UserInfo {
         this.identityTypeUser = identityTypeUser;
     }
 
-    public Gender getTherapistGender() {
-        return therapistGender;
+
+
+    public TherapyHistory getTherapyHistory() {
+        return therapyHistory;
     }
 
-    public void setTherapistGender(Gender therapistGender) {
-        this.therapistGender = therapistGender;
+    public void setTherapyHistory(TherapyHistory therapyHistory) {
+        this.therapyHistory = therapyHistory;
+    }
+
+    public Communication getCommunication() {
+        return communication;
+    }
+
+    public void setCommunication(Communication communication) {
+        this.communication = communication;
+    }
+
+    public MedicationHistory getMedicationHistory() {
+        return medicationHistory;
+    }
+
+    public void setMedicationHistory(MedicationHistory medicationHistory) {
+        this.medicationHistory = medicationHistory;
+    }
+
+    public MentalState1 getMentalState1() {
+        return mentalState1;
+    }
+
+    public void setMentalState1(MentalState1 mentalState1) {
+        this.mentalState1 = mentalState1;
+    }
+
+    public MentalState2 getMentalState2() {
+        return mentalState2;
+    }
+
+    public void setMentalState2(MentalState2 mentalState2) {
+        this.mentalState2 = mentalState2;
+    }
+
+    public PhysicalHealth getPhysicalHealth() {
+        return physicalHealth;
+    }
+
+    public void setPhysicalHealth(PhysicalHealth physicalHealth) {
+        this.physicalHealth = physicalHealth;
+    }
+
+    public RelationshipStatus getRelationshipStatus() {
+        return relationshipStatus;
+    }
+
+    public void setRelationshipStatus(RelationshipStatus relationshipStatus) {
+        this.relationshipStatus = relationshipStatus;
+    }
+
+    public TherapistInfo getTherapistInfo() {
+        return therapistInfo;
+    }
+
+    public void setTherapistInfo(TherapistInfo therapistInfo) {
+        this.therapistInfo = therapistInfo;
     }
 }

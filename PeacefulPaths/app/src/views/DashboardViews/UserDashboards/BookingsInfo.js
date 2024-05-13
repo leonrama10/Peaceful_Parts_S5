@@ -1,23 +1,27 @@
 import React, {useEffect, useState} from 'react';
 import {
-    fetchNextBooking,
+    bookSession, cancelBooking,
+    fetchBookedHours, fetchBookings,
     fetchUserData,
-    fetchUserTherapistConnectionData,
-    removeTherapist
+    fetchUserTherapistConnectionData, removeTherapist, selectWorkDays
 } from '../../../api/authService';
-import {useNavigate} from 'react-router-dom';
+import {Link, useNavigate} from 'react-router-dom';
 import '../../../css/sb-admin-2.css';
 import '../../../css/myCss.css';
 import DashboardNav from "../DashboardNav";
 import SideBarUser from "../SideBars/SideBarUser";
 import {Alert} from "reactstrap";
-import {authenticate, authFailure, authSuccess, setUserAuthenticationState} from "../../../redux/authActions";
+import {
+    authenticate,
+    authFailure,
+    authSuccess,
+    setUserAuthenticationState
+} from "../../../redux/authActions";
 import {connect} from "react-redux";
 import {loadState, saveState} from "../../../helper/sessionStorage";
-
 let connected = null;
 const isUserAuthenticatedBoolean = loadState("isUserAuthenticated",false)
-function UserDashboardTherapists({loading,error,...props}){
+function BookingsInfo({loading,error,...props}){
 
     useEffect(() => {
         if(!isUserAuthenticatedBoolean){
@@ -34,9 +38,9 @@ function UserDashboardTherapists({loading,error,...props}){
 
     const history = useNavigate ();
     const [data,setData]=useState({});
-    const [hideFilterMenu,setHideFilterMenu]=useState(true);
-    const [nextBooking,setNextBooking]=useState({});
+    const [allBookings, setAllBookings] = useState([]);
     const [connectionFailure, setConnectionFailure] = useState('');
+    const [info, setInfo] = useState(false);
     const [therapistData, setTherapistData] = useState({
         id:0,
         email: '',
@@ -50,6 +54,13 @@ function UserDashboardTherapists({loading,error,...props}){
         university: '',
         location:{},
         gender:{},
+    });
+
+    const [values, setValues] = useState({
+        clientId:0,
+        therapistId: 0,
+        date: '',
+        hour:''
     });
 
     React.useEffect(() => {
@@ -66,18 +77,18 @@ function UserDashboardTherapists({loading,error,...props}){
                 fetchUserTherapistConnectionData(response.data.id).then((response) => {
                     if (response.data.roles.at(0).role === 'ROLE_THERAPIST') {
                         setTherapistData({
-                           id: response.data.id,
-                           email: response.data.email,
-                           name: response.data.name,
-                           surname: response.data.surname,
-                           password: response.data.password,
-                           roles: response.data.roles,
-                           number: response.data.number,
-                           experience: response.data.experience,
-                           location: response.data.location,
-                           allRoles: response.data.allRoles,
-                           university: response.data.university,
-                           gender: response.data.gender
+                            id: response.data.id,
+                            email: response.data.email,
+                            name: response.data.name,
+                            surname: response.data.surname,
+                            password: response.data.password,
+                            roles: response.data.roles,
+                            number: response.data.number,
+                            experience: response.data.experience,
+                            location: response.data.location,
+                            allRoles: response.data.allRoles,
+                            University: response.data.University,
+                            gender: response.data.gender
                         });
                         connected = loadState("connected",false)
                         if(response.data.id===0){
@@ -88,8 +99,10 @@ function UserDashboardTherapists({loading,error,...props}){
 
                         newBookingsData.therapistId = response.data.id
 
-                        fetchNextBooking(newBookingsData).then((response) => {
-                            setNextBooking(response.data)
+                        fetchBookings(newBookingsData).then((response) => {
+                            if (response.data.length === 0){
+                                setInfo(true);
+                            }else {setAllBookings(response.data);}
                         }).catch((e) => {
                             history('/loginBoot');
                         });
@@ -122,11 +135,15 @@ function UserDashboardTherapists({loading,error,...props}){
         });
     }, []);
 
-    function handleRemove(id) {
-        removeTherapist(id).then((response)=>{
+
+    function handleEdit(id) {
+        history(`/dashboard/userDashboard/editBooking/${id}`);
+    }
+
+    function handleCanceling(id) {
+        cancelBooking({bookingId:id}).then((response)=>{
             if(response.status===200){
-                saveState("connected",false)
-                history('/dashboard/userDashboard')
+                window.location.reload();
             }
             else{
                 //Add error on page if user cant be deleted
@@ -137,17 +154,12 @@ function UserDashboardTherapists({loading,error,...props}){
         });
     }
 
-    function formatHour(hour) {
-        return `${hour[0] < 10 ? '0' + hour[0] : hour[0]}:${hour[1] < 10 ? '0' + hour[1] : hour[1]}`;
-    }
-
-
     return (
         <main id="page-top">
 
             <div id="wrapper">
 
-                <SideBarUser hideFilterMenu={hideFilterMenu}/>
+                <SideBarUser />
 
                 <div id="content-wrapper" className="d-flex flex-column">
 
@@ -155,33 +167,41 @@ function UserDashboardTherapists({loading,error,...props}){
 
                         <DashboardNav data={data} setUser={props.setUser} setUserAuthenticationState={props.setUserAuthenticationState}/>
 
-                        { connectionFailure &&
-                            <Alert style={{marginTop:'20px'}} variant="danger">
-                                {connectionFailure}
-                            </Alert>
-                        }
-
                         <div className="container-fluid">
-                            {connected && <div className="card" style={{display: "flex", flexDirection: "row"}}>
-                                <div className="card-body">
-                                    <h5 className="card-title">Full
-                                        name: {therapistData.name} {therapistData.surname}</h5>
-                                    <p className="card-text">Email: {therapistData.email}</p>
-                                    <p className="card-text">Phone: {therapistData.number}</p>
-                                    <p className="card-text">Gender: {therapistData.gender.gender}</p>
-                                    <p className="card-text">Experience: {therapistData.experience} years</p>
-                                    <p className="card-text">Location: {therapistData.location.location}</p>
-                                    <br/>
+                            {connected && <div className="card">
+                                {!info ? <div className="card-body">
+                                    {allBookings.map((booking, index) => {
+                                        const date = booking.date;
+                                        const formattedDate = `${date[0]}-${date[1] < 10 ? '0' + date[1] : date[1]}-${date[2] < 10 ? '0' + date[2] : date[2]}`;
 
-                                    <button onClick={() => handleRemove(data.id)}>Remove Therapist</button>
-                                </div>
+                                        // Convert the hour into a more readable format
+                                        const hour = booking.hour;
+                                        const formattedHour = `${hour[0] < 10 ? '0' + hour[0] : hour[0]}:${hour[1] < 10 ? '0' + hour[1] : hour[1]}`;
 
-                                <div className="card-body">
-                                    <h5 className="card-title">Next Session:</h5>
-                                    <p className="card-text">Date: {new Date(nextBooking.date).toLocaleDateString()}</p>
-                                    <p className="card-text">Hour: {nextBooking && nextBooking.hour && formatHour(nextBooking.hour)}</p>
-                                </div>
+                                        return (
+                                            <div key={index} className="card"
+                                                 style={{marginTop: '10px', display: "flex", flexDirection: "row"}}>
+                                                <div className="card-body">
+                                                    <h5 className="card-title">Booking {index + 1}</h5>
+                                                    <p className="card-text">Date: {formattedDate}</p>
+                                                    <p className="card-text">Hour: {formattedHour}</p>
+                                                </div>
 
+                                                <div className="card-body" style={{marginLeft: '800px'}}>
+                                                    <button className="btn btn-info btn-sm" onClick={() => handleEdit(booking.bookingId)}>Edit Session
+                                                    </button>
+                                                    <br/>
+                                                    <br/>
+                                                    <button className="btn btn-danger btn-sm" onClick={() => handleCanceling(booking.bookingId)}>Cancel Session
+                                                    </button>
+                                                </div>
+                                            </div>
+                                        )
+                                    })}
+                                </div> : <p>You need to make booking first: <Link
+                                    to="/dashboard/userDashboard/addBookings">Click here to book your first
+                                    session.</Link></p>
+                                }
                             </div>}
                         </div>
 
@@ -189,8 +209,8 @@ function UserDashboardTherapists({loading,error,...props}){
 
                     <footer className="sticky-footer bg-white">
                         <div className="container my-auto">
-                        <div className="copyright text-center my-auto">
-                            <span>Copyright &copy; Your Website 2020</span>
+                            <div className="copyright text-center my-auto">
+                                <span>Copyright &copy; Your Website 2020</span>
                             </div>
                         </div>
                     </footer>
@@ -200,31 +220,8 @@ function UserDashboardTherapists({loading,error,...props}){
             </div>
 
             <a className="scroll-to-top rounded" href="#page-top">
-            <i className="fas fa-angle-up"></i>
+                <i className="fas fa-angle-up"></i>
             </a>
-
-            <div className="modal fade" id="logoutModal" tabIndex="-1" role="dialog"
-                 aria-labelledby="exampleModalLabel"
-                 aria-hidden="true">
-                <div className="modal-dialog" role="document">
-                    <div className="modal-content">
-                        <div className="modal-header">
-                            <h5 className="modal-title" id="exampleModalLabel">Ready to Leave?</h5>
-                            <button className="close" type="button" data-dismiss="modal" aria-label="Close">
-                                <span aria-hidden="true">×</span>
-                            </button>
-                        </div>
-                        <div className="modal-body">Select "Logout" below if you are ready to end your current
-                            session.
-                        </div>
-                        <div className="modal-footer">
-                            <button className="btn btn-secondary" type="button" data-dismiss="modal">Cancel
-                            </button>
-                            <a className="btn btn-primary" href="login.html">Logout</a>
-                        </div>
-                    </div>
-                </div>
-            </div>
 
             <script src="../../../vendor/jquery/jquery.min.js"></script>
             <script src="../../../vendor/bootstrap/js/bootstrap.bundle.min.js"></script>
@@ -251,4 +248,4 @@ const mapDispatchToProps = (dispatch) => {
         setUserAuthenticationState: (boolean) => dispatch(setUserAuthenticationState(boolean))
     }
 }
-export default connect(mapStateToProps, mapDispatchToProps)(UserDashboardTherapists);
+export default connect(mapStateToProps, mapDispatchToProps)(BookingsInfo);

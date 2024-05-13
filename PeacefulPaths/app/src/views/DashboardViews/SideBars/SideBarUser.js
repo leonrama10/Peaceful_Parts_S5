@@ -13,7 +13,6 @@ import {
     therapistFilterByLanguageNotConnected,
     fetchAllTherapistData,
     fetchAllTherapistNotConnectedData,
-    therapistFilterByTherapy,
     therapistFilterByTherapistType,
     therapistFilterByTherapistTypeNotConnected,
     therapistFilterByIdentityTypeNotConnected,
@@ -40,8 +39,7 @@ function SideBarUser({loading,error,...props}){
     React.useEffect(() => {
         connected = loadState("connected",false)
         therapistId = loadState("therapistId",0)
-         console.log(connected, therapistId);
-
+        console.log(connected, therapistId);
     }, []);
 
     function handleFilterByAll(){
@@ -625,6 +623,8 @@ function SideBarUser({loading,error,...props}){
                             <h6 className="collapse-header">Custom Components:</h6>
                             <Link className="collapse-item" to="/dashboard/userDashboard/therapists">Manage
                                 Therapists</Link>
+                            <Link className="collapse-item" to="/dashboard/userDashboard/bookingsDashboard">Manage
+                                Bookings</Link>
                         </div>
                     </div>
                 </Collapse>

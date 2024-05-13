@@ -1,5 +1,5 @@
 import React, {useEffect, useState} from 'react';
-import {fetchUserData, selectWorkDays, userRegister} from '../../../api/authService';
+import {fetchUserData} from '../../../api/authService';
 import {useNavigate} from 'react-router-dom';
 import {
     authenticate,
@@ -18,12 +18,7 @@ function TherapistWorkDaysDashboard({loading,error,...props}){
 
     const history = useNavigate ();
     const [userData,setUserData]=useState({});
-    const [values, setValues] = useState({
-        therapistId: 0,
-        days: [],
-        startTime: '',
-        endTime: ''
-    });
+
 
     useEffect(() => {
         if(isTherapistAuthenticatedBoolean){
@@ -31,7 +26,6 @@ function TherapistWorkDaysDashboard({loading,error,...props}){
             fetchUserData().then((response)=>{
                 if (response.data.roles.at(0).role === 'ROLE_THERAPIST'){
                     setUserData(response.data);
-                    values.therapistId = response.data.id
                     role = loadState("role",'');
                 }
                 else{
@@ -46,7 +40,6 @@ function TherapistWorkDaysDashboard({loading,error,...props}){
             fetchUserData().then((response)=>{
                 if (response.data.roles.at(0).role === 'ROLE_THERAPIST'){
                     setUserData(response.data);
-                    values.therapistId = response.data.id
                     role = loadState("role",'');
                 }
                 else{
@@ -63,54 +56,13 @@ function TherapistWorkDaysDashboard({loading,error,...props}){
     }, []);
 
 
-    const dayToNumber = {
-        'Monday': 1,
-        'Tuesday': 2,
-        'Wednesday': 3,
-        'Thursday': 4,
-        'Friday': 5,
-        'Saturday': 6,
-        'Sunday': 7
-    };
 
-    const handleChange = (e) => {
-        const { name, value } = e.target;
+    function showCurrentWorkDays() {
+        history(`/dashboard/therapistDashboard/currentWorkDays`);
+    }
 
-        if (name === 'days') {
-            const selectedDays = Array.from(e.target.selectedOptions, option => ({ id: dayToNumber[option.value], day: option.value }));
-            setValues(values => ({ ...values, [name]: selectedDays }));
-        } else {
-            setValues(values => ({ ...values, [name]: value }));
-        }
-    };
-
-
-    React.useEffect(() => {
-        console.log("VALUESSSSSSSSS",values)
-    }, [values])
-
-    function handleSubmit(evt) {
-        evt.preventDefault();
-
-        selectWorkDays(values).then((response) => {
-                //add smth here !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
-            console.log("CONGRATSSSSSS",response)
-        }).catch((err) => {
-            if (err && err.response) {
-                switch (err.response.status) {
-                    case 401:
-                        console.log("401 status");
-                        props.loginFailure("Authentication Failed.Bad Credentials");
-                        break;
-                    default:
-                        props.loginFailure('Something BABAAAAAA!Please Try Again');
-
-                }
-            } else {
-                console.log("ERROR: ", err)
-                props.loginFailure('Something NaNAAAAA!Please Try Again');
-            }
-        });
+    function updateWorkDays() {
+        history(`/dashboard/therapistDashboard/addNewWorkDays`);
     }
 
     return (
@@ -128,30 +80,8 @@ function TherapistWorkDaysDashboard({loading,error,...props}){
 
                         <div className="container-fluid" style={{marginBottom: '100px'}}>
 
-                            <form onSubmit={handleSubmit}>
-                                <input type="hidden" name="therapistId" value={values.therapistId}/>
-                                <label htmlFor="days">Select work days for the week:</label><br/>
-                                <select multiple={true} id="days" name="days"
-                                        value={values.days.map(dayObj => dayObj.day)} onChange={handleChange}>
-                                    <option value="Monday">Monday</option>
-                                    <option value="Tuesday">Tuesday</option>
-                                    <option value="Wednesday">Wednesday</option>
-                                    <option value="Thursday">Thursday</option>
-                                    <option value="Friday">Friday</option>
-                                    <option value="Saturday">Saturday</option>
-                                    <option value="Sunday">Sunday</option>
-                                </select><br/><br/>
-                                <label htmlFor="startTime">Start Time:</label><br/>
-                                <input type="time" id="startTime" name="startTime" value={values.startTime}
-                                       onChange={handleChange}/><br/><br/>
-                                <label htmlFor="endTime">End Time:</label><br/>
-                                <input type="time" id="endTime" name="endTime" value={values.endTime}
-                                       onChange={handleChange}/><br/><br/>
-
-                                <button type="submit" className="btn btn-primary btn-user btn-block">
-                                    Submit
-                                </button>
-                            </form>
+                            <button onClick={showCurrentWorkDays}>Show Your Work Days and Work Hours</button>
+                            <button onClick={updateWorkDays}>Update Work Days and Work Hours</button>
 
                         </div>
                     </div>

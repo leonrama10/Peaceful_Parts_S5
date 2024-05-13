@@ -1,7 +1,5 @@
 import React, {useEffect, useState} from 'react';
 import {
-    fetchAllTherapistData,
-    fetchAllTherapistNotConnectedData,
     fetchUserData,
     fetchUserTherapistConnectionData, therapistFilterByGetStarted, therapistFilterByGetStartedNotConnectedData
 } from '../../../api/authService';

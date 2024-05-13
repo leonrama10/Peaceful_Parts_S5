@@ -66,21 +66,26 @@ public class AuthController {
             userInfo.setTherapyTypeUser(userDetails.getQuestionnaire().getTherapyType());
             userInfo.setIdentityTypeUser(userDetails.getQuestionnaire().getIdentityType());
             userInfo.setTherapistTypeUser(userDetails.getQuestionnaire().getTherapistType());
+            userInfo.setCommunication(userDetails.getQuestionnaire().getCommunication());
+            userInfo.setMedicationHistory(userDetails.getQuestionnaire().getMedicationHistory());
+            userInfo.setPhysicalHealth(userDetails.getQuestionnaire().getPhysicalHealth());
+            userInfo.setMentalState1(userDetails.getQuestionnaire().getMentalState1());
+            userInfo.setMentalState2(userDetails.getQuestionnaire().getMentalState2());
+            userInfo.setRelationshipStatus(userDetails.getQuestionnaire().getRelationshipStatus());
+            userInfo.setTherapyHistory(userDetails.getQuestionnaire().getTherapyHistory());
         }else if(role.contains(roleTherapist)){
             userInfo.setLocation(userDetails.getLocation());
             userInfo.setGender(userDetails.getGender());
             userInfo.setLanguage(userDetails.getLanguage());
             userInfo.setUniversity(userDetails.getUniversity());
             userInfo.setDateOfBirth(userDetails.getDateOfBirth());
-            userInfo.setTherapyType(userDetails.getTherapistInfo().getTherapyType());
-            userInfo.setTherapistType(userDetails.getTherapistInfo().getTherapistType());
-            userInfo.setIdentityType(userDetails.getTherapistInfo().getIdentityType());
+            userInfo.setTherapyTypeTherapist(userDetails.getTherapistInfo().getTherapyType());
+            userInfo.setTherapistTypeTherapist(userDetails.getTherapistInfo().getTherapistType());
+            userInfo.setIdentityTypeTherapist(userDetails.getTherapistInfo().getIdentityType());
+            userInfo.setExperience(userDetails.getExperience());
         }else{
-            userInfo.setLocation(userDetails.getLocation());
             userInfo.setGender(userDetails.getGender());
-            userInfo.setLanguage(userDetails.getLanguage());
         }
-        userInfo.setExperience(userDetails.getExperience());
         userInfo.setResetToken(userDetails.getResetToken());
         userInfo.setExpirationTime(userDetails.getExpirationTime());
         userInfo.setDateAdded(userDetails.getDateAdded());
@@ -143,11 +148,41 @@ public class AuthController {
 
         therapistWorkDaysDto.setTherapistId(therapistWorkDays.getTherapistId());
         therapistWorkDaysDto.setDays(therapistWorkDays.getWeekdays());
-        therapistWorkDaysDto.setStartTime(therapistWorkDays.getStartTime());
-        therapistWorkDaysDto.setEndTime(therapistWorkDays.getEndTime());
+        therapistWorkDaysDto.setWorkhours(therapistWorkDays.getWorkhours());
 
         return therapistWorkDaysDto;
     }
+
+    private WorkhoursDto convertToWorkhoursDto(Workhours workhours) {
+        WorkhoursDto workhoursDto = new WorkhoursDto();
+
+        workhoursDto.setHour(workhours.getHour());
+        workhoursDto.setId(workhours.getId());
+
+        return workhoursDto;
+    }
+
+    private BookingsDto convertToBookingsDto(Bookings bookings) {
+        BookingsDto bookingsDto = new BookingsDto();
+
+        bookingsDto.setBookingId(bookings.getId());
+        bookingsDto.setHour(bookings.getHour());
+        bookingsDto.setClientId(bookings.getClientId());
+        bookingsDto.setTherapistId(bookings.getTherapistWorkDays().getTherapistId());
+        bookingsDto.setDate(bookings.getDate());
+
+        return bookingsDto;
+    }
+
+    private WeekdaysDto convertToWeekdaysDto(Weekdays weekdays) {
+        WeekdaysDto weekdaysDto = new WeekdaysDto();
+
+        weekdaysDto.setDay(weekdays.getDay());
+        weekdaysDto.setId(weekdays.getId());
+
+        return weekdaysDto;
+    }
+
 
     @PostMapping("/auth/login")
     public ResponseEntity<UserDto> login(@RequestBody @Valid CredentialsDto credentialsDto) {
@@ -200,6 +235,7 @@ public class AuthController {
 
         Collection<Roles> role;
         Roles roleUser = new Roles(1,"ROLE_USER");
+        Roles roleTherapist = new Roles(2,"ROLE_THERAPIST");
 
         UserInfo userInfo = new UserInfo();
         userInfo.setId(userDetails.getId());
@@ -215,10 +251,29 @@ public class AuthController {
             userInfo.setLocation(userDetails.getQuestionnaire().getLocation());
             userInfo.setGender(userDetails.getQuestionnaire().getGender());
             userInfo.setLanguage(userDetails.getQuestionnaire().getLanguage());
-        }else {
+            userInfo.setTherapistGender(userDetails.getQuestionnaire().getTherapistGender());
+            userInfo.setTherapyHistory(userDetails.getQuestionnaire().getTherapyHistory());
+            userInfo.setTherapyTypeUser(userDetails.getQuestionnaire().getTherapyType());
+            userInfo.setIdentityTypeUser(userDetails.getQuestionnaire().getIdentityType());
+            userInfo.setTherapistTypeUser(userDetails.getQuestionnaire().getTherapistType());
+            userInfo.setCommunication(userDetails.getQuestionnaire().getCommunication());
+            userInfo.setMedicationHistory(userDetails.getQuestionnaire().getMedicationHistory());
+            userInfo.setMentalState1(userDetails.getQuestionnaire().getMentalState1());
+            userInfo.setMentalState2(userDetails.getQuestionnaire().getMentalState2());
+            userInfo.setPhysicalHealth(userDetails.getQuestionnaire().getPhysicalHealth());
+            userInfo.setRelationshipStatus(userDetails.getQuestionnaire().getRelationshipStatus());
+        }else if (role.contains(roleTherapist)){
             userInfo.setLocation(userDetails.getLocation());
             userInfo.setGender(userDetails.getGender());
+            userInfo.setDateOfBirth(userDetails.getDateOfBirth());
             userInfo.setLanguage(userDetails.getLanguage());
+            userInfo.setUniversity(userDetails.getUniversity());
+            userInfo.setTherapistInfo(userDetails.getTherapistInfo());
+            userInfo.setTherapistTypeTherapist(userDetails.getTherapistInfo().getTherapistType());
+            userInfo.setTherapyTypeTherapist(userDetails.getTherapistInfo().getTherapyType());
+            userInfo.setIdentityTypeTherapist(userDetails.getTherapistInfo().getIdentityType());
+        }else {
+            userInfo.setGender(userDetails.getGender());
         }
         userInfo.setExperience(userDetails.getExperience());
         userInfo.setResetToken(userDetails.getResetToken());
@@ -493,6 +548,80 @@ public class AuthController {
     @PostMapping("/auth/selectWorkDays")
     public void selectWorkDays(@RequestBody @Valid TherapistWorkDaysDto therapistWorkDaysDto) {
         userService.selectWorkDays(therapistWorkDaysDto);
+    }
+
+    @PostMapping("/auth/fetchBookedHours")
+    public ResponseEntity<?> fetchBookedHours(@RequestBody @Valid BookingsDto bookingsDto) {
+        List<WorkhoursDto> bookingsDtoList = userService.fetchBookedHours(bookingsDto).stream()
+                .map(this::convertToWorkhoursDto)
+                .collect(Collectors.toList());
+        return ResponseEntity.ok(bookingsDtoList);
+    }
+
+    @PostMapping("/auth/bookSession")
+    public void bookSession(@RequestBody @Valid BookingsDto bookingsDto) {
+        userService.bookSession(bookingsDto);
+    }
+
+    @PostMapping("/auth/fetchBookings")
+    public ResponseEntity<?> fetchBookings(@RequestBody @Valid BookingsDto bookingsDto) {
+        List<BookingsDto> bookingsDtoList = userService.fetchByClientIdAndTherapistId(bookingsDto).stream()
+                .map(this::convertToBookingsDto)
+                .collect(Collectors.toList());
+        return ResponseEntity.ok(bookingsDtoList);
+    }
+
+    @PostMapping("/auth/fetchWorkDays")
+    public ResponseEntity<?> fetchWorkDays(@RequestBody @Valid WeekdaysDto weekdaysDto) {
+        List<WeekdaysDto> weekdaysDtoList = userService.fetchWorkDays(weekdaysDto).stream()
+                .map(this::convertToWeekdaysDto)
+                .collect(Collectors.toList());
+        return ResponseEntity.ok(weekdaysDtoList);
+    }
+
+    @PostMapping("/auth/fetchWorkHours")
+    public ResponseEntity<?> fetchWorkHours(@RequestBody @Valid WeekdaysDto weekdaysDto) {
+        List<WorkhoursDto> workhoursDto = userService.fetchWorkHours(weekdaysDto).stream()
+                .map(this::convertToWorkhoursDto)
+                .collect(Collectors.toList());
+
+        return ResponseEntity.ok(workhoursDto);
+    }
+
+    @PostMapping("/auth/fetchNextBooking")
+    public ResponseEntity<?> fetchNextBooking(@RequestBody @Valid BookingsDto bookingsDto) {
+        Bookings booking = userService.fetchNextBooking(bookingsDto);
+
+        BookingsDto bookingDto = convertToBookingsDto(booking);
+
+        return ResponseEntity.ok(bookingDto);
+    }
+
+    @DeleteMapping("/auth/cancelBooking")
+    public void cancelBooking(@RequestBody @Valid BookingsDto bookingsDto) {
+        userService.cancelBooking(bookingsDto);
+    }
+
+    @PostMapping("/auth/fetchBookingByBookingId")
+    public ResponseEntity<?> fetchBookingByBookingId(@RequestBody @Valid BookingsDto bookingsDto) {
+        Bookings booking = userService.fetchBookingByBookingId(bookingsDto);
+
+        BookingsDto bookingDto = convertToBookingsDto(booking);
+
+        return ResponseEntity.ok(bookingDto);
+    }
+
+    @PutMapping("/auth/updateBookingSession")
+    public void updateBookingSession(@RequestBody @Valid BookingsDto bookingsDto) {
+        userService.updateBookingSession(bookingsDto);
+    }
+
+    @PostMapping("/auth/fetchBookedHoursInEdit")
+    public ResponseEntity<?> fetchBookedHoursInEdit(@RequestBody @Valid BookingsDto bookingsDto) {
+        List<WorkhoursDto> bookingsDtoList = userService.fetchBookedHoursInEdit(bookingsDto).stream()
+                .map(this::convertToWorkhoursDto)
+                .collect(Collectors.toList());
+        return ResponseEntity.ok(bookingsDtoList);
     }
 
 }

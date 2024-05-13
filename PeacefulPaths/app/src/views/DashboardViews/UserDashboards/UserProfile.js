@@ -42,11 +42,22 @@ function UserProfile({loading,error,...props}){
         surname:'',
         password:'',
         number:'',
+        experience:0,
         location:{},
         gender:{},
+        therapistGender:{},
         language:[],
-        roles:[],
-        questionnaire:{}
+        questionnaire:{},
+        therapistTypeUser: {},
+        therapyTypeUser: {},
+        identityTypeUser: {},
+        relationshipStatus: {},
+        therapyHistory: {},
+        communication: {},
+        medicationHistory: {},
+        physicalHealth: {},
+        mentalState1: {},
+        mentalState2: {}
     });
 
     React.useEffect(()=>{
@@ -58,13 +69,26 @@ function UserProfile({loading,error,...props}){
                     email: response.data.email,
                     name: response.data.name,
                     surname: response.data.surname,
-                    roles: response.data.roles,
                     password: response.data.password,
+                    roles: response.data.roles,
                     number:response.data.number,
+                    experience:response.data.experience,
                     location:response.data.location,
                     gender:response.data.gender,
+                    therapistGender:response.data.therapistGender,
                     language:response.data.language,
-                    questionnaire:response.data.questionnaire
+                    allRoles: response.data.allRoles,
+                    questionnaire: response.data.questionnaire,
+                    therapistTypeUser: response.data.therapistTypeUser,
+                    therapyTypeUser: response.data.therapyTypeUser,
+                    identityTypeUser: response.data.identityTypeUser,
+                    relationshipStatus: response.data.relationshipStatus,
+                    therapyHistory: response.data.therapyHistory,
+                    communication: response.data.communication,
+                    medicationHistory: response.data.medicationHistory,
+                    physicalHealth: response.data.physicalHealth,
+                    mentalState1: response.data.mentalState1,
+                    mentalState2: response.data.mentalState2
                 })
             }
             else{
@@ -131,12 +155,31 @@ function UserProfile({loading,error,...props}){
                     [name]: [...values[name], languageObject]
                 }));
             }
+        }else if (name === 'age') {
+            setValues(values => ({
+                ...values,
+                questionnaire: {
+                    ...values.questionnaire,
+                    [name]: value
+                }
+            }));
         } else {
             setValues(values => ({
                 ...values,
                 [name]:
                     name === 'gender' ? { id: Number(value.split('-')[0]), gender: value.split('-')[1] } :
                         name === 'location' ? { id: Number(value.split('-')[0]), location: value.split('-')[1] } :
+                        name === 'therapyTypeUser' ? { id: Number(value.split('-')[0]), therapyType: value.split('-')[1] } :
+                        name === 'therapistGender' ? { id: Number(value.split('-')[0]), gender: value.split('-')[1] } :
+                        name === 'therapistTypeUser' ? { id: Number(value.split('-')[0]), therapistType: value.split('-')[1] } :
+                        name === 'relationshipStatus' ? { id: Number(value.split('-')[0]), answer: value.split('-')[1] } :
+                        name === 'identityTypeUser' ? { id: Number(value.split('-')[0]), identityType: value.split('-')[1] } :
+                        name === 'therapyHistory' ? { id: Number(value.split('-')[0]), answer: value.split('-')[1] } :
+                        name === 'communication' ? { id: Number(value.split('-')[0]), answer: value.split('-')[1] } :
+                        name === 'medicationHistory' ? { id: Number(value.split('-')[0]), answer: value.split('-')[1] } :
+                        name === 'physicalHealth' ? { id: Number(value.split('-')[0]), answer: value.split('-')[1] } :
+                        name === 'mentalState1' ? { id: Number(value.split('-')[0]), answer: value.split('-')[1] } :
+                        name === 'mentalState2' ? { id: Number(value.split('-')[0]), answer: value.split('-')[1] } :
                             value
             }));
         }
@@ -156,7 +199,7 @@ function UserProfile({loading,error,...props}){
 
                         <DashboardNav data={data} setUser={props.setUser} setUserAuthenticationState={props.setUserAuthenticationState}/>
 
-                        <div className="container-fluid">
+                        <div className="container-fluid" style={{marginBottom: '50px'}}>
 
                             {/*ADD ACCOUNT FEATURES HERE: */}
 
@@ -164,50 +207,65 @@ function UserProfile({loading,error,...props}){
                                 <Row className="justify-content-md-center">
                                     <Col xs={12} md={6}>
                                         <h2>Account Information</h2>
-                                        { updateError &&
-                                            <Alert style={{marginTop:'20px'}} variant="danger">
+                                        {updateError &&
+                                            <Alert style={{marginTop: '20px'}} variant="danger">
                                                 {updateError}
                                             </Alert>
                                         }
-                                        { updateSuccess &&
-                                            <Alert style={{marginTop:'20px'}} variant="success">
+                                        {updateSuccess &&
+                                            <Alert style={{marginTop: '20px'}} variant="success">
                                                 {updateSuccess}
                                             </Alert>
                                         }
+                                        <br/>
                                         <Form onSubmit={handleUpdate}>
                                             <Form.Group controlId="formName">
                                                 <Form.Label>Name</Form.Label>
                                                 <Form.Control type="text" name="name"
-                                                              defaultValue={data.name} onChange={handleChange} required/>
+                                                              defaultValue={data.name} onChange={handleChange}
+                                                              required/>
                                             </Form.Group>
-
+                                            <br/>
                                             <Form.Group controlId="formSurname">
                                                 <Form.Label>Surname</Form.Label>
                                                 <Form.Control type="text" name="surname"
-                                                              defaultValue={data.surname} onChange={handleChange} required/>
+                                                              defaultValue={data.surname} onChange={handleChange}
+                                                              required/>
                                             </Form.Group>
-
+                                            <br/>
+                                            <Form.Group controlId="formBasicAge">
+                                                <Form.Label>Age</Form.Label>
+                                                <Form.Control type="number" defaultValue={values.questionnaire.age} name="age"
+                                                             min={18} max={99} onChange={handleChange} required/>
+                                            </Form.Group>
+                                            <br/>
                                             <Form.Group controlId="formBasicEmail">
                                                 <Form.Label>Email address</Form.Label>
-                                                <Form.Control type="email" name="email" defaultValue={data.email} onChange={handleChange} required/>
+                                                <Form.Control type="email" name="email" defaultValue={data.email}
+                                                              onChange={handleChange} required/>
                                             </Form.Group>
-
+                                            <br/>
                                             <Form.Group controlId="formBasicGender">
                                                 <Form.Label>Gender</Form.Label>
-                                                <Form.Select name="gender" value={values.gender ? `${values.gender.id}-${values.gender.gender}` : ''} onChange={handleChange} required>
+                                                <Form.Select name="gender"
+                                                             value={values.gender ? `${values.gender.id}-${values.gender.gender}` : ''}
+                                                             onChange={handleChange} required>
                                                     <option value="1-M">Male</option>
                                                     <option value="2-F">Female</option>
                                                 </Form.Select>
                                             </Form.Group>
-
+                                            <br/>
                                             <Form.Group controlId="formBasicPhone">
                                                 <Form.Label>Phone</Form.Label>
-                                                <Form.Control type="tel" defaultValue={data.number} onChange={handleChange} name="number"/>
+                                                <Form.Control type="tel" defaultValue={data.number}
+                                                              onChange={handleChange} name="number"/>
                                             </Form.Group>
-
+                                            <br/>
                                             <Form.Group controlId="formBasicAddress">
                                                 <Form.Label>Location</Form.Label>
-                                                <Form.Select name="location" value={values.location ? `${values.location.id}-${values.location.location}` : ''} onChange={handleChange} required>
+                                                <Form.Select name="location"
+                                                             value={values.location ? `${values.location.id}-${values.location.location}` : ''}
+                                                             onChange={handleChange} required>
                                                     <option value="1-Kosovo">Kosovo</option>
                                                     <option value="2-Albania">Albania</option>
                                                     <option value="3-Montenegro">Montenegro</option>
@@ -215,7 +273,7 @@ function UserProfile({loading,error,...props}){
                                                     <option value="5-Serbia">Serbia</option>
                                                 </Form.Select>
                                             </Form.Group>
-
+                                            <br/>
                                             <div className="custom-checkboxes">
                                                 <label>Language</label>
                                                 <div>
@@ -252,11 +310,170 @@ function UserProfile({loading,error,...props}){
                                                     <label htmlFor="serbianCheckbox">Serbian</label>
                                                 </div>
                                             </div>
+                                            <i>You can select more than one language!</i>
+                                            <br/>
+                                            <hr/>
+                                            <br/>
+                                            <div><label htmlFor="specializationSelect"><h2>Therapy and Therapist
+                                                preferences:</h2></label>
+                                                <br/>
+                                                <Form.Group controlId="formBasicTherapyTypeUser">
+                                                    <Form.Label>Therapy type:</Form.Label>
+                                                    <Form.Select name="therapyTypeUser"
+                                                                 value={values.therapyTypeUser ? `${values.therapyTypeUser.id}-${values.therapyTypeUser.therapyType}` : ''}
+                                                                 onChange={handleChange} required>
+                                                        <option value="1-Individual
+                                                            Therapy">Individual
+                                                            Therapy
+                                                        </option>
+                                                        <option value="2-In a relationship">Couples
+                                                            Therapy
+                                                        </option>
+                                                        <option value="3-Married">Teen Therapy</option>
+                                                    </Form.Select>
+                                                </Form.Group>
+                                                <br/>
+                                                <Form.Group controlId="formBasicTherapyTypeUser">
+                                                    <Form.Label>Therapist gender:</Form.Label>
+                                                    <Form.Select name="therapistGender"
+                                                                 value={values.therapistGender ? `${values.therapistGender.id}-${values.therapistGender.gender}` : ''}
+                                                                 onChange={handleChange} required>
+                                                        <option value="1-M">Male therapist</option>
+                                                        <option value="2-F">Female therapist</option>
+                                                    </Form.Select>
+                                                </Form.Group>
+                                                <br/>
+                                                <Form.Group controlId="formBasicTherapistTypeUser">
+                                                    <Form.Label>Therapist type:</Form.Label>
+                                                    <Form.Select name="therapistTypeUser"
+                                                                 value={values.therapistTypeUser ? `${values.therapistTypeUser.id}-${values.therapistTypeUser.therapistType}` : ''}
+                                                                 onChange={handleChange} required>
+                                                        <option value="1-Listens">A therapist that
+                                                            listens
+                                                        </option>
+                                                        <option value="2-ExploresPast">A therapist
+                                                            that explores the past
+                                                        </option>
+                                                        <option value="3-TeachesSkills">A therapist
+                                                            that teaches new skills</option>
+                                                    </Form.Select>
+                                                </Form.Group>
+                                                <br/>
+                                                <hr/>
+                                                <br/>
+                                                <div><label htmlFor="specializationSelect"><h2>More info about
+                                                    myself:</h2></label>
 
-                                            <div className="text-left" style={{padding: '10px 0'}}>
-                                                <Link className="small" to="/forgotPassBoot">Forgot Password?</Link>
+                                                    <Form.Group controlId="formBasicRelationshipStatus">
+                                                        <Form.Label>Relationship status:</Form.Label>
+                                                        <Form.Select name="relationshipStatus"
+                                                                     value={values.relationshipStatus ? `${values.relationshipStatus.id}-${values.relationshipStatus.answer}` : ''}
+                                                                     onChange={handleChange} required>
+                                                            <option value="1-Single">Single</option>
+                                                            <option value="2-In a relationship">In a relationship
+                                                            </option>
+                                                            <option value="3-Married">Married</option>
+                                                            <option value="4-Divorced">Divorced</option>
+                                                        </Form.Select>
+                                                    </Form.Group>
+                                                    <br/>
+                                                    <Form.Group controlId="formBasicIdentityType">
+                                                        <Form.Label>My Identity type:</Form.Label>
+                                                        <Form.Select name="identityTypeUser"
+                                                                     value={values.identityTypeUser ? `${values.identityTypeUser.id}-${values.identityTypeUser.identityType}` : ''}
+                                                                     onChange={handleChange} required>
+                                                            <option value="1-Straight">Straight</option>
+                                                            <option value="2-Gay">Gay</option>
+                                                            <option value="3-Lesbian">Lesbian</option>
+                                                            <option value="4-Prefer not to say">Prefer not to say
+                                                            </option>
+                                                        </Form.Select>
+                                                    </Form.Group>
+                                                    <br/>
+                                                    <Form.Group controlId="formBasicTherapyHistory">
+                                                        <Form.Label>Been to therapy before?</Form.Label>
+                                                        <Form.Select name="therapyHistory"
+                                                                     value={values.therapyHistory ? `${values.therapyHistory.id}-${values.therapyHistory.answer}` : ''}
+                                                                     onChange={handleChange} required>
+                                                            <option value="1-Yes">Yes</option>
+                                                            <option value="2-No">No</option>
+                                                        </Form.Select>
+                                                    </Form.Group>
+                                                    <br/>
+                                                    <Form.Group controlId="formBasicCommunication">
+                                                        <Form.Label>Communication preferences:</Form.Label>
+                                                        <Form.Select name="communication"
+                                                                     value={values.communication ? `${values.communication.id}-${values.communication.answer}` : ''}
+                                                                     onChange={handleChange} required>
+                                                            <option value="1-Mostly via messaging">Mostly via
+                                                                messaging
+                                                            </option>
+                                                            <option value="2-Mostly via phone">Mostly via phone</option>
+                                                            <option value="3-Video sessions">Video sessions</option>
+                                                            <option value="4-Not sure yet (decide later)">Not sure yet
+                                                                (decide later)
+                                                            </option>
+                                                        </Form.Select>
+                                                    </Form.Group>
+                                                    <br/>
+                                                    <Form.Group controlId="formBasicMedicationHistory">
+                                                        <Form.Label>Currently taking any medication:</Form.Label>
+                                                        <Form.Select name="medicationHistory"
+                                                                     value={values.medicationHistory ? `${values.medicationHistory.id}-${values.medicationHistory.answer}` : ''}
+                                                                     onChange={handleChange} required>
+                                                            <option value="1-Yes">Yes</option>
+                                                            <option value="2-No">No</option>
+                                                        </Form.Select>
+                                                    </Form.Group>
+                                                    <br/>
+                                                    <Form.Group controlId="formBasicPhysicalHealth">
+                                                        <Form.Label>Current physical health:</Form.Label>
+                                                        <Form.Select name="physicalHealth"
+                                                                     value={values.physicalHealth ? `${values.physicalHealth.id}-${values.physicalHealth.answer}` : ''}
+                                                                     onChange={handleChange} required>
+                                                            <option value="1-Good">Good</option>
+                                                            <option value="2-Fair">Fair</option>
+                                                            <option value="3-Poor">Poor</option>
+                                                        </Form.Select>
+                                                    </Form.Group>
+                                                    <br/>
+                                                    <Form.Group controlId="formBasicMentalState1">
+                                                        <Form.Label>Feeling down, depressed or hopeless:</Form.Label>
+                                                        <Form.Select name="mentalState1"
+                                                                     value={values.mentalState1 ? `${values.mentalState1.id}-${values.mentalState1.answer}` : ''}
+                                                                     onChange={handleChange} required>
+                                                            <option value="1-Not at all">Not at all</option>
+                                                            <option value="2-Several days">Several days</option>
+                                                            <option value="3-More than half the days">More than half the
+                                                                days
+                                                            </option>
+                                                            <option value="4-Nearly every day">Nearly every day</option>
+                                                        </Form.Select>
+                                                    </Form.Group>
+                                                    <br/>
+                                                    <Form.Group controlId="formBasicMentalState2">
+                                                        <Form.Label>Thoughts that they would be better off dead or of
+                                                            hurting themself in some way:</Form.Label>
+                                                        <Form.Select name="mentalState2"
+                                                                     value={values.mentalState2 ? `${values.mentalState2.id}-${values.mentalState2.answer}` : ''}
+                                                                     onChange={handleChange} required>
+                                                            <option value="1-Not at all">Not at all</option>
+                                                            <option value="2-Several days">Several days</option>
+                                                            <option value="3-More than half the days">More than half the
+                                                                days
+                                                            </option>
+                                                            <option value="4-Nearly every day">Nearly every day</option>
+                                                        </Form.Select>
+                                                    </Form.Group>
+                                                </div>
                                             </div>
-
+                                            <br/>
+                                            <hr/>
+                                            <div className="text-left" style={{padding: '10px 0'}}>
+                                                <Link className="small" to="/forgotPassBoot">Change Password</Link>
+                                            </div>
+                                            <hr/>
+                                            <br/>
                                             <Button variant="primary" type="submit">
                                                 Update Information
                                             </Button>
@@ -264,40 +481,6 @@ function UserProfile({loading,error,...props}){
                                     </Col>
                                 </Row>
                             </Container>
-
-                        </div>
-
-                    </div>
-
-                    <footer className="sticky-footer bg-white">
-                        <div className="container my-auto">
-                            <div className="copyright text-center my-auto">
-                                <span style={{color: 'grey'}}>Copyright &copy; PeacefulParts 2024</span>
-                            </div>
-                        </div>
-                    </footer>
-
-                </div>
-
-            </div>
-
-
-            <div className="modal fade" id="logoutModal" tabIndex="-1" role="dialog" aria-labelledby="exampleModalLabel"
-                 aria-hidden="true">
-                <div className="modal-dialog" role="document">
-                    <div className="modal-content">
-                        <div className="modal-header">
-                            <h5 className="modal-title" id="exampleModalLabel">Ready to Leave?</h5>
-                            <button className="close" type="button" data-dismiss="modal" aria-label="Close">
-                                <span aria-hidden="true">×</span>
-                            </button>
-                        </div>
-                        <div className="modal-body">Select "Logout" below if you are ready to end your current
-                            session.
-                        </div>
-                        <div className="modal-footer">
-                            <button className="btn btn-secondary" type="button" data-dismiss="modal">Cancel</button>
-                            <Link className="btn btn-primary" to="/loginBoot">Logout</Link>
                         </div>
                     </div>
                 </div>
@@ -335,4 +518,4 @@ const mapDispatchToProps = (dispatch) => {
         setUserAuthenticationState: (boolean) => dispatch(setUserAuthenticationState(boolean))
     }
 }
-export default connect(mapStateToProps,mapDispatchToProps)(UserProfile);
+export default connect(mapStateToProps, mapDispatchToProps)(UserProfile);

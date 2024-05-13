@@ -1,8 +1,6 @@
 package com.brogramer.peacefulPaths.dtos;
 
-import com.brogramer.peacefulPaths.entity.Gender;
-import com.brogramer.peacefulPaths.entity.Language;
-import com.brogramer.peacefulPaths.entity.Location;
+import com.brogramer.peacefulPaths.entity.*;
 import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
@@ -20,29 +18,29 @@ public class QuestionnaireDto {
 
     private Long id;
 
-    private String therapyType;
+    private TherapyType therapyType;
 
     private int age;
 
-    private String identityType;
+    private IdentityType identityType;
 
-    private String relationshipStatus;
+    private RelationshipStatus relationshipStatus;
 
-    private String therapyHistory;
+    private TherapyHistory therapyHistory;
 
-    private String medicationHistory;
+    private MedicationHistory medicationHistory;
 
-    private String communication;
+    private Communication communication;
 
     private Gender therapistGender;
 
-    private String therapistType;
+    private TherapistType therapistType;
 
-    private String currentPhysicalHealth;
+    private PhysicalHealth physicalHealth;
 
-    private String mentalState1;
+    private MentalState1 mentalState1;
 
-    private String mentalState2;
+    private MentalState2 mentalState2;
 
     private Collection<Language> language;
 
@@ -58,14 +56,6 @@ public class QuestionnaireDto {
         this.id = id;
     }
 
-    public String getTherapyType() {
-        return therapyType;
-    }
-
-    public void setTherapyType(String therapyType) {
-        this.therapyType = therapyType;
-    }
-
     public int getAge() {
         return age;
     }
@@ -74,85 +64,12 @@ public class QuestionnaireDto {
         this.age = age;
     }
 
-    public String getIdentityType() {
-        return identityType;
-    }
-
-    public void setIdentityType(String identityType) {
-        this.identityType = identityType;
-    }
-
-    public String getTherapistType() {
-        return therapistType;
-    }
-
-    public void setTherapistType(String therapistType) {
-        this.therapistType = therapistType;
-    }
-
-    public String getRelationshipStatus() {
-        return relationshipStatus;
-    }
-
-    public void setRelationshipStatus(String relationshipStatus) {
-        this.relationshipStatus = relationshipStatus;
-    }
-
-    public String getTherapyHistory() {
-        return therapyHistory;
-    }
-
-    public void setTherapyHistory(String therapyHistory) {
-        this.therapyHistory = therapyHistory;
-    }
-
-    public String getMedicationHistory() {
-        return medicationHistory;
-    }
-
-    public void setMedicationHistory(String medicationHistory) {
-        this.medicationHistory = medicationHistory;
-    }
-
-    public String getCommunication() {
-        return communication;
-    }
-
-    public void setCommunication(String communication) {
-        this.communication = communication;
-    }
-
     public Gender getTherapistGender() {
         return therapistGender;
     }
 
     public void setTherapistGender(Gender therapistGender) {
         this.therapistGender = therapistGender;
-    }
-
-
-    public String getCurrentPhysicalHealth() {
-        return currentPhysicalHealth;
-    }
-
-    public void setCurrentPhysicalHealth(String currentPhysicalHealth) {
-        this.currentPhysicalHealth = currentPhysicalHealth;
-    }
-
-    public String getMentalState1() {
-        return mentalState1;
-    }
-
-    public void setMentalState1(String mentalState1) {
-        this.mentalState1 = mentalState1;
-    }
-
-    public String getMentalState2() {
-        return mentalState2;
-    }
-
-    public void setMentalState2(String mentalState2) {
-        this.mentalState2 = mentalState2;
     }
 
     public Collection<Language> getLanguage() {
@@ -179,4 +96,83 @@ public class QuestionnaireDto {
         this.gender = gender;
     }
 
+    public TherapyType getTherapyType() {
+        return therapyType;
+    }
+
+    public void setTherapyType(TherapyType therapyType) {
+        this.therapyType = therapyType;
+    }
+
+    public IdentityType getIdentityType() {
+        return identityType;
+    }
+
+    public void setIdentityType(IdentityType identityType) {
+        this.identityType = identityType;
+    }
+
+    public RelationshipStatus getRelationshipStatus() {
+        return relationshipStatus;
+    }
+
+    public void setRelationshipStatus(RelationshipStatus relationshipStatus) {
+        this.relationshipStatus = relationshipStatus;
+    }
+
+    public TherapyHistory getTherapyHistory() {
+        return therapyHistory;
+    }
+
+    public void setTherapyHistory(TherapyHistory therapyHistory) {
+        this.therapyHistory = therapyHistory;
+    }
+
+    public MedicationHistory getMedicationHistory() {
+        return medicationHistory;
+    }
+
+    public void setMedicationHistory(MedicationHistory medicationHistory) {
+        this.medicationHistory = medicationHistory;
+    }
+
+    public Communication getCommunication() {
+        return communication;
+    }
+
+    public void setCommunication(Communication communication) {
+        this.communication = communication;
+    }
+
+    public TherapistType getTherapistType() {
+        return therapistType;
+    }
+
+    public void setTherapistType(TherapistType therapistType) {
+        this.therapistType = therapistType;
+    }
+
+    public PhysicalHealth getPhysicalHealth() {
+        return physicalHealth;
+    }
+
+    public void setPhysicalHealth(PhysicalHealth physicalHealth) {
+        this.physicalHealth = physicalHealth;
+    }
+
+    public MentalState1 getMentalState1() {
+        return mentalState1;
+    }
+
+    public void setMentalState1(MentalState1 mentalState1) {
+        this.mentalState1 = mentalState1;
+    }
+
+    public MentalState2 getMentalState2() {
+        return mentalState2;
+    }
+
+    public void setMentalState2(MentalState2 mentalState2) {
+        this.mentalState2 = mentalState2;
+    }
 }
