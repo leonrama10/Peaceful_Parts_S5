@@ -1,12 +1,15 @@
 package com.brogramer.peacefulPaths.dtos;
 
 import com.brogramer.peacefulPaths.entity.Weekdays;
-import com.brogramer.peacefulPaths.entity.Workhours;
 import lombok.*;
 
 import java.time.LocalDate;
+import java.time.LocalTime;
 import java.util.Collection;
+import java.util.List;
 
+@Setter
+@Getter
 @Data
 @AllArgsConstructor
 @NoArgsConstructor
@@ -14,9 +17,19 @@ import java.util.Collection;
 public class TherapistWorkDaysDto {
 
     private int therapistId;
-    private LocalDate date;
     private Collection<Weekdays> days;
-    private Collection<Workhours> workhours;
+    private LocalTime startTime;
+    private LocalTime endTime;
+
+    public TherapistWorkDaysDto(int therapistId, Collection<Weekdays> days, LocalTime startTime, LocalTime endTime) {
+        this.therapistId = therapistId;
+        this.days = days;
+        this.startTime = startTime;
+        this.endTime = endTime;
+    }
+
+    public TherapistWorkDaysDto() {
+    }
 
     public int getTherapistId() {
         return therapistId;
@@ -24,14 +37,6 @@ public class TherapistWorkDaysDto {
 
     public void setTherapistId(int therapistId) {
         this.therapistId = therapistId;
-    }
-
-    public LocalDate getDate() {
-        return date;
-    }
-
-    public void setDate(LocalDate date) {
-        this.date = date;
     }
 
     public Collection<Weekdays> getDays() {
@@ -42,11 +47,19 @@ public class TherapistWorkDaysDto {
         this.days = days;
     }
 
-    public Collection<Workhours> getWorkhours() {
-        return workhours;
+    public LocalTime getStartTime() {
+        return startTime;
     }
 
-    public void setWorkhours(Collection<Workhours> workhours) {
-        this.workhours = workhours;
+    public void setStartTime(LocalTime startTime) {
+        this.startTime = startTime;
+    }
+
+    public LocalTime getEndTime() {
+        return endTime;
+    }
+
+    public void setEndTime(LocalTime endTime) {
+        this.endTime = endTime;
     }
 }

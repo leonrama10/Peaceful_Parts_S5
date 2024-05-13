@@ -165,7 +165,7 @@ function TherapistCardInfo({loading,error,...props}){
                                 <p>Email: {therapistData.email}</p>
                                 <p>Name: {therapistData.name}</p>
                                 <p>Surname: {therapistData.surname}</p>
-                                <p>Surname: {therapistData.gender.gender}</p>
+                                <p>Gender: {therapistData.gender.gender}</p>
                                 <p>Number: {therapistData.number}</p>
                                 <p>Experience: {therapistData.experience} years</p>
                                 <p>Location: {therapistData.location.location}</p>

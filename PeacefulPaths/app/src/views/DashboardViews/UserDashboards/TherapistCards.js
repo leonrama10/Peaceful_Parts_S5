@@ -1,5 +1,6 @@
 import React, { useState } from 'react';
 import {Link} from "react-router-dom";
+import '../../../css/therapistCards.css';
 
 export default function TherapistCards (props) {
     const [showDetails, setShowDetails] = useState(false);
@@ -9,10 +10,15 @@ export default function TherapistCards (props) {
     };
 
     return (
-        <div className={`card ${showDetails ? 'expanded' : ''}`} onClick={handleCardClick}>
-            <h3>{props.title}</h3>
-            {showDetails && <p>Additional information about {props.title} goes here.</p>}
-            <Link to={`/dashboard/userDashboard/therapistInfo/${props.id}`}>Learn More</Link>
-        </div>
+        <div className={`therapist-card expanded`}>
+                    <h3>{props.title}</h3>
+                    <div className="therapist-personal">
+                        <p><span style={{fontWeight: 'bold'}}>Email:</span> {props.email}</p>
+                        <p><span style={{fontWeight: 'bold'}}>Experience:</span> {props.experience}</p>
+                        <p><span style={{fontWeight: 'bold'}}>Number:</span> {props.number}</p>
+                        <p><Link to={`/dashboard/userDashboard/therapistInfo/${props.id}`}>Learn More About Therapist</Link></p>
+                    </div>
+
+                </div>
     );
 };

@@ -121,7 +121,8 @@ function UserDashboard({loading,error,...props}){
                         <div className="container-fluid">
 
                             {allUsers.map((card, index) => (
-                                <TherapistCards key={index} title={card.name} id={card.id} />
+                                <TherapistCards key={index} title={card.name} email={card.email}
+                                 experience={card.experience} number={card.number} id={card.id} />
                             ))}
 
                         </div>

@@ -1,0 +1,15 @@
+.therapist-card{
+width: calc(33.33% - 20px);
+height: 200px;
+  margin: 10px;
+  float: left;
+   border: 1px solid #ccc;
+    border-radius: 5px;
+    background-color: #f0f0f0;
+}
+
+.therapist-personal p{
+margin-bottom: 2px;
+position: relative;
+top: 55px;
+}
