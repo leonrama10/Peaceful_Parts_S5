@@ -1,7 +1,7 @@
 import React from 'react';
 import {Link, useNavigate} from 'react-router-dom';
-import '../../css/sb-admin-2.min.css';
-import {loadState} from "../../helper/sessionStorage";
+import '../../../css/sb-admin-2.min.css';
+import {loadState} from "../../../helper/sessionStorage";
 
 export default function VerifyPasswordInfo(){
 
@@ -59,10 +59,10 @@ export default function VerifyPasswordInfo(){
 
             </div>
 
-            <script src="../../vendor/jquery/jquery.min.js"></script>
-            <script src="../../vendor/bootstrap/js/bootstrap.bundle.min.js"></script>
-            <script src="../../vendor/jquery-easing/jquery.easing.min.js"></script>
-            <script src="../../js/sb-admin-2.min.js"></script>
+            <script src="../../../vendor/jquery/jquery.min.js"></script>
+            <script src="../../../vendor/bootstrap/js/bootstrap.bundle.min.js"></script>
+            <script src="../../../vendor/jquery-easing/jquery.easing.min.js"></script>
+            <script src="../../../js/sb-admin-2.min.js"></script>
 
         </main>
     )

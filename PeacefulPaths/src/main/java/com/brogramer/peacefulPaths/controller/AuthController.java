@@ -79,6 +79,7 @@ public class AuthController {
             userInfo.setLanguage(userDetails.getLanguage());
             userInfo.setUniversity(userDetails.getUniversity());
             userInfo.setDateOfBirth(userDetails.getDateOfBirth());
+            userInfo.setTherapistInfo(userDetails.getTherapistInfo());
             userInfo.setTherapyTypeTherapist(userDetails.getTherapistInfo().getTherapyType());
             userInfo.setTherapistTypeTherapist(userDetails.getTherapistInfo().getTherapistType());
             userInfo.setIdentityTypeTherapist(userDetails.getTherapistInfo().getIdentityType());
@@ -592,7 +593,10 @@ public class AuthController {
     public ResponseEntity<?> fetchNextBooking(@RequestBody @Valid BookingsDto bookingsDto) {
         Bookings booking = userService.fetchNextBooking(bookingsDto);
 
-        BookingsDto bookingDto = convertToBookingsDto(booking);
+        BookingsDto bookingDto = new BookingsDto();
+        if (booking!=null) {
+            bookingDto = convertToBookingsDto(booking);
+        }
 
         return ResponseEntity.ok(bookingDto);
     }

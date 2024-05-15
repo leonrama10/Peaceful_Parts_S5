@@ -1,29 +1,28 @@
 package com.brogramer.peacefulPaths.dtos;
 
 import com.brogramer.peacefulPaths.entity.Weekdays;
+import com.brogramer.peacefulPaths.entity.Workhours;
 import lombok.*;
 
-import java.time.LocalDate;
 import java.time.LocalTime;
 import java.util.Collection;
-import java.util.List;
 
 @Setter
 @Getter
 @Data
-@AllArgsConstructor
-@NoArgsConstructor
 @Builder
 public class TherapistWorkDaysDto {
 
     private int therapistId;
     private Collection<Weekdays> days;
+    private Collection<Workhours> workhours;
     private LocalTime startTime;
     private LocalTime endTime;
 
-    public TherapistWorkDaysDto(int therapistId, Collection<Weekdays> days, LocalTime startTime, LocalTime endTime) {
+    public TherapistWorkDaysDto(int therapistId, Collection<Weekdays> days, Collection<Workhours> workhours, LocalTime startTime, LocalTime endTime) {
         this.therapistId = therapistId;
         this.days = days;
+        this.workhours = workhours;
         this.startTime = startTime;
         this.endTime = endTime;
     }
@@ -61,5 +60,13 @@ public class TherapistWorkDaysDto {
 
     public void setEndTime(LocalTime endTime) {
         this.endTime = endTime;
+    }
+
+    public Collection<Workhours> getWorkhours() {
+        return workhours;
+    }
+
+    public void setWorkhours(Collection<Workhours> workhours) {
+        this.workhours = workhours;
     }
 }

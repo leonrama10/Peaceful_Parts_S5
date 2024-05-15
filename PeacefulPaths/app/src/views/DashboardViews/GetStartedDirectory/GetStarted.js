@@ -2,7 +2,7 @@ import React,{useState} from 'react';
 import {useNavigate} from 'react-router-dom';
 import '../../../css/sb-admin-2.min.css';
 import Questionnaire from "./Questionnaire";
-import RegisterBoot from "../RegisterBoot";
+import RegisterBoot from "../Login and register/RegisterBoot";
 import "../../../css/QuestionnaireForm.css";
 import {questionnaireAnswers} from "../../../api/authService";
 import {authenticate, authFailure, authSuccess} from "../../../redux/authActions";
@@ -186,15 +186,15 @@ function GetStarted({loading,error,...props}){
                 ],
                        answerMethod: "dropdown"
            },
-            {
-                question: "What is your preferred language?",
-                answers: [
-                     { text: "Albanian" },
-                     { text: "English"},
-                     { text: "Serbian" }
-                 ],
-                     answerMethod: "dropdown"
-            },
+        {
+            question: "What is your preferred language?",
+            answers: [
+                { text: "Albanian" },
+                { text: "English"},
+                { text: "Serbian" }
+            ],
+            answerMethod: "checkbox"
+        }
     ];
 
     const genderToId = {
@@ -288,13 +288,14 @@ function GetStarted({loading,error,...props}){
 
     const [currentQuestion, setCurrentQuestion] = useState(0);
     const [isQuizOver, setIsQuizOver] = useState(false);
+    const [continueButton , setContinueButton] = useState(false);
     const [questionnaire, setQuestionnaire] = useState({});
     const [getStartedFinished, setGetStartedFinished] = useState(false);
     const [questionIndex, setQuestionIndex] = useState(0);
     const properties = ['therapyType', 'gender', 'age', 'identityType', 'relationshipStatus', 'therapyHistory', 'medicationHistory', 'communication', 'therapistGender', 'therapistType', 'physicalHealth', 'mentalState1', 'mentalState2', 'location', 'language'];
-
+    // questionIndex >= questions.length
     React.useEffect(() => {
-        if (questionIndex >= questions.length) {
+        if (continueButton) {
                 questionnaireAnswers(selectedAnswer).then((response)=>{
                     if(response.status===200){
                         setQuestionnaire(response.data);
@@ -323,15 +324,15 @@ function GetStarted({loading,error,...props}){
                     }
                 });
         }
-    }, [selectedAnswer, questionIndex, questions.length]);
+    }, [continueButton]);
 
     const handleAnswerClick = (answer) => {
         const property = properties[questionIndex];
         let value = answer;
 
         if (property === 'language') {
-            value = [{ 'id': languageToId[answer], 'language': answer }];
-        }else if (property === 'location') {
+            value = { 'id': languageToId[answer], 'language': answer };
+        } else if (property === 'location') {
             value = { 'id': locationToId[answer], 'location': answer };
         }else if (property === 'gender') {
             value = { 'id': genderToId[answer], 'gender': answer };
@@ -358,15 +359,25 @@ function GetStarted({loading,error,...props}){
         }else if (property === 'mentalState2') {
             value = { 'id': mentalState2ToId[answer], 'answer': answer };
         }
-
-        setSelectedAnswer(prevAnswers => ({ ...prevAnswers, [property]: value }));
-        setQuestionIndex(prevIndex => prevIndex + 1);
-
-        const next = currentQuestion + 1;
-        if (next < questions.length){
-            setCurrentQuestion(next);
+        if (property !== 'language') {
+            setSelectedAnswer(prevAnswers => ({...prevAnswers, [property]: value}));
+        }else{
+            setSelectedAnswer(prevAnswers => ({
+                ...prevAnswers,
+                [property]: [...(prevAnswers[property] || []), { 'id': languageToId[answer], 'language': answer }]
+            }));
         }
-    };
+
+        if (property !== 'language') {
+            setQuestionIndex(prevIndex => prevIndex + 1);
+            const next = currentQuestion + 1;
+            if (next < questions.length){
+                setCurrentQuestion(next);
+            }
+        }
+    }
+
+    console.log("VALUESSSSSSSSSSSSSSSS",selectedAnswer)
 
     return (
         <main className="bg-gradient-primary">
@@ -382,6 +393,7 @@ function GetStarted({loading,error,...props}){
                                         questions={questions}
                                         currentQuestion={currentQuestion}
                                         handleAnswerClick={handleAnswerClick}
+                                        setContinueButton={setContinueButton}
                                     />
                                     </div>
                                 )}

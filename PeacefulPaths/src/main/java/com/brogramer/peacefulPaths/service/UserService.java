@@ -338,6 +338,7 @@ public class UserService implements UserDetailsService {
                 }
                 user.setExpirationTime(userDto.getExpirationTime());
                 user.setResetToken(userDto.getResetToken());
+                user.setDateAdded(userDto.getDateAdded());
             }
             else {
                 throw new AppException("Login already exists", HttpStatus.BAD_REQUEST);
@@ -389,6 +390,7 @@ public class UserService implements UserDetailsService {
             }
             user.setExpirationTime(userDto.getExpirationTime());
             user.setResetToken(userDto.getResetToken());
+            user.setDateAdded(userDto.getDateAdded());
         }
 
         User savedUser = userRepository.save(user);
@@ -854,7 +856,6 @@ public class UserService implements UserDetailsService {
          Optional<Bookings> bookingsOptional = bookingsRepository.fetchNextBookingByClientIdAndTherapistId(bookingsDto.getClientId(),bookingsDto.getTherapistId());
 
         return bookingsOptional.orElse(null);
-
     }
 
     public void cancelBooking(BookingsDto bookingsDto) {

@@ -36,3 +36,33 @@ color: black;
 transition: 3ms;
 }
 
+.customCheckbox input[type="checkbox"] {
+    display: none;
+}
+
+.customCheckbox label {
+    position: relative;
+    padding-left: 35px;
+    cursor: pointer;
+    display: inline-block;
+    color: white;
+    font-size: 14px;
+}
+
+.customCheckbox label:before {
+    content: "";
+    display: inline-block;
+    width: 20px;
+    height: 20px;
+    border: 2px solid #aaa;
+    border-radius: 3px;
+    position: absolute;
+    left: 0;
+    top: 0;
+    transition: 0.2s all;
+}
+
+.customCheckbox input[type="checkbox"]:checked + label:before {
+    background-color: #2e4057;
+}
+

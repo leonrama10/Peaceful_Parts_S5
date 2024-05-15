@@ -219,7 +219,7 @@ function AddBookings({loading,error,...props}){
                                     <form onSubmit={handleSubmit}>
                                         <label htmlFor="sessionDate">Date:</label><br/>
                                         <input type="date" id="sessionDate" name="date" defaultValue={values.date}
-                                               onChange={handleChange}/><br/>
+                                               min={new Date().toISOString().split('T')[0]}  onChange={handleChange}/><br/>
                                         <select name="hour" onChange={handleChange}>
                                             <option value="">Select an hour</option>
                                             {hours.map((hourObj, index) => {
@@ -244,17 +244,7 @@ function AddBookings({loading,error,...props}){
                                 </div>
                             </div>}
                         </div>
-
                     </div>
-
-                    <footer className="sticky-footer bg-white">
-                        <div className="container my-auto">
-                            <div className="copyright text-center my-auto">
-                                <span>Copyright &copy; Your Website 2020</span>
-                            </div>
-                        </div>
-                    </footer>
-
                 </div>
 
             </div>
@@ -262,29 +252,6 @@ function AddBookings({loading,error,...props}){
             <a className="scroll-to-top rounded" href="#page-top">
                 <i className="fas fa-angle-up"></i>
             </a>
-
-            <div className="modal fade" id="logoutModal" tabIndex="-1" role="dialog"
-                 aria-labelledby="exampleModalLabel"
-                 aria-hidden="true">
-                <div className="modal-dialog" role="document">
-                    <div className="modal-content">
-                        <div className="modal-header">
-                            <h5 className="modal-title" id="exampleModalLabel">Ready to Leave?</h5>
-                            <button className="close" type="button" data-dismiss="modal" aria-label="Close">
-                                <span aria-hidden="true">×</span>
-                            </button>
-                        </div>
-                        <div className="modal-body">Select "Logout" below if you are ready to end your current
-                            session.
-                        </div>
-                        <div className="modal-footer">
-                            <button className="btn btn-secondary" type="button" data-dismiss="modal">Cancel
-                            </button>
-                            <a className="btn btn-primary" href="login.html">Logout</a>
-                        </div>
-                    </div>
-                </div>
-            </div>
 
             <script src="../../../vendor/jquery/jquery.min.js"></script>
             <script src="../../../vendor/bootstrap/js/bootstrap.bundle.min.js"></script>

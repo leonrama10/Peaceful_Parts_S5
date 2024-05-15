@@ -40,29 +40,10 @@ public class TherapistWorkDays {
         this.workhours = workhours;
     }
 
-    public Long getId() {
-        return id;
-    }
-
-    public void setId(Long id) {
-        this.id = id;
-    }
-
     public int getTherapistId() {
         return therapistId;
     }
 
-    public void setTherapistId(int therapistId) {
-        this.therapistId = therapistId;
-    }
-
-    public Collection<Weekdays> getWeekdays() {
-        return weekdays;
-    }
-
-    public void setWeekdays(Collection<Weekdays> weekdays) {
-        this.weekdays = weekdays;
-    }
 
     public Collection<Workhours> getWorkhours() {
         return workhours;
@@ -72,9 +53,6 @@ public class TherapistWorkDays {
         this.workhours = workhours;
     }
 
-    public int getTherapistId() {
-        return therapistId;
-    }
 
     public void setTherapistId(int therapistId) {
         this.therapistId = therapistId;
@@ -86,22 +64,6 @@ public class TherapistWorkDays {
 
     public void setWeekdays(Collection<Weekdays> weekdays) {
         this.weekdays = weekdays;
-    }
-
-    public LocalTime getStartTime() {
-        return startTime;
-    }
-
-    public void setStartTime(LocalTime startTime) {
-        this.startTime = startTime;
-    }
-
-    public LocalTime getEndTime() {
-        return endTime;
-    }
-
-    public void setEndTime(LocalTime endTime) {
-        this.endTime = endTime;
     }
 
     public Long getId() {

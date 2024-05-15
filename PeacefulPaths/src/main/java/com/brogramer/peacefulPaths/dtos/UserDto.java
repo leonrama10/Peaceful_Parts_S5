@@ -1,11 +1,13 @@
 package com.brogramer.peacefulPaths.dtos;
 
 import com.brogramer.peacefulPaths.entity.*;
+import com.fasterxml.jackson.annotation.JsonFormat;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
+import java.time.LocalDateTime;
 import java.util.Collection;
 import java.util.Date;
 
@@ -45,8 +47,13 @@ public class UserDto {
     private Long expirationTime;
     private Gender gender;
     private Questionnaire questionnaire;
+    @JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "yyyy-MM-dd")
     private Date dateOfBirth;
     private TherapistInfo therapistInfo;
+    @JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "yyyy-MM-dd HH:mm:ss")
+    private LocalDateTime dateAdded;
+
+
 
     public University getUniversity() {
         return university;
@@ -311,5 +318,13 @@ public class UserDto {
 
     public void setTherapistInfo(TherapistInfo therapistInfo) {
         this.therapistInfo = therapistInfo;
+    }
+
+    public LocalDateTime getDateAdded() {
+        return dateAdded;
+    }
+
+    public void setDateAdded(LocalDateTime dateAdded) {
+        this.dateAdded = dateAdded;
     }
 }

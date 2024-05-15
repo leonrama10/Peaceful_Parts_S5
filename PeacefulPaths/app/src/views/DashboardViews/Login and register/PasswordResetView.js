@@ -1,9 +1,9 @@
 import React,{useState} from 'react';
-import {fetchUserData, userResetPassword} from '../../api/authService';
+import {fetchUserData, userResetPassword} from '../../../api/authService';
 import {Link, useNavigate, useParams} from 'react-router-dom';
-import '../../css/sb-admin-2.min.css';
+import '../../../css/sb-admin-2.min.css';
 import {Alert} from "reactstrap";
-import {authenticate, authFailure, authSuccess} from "../../redux/authActions";
+import {authenticate, authFailure, authSuccess} from "../../../redux/authActions";
 import {connect} from "react-redux";
 
 function PasswordResetView({loading,error,...props}){
@@ -175,12 +175,12 @@ function PasswordResetView({loading,error,...props}){
 
             </div>
 
-            <script src="../../vendor/jquery/jquery.min.js"></script>
-            <script src="../../vendor/bootstrap/js/bootstrap.bundle.min.js"></script>
+            <script src="../../../vendor/jquery/jquery.min.js"></script>
+            <script src="../../../vendor/bootstrap/js/bootstrap.bundle.min.js"></script>
 
-            <script src="../../vendor/jquery-easing/jquery.easing.min.js"></script>
+            <script src="../../../vendor/jquery-easing/jquery.easing.min.js"></script>
 
-            <script src="../../js/sb-admin-2.min.js"></script>
+            <script src="../../../js/sb-admin-2.min.js"></script>
 
         </main>
     )

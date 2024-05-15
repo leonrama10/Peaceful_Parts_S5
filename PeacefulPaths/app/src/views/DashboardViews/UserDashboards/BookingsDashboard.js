@@ -35,6 +35,7 @@ function BookingsDashboard({loading,error,...props}){
 
     const history = useNavigate ();
     const [data,setData]=useState({});
+    const [hideFilterMenu,setHideFilterMenu]=useState(true);
 
     React.useEffect(() => {
         fetchUserData().then((response) => {
@@ -61,7 +62,7 @@ function BookingsDashboard({loading,error,...props}){
 
             <div id="wrapper">
 
-                <SideBarUser />
+                <SideBarUser hideFilterMenu={hideFilterMenu}/>
 
                 <div id="content-wrapper" className="d-flex flex-column">
 

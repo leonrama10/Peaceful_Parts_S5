@@ -53,6 +53,8 @@ function EditUser({loading,error,...props}){
         mentalState1: {},
         mentalState2: {},
         therapistGender: {},
+        dateAdded:'',
+        therapistInfo:[]
     });
 
     useEffect(() => {
@@ -102,7 +104,9 @@ function EditUser({loading,error,...props}){
                     physicalHealth: response.data.physicalHealth,
                     mentalState1: response.data.mentalState1,
                     mentalState2: response.data.mentalState2,
-                    therapistGender: response.data.therapistGender
+                    therapistGender: response.data.therapistGender,
+                    dateAdded: response.data.dateAdded,
+                    therapistInfo: response.data.therapistInfo
                 })
                 userRole = loadState("userRole",'')
                 saveState("userRole",response.data.roles.at(0).role);
@@ -144,6 +148,7 @@ function EditUser({loading,error,...props}){
                     questionnaire: response.data.questionnaire,
                     university: response.data.university,
                     dateOfBirth: response.data.dateOfBirth,
+                    therapistInfo: response.data.therapistInfo,
                     therapistTypeTherapist: response.data.therapistTypeTherapist,
                     therapistTypeUser: response.data.therapistTypeUser,
                     therapyTypeTherapist: response.data.therapyTypeTherapist,
@@ -157,7 +162,8 @@ function EditUser({loading,error,...props}){
                     physicalHealth: response.data.physicalHealth,
                     mentalState1: response.data.mentalState1,
                     mentalState2: response.data.mentalState2,
-                    therapistGender: response.data.therapistGender
+                    therapistGender: response.data.therapistGender,
+                    dateAdded: response.data.dateAdded,
                 })
                 userRole = loadState("userRole",'')
                 saveState("userRole",response.data.roles.at(0).role);
@@ -179,10 +185,13 @@ function EditUser({loading,error,...props}){
         userUpdate(values).then((response)=>{
             if(response.status===201){
                if (role==="ROLE_ADMIN") {
-                   // update this so it when u update a user it sends to adminDashboard/users ,
-                   // when u update a therapist sends to adminDashboard/therapists ,
-                   // and when u update admins sends to adminDashboard/admins
-                    history('/dashboard/adminDashboard');
+                   if(userRole==="ROLE_ADMIN"){
+                       history('/dashboard/adminDashboard/admin');
+                   }else if(userRole==="ROLE_THERAPIST"){
+                       history('/dashboard/adminDashboard/therapists');
+                   }else if(userRole==="ROLE_USER"){
+                       history('/dashboard/adminDashboard/users');
+                   }
                }else if (role==="ROLE_THERAPIST"){
                     history('/dashboard/therapistDashboard/users');
                }
@@ -297,9 +306,6 @@ function EditUser({loading,error,...props}){
         }
     };
 
-    console.log("VALUESSSSSSSSSSSSSSSSS",values.therapistGender)
-
-
     return (
         <main id="page-top" style={{height: '100%'}}>
 
@@ -346,7 +352,7 @@ function EditUser({loading,error,...props}){
                                                 <Form.Group controlId="formBasicDateOfBirth">
                                                     <br/>
                                                     <Form.Label>Date of Birth</Form.Label>
-                                                    <Form.Control type="date" value={values.dateOfBirth}
+                                                    <Form.Control type="date" value={values.dateOfBirth} name="dateOfBirth"
                                                                   onChange={handleChange}
                                                                   required/>
                                                 </Form.Group>}

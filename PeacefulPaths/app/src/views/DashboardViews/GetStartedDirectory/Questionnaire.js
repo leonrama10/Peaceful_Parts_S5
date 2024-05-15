@@ -1,7 +1,7 @@
 import React from "react";
 import "../../../css/Questionnaire.css";
 
-const Questionnaire = ({ questions, currentQuestion, handleAnswerClick }) => {
+const Questionnaire = ({ questions, currentQuestion, handleAnswerClick, setContinueButton }) => {
     return (
         <>
             <div className="question">
@@ -35,6 +35,21 @@ const Questionnaire = ({ questions, currentQuestion, handleAnswerClick }) => {
                            ))}
                        </div>
            )}
+
+            {questions[currentQuestion].answerMethod === "checkbox" && (
+                <div className="answer" style={{ display: 'flex', flexDirection: 'column', alignItems: 'self-start', gap: '10px' ,paddingLeft:"220px",paddingRight:"300px"}}>
+                    {questions[currentQuestion].answers.map(({text}) => (
+                        <div key={text} className="customCheckbox">
+                            <input type="checkbox" id={text} name={text} value={text} onChange={(event) => handleAnswerClick(event.target.value)} />
+                            <label htmlFor={text}>{text}</label>
+                        </div>
+                    ))}
+                    <button onClick={() => {
+                        setContinueButton(true);
+                    }} style={{ width:"100px"}}>Continue</button>
+                </div>
+            )}
+
         </>
     );
 

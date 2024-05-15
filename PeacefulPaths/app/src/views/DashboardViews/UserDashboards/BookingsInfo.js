@@ -40,6 +40,7 @@ function BookingsInfo({loading,error,...props}){
     const [data,setData]=useState({});
     const [allBookings, setAllBookings] = useState([]);
     const [connectionFailure, setConnectionFailure] = useState('');
+    const [hideFilterMenu,setHideFilterMenu]=useState(true);
     const [info, setInfo] = useState(false);
     const [therapistData, setTherapistData] = useState({
         id:0,
@@ -159,64 +160,134 @@ function BookingsInfo({loading,error,...props}){
 
             <div id="wrapper">
 
-                <SideBarUser />
+                <SideBarUser hideFilterMenu={hideFilterMenu} />
 
                 <div id="content-wrapper" className="d-flex flex-column">
 
                     <div id="content">
 
-                        <DashboardNav data={data} setUser={props.setUser} setUserAuthenticationState={props.setUserAuthenticationState}/>
+                        <DashboardNav data={data} setUser={props.setUser}
+                                      setUserAuthenticationState={props.setUserAuthenticationState}/>
+
+                        {/*<div className="container-fluid">*/}
+                        {/*    {connected && <div className="card">*/}
+                        {/*        {!info ? <div className="card-body">*/}
+                        {/*            {allBookings.map((booking, index) => {*/}
+                        {/*                const date = booking.date;*/}
+                        {/*                const formattedDate = `${date[0]}-${date[1] < 10 ? '0' + date[1] : date[1]}-${date[2] < 10 ? '0' + date[2] : date[2]}`;*/}
+
+                        {/*                // Convert the hour into a more readable format*/}
+                        {/*                const hour = booking.hour;*/}
+                        {/*                const formattedHour = `${hour[0] < 10 ? '0' + hour[0] : hour[0]}:${hour[1] < 10 ? '0' + hour[1] : hour[1]}`;*/}
+
+                        {/*                return (*/}
+                        {/*                    <div key={index} className="card"*/}
+                        {/*                         style={{marginTop: '10px', display: "flex", flexDirection: "row"}}>*/}
+                        {/*                        <div className="card-body">*/}
+                        {/*                            <h5 className="card-title">Booking {index + 1}</h5>*/}
+                        {/*                            <p className="card-text">Date: {formattedDate}</p>*/}
+                        {/*                            <p className="card-text">Hour: {formattedHour}</p>*/}
+                        {/*                        </div>*/}
+
+                        {/*                        <div className="card-body" style={{marginLeft: '800px'}}>*/}
+                        {/*                            <button className="btn btn-info btn-sm" onClick={() => handleEdit(booking.bookingId)}>Edit Session*/}
+                        {/*                            </button>*/}
+                        {/*                            <br/>*/}
+                        {/*                            <br/>*/}
+                        {/*                            <button className="btn btn-danger btn-sm" onClick={() => handleCanceling(booking.bookingId)}>Cancel Session*/}
+                        {/*                            </button>*/}
+                        {/*                        </div>*/}
+                        {/*                    </div>*/}
+                        {/*                )*/}
+                        {/*            })}*/}
+                        {/*        </div> : <p>You need to make booking first: <Link*/}
+                        {/*            to="/dashboard/userDashboard/addBookings">Click here to book your first*/}
+                        {/*            session.</Link></p>*/}
+                        {/*        }*/}
+                        {/*    </div>}*/}
+                        {/*</div>*/}
 
                         <div className="container-fluid">
                             {connected && <div className="card">
                                 {!info ? <div className="card-body">
-                                    {allBookings.map((booking, index) => {
-                                        const date = booking.date;
-                                        const formattedDate = `${date[0]}-${date[1] < 10 ? '0' + date[1] : date[1]}-${date[2] < 10 ? '0' + date[2] : date[2]}`;
+                                        <h2>Available bookings</h2>
+                                        {allBookings
+                                            .filter(booking => {
+                                                const date = booking.date;
+                                                const formattedDate = `${date[0]}-${date[1] < 10 ? '0' + date[1] : date[1]}-${date[2] < 10 ? '0' + date[2] : date[2]}`;
+                                                const currentDate = new Date();
+                                                const bookingDate = new Date(formattedDate);
+                                                return currentDate <= bookingDate;
+                                            })
+                                            .sort((a, b) => {
+                                                const dateA = new Date(`${a.date[0]}-${a.date[1] < 10 ? '0' + a.date[1] : a.date[1]}-${a.date[2] < 10 ? '0' + a.date[2] : a.date[2]}`);
+                                                const dateB = new Date(`${b.date[0]}-${b.date[1] < 10 ? '0' + b.date[1] : b.date[1]}-${b.date[2] < 10 ? '0' + b.date[2] : b.date[2]}`);
+                                                return dateA - dateB;
+                                            })
+                                            .map((booking, index) => {
+                                                const date = booking.date;
+                                                const formattedDate = `${date[0]}-${date[1] < 10 ? '0' + date[1] : date[1]}-${date[2] < 10 ? '0' + date[2] : date[2]}`;
+                                                const hour = booking.hour;
+                                                const formattedHour = `${hour[0] < 10 ? '0' + hour[0] : hour[0]}:${hour[1] < 10 ? '0' + hour[1] : hour[1]}`;
+                                                // ... existing code ...
+                                                return (
+                                                    <div key={index} className="card" style={{marginTop: '10px', display: "flex", flexDirection: "row"}}>
+                                                        <div className="card-body">
+                                                            <h5 className="card-title">Booking:</h5>
+                                                            <p className="card-text">Date: {formattedDate}</p>
+                                                            <p className="card-text">Hour: {formattedHour}</p>
+                                                        </div>
 
-                                        // Convert the hour into a more readable format
-                                        const hour = booking.hour;
-                                        const formattedHour = `${hour[0] < 10 ? '0' + hour[0] : hour[0]}:${hour[1] < 10 ? '0' + hour[1] : hour[1]}`;
-
-                                        return (
-                                            <div key={index} className="card"
-                                                 style={{marginTop: '10px', display: "flex", flexDirection: "row"}}>
-                                                <div className="card-body">
-                                                    <h5 className="card-title">Booking {index + 1}</h5>
-                                                    <p className="card-text">Date: {formattedDate}</p>
-                                                    <p className="card-text">Hour: {formattedHour}</p>
-                                                </div>
-
-                                                <div className="card-body" style={{marginLeft: '800px'}}>
-                                                    <button className="btn btn-info btn-sm" onClick={() => handleEdit(booking.bookingId)}>Edit Session
-                                                    </button>
-                                                    <br/>
-                                                    <br/>
-                                                    <button className="btn btn-danger btn-sm" onClick={() => handleCanceling(booking.bookingId)}>Cancel Session
-                                                    </button>
-                                                </div>
-                                            </div>
-                                        )
-                                    })}
-                                </div> : <p>You need to make booking first: <Link
-                                    to="/dashboard/userDashboard/addBookings">Click here to book your first
-                                    session.</Link></p>
-                                }
+                                                        <div className="card-body" style={{marginLeft: '800px'}}>
+                                                            <button className="btn btn-info btn-sm" onClick={() => handleEdit(booking.bookingId)}>Edit Session</button>
+                                                            <br/>
+                                                            <br/>
+                                                            <button className="btn btn-danger btn-sm" onClick={() => handleCanceling(booking.bookingId)}>Cancel Session</button>
+                                                        </div>
+                                                    </div>
+                                                )
+                                            })}
+                                        <hr/>
+                                        <h2>Expired bookings</h2>
+                                        {allBookings
+                                            .filter(booking => {
+                                                const date = booking.date;
+                                                const formattedDate = `${date[0]}-${date[1] < 10 ? '0' + date[1] : date[1]}-${date[2] < 10 ? '0' + date[2] : date[2]}`;
+                                                const hour = booking.hour;
+                                                const formattedHour = `${hour[0] < 10 ? '0' + hour[0] : hour[0]}:${hour[1] < 10 ? '0' + hour[1] : hour[1]}`;
+                                                const currentDate = new Date();
+                                                const bookingDate = new Date(formattedDate + ' ' + formattedHour);
+                                                return currentDate > bookingDate;
+                                            })
+                                            .sort((a, b) => {
+                                                const dateA = new Date(`${a.date[0]}-${a.date[1] < 10 ? '0' + a.date[1] : a.date[1]}-${a.date[2] < 10 ? '0' + a.date[2] : a.date[2]}`);
+                                                const dateB = new Date(`${b.date[0]}-${b.date[1] < 10 ? '0' + b.date[1] : b.date[1]}-${b.date[2] < 10 ? '0' + b.date[2] : b.date[2]}`);
+                                                return dateA - dateB;
+                                            })
+                                            .map((booking, index) => {
+                                                const date = booking.date;
+                                                const formattedDate = `${date[0]}-${date[1] < 10 ? '0' + date[1] : date[1]}-${date[2] < 10 ? '0' + date[2] : date[2]}`;
+                                                const hour = booking.hour;
+                                                const formattedHour = `${hour[0] < 10 ? '0' + hour[0] : hour[0]}:${hour[1] < 10 ? '0' + hour[1] : hour[1]}`;
+                                                // ... existing code ...
+                                                return (
+                                                    <div key={index} className="card" style={{marginTop: '10px', display: "flex", flexDirection: "row"}}>
+                                                        <div className="card-body">
+                                                            <h5 className="card-title">Booking:</h5>
+                                                            <p className="card-text">Date: {formattedDate}</p>
+                                                            <p className="card-text">Hour: {formattedHour}</p>
+                                                        </div>
+                                                    </div>
+                                                )
+                                            })}
+                                    </div> :
+                                    <p>You need to make booking first: <Link to="/dashboard/userDashboard/addBookings">Click
+                                        here to book your first session.</Link></p>}
                             </div>}
                         </div>
 
                     </div>
-
-                    <footer className="sticky-footer bg-white">
-                        <div className="container my-auto">
-                            <div className="copyright text-center my-auto">
-                                <span>Copyright &copy; Your Website 2020</span>
-                            </div>
-                        </div>
-                    </footer>
-
                 </div>
-
             </div>
 
             <a className="scroll-to-top rounded" href="#page-top">

@@ -325,7 +325,7 @@ CREATE TABLE `user` (
   `date_of_birth` DATE DEFAULT NULL,
   `email` varchar(45) DEFAULT NULL,
   `number` varchar(9) DEFAULT NULL,
-  `experience` int NOT NULL,
+  `experience` int NOT NULL DEFAULT 0,
   `reset_token` varchar(255) DEFAULT NULL,
   `expiration_time` long,
   `password` char(68) NOT NULL,
@@ -344,9 +344,9 @@ CREATE TABLE `user` (
 ) AUTO_INCREMENT=1;
 
 -- Admin-- 
-INSERT INTO `user` (`name`, `surname`, `email`, `number`, `experience`, `password`, `reset_token`, `expiration_time`, `location_id`, `gender_id`, `university_id`, `date_of_birth`)
+INSERT INTO `user` (`name`, `surname`, `email`, `number`, `password`, `reset_token`, `expiration_time`, `gender_id`)
 VALUES
-('Leke', 'Markaj', 'markaj.leka@gmail.com', '044806543', 20, '$2a$10$lAZ7fMTXoALYWY.C4rAs7u7Bdzz4qd7SIwAkWNOX5XQkTRe7vo4P.', NULL, 0, 1, 1, 1, '1992-05-15');
+('Leke', 'Markaj', 'markaj.leka@gmail.com', '044806543', '$2a$10$lAZ7fMTXoALYWY.C4rAs7u7Bdzz4qd7SIwAkWNOX5XQkTRe7vo4P.', NULL, 0, 1);
 
 -- Therapist -- 
 INSERT INTO `user` (`name`, `surname`, `email`, `number`, `experience`, `password`, `reset_token`, `expiration_time`, `location_id`, `gender_id`, `university_id`, `date_of_birth`,`therapist_info_id`)

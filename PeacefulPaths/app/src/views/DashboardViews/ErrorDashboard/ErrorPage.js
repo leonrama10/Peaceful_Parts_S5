@@ -1,11 +1,11 @@
 import React,{useState} from 'react';
-import {fetchUserData} from '../../api/authService';
+import {fetchUserData} from '../../../api/authService';
 import {Link, useNavigate} from 'react-router-dom';
-import '../../css/sb-admin-2.min.css';
-import accLogo from "../../img/undraw_profile.svg"
-import navimg2 from "../../img/undraw_profile_2.svg"
-import navimg1 from "../../img/undraw_profile_1.svg"
-import navimg3 from "../../img/undraw_profile_3.svg"
+import '../../../css/sb-admin-2.min.css';
+import accLogo from "../../../img/undraw_profile.svg"
+import navimg2 from "../../../img/undraw_profile_2.svg"
+import navimg1 from "../../../img/undraw_profile_1.svg"
+import navimg3 from "../../../img/undraw_profile_3.svg"
 export default function ErrorPage(){
 
     const history = useNavigate ();
@@ -390,14 +390,14 @@ export default function ErrorPage(){
             </div>
 
 
-            <script src="../../vendor/jquery/jquery.min.js"></script>
-            <script src="../../vendor/bootstrap/js/bootstrap.bundle.min.js"></script>
+            <script src="../../../vendor/jquery/jquery.min.js"></script>
+            <script src="../../../vendor/bootstrap/js/bootstrap.bundle.min.js"></script>
 
 
-            <script src="../../vendor/jquery-easing/jquery.easing.min.js"></script>
+            <script src="../../../vendor/jquery-easing/jquery.easing.min.js"></script>
 
 
-            <script src="../../js/sb-admin-2.min.js"></script>
+            <script src="../../../js/sb-admin-2.min.js"></script>
 
             </main>
     )

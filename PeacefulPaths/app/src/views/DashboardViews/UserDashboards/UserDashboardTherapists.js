@@ -5,7 +5,7 @@ import {
     fetchUserTherapistConnectionData,
     removeTherapist
 } from '../../../api/authService';
-import {useNavigate} from 'react-router-dom';
+import {Link, useNavigate} from 'react-router-dom';
 import '../../../css/sb-admin-2.css';
 import '../../../css/myCss.css';
 import DashboardNav from "../DashboardNav";
@@ -35,6 +35,7 @@ function UserDashboardTherapists({loading,error,...props}){
     const history = useNavigate ();
     const [data,setData]=useState({});
     const [hideFilterMenu,setHideFilterMenu]=useState(true);
+    const [bookingExists,setBookingExists]=useState(true);
     const [nextBooking,setNextBooking]=useState({});
     const [connectionFailure, setConnectionFailure] = useState('');
     const [therapistData, setTherapistData] = useState({
@@ -89,7 +90,11 @@ function UserDashboardTherapists({loading,error,...props}){
                         newBookingsData.therapistId = response.data.id
 
                         fetchNextBooking(newBookingsData).then((response) => {
-                            setNextBooking(response.data)
+                            if(response.data.bookingId===0){
+                                setBookingExists(true)
+                            }else{
+                                setNextBooking(response.data)
+                            }
                         }).catch((e) => {
                             history('/loginBoot');
                         });
@@ -176,25 +181,17 @@ function UserDashboardTherapists({loading,error,...props}){
                                     <button onClick={() => handleRemove(data.id)}>Remove Therapist</button>
                                 </div>
 
-                                <div className="card-body">
+                                {!bookingExists ? <div className="card-body">
                                     <h5 className="card-title">Next Session:</h5>
                                     <p className="card-text">Date: {new Date(nextBooking.date).toLocaleDateString()}</p>
                                     <p className="card-text">Hour: {nextBooking && nextBooking.hour && formatHour(nextBooking.hour)}</p>
+                                </div>:<div><p>No bookings in the future, <br/>why dont you select a date <br/>and talk some stuff :)</p>
+                                    <Link to="/dashboard/userDashboard/addBookings">Click here</Link>
                                 </div>
-
+                                }
                             </div>}
                         </div>
-
                     </div>
-
-                    <footer className="sticky-footer bg-white">
-                        <div className="container my-auto">
-                        <div className="copyright text-center my-auto">
-                            <span>Copyright &copy; Your Website 2020</span>
-                            </div>
-                        </div>
-                    </footer>
-
                 </div>
 
             </div>
@@ -202,29 +199,6 @@ function UserDashboardTherapists({loading,error,...props}){
             <a className="scroll-to-top rounded" href="#page-top">
             <i className="fas fa-angle-up"></i>
             </a>
-
-            <div className="modal fade" id="logoutModal" tabIndex="-1" role="dialog"
-                 aria-labelledby="exampleModalLabel"
-                 aria-hidden="true">
-                <div className="modal-dialog" role="document">
-                    <div className="modal-content">
-                        <div className="modal-header">
-                            <h5 className="modal-title" id="exampleModalLabel">Ready to Leave?</h5>
-                            <button className="close" type="button" data-dismiss="modal" aria-label="Close">
-                                <span aria-hidden="true">×</span>
-                            </button>
-                        </div>
-                        <div className="modal-body">Select "Logout" below if you are ready to end your current
-                            session.
-                        </div>
-                        <div className="modal-footer">
-                            <button className="btn btn-secondary" type="button" data-dismiss="modal">Cancel
-                            </button>
-                            <a className="btn btn-primary" href="login.html">Logout</a>
-                        </div>
-                    </div>
-                </div>
-            </div>
 
             <script src="../../../vendor/jquery/jquery.min.js"></script>
             <script src="../../../vendor/bootstrap/js/bootstrap.bundle.min.js"></script>

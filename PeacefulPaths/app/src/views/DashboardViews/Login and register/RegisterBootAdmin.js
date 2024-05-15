@@ -1,18 +1,18 @@
 import React,{useState,useEffect} from 'react';
 import {connect} from 'react-redux';
-import {registerAdmin} from '../../api/authService';
+import {registerAdmin} from '../../../api/authService';
 import {Link, useNavigate} from 'react-router-dom';
-import '../../css/sb-admin-2.min.css';
+import '../../../css/sb-admin-2.min.css';
 import {Alert} from "reactstrap";
 import {
     authenticate,
     authFailure,
     authSuccess,
     setAdminAuthenticationState
-} from "../../redux/authActions";
-import SideBarAdmin from "./SideBars/SideBarAdmin";
-import DashboardNav from "./DashboardNav";
-import {loadState, saveState} from "../../helper/sessionStorage";
+} from "../../../redux/authActions";
+import SideBarAdmin from "../SideBars/SideBarAdmin";
+import DashboardNav from "../DashboardNav";
+import {loadState, saveState} from "../../../helper/sessionStorage";
 const isAdminAuthenticatedBoolean = loadState("isAdminAuthenticated",false)
 function RegisterBootAdmin({loading,error,...props}){
 
@@ -262,10 +262,10 @@ function RegisterBootAdmin({loading,error,...props}){
                                            </div>
                                        </div></div>
                                    </div>
-                               <script src="../../vendor/jquery/jquery.min.js"></script>
-                               <script src="../../vendor/bootstrap/js/bootstrap.bundle.min.js"></script>
-                               <script src="../../vendor/jquery-easing/jquery.easing.min.js"></script>
-                               <script src="../../js/sb-admin-2.min.js"></script>
+                               <script src="../../../vendor/jquery/jquery.min.js"></script>
+                               <script src="../../../vendor/bootstrap/js/bootstrap.bundle.min.js"></script>
+                               <script src="../../../vendor/jquery-easing/jquery.easing.min.js"></script>
+                               <script src="../../../js/sb-admin-2.min.js"></script>
                            </div>
 
 
@@ -289,17 +289,17 @@ function RegisterBootAdmin({loading,error,...props}){
 
 
            </div>
-               <script src="../../vendor/jquery/jquery.min.js"></script>
-               <script src="../../vendor/bootstrap/js/bootstrap.bundle.min.js"></script>
+               <script src="../../../vendor/jquery/jquery.min.js"></script>
+               <script src="../../../vendor/bootstrap/js/bootstrap.bundle.min.js"></script>
 
-               <script src="../../vendor/jquery-easing/jquery.easing.min.js"></script>
+               <script src="../../../vendor/jquery-easing/jquery.easing.min.js"></script>
 
-               <script src="../../js/sb-admin-2.min.js"></script>
+               <script src="../../../js/sb-admin-2.min.js"></script>
 
-               <script src="../../vendor/chart.js/Chart.min.js"></script>
+               <script src="../../../vendor/chart.js/Chart.min.js"></script>
 
-               <script src="../../js/demo/chart-area-demo.js"></script>
-               <script src="../../js/demo/chart-pie-demo.js"></script>
+               <script src="../../../js/demo/chart-area-demo.js"></script>
+               <script src="../../../js/demo/chart-pie-demo.js"></script>
 
        </main>
    );
