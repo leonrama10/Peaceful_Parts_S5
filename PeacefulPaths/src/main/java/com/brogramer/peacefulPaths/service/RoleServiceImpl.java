@@ -1,11 +1,7 @@
 package com.brogramer.peacefulPaths.service;
 
-import com.brogramer.peacefulPaths.dao.RoleDao;
 import com.brogramer.peacefulPaths.dao.RoleRepository;
-import com.brogramer.peacefulPaths.dao.TherapistRepository;
-import com.brogramer.peacefulPaths.dao.UserDao;
 import com.brogramer.peacefulPaths.entity.Roles;
-import jakarta.persistence.EntityManager;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 

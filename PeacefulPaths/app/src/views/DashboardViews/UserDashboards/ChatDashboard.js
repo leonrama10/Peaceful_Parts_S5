@@ -1,9 +1,8 @@
 import React, {useEffect, useState} from 'react';
 import {
-    fetchNextBooking,
+    fetchAllUserTherapistOldConnectionData, fetchNextBooking,
     fetchUserData,
-    fetchUserTherapistConnectionData,
-    removeTherapist
+    fetchUserTherapistConnectionData
 } from '../../../api/authService';
 import {Link, useNavigate} from 'react-router-dom';
 import '../../../css/sb-admin-2.css';
@@ -23,10 +22,10 @@ import {loadState, saveState} from "../../../helper/sessionStorage";
 
 let connected = null;
 const isUserAuthenticatedBoolean = loadState("isUserAuthenticated",false)
-function UserDashboardTherapists({loading,error,...props}){
+function ChatDashboard({loading,error,...props}){
 
     useEffect(() => {
-        props.setLocation("/dashboard/userDashboard/therapists")
+        props.setLocation("/dashboard/userDashboard/chatDashboard")
         if(!isUserAuthenticatedBoolean){
             if (!props.isUserAuthenticated){
                 props.loginFailure("Authentication Failed!!!");
@@ -57,45 +56,24 @@ function UserDashboardTherapists({loading,error,...props}){
     const [connectionFailure, setConnectionFailure] = useState('');
     const [therapistData, setTherapistData] = useState({
         id:0,
-        email: '',
         name:'',
         surname:'',
-        password:'',
-        roles:[],
-        number:'',
-        experience:0,
-        allRoles:[],
-        university: '',
-        location:{},
-        gender:{},
     });
+    const [allTherapistData, setAllTherapistData] = useState([]);
 
     React.useEffect(() => {
         connected = loadState("connected",false)
         fetchUserData().then((response) => {
             if (response.data.roles.at(0).role === 'ROLE_USER') {
                 setData(response.data);
-
-                const newBookingsData = {
-                    clientId: response.data.id,
-                    therapistId: 0
-                };
+                const userId = response.data.id;
 
                 fetchUserTherapistConnectionData(response.data.id).then((response) => {
                     if (response.data.roles.at(0).role === 'ROLE_THERAPIST') {
                         setTherapistData({
-                           id: response.data.id,
-                           email: response.data.email,
-                           name: response.data.name,
-                           surname: response.data.surname,
-                           password: response.data.password,
-                           roles: response.data.roles,
-                           number: response.data.number,
-                           experience: response.data.experience,
-                           location: response.data.location,
-                           allRoles: response.data.allRoles,
-                           university: response.data.university,
-                           gender: response.data.gender
+                            id: response.data.id,
+                            name: response.data.name,
+                            surname: response.data.surname,
                         });
                         connected = loadState("connected",false)
                         if(response.data.id===0){
@@ -104,9 +82,14 @@ function UserDashboardTherapists({loading,error,...props}){
                             saveState("connected",true)
                         }
 
-                        newBookingsData.therapistId = response.data.id
+                        fetchAllUserTherapistOldConnectionData({therapistId:response.data.id,userId:userId}).then((response) => {
+                            setAllTherapistData(response.data);
+                        }).catch((e) => {
+                            history('/loginBoot');
+                        });
 
-                        fetchNextBooking(newBookingsData).then((response) => {
+
+                        fetchNextBooking({therapistId:response.data.id,clientId:userId}).then((response) => {
                             if(response.data.bookingId!==0){
                                 setBookingExists(true)
                                 setNextBooking(response.data)
@@ -135,6 +118,7 @@ function UserDashboardTherapists({loading,error,...props}){
                         console.log('Error', e.message);
                     }
                 });
+
             } else {
                 history('/loginBoot');
             }
@@ -143,25 +127,34 @@ function UserDashboardTherapists({loading,error,...props}){
         });
     }, []);
 
-    function handleRemove(id) {
-        removeTherapist(id).then((response)=>{
-            if(response.status===200){
-                saveState("connected",false)
-                history('/dashboard/userDashboard')
-            }
-            else{
-                //Add error on page if user cant be deleted
-                history('/loginBoot');
-            }
-        }).catch((err)=>{
-            history('/loginBoot');
-        });
+    function handleClick() {
+        saveState("meetingAvailable",true)
+        props.setLocation("/dashboard/userDashboard/chatTherapist")
+        history("/dashboard/userDashboard/chatTherapist")
     }
+
+    function handleOldClick(id) {
+        saveState("chatTherapistId", id);
+        history("/dashboard/userDashboard/oldChatTherapist")
+    }
+
+    let hours, minutes;
+    if (nextBooking && nextBooking.hour) {
+        [hours, minutes] = nextBooking.hour;
+    }
+
+    const currentTime = new Date();
+    let meetingTime = currentTime;
+    if (nextBooking && nextBooking.date) {
+        const [year, month, day] = nextBooking.date;
+        meetingTime = new Date(year, month - 1, day, hours, minutes);
+    }
+
+    const timeDifference = (currentTime - meetingTime) / 1000 / 60;
 
     function formatHour(hour) {
         return `${hour[0] < 10 ? '0' + hour[0] : hour[0]}:${hour[1] < 10 ? '0' + hour[1] : hour[1]}`;
     }
-
 
     return (
         <main id="page-top">
@@ -183,46 +176,60 @@ function UserDashboardTherapists({loading,error,...props}){
                         }
 
                         <div className="container-fluid">
-                            {connected && <div className="card" style={{display: "flex", flexDirection: "row"}}>
-                                <div className="card-body">
-                                    <h5 className="card-title">Full
-                                        name: {therapistData.name} {therapistData.surname}</h5>
-                                    <p className="card-text">Email: {therapistData.email}</p>
-                                    <p className="card-text">Phone: {therapistData.number}</p>
-                                    <p className="card-text">Gender: {therapistData.gender.gender}</p>
-                                    <p className="card-text">Experience: {therapistData.experience} years</p>
-                                    <p className="card-text">Location: {therapistData.location.location}</p>
-                                    <br/>
+                             <div className="card">
+                                {connected && <div className="card-body" style={{display: "flex", flexDirection: "row"}}>
+                                    <div className="card-body">
+                                        CONNECTED THERAPIST
+                                        <h5 className="card-title">Full
+                                            name: {therapistData.name} {therapistData.surname}</h5>
+                                        <br/>
 
-                                    <button onClick={() => handleRemove(data.id)}>Remove Therapist</button>
-                                </div>
+                                        {bookingExists && nextBooking && timeDifference >= 0 && timeDifference <= 50 && <button onClick={handleClick}>Chat With Therapist</button>}
+                                    </div>
 
-                                {bookingExists ? <div className="card-body">
-                                    <h5 className="card-title">Next Session:</h5>
-                                    <p className="card-text">Date: {new Date(nextBooking.date).toLocaleDateString()}</p>
-                                    <p className="card-text">Hour: {nextBooking && nextBooking.hour && formatHour(nextBooking.hour)}</p>
-                                </div>:<div><p>No bookings in the future, <br/>why dont you select a date <br/>and talk some stuff :)</p>
-                                    <Link to="/dashboard/userDashboard/addBookings">Click here</Link>
-                                </div>
-                                }
-                            </div>}
+                                    {bookingExists ?
+                                        <div>{nextBooking && timeDifference >= 0 && timeDifference <= 50 ?
+                                            <div className="card-body">
+                                                <h4 className="card-title">Session is in progress</h4>
+                                            </div> : <div className="card-body">
+                                                <h5 className="card-title">Next Session:</h5>
+                                                <p className="card-text">Date: {new Date(nextBooking.date).toLocaleDateString()}</p>
+                                                <p className="card-text">Hour: {nextBooking && nextBooking.hour && formatHour(nextBooking.hour)}</p>
+                                            </div>}
+                                        </div> :
+                                        <div><p>No bookings in the future, <br/>why dont you select a date <br/>and talk
+                                            some stuff :)</p>
+                                            <Link to="/dashboard/userDashboard/addBookings">Click here</Link>
+                                        </div>
+                                    }
+                                </div>} 
+
+                                 <hr/>
+                                 <div className="card-body">
+                                     OLD THERAPIST CHATS:
+                                     {allTherapistData.map((data, index) => (
+                                         <div key={index} className="card">
+                                             <div className="card-body">
+                                                 <h5 className="card-title">Full
+                                                     name: {data.name} {data.surname}</h5>
+                                                 <br/>
+                                                 <button onClick={() => handleOldClick(data.id)}>See Old Chats
+                                                 </button>
+                                             </div>
+                                         </div>
+                                     ))}
+
+                                 </div>
+                             </div>
                         </div>
                     </div>
                 </div>
-
             </div>
-
-            <a className="scroll-to-top rounded" href="#page-top">
-            <i className="fas fa-angle-up"></i>
-            </a>
-
             <script src="../../../vendor/jquery/jquery.min.js"></script>
             <script src="../../../vendor/bootstrap/js/bootstrap.bundle.min.js"></script>
             <script src="../../../vendor/jquery-easing/jquery.easing.min.js"></script>
-
         </main>
     )
-
 }
 
 const mapStateToProps = ({auth}) => {
@@ -243,4 +250,4 @@ const mapDispatchToProps = (dispatch) => {
         setLocation: (path) => dispatch(setLocation(path))
     }
 }
-export default connect(mapStateToProps, mapDispatchToProps)(UserDashboardTherapists);
+export default connect(mapStateToProps, mapDispatchToProps)(ChatDashboard);

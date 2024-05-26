@@ -11,8 +11,14 @@ import jakarta.validation.Valid;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.messaging.handler.annotation.MessageMapping;
+import org.springframework.messaging.handler.annotation.SendTo;
+import org.springframework.messaging.simp.SimpMessageHeaderAccessor;
+import org.springframework.messaging.simp.SimpMessagingTemplate;
 import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.messaging.handler.annotation.Payload;
+
 
 import java.net.URI;
 import java.security.Principal;
@@ -184,6 +190,17 @@ public class AuthController {
         return weekdaysDto;
     }
 
+    private ChatDto convertToChatDto(Chat chat) {
+        ChatDto chatDto = new ChatDto();
+
+        if (chat==null) {
+            return chatDto;
+        }
+        chatDto.setMessages(chat.getMessages());
+        chatDto.setId(chat.getId());
+
+        return chatDto;
+    }
 
     @PostMapping("/auth/login")
     public ResponseEntity<UserDto> login(@RequestBody @Valid CredentialsDto credentialsDto) {
@@ -278,6 +295,7 @@ public class AuthController {
         }
         userInfo.setExperience(userDetails.getExperience());
         userInfo.setResetToken(userDetails.getResetToken());
+        userInfo.setToken(userAuthenticationProvider.createToken(userDetails.getUsername()));
         userInfo.setExpirationTime(userDetails.getExpirationTime());
 
         return ResponseEntity.ok(userInfo);
@@ -298,6 +316,7 @@ public class AuthController {
 
         return ResponseEntity.ok(userInfo);
     }
+
     @GetMapping("/auth/allTherapistInfo")
     public ResponseEntity<?> getAllTherapistInfo(){
         List<UserInfo> therapistInfos = getAllWithRole("ROLE_THERAPIST");
@@ -591,11 +610,11 @@ public class AuthController {
 
     @PostMapping("/auth/fetchNextBooking")
     public ResponseEntity<?> fetchNextBooking(@RequestBody @Valid BookingsDto bookingsDto) {
-        Bookings booking = userService.fetchNextBooking(bookingsDto);
+        Optional<Bookings> booking = userService.fetchNextBooking(bookingsDto);
 
         BookingsDto bookingDto = new BookingsDto();
-        if (booking!=null) {
-            bookingDto = convertToBookingsDto(booking);
+        if (booking.isPresent()) {
+            bookingDto = convertToBookingsDto(booking.get());
         }
 
         return ResponseEntity.ok(bookingDto);
@@ -626,6 +645,40 @@ public class AuthController {
                 .map(this::convertToWorkhoursDto)
                 .collect(Collectors.toList());
         return ResponseEntity.ok(bookingsDtoList);
+    }
+
+    @PostMapping("/auth/fetchAllUserTherapistOldConnectionData")
+    public ResponseEntity<?> fetchAllUserTherapistOldConnectionData(@RequestBody @Valid ConnectionDto connectionDto) {
+        List<UserInfo> therapistDtoList = userService.fetchAllUserTherapistOldConnectionData(connectionDto).stream()
+                .map(this::convertToUserInfo)
+                .collect(Collectors.toList());
+        return ResponseEntity.ok(therapistDtoList);
+    }
+
+    @PostMapping("/auth/fetchUserTherapistChats")
+    public ResponseEntity<?> fetchUserTherapistChats(@RequestBody @Valid ConnectionDto connectionDto) {
+        Chat chat = userService.fetchUserTherapistChats(connectionDto);
+
+        ChatDto chatDto = convertToChatDto(chat);
+
+        return ResponseEntity.ok(chatDto);
+    }
+
+    @PostMapping("/auth/sendMessage")
+    public void sendMessage(@RequestBody @Valid MessageDto messageDto) {
+        userService.sendMessage(messageDto);
+    }
+
+    @PostMapping("/auth/fetchTherapistUserConnectionData")
+    public ResponseEntity<?> fetchTherapistUserConnectionData(@RequestBody @Valid ConnectionDto connectionDto){
+        User user = userService.findTherapistConnectionById(connectionDto);
+        UserInfo userInfo = new UserInfo();
+
+        if (user!=null){
+            userInfo = convertToUserInfo(user);
+        }
+
+        return ResponseEntity.ok(userInfo);
     }
 
 }

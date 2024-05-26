@@ -1,9 +1,7 @@
 import React, {useEffect, useState} from 'react';
 import {
-    bookSession,
-    fetchBookedHours, fetchBookedHoursInEdit, fetchBookingByBookingId, fetchBookings,
-    fetchUserData,
-    fetchUserTherapistConnectionData, fetchWorkDays, removeTherapist, selectWorkDays, updateBookingSession
+    fetchBookedHoursInEdit, fetchBookingByBookingId, fetchUserData,
+    fetchUserTherapistConnectionData, fetchWorkDays, updateBookingSession
 } from '../../../api/authService';
 import {Link, useNavigate, useParams} from 'react-router-dom';
 import '../../../css/sb-admin-2.css';
@@ -14,7 +12,7 @@ import {Alert} from "reactstrap";
 import {
     authenticate,
     authFailure,
-    authSuccess,
+    authSuccess, setLocation,
     setUserAuthenticationState
 } from "../../../redux/authActions";
 import {connect} from "react-redux";
@@ -23,21 +21,34 @@ let connected = null;
 const isUserAuthenticatedBoolean = loadState("isUserAuthenticated",false)
 function EditBooking({loading,error,...props}){
 
+    const { id } = useParams();
+    const bookingId = Number(id);
+
     useEffect(() => {
+        props.setLocation("/dashboard/userDashboard/editBooking/"+bookingId)
         if(!isUserAuthenticatedBoolean){
             if (!props.isUserAuthenticated){
                 props.loginFailure("Authentication Failed!!!");
+                props.setLocation("/loginBoot")
                 history('/loginBoot');
             }else{
+                props.setUserAuthenticationState(true)
                 saveState("isUserAuthenticated",props.isUserAuthenticated)
             }
         }else{
+            props.setUserAuthenticationState(true)
             saveState("isUserAuthenticated",isUserAuthenticatedBoolean)
+        }
+
+        if (localStorage.getItem('reloadUser')==="true") {
+            // Set the 'reloaded' item in localStorage
+            localStorage.setItem('reloadUser', "false");
+            // Reload the page
+            window.location.reload();
         }
     }, []);
 
-    const { id } = useParams();
-    const bookingId = Number(id);
+
     const history = useNavigate ();
     const [data,setData]=useState({});
     const [booking,setBooking]=useState({});
@@ -311,7 +322,8 @@ const mapStateToProps = ({auth}) => {
     return {
         loading: auth.loading,
         error: auth.error,
-        isUserAuthenticated: auth.isUserAuthenticated
+        isUserAuthenticated: auth.isUserAuthenticated,
+        location: auth.location
     }
 }
 const mapDispatchToProps = (dispatch) => {
@@ -319,7 +331,8 @@ const mapDispatchToProps = (dispatch) => {
         authenticate: () => dispatch(authenticate()),
         setUser: (data) => dispatch(authSuccess(data)),
         loginFailure: (message) => dispatch(authFailure(message)),
-        setUserAuthenticationState: (boolean) => dispatch(setUserAuthenticationState(boolean))
+        setUserAuthenticationState: (boolean) => dispatch(setUserAuthenticationState(boolean)),
+        setLocation: (path) => dispatch(setLocation(path))
     }
 }
 export default connect(mapStateToProps, mapDispatchToProps)(EditBooking);

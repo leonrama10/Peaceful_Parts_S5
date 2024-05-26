@@ -39,6 +39,10 @@ import BookingsInfo from "./DashboardViews/UserDashboards/BookingsInfo";
 import TherapistCurrentWorkDays from "./DashboardViews/TherapistDashboards/TherapistCurrentWorkDays";
 import TherapistAddNewWorkDays from "./DashboardViews/TherapistDashboards/TherapistAddNewWorkDays";
 import EditBooking from "./DashboardViews/UserDashboards/EditBooking";
+import ChatDashboard from "./DashboardViews/UserDashboards/ChatDashboard";
+import ChatTherapist from "./DashboardViews/UserDashboards/ChatTherapist";
+import TherapistChatDashboard from "./DashboardViews/TherapistDashboards/TherapistChatDashboard";
+import ChatClient from "./DashboardViews/TherapistDashboards/ChatClient";
 
 function Main() {
     const location = useLocation();
@@ -49,7 +53,6 @@ function Main() {
             {!isDashboard && <Header />}
             <Routes>
                 <Route path="/admin-dashboard" element={<AdminDashboardTherapists />} />
-
                 <Route path="/loginBoot" element={<LoginBoot />}/>
                 <Route path="/registerBoot" element={<RegisterBoot />}/>
                 <Route path="/dashboard/registerBoot-therapist" element={<RegisterBootTherapist />}/>
@@ -60,6 +63,8 @@ function Main() {
                 <Route path="/passwordReset/:token" element={<PasswordResetView />}/>
                 <Route path="/dashboard/userDashboard/profile" element={<UserProfile />}/>
                 <Route path="/dashboard/userDashboard" element={<UserDashboard />}/>
+                <Route path="/dashboard/userDashboard/chatDashboard" element={<ChatDashboard />}/>
+                <Route path="/dashboard/userDashboard/chatTherapist" element={<ChatTherapist />}/>
                 <Route path="/dashboard/userDashboard/therapists" element={<UserDashboardTherapists />}/>
                 <Route path="/dashboard/userDashboard/bookingsDashboard" element={<BookingsDashboard />}/>
                 <Route path="/dashboard/userDashboard/bookingsInfo" element={<BookingsInfo />}/>
@@ -78,6 +83,8 @@ function Main() {
                 <Route path="/dashboard/therapistDashboard/users/oldNotesHistory/:id" element={<TherapistOldNotesHistory />}/>
                 <Route path="/dashboard/therapistDashboard/users/notesDashboard/:id" element={<TherapistNotesDashboard />}/>
                 <Route path="/dashboard/therapistDashboard" element={<TherapistDashboard />}/>
+                <Route path="/dashboard/therapistDashboard/therapistChatDashboard" element={<TherapistChatDashboard />}/>
+                <Route path="/dashboard/therapistDashboard/chatClient" element={<ChatClient />}/>
                 <Route path="/dashboard/therapistDashboard/profile" element={<TherapistProfile />}/>
                 <Route path="/dashboard/therapistDashboard/users" element={<TherapistDashboardUsers />}/>
                 <Route path="/dashboard/therapistDashboard/workDaysDashboard" element={<TherapistWorkDaysDashboard />}/>

@@ -1,9 +1,7 @@
 package com.brogramer.peacefulPaths.dao;
 
-import com.brogramer.peacefulPaths.dtos.NoteDto;
 import com.brogramer.peacefulPaths.entity.Roles;
 import com.brogramer.peacefulPaths.entity.User;
-import com.brogramer.peacefulPaths.responses.UserInfo;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Modifying;
 import org.springframework.data.jpa.repository.Query;
@@ -45,4 +43,9 @@ public interface TherapistRepository extends JpaRepository<User,Integer> {
     @Query(value = "SELECT uc.user_id FROM user_connections_history uc WHERE uc.connected_user_id = :id", nativeQuery = true)
     Collection<Integer> findAllUsersConnectedHistoryById(int id);
 
+    @Query(value = "SELECT uc.connected_user_id FROM user_connections_history uc WHERE uc.user_id = :userId AND NOT uc.connected_user_id = :therapistId", nativeQuery = true)
+    List<Integer> fetchAllUserTherapistOldConnectionData(@Param("userId")int userId, @Param("therapistId")int therapistId);
+
+    @Query("SELECT uc.userId FROM Connection uc WHERE uc.userId = :userId AND uc.therapistId = :therapistId")
+    Integer findTherapistConnectionByUserIdAndTherapistId(@Param("therapistId") int therapistId, @Param("userId") int userId);
 }

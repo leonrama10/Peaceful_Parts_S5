@@ -19,10 +19,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.nio.CharBuffer;
-import java.time.DayOfWeek;
-import java.time.LocalDate;
-import java.time.LocalDateTime;
-import java.time.LocalTime;
+import java.time.*;
 import java.time.format.DateTimeFormatter;
 import java.util.*;
 import java.util.stream.Collectors;
@@ -43,12 +40,15 @@ public class UserService implements UserDetailsService {
     private final RoleDao roleDao;
     private final PasswordEncoder passwordEncoder;
     private final UserDao userDao;
+    private final UserTherapistMessagesRepository userTherapistMessagesRepository;
+    private final MessageRepository messageRepository;
+    private final ChatRepository chatRepository;
 
     @Autowired
     private JavaMailSender javaMailSender;
-    @Autowired
 
-    public UserService(TherapistRepository userRepository, PasswordEncoder passwordEncoder,RoleDao roleDao,UserDao userDao,QuestionnaireRepository questionnaireRepository,TherapistInfoRepository therapistInfoRepository,NoteRepository noteRepository,TherapistNotesRepository therapistNotesRepository,MainPointsRepository mainPointsRepository,PointRepository pointRepository,TherapistNotesHistoryRepository therapistNotesHistoryRepository,TherapistWorkDaysRepository therapistWorkDaysRepository,BookingsRepository bookingsRepository) {
+    @Autowired
+    public UserService(TherapistRepository userRepository, PasswordEncoder passwordEncoder, RoleDao roleDao, UserDao userDao, QuestionnaireRepository questionnaireRepository, TherapistInfoRepository therapistInfoRepository, NoteRepository noteRepository, TherapistNotesRepository therapistNotesRepository, MainPointsRepository mainPointsRepository, PointRepository pointRepository, TherapistNotesHistoryRepository therapistNotesHistoryRepository, TherapistWorkDaysRepository therapistWorkDaysRepository, BookingsRepository bookingsRepository, UserTherapistMessagesRepository userTherapistMessagesRepository, MessageRepository messageRepository, ChatRepository chatRepository) {
         this.userRepository = userRepository;
         this.passwordEncoder = passwordEncoder;
         this.roleDao = roleDao;
@@ -62,6 +62,9 @@ public class UserService implements UserDetailsService {
         this.pointRepository = pointRepository;
         this.therapistWorkDaysRepository = therapistWorkDaysRepository;
         this.bookingsRepository = bookingsRepository;
+        this.userTherapistMessagesRepository = userTherapistMessagesRepository;
+        this.messageRepository = messageRepository;
+        this.chatRepository = chatRepository;
     }
 
     public List<User> findAllByRole(String role) {
@@ -852,11 +855,32 @@ public class UserService implements UserDetailsService {
         return therapistWorkDays.getWorkhours();
     }
 
-    public Bookings fetchNextBooking(BookingsDto bookingsDto) {
-         Optional<Bookings> bookingsOptional = bookingsRepository.fetchNextBookingByClientIdAndTherapistId(bookingsDto.getClientId(),bookingsDto.getTherapistId());
+    public Optional<Bookings> fetchNextBooking(BookingsDto bookingsDto) {
+        List<Bookings> bookings = bookingsRepository.fetchNextBookingByClientIdAndTherapistId(bookingsDto.getClientId(), bookingsDto.getTherapistId());
+        LocalDateTime now = LocalDateTime.now();
+        Optional<Bookings> booking =  bookings.stream()
+                .filter(b -> {
+                    LocalDateTime bookingDateTime = LocalDateTime.of(b.getDate(), b.getHour());
+                    LocalDateTime bookingEnd = bookingDateTime.plusMinutes(50);
+                    if (bookingDateTime.toLocalDate().isEqual(now.toLocalDate())) {
+                        // If the booking is today, check if it's in progress
+                        if (bookingDateTime.toLocalTime().equals(now.toLocalTime())) {
+                            // If it's the current time, check if it's in progress
+                            return now.isAfter(bookingDateTime) && now.isBefore(bookingEnd);
+                        } else {
+                            // If it's not the current time, return the booking
+                            return true;
+                        }
+                    } else {
+                        // If the booking is not today, return it if it's in the future
+                        return now.isBefore(bookingDateTime);
+                    }
+                })
+                .findFirst();
 
-        return bookingsOptional.orElse(null);
+        return booking;
     }
+
 
     public void cancelBooking(BookingsDto bookingsDto) {
         bookingsRepository.deleteById(bookingsDto.getBookingId());
@@ -934,5 +958,76 @@ public class UserService implements UserDetailsService {
         }
 
         return new ArrayList<>();
+    }
+
+    public List<User> fetchAllUserTherapistOldConnectionData(ConnectionDto connectionDto) {
+        List<User> users = new ArrayList<>();
+        List<Integer> therapistIdsList = userRepository.fetchAllUserTherapistOldConnectionData(connectionDto.getUserId(),connectionDto.getTherapistId());
+
+        for (Integer i : therapistIdsList) {
+            users.add(userRepository.findById(i).get());
+        }
+
+        return users;
+    }
+
+    public Chat fetchUserTherapistChats(ConnectionDto connectionDto) {
+        Optional<UserTherapistMessages> userTherapistMessages = userTherapistMessagesRepository.findByUserIdAndTherapistId(connectionDto.getUserId(),connectionDto.getTherapistId());
+
+        return userTherapistMessages.map(UserTherapistMessages::getChat).orElse(null);
+    }
+
+    public void sendMessage(MessageDto messageDto) {
+        if (messageDto.getChatId()!=0){
+            Optional<UserTherapistMessages> userTherapistMessages = userTherapistMessagesRepository.findByUserIdAndTherapistId(messageDto.getUserId(),messageDto.getTherapistId());
+
+            if (userTherapistMessages.isPresent()) {
+                Chat chat = userTherapistMessages.get().getChat();
+
+                Message message = new Message();
+                message.setMessage(messageDto.getMessage());
+                message.setWrittenBy(messageDto.getWrittenBy());
+                messageRepository.save(message);
+
+                chat.getMessages().add(message);
+                chatRepository.save(chat);
+
+                userTherapistMessagesRepository.save(userTherapistMessages.get());
+            }
+        }else {
+            Chat chat = new Chat();
+
+            Message message = new Message();
+            message.setMessage(messageDto.getMessage());
+            message.setWrittenBy(messageDto.getWrittenBy());
+            messageRepository.save(message);
+
+            Collection<Message> messages = new ArrayList<>();
+            messages.add(message);
+            chat.setMessages(messages);
+            chatRepository.save(chat);
+
+            UserTherapistMessages userTherapistMessages = new UserTherapistMessages();
+            userTherapistMessages.setChat(chat);
+
+            Optional<User> therapist = userRepository.findById(messageDto.getTherapistId());
+            Optional<User> user = userRepository.findById(messageDto.getUserId());
+
+            if (therapist.isPresent() && user.isPresent()) {
+                userTherapistMessages.setTherapist(therapist.get());
+                userTherapistMessages.setUser(user.get());
+            }
+
+            userTherapistMessagesRepository.save(userTherapistMessages);
+        }
+
+    }
+
+    public User findTherapistConnectionById(ConnectionDto connectionDto) {
+        Integer userId = userRepository.findTherapistConnectionByUserIdAndTherapistId(connectionDto.getTherapistId(),connectionDto.getUserId());
+
+        Optional<User> optionalUser = userRepository.findById(userId);
+
+        return optionalUser.orElse(null);
     }
 }

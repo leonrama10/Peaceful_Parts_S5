@@ -112,5 +112,9 @@ public class CustomUserDetails implements UserDetails {
     public Date getDateOfBirth() {
         return user.getDateOfBirth();
     }
+
+    public String getToken() {
+        return user.getToken();
+    }
 }
 

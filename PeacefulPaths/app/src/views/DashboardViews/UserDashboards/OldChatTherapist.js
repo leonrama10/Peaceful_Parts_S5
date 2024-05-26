@@ -1,25 +1,31 @@
 import React, {useEffect, useState} from 'react';
-import {useNavigate} from 'react-router-dom';
+import {
+    fetchUserData, fetchUserDataId,
+    fetchUserTherapistConnectionData
+} from '../../../api/authService';
+import {Link, useNavigate} from 'react-router-dom';
 import '../../../css/sb-admin-2.css';
 import '../../../css/myCss.css';
 import DashboardNav from "../DashboardNav";
 import SideBarUser from "../SideBars/SideBarUser";
+import {Alert} from "reactstrap";
 import {
     authenticate,
     authFailure,
-    authSuccess, setLocation,
+    authSuccess,
+    setLocation,
     setUserAuthenticationState
 } from "../../../redux/authActions";
 import {connect} from "react-redux";
 import {loadState, saveState} from "../../../helper/sessionStorage";
-import {
-    fetchUserData
-} from "../../../api/authService";
+
+let connected = null;
 const isUserAuthenticatedBoolean = loadState("isUserAuthenticated",false)
-function BookingsDashboard({loading,error,...props}){
+const chatTherapistId = loadState("chatTherapistId",false)
+function OldChatTherapist({loading,error,...props}){
 
     useEffect(() => {
-        props.setLocation("/dashboard/userDashboard/bookingsDashboard")
+        props.setLocation("/dashboard/userDashboard/oldChatTherapist")
         if(!isUserAuthenticatedBoolean){
             if (!props.isUserAuthenticated){
                 props.loginFailure("Authentication Failed!!!");
@@ -45,11 +51,42 @@ function BookingsDashboard({loading,error,...props}){
     const history = useNavigate ();
     const [data,setData]=useState({});
     const [hideFilterMenu,setHideFilterMenu]=useState(true);
+    const [oldChats,setOldChats]=useState([]);
+    const [connectionFailure, setConnectionFailure] = useState('');
+    const [therapistData, setTherapistData] = useState({
+        id:0,
+        name:'',
+        surname:''
+    });
 
     React.useEffect(() => {
+        connected = loadState("connected",false)
         fetchUserData().then((response) => {
             if (response.data.roles.at(0).role === 'ROLE_USER') {
                 setData(response.data);
+                const userId = response.data.id
+
+                fetchUserDataId({therapistId:response.data.id}).then((response) => {
+                    if (response.data.roles.at(0).role === 'ROLE_THERAPIST') {
+                        setTherapistData({
+                            id: response.data.id,
+                            name: response.data.name,
+                            surname: response.data.surname
+                        });
+
+                        fetchUserTherapistOldChats({therapistId:response.data.id,userId:userId}).then((response) => {
+                                setOldChats(response.data);
+                        }).catch((e) => {
+                            history('/loginBoot');
+                        });
+
+                    } else {
+                        localStorage.clear();
+                        history('/loginBoot');
+                    }
+                }).catch((e) => {
+                    history('/loginBoot');
+                });
             } else {
                 history('/loginBoot');
             }
@@ -58,13 +95,7 @@ function BookingsDashboard({loading,error,...props}){
         });
     }, []);
 
-    function showBookingsInfo() {
-        history(`/dashboard/userDashboard/bookingsInfo`);
-    }
 
-    function addNewBooking() {
-        history(`/dashboard/userDashboard/addBookings`);
-    }
 
     return (
         <main id="page-top">
@@ -79,21 +110,30 @@ function BookingsDashboard({loading,error,...props}){
 
                         <DashboardNav data={data} setUser={props.setUser} setUserAuthenticationState={props.setUserAuthenticationState}/>
 
+                        { connectionFailure &&
+                            <Alert style={{marginTop:'20px'}} variant="danger">
+                                {connectionFailure}
+                            </Alert>
+                        }
+
                         <div className="container-fluid">
-                            <button onClick={showBookingsInfo}>Show Your Bookings</button>
-                            <button onClick={addNewBooking}>Book a session</button>
-                        </div>
+                            {connected && <div className="card" >
+                                <div className="card-body">
+                                    <h5 className="card-title">Full
+                                        name: {therapistData.name} {therapistData.surname}</h5>
+                                    <br/>
 
+                                    {oldChats.map((data, index) => (
+                                        <div key={index} className="card">
+                                            <div className="card-body">
+
+                                            </div>
+                                        </div>
+                                    ))}
+                                </div>
+                            </div>}
+                        </div>
                     </div>
-
-                    <footer className="sticky-footer bg-white">
-                        <div className="container my-auto">
-                            <div className="copyright text-center my-auto">
-                                <span>Copyright &copy; Your Website 2020</span>
-                            </div>
-                        </div>
-                    </footer>
-
                 </div>
 
             </div>
@@ -101,29 +141,6 @@ function BookingsDashboard({loading,error,...props}){
             <a className="scroll-to-top rounded" href="#page-top">
                 <i className="fas fa-angle-up"></i>
             </a>
-
-            <div className="modal fade" id="logoutModal" tabIndex="-1" role="dialog"
-                 aria-labelledby="exampleModalLabel"
-                 aria-hidden="true">
-                <div className="modal-dialog" role="document">
-                    <div className="modal-content">
-                        <div className="modal-header">
-                            <h5 className="modal-title" id="exampleModalLabel">Ready to Leave?</h5>
-                            <button className="close" type="button" data-dismiss="modal" aria-label="Close">
-                                <span aria-hidden="true">×</span>
-                            </button>
-                        </div>
-                        <div className="modal-body">Select "Logout" below if you are ready to end your current
-                            session.
-                        </div>
-                        <div className="modal-footer">
-                            <button className="btn btn-secondary" type="button" data-dismiss="modal">Cancel
-                            </button>
-                            <a className="btn btn-primary" href="login.html">Logout</a>
-                        </div>
-                    </div>
-                </div>
-            </div>
 
             <script src="../../../vendor/jquery/jquery.min.js"></script>
             <script src="../../../vendor/bootstrap/js/bootstrap.bundle.min.js"></script>
@@ -152,4 +169,4 @@ const mapDispatchToProps = (dispatch) => {
         setLocation: (path) => dispatch(setLocation(path))
     }
 }
-export default connect(mapStateToProps, mapDispatchToProps)(BookingsDashboard);
+export default connect(mapStateToProps, mapDispatchToProps)(OldChatTherapist);

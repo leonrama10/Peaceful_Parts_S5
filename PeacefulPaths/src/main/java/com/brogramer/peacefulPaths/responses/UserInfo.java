@@ -15,6 +15,7 @@ import java.util.Date;
 public class UserInfo {
 
     private String email;
+    private String token;
     private int id;
     private int experience;
     private String name;
@@ -312,5 +313,13 @@ public class UserInfo {
 
     public void setTherapistInfo(TherapistInfo therapistInfo) {
         this.therapistInfo = therapistInfo;
+    }
+
+    public String getToken() {
+        return token;
+    }
+
+    public void setToken(String token) {
+        this.token = token;
     }
 }

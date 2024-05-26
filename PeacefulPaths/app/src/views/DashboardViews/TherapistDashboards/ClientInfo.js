@@ -1,11 +1,11 @@
 import React, {useEffect, useState} from 'react';
 import {fetchUserData, fetchUserDataId} from '../../../api/authService';
-import {useNavigate, useParams} from 'react-router-dom';
+import {useLocation, useNavigate, useParams} from 'react-router-dom';
 import {Container, Row, Col, Form} from 'react-bootstrap';
 import {
     authenticate,
     authFailure,
-    authSuccess,
+    authSuccess, setLocation,
     setTherapistAuthenticationState
 } from "../../../redux/authActions";
 import '../../../css/sb-admin-2.min.css';
@@ -18,7 +18,6 @@ let role;
 let userRole ;
 const isTherapistAuthenticatedBoolean = loadState("isTherapistAuthenticated",false)
 function ClientInfo({loading,error,...props}){
-
     const { id } = useParams();
     const idNumber = Number(id);
     const history = useNavigate ();
@@ -45,7 +44,9 @@ function ClientInfo({loading,error,...props}){
     });
 
     useEffect(() => {
+        props.setLocation("/dashboard/therapistDashboard/users/info/"+idNumber)
          if(isTherapistAuthenticatedBoolean){
+             props.setTherapistAuthenticationState(true)
             saveState("isTherapistAuthenticated",isTherapistAuthenticatedBoolean)
             fetchUserData().then((response)=>{
                 if (response.data.roles.at(0).role === 'ROLE_THERAPIST'){
@@ -53,9 +54,11 @@ function ClientInfo({loading,error,...props}){
                     role = loadState("role",'');
                 }
                 else{
+                    props.setLocation('/loginBoot')
                     history('/loginBoot');
                 }
             }).catch((e)=>{
+                props.setLocation('/loginBoot')
                 localStorage.clear();
                 history('/loginBoot');
             })
@@ -89,6 +92,7 @@ function ClientInfo({loading,error,...props}){
                 history('/loginBoot');
             })
         }else if(props.isTherapistAuthenticated){
+             props.setTherapistAuthenticationState(true)
             saveState("isTherapistAuthenticated",props.isTherapistAuthenticated)
             fetchUserData().then((response)=>{
                 if (response.data.roles.at(0).role === 'ROLE_THERAPIST'){
@@ -99,6 +103,7 @@ function ClientInfo({loading,error,...props}){
                     history('/loginBoot');
                 }
             }).catch((e)=>{
+                props.setLocation('/loginBoot')
                 localStorage.clear();
                 history('/loginBoot');
             })
@@ -128,15 +133,23 @@ function ClientInfo({loading,error,...props}){
                 userRole = loadState("userRole",'')
                 saveState("userRole",response.data.roles.at(0).role);
             }).catch((e)=>{
+                props.setLocation('/loginBoot')
                 localStorage.clear();
                 history('/loginBoot');
             })
         }else{
+             props.setLocation('/loginBoot')
             props.loginFailure("Authentication Failed!!!");
             history('/loginBoot');
         }
-    }, []);
 
+        if (localStorage.getItem('reloadTherapist')==="true") {
+            // Set the 'reloaded' item in localStorage
+            localStorage.setItem('reloadTherapist', "false");
+            // Reload the page
+            window.location.reload();
+        }
+    }, []);
 
 
     return (
@@ -342,7 +355,8 @@ const mapStateToProps = ({auth}) => {
     return {
         loading: auth.loading,
         error: auth.error,
-        isTherapistAuthenticated: auth.isTherapistAuthenticated
+        isTherapistAuthenticated: auth.isTherapistAuthenticated,
+        location: auth.location
     }
 }
 const mapDispatchToProps = (dispatch) => {
@@ -350,7 +364,8 @@ const mapDispatchToProps = (dispatch) => {
         authenticate: () => dispatch(authenticate()),
         setUser: (data) => dispatch(authSuccess(data)),
         loginFailure: (message) => dispatch(authFailure(message)),
-        setTherapistAuthenticationState: (boolean) => dispatch(setTherapistAuthenticationState(boolean))
+        setTherapistAuthenticationState: (boolean) => dispatch(setTherapistAuthenticationState(boolean)),
+        setLocation: (path) => dispatch(setLocation(path))
     }
 }
 export default connect(mapStateToProps, mapDispatchToProps)(ClientInfo);

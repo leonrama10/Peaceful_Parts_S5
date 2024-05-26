@@ -49,6 +49,7 @@ export default function SideBarTherapist(){
                     <div id="collapse-text">
                         <div className="bg-white py-2 collapse-inner rounded">
                             <h6 className="collapse-header">Custom Components:</h6>
+                            <Link className="collapse-item" to="/dashboard/therapistDashboard/therapistChatDashboard">Message Center</Link>
                             <Link className="collapse-item" to="/dashboard/therapistDashboard/workDaysDashboard">Manage Work Days</Link>
                             <Link className="collapse-item" to="/dashboard/therapistDashboard/users">Manage Clients</Link>
                             <Link className="collapse-item" to="/dashboard/therapistDashboard/history">Client History</Link>

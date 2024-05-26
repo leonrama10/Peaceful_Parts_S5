@@ -439,9 +439,9 @@ CREATE TABLE `questionnaire_language` (
   ON DELETE CASCADE ON UPDATE CASCADE
 ) ENGINE=InnoDB DEFAULT CHARSET=latin1;
 
-
+SET FOREIGN_KEY_CHECKS = 0;
 DROP TABLE IF EXISTS `user_connections`;
-
+SET FOREIGN_KEY_CHECKS = 1;
 CREATE TABLE `user_connections` (
   `id` int(11) NOT NULL AUTO_INCREMENT,
   `user_id` int(11) NOT NULL unique,
@@ -451,8 +451,9 @@ CREATE TABLE `user_connections` (
   FOREIGN KEY (`connected_user_id`) REFERENCES `user`(`id`) ON DELETE CASCADE
 ) AUTO_INCREMENT=1;
 
+SET FOREIGN_KEY_CHECKS = 0;
 DROP TABLE IF EXISTS `user_connections_history`;
-
+SET FOREIGN_KEY_CHECKS = 1;
 CREATE TABLE `user_connections_history` (
   `id` int(11) NOT NULL AUTO_INCREMENT ,
   `user_id` int(11) NOT NULL ,
@@ -632,3 +633,55 @@ CREATE TABLE `bookings` (
     PRIMARY KEY (id),
     FOREIGN KEY (`therapist_work_days_id`) REFERENCES `therapist_work_days`(`id`) ON DELETE CASCADE on update cascade
 );
+
+SET FOREIGN_KEY_CHECKS = 0;
+DROP TABLE IF EXISTS `message`;
+SET FOREIGN_KEY_CHECKS = 1;
+CREATE TABLE `message` (
+    `id` INT AUTO_INCREMENT,
+    `message` varchar(500),
+    `written_by` varchar(10),
+    PRIMARY KEY (`id`)
+) AUTO_INCREMENT=1;
+
+SET FOREIGN_KEY_CHECKS = 0;
+DROP TABLE IF EXISTS `chat`;
+SET FOREIGN_KEY_CHECKS = 1;
+CREATE TABLE `chat` (
+  `id` int(11) NOT NULL AUTO_INCREMENT,
+  PRIMARY KEY (`id`)
+) AUTO_INCREMENT=1;
+
+SET FOREIGN_KEY_CHECKS = 0;
+DROP TABLE IF EXISTS `chat_message`;
+SET FOREIGN_KEY_CHECKS = 1;
+CREATE TABLE `chat_message` (
+  `chat_id` int(11) NOT NULL,
+  `message_id` int(11) NOT NULL,
+  
+  PRIMARY KEY (`chat_id`,`message_id`),
+  
+  KEY `FK_MESSAGE_idx` (`message_id`),
+  
+  CONSTRAINT `FK_CHAT_MESSAGE` FOREIGN KEY (`chat_id`) 
+  REFERENCES `chat` (`id`) 
+  ON DELETE CASCADE ON UPDATE CASCADE,
+  
+  CONSTRAINT `FK_MESSAGE_CHAT` FOREIGN KEY (`message_id`) 
+  REFERENCES `message` (`id`) 
+  ON DELETE CASCADE ON UPDATE CASCADE
+) ENGINE=InnoDB DEFAULT CHARSET=latin1;
+
+SET FOREIGN_KEY_CHECKS = 0;
+DROP TABLE IF EXISTS `user_therapist_messages`;
+SET FOREIGN_KEY_CHECKS = 1;
+CREATE TABLE `user_therapist_messages` (
+  `id` int(11) NOT NULL AUTO_INCREMENT,
+  `user_id` int(11) NOT NULL unique,
+  `therapist_id` int(11) NOT NULL,
+  `chat_id` int(11) NOT NULL,
+  PRIMARY KEY (`id`),
+  FOREIGN KEY (`user_id`) REFERENCES `user`(`id`) ON DELETE CASCADE,
+  FOREIGN KEY (`therapist_id`) REFERENCES `user`(`id`) ON DELETE CASCADE,
+  FOREIGN KEY (`chat_id`) REFERENCES `chat`(`id`) ON DELETE CASCADE
+) AUTO_INCREMENT=1;

@@ -540,3 +540,47 @@ export const fetchBookedHoursInEdit = (authRequest) => {
     });
 };
 
+export const fetchAllUserTherapistOldConnectionData = (authRequest) => {
+    return axios({
+        method: 'POST',
+        url: `${process.env.hostUrl || 'http://localhost:8080'}/api/auth/fetchAllUserTherapistOldConnectionData`,
+        data:authRequest,
+        headers: {
+            'Authorization': 'Bearer ' + getToken()
+        }
+    });
+};
+
+export const fetchUserTherapistChats = (authRequest) => {
+    return axios({
+        method: 'POST',
+        url: `${process.env.hostUrl || 'http://localhost:8080'}/api/auth/fetchUserTherapistChats`,
+        data:authRequest,
+        headers: {
+            'Authorization': 'Bearer ' + getToken()
+        }
+    });
+};
+
+export const sendMessage = (authRequest) => {
+    return axios({
+        method: 'POST',
+        url: `${process.env.hostUrl || 'http://localhost:8080'}/api/auth/sendMessage`,
+        data:authRequest,
+        headers: {
+            'Authorization': 'Bearer ' + getToken()
+        }
+    });
+};
+
+export const fetchTherapistUserConnectionData = (authRequest) => {
+    return axios({
+        method: 'POST',
+        url: `${process.env.hostUrl || 'http://localhost:8080'}/api/auth/fetchTherapistUserConnectionData`,
+        data:authRequest,
+        headers: {
+            'Authorization': 'Bearer ' + getToken()
+        }
+    });
+};
+

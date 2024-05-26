@@ -165,12 +165,10 @@ function RegisterBoot({loading,error,...props}){
 
                                     </form>
                                     <hr/>
-                                    <div className="text-center">
-                                        <Link className="small" to="forgotPassBoot">Forgot Password?</Link>
-                                    </div>
+
                                     <div className="text-center">
                                         <Link className="small" to="/loginBoot">Already have an account? Login!</Link>
-                                        </div>
+                                    </div>
                                 </div>
                             </div>
                         </div>

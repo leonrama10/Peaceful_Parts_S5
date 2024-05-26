@@ -331,7 +331,24 @@ function GetStarted({loading,error,...props}){
         let value = answer;
 
         if (property === 'language') {
-            value = { 'id': languageToId[answer], 'language': answer };
+            setSelectedAnswer(prevAnswers => {
+                const existingAnswers = prevAnswers[property] || [];
+                const answerIndex = existingAnswers.findIndex(a => a.language === answer);
+
+                if (answerIndex !== -1) {
+                    // If the language is already selected, remove it
+                    return {
+                        ...prevAnswers,
+                        [property]: [...existingAnswers.slice(0, answerIndex), ...existingAnswers.slice(answerIndex + 1)]
+                    };
+                } else {
+                    // If the language is not selected, add it
+                    return {
+                        ...prevAnswers,
+                        [property]: [...existingAnswers, { 'id': languageToId[answer], 'language': answer }]
+                    };
+                }
+            });
         } else if (property === 'location') {
             value = { 'id': locationToId[answer], 'location': answer };
         }else if (property === 'gender') {
@@ -361,11 +378,6 @@ function GetStarted({loading,error,...props}){
         }
         if (property !== 'language') {
             setSelectedAnswer(prevAnswers => ({...prevAnswers, [property]: value}));
-        }else{
-            setSelectedAnswer(prevAnswers => ({
-                ...prevAnswers,
-                [property]: [...(prevAnswers[property] || []), { 'id': languageToId[answer], 'language': answer }]
-            }));
         }
 
         if (property !== 'language') {

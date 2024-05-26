@@ -13,8 +13,8 @@ import {
 import {Alert} from "reactstrap";
 import {saveState} from "../../../helper/sessionStorage";
 
-
 function LoginBoot({loading,error,...props}){
+
     const history = useNavigate ();
 
     const [values, setValues] = useState({

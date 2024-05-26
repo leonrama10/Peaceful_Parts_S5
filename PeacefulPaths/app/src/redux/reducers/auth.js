@@ -1,4 +1,12 @@
-import {AUTH_REQ, AUTH_SUCCESS, AUTH_FAILURE, ADMIN_AUTH_STATE, THERAPIST_AUTH_STATE, USER_AUTH_STATE} from '../types';
+import {
+    AUTH_REQ,
+    AUTH_SUCCESS,
+    AUTH_FAILURE,
+    ADMIN_AUTH_STATE,
+    THERAPIST_AUTH_STATE,
+    USER_AUTH_STATE,
+    USER_LOCATION
+} from '../types';
 
 const initialState={
     user:{},
@@ -6,7 +14,8 @@ const initialState={
     loading:false,
     isAdminAuthenticated: false,
     isTherapistAuthenticated: false,
-    isUserAuthenticated: false
+    isUserAuthenticated: false,
+    location: '',
 };
 
 const auth=(state=initialState,action)=>{
@@ -30,6 +39,9 @@ const auth=(state=initialState,action)=>{
 
         case USER_AUTH_STATE:
             return {...state, loading: false, error: '', isUserAuthenticated: action.payload};
+
+        case USER_LOCATION:
+            return {...state, loading: false, error: '', location: action.payload};
 
         default:
             return state;

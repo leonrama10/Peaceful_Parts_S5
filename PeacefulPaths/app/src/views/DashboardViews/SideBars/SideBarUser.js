@@ -621,6 +621,7 @@ function SideBarUser({loading,error,...props}){
                     <div id="collapse-text">
                         <div className="bg-white py-2 collapse-inner rounded">
                             <h6 className="collapse-header">Custom Components:</h6>
+                            <Link className="collapse-item" to="/dashboard/userDashboard/chatDashboard">Message Center</Link>
                             <Link className="collapse-item" to="/dashboard/userDashboard/therapists">Manage
                                 Therapists</Link>
                             <Link className="collapse-item" to="/dashboard/userDashboard/bookingsDashboard">Manage

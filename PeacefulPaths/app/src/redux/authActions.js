@@ -2,10 +2,9 @@ import {
     AUTH_REQ,
     AUTH_SUCCESS,
     AUTH_FAILURE,
-    AUTH_STATE,
     ADMIN_AUTH_STATE,
     THERAPIST_AUTH_STATE,
-    USER_AUTH_STATE
+    USER_AUTH_STATE, USER_LOCATION
 } from './types';
 
 export const authenticate=()=>{
@@ -17,6 +16,7 @@ export const authenticate=()=>{
 export const authSuccess = (content) => {
     if (content === null) {
         localStorage.removeItem('USER_KEY');
+        console.log("YOYOOOOOOOOOOOOOOOOOO")
     } else {
         localStorage.setItem('USER_KEY', content.token);
     }
@@ -52,4 +52,11 @@ export const setUserAuthenticationState=(boolean)=>{
         payload:boolean
     }
 }
+export const setLocation=(path)=>{
+    return {
+        type:USER_LOCATION,
+        payload:path
+    }
+}
+
 

@@ -6,7 +6,7 @@ import undraw_posting_photo from "../../../img/undraw_posting_photo.svg"
 import {
     authenticate,
     authFailure,
-    authSuccess,
+    authSuccess, setLocation,
     setTherapistAuthenticationState
 } from "../../../redux/authActions";
 import {connect} from "react-redux";
@@ -17,15 +17,26 @@ const isTherapistAuthenticatedBoolean = loadState("isTherapistAuthenticated",fal
 function TherapistDashboard({loading,error,...props}){
 
     useEffect(() => {
+        props.setLocation("/dashboard/therapistDashboard")
         if(!isTherapistAuthenticatedBoolean){
             if (!props.isTherapistAuthenticated){
+                props.setLocation('/loginBoot')
                 props.loginFailure("Authentication Failed!!!");
                 history('/loginBoot');
             }else{
+                props.setTherapistAuthenticationState(true)
                 saveState("isTherapistAuthenticated",props.isTherapistAuthenticated)
             }
         }else{
+            props.setTherapistAuthenticationState(true)
             saveState("isTherapistAuthenticated",isTherapistAuthenticatedBoolean)
+        }
+
+        if (localStorage.getItem('reloadTherapist')==="true") {
+            // Set the 'reloaded' item in localStorage
+            localStorage.setItem('reloadTherapist', "false");
+            // Reload the page
+            window.location.reload();
         }
     }, []);
 
@@ -430,6 +441,7 @@ const mapStateToProps = ({auth}) => {
         loading: auth.loading,
         error: auth.error,
         isTherapistAuthenticated: auth.isTherapistAuthenticated,
+        location: auth.location
     }
 }
 const mapDispatchToProps = (dispatch) => {
@@ -437,7 +449,8 @@ const mapDispatchToProps = (dispatch) => {
         authenticate: () => dispatch(authenticate()),
         setUser: (data) => dispatch(authSuccess(data)),
         loginFailure: (message) => dispatch(authFailure(message)),
-        setTherapistAuthenticationState: (boolean) => dispatch(setTherapistAuthenticationState(boolean))
+        setTherapistAuthenticationState: (boolean) => dispatch(setTherapistAuthenticationState(boolean)),
+        setLocation: (path) => dispatch(setLocation(path))
     }
 }
 export default connect(mapStateToProps, mapDispatchToProps)(TherapistDashboard);

@@ -18,7 +18,7 @@ public interface BookingsRepository extends JpaRepository<Bookings,Integer> {
     @Query("SELECT b FROM Bookings b JOIN b.therapistWorkDays t WHERE b.clientId = :clientId AND t.therapistId = :therapistId")
     Collection<Bookings> fetchBookingsClientIdAndTherapistId(@Param("clientId")int clientId, @Param("therapistId") int therapistId);
 
-    @Query("SELECT b FROM Bookings b JOIN b.therapistWorkDays t WHERE b.clientId = :clientId AND t.therapistId = :therapistId AND b.date >= CURRENT_DATE ORDER BY b.date ASC")
-    Optional<Bookings> fetchNextBookingByClientIdAndTherapistId(@Param("clientId") int clientId, @Param("therapistId") int therapistId);
+    @Query("SELECT b FROM Bookings b JOIN b.therapistWorkDays t WHERE b.clientId = :clientId AND t.therapistId = :therapistId ORDER BY b.date ASC, b.hour ASC")
+    List<Bookings> fetchNextBookingByClientIdAndTherapistId(@Param("clientId") int clientId, @Param("therapistId") int therapistId);
 
 }

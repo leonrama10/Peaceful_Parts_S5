@@ -5,7 +5,7 @@ import {Container, Row, Col, Form, Button} from 'react-bootstrap';
 import {
     authenticate,
     authFailure,
-    authSuccess,
+    authSuccess, setLocation,
     setTherapistAuthenticationState
 } from "../../../redux/authActions";
 import '../../../css/sb-admin-2.min.css';
@@ -36,7 +36,9 @@ function TherapistAddNotes({loading,error,...props}){
     });
 
     useEffect(() => {
+        props.setLocation("/dashboard/therapistDashboard/users/addNotes/"+idNumber)
         if(isTherapistAuthenticatedBoolean){
+            props.setTherapistAuthenticationState(true)
             saveState("isTherapistAuthenticated",isTherapistAuthenticatedBoolean)
             fetchUserData().then((response)=>{
                 if (response.data.roles.at(0).role === 'ROLE_THERAPIST'){
@@ -69,6 +71,7 @@ function TherapistAddNotes({loading,error,...props}){
                 history('/loginBoot');
             })
         }else if(props.isTherapistAuthenticated){
+            props.setTherapistAuthenticationState(true)
             saveState("isTherapistAuthenticated",props.isTherapistAuthenticated)
             fetchUserData().then((response)=>{
                 if (response.data.roles.at(0).role === 'ROLE_THERAPIST'){
@@ -101,8 +104,16 @@ function TherapistAddNotes({loading,error,...props}){
                 history('/loginBoot');
             })
         }else{
+            props.setLocation('/loginBoot')
             props.loginFailure("Authentication Failed!!!");
             history('/loginBoot');
+        }
+
+        if (localStorage.getItem('reloadTherapist')==="true") {
+            // Set the 'reloaded' item in localStorage
+            localStorage.setItem('reloadTherapist', "false");
+            // Reload the page
+            window.location.reload();
         }
     }, []);
 
@@ -301,7 +312,8 @@ const mapStateToProps = ({auth}) => {
     return {
         loading: auth.loading,
         error: auth.error,
-        isTherapistAuthenticated: auth.isTherapistAuthenticated
+        isTherapistAuthenticated: auth.isTherapistAuthenticated,
+        location: auth.location
     }
 }
 const mapDispatchToProps = (dispatch) => {
@@ -309,7 +321,8 @@ const mapDispatchToProps = (dispatch) => {
         authenticate: () => dispatch(authenticate()),
         setUser: (data) => dispatch(authSuccess(data)),
         loginFailure: (message) => dispatch(authFailure(message)),
-        setTherapistAuthenticationState: (boolean) => dispatch(setTherapistAuthenticationState(boolean))
+        setTherapistAuthenticationState: (boolean) => dispatch(setTherapistAuthenticationState(boolean)),
+        setLocation: (path) => dispatch(setLocation(path))
     }
 }
 export default connect(mapStateToProps, mapDispatchToProps)(TherapistAddNotes);
