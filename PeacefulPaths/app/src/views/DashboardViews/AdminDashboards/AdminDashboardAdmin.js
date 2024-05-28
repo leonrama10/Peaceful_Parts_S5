@@ -19,6 +19,7 @@ import {loadState, saveState} from "../../../helper/sessionStorage";
 const isAdminAuthenticatedBoolean = loadState("isAdminAuthenticated",false)
 function AdminDashboardAdmin({loading,error,...props}){
 
+
     useEffect(() => {
         if(!isAdminAuthenticatedBoolean){
             if (!props.isAdminAuthenticated){
@@ -70,6 +71,9 @@ function AdminDashboardAdmin({loading,error,...props}){
     }, [allUsers]);
 
     function handleDelete(id) {
+    const confirmation = window.confirm("Are you sure you want to delete this ADMIN");
+    if(confirmation){
+
         userDelete(id).then((response)=>{
             if(response.status===200){
                 window.location.reload();
@@ -81,6 +85,7 @@ function AdminDashboardAdmin({loading,error,...props}){
         }).catch((err)=>{
             history('/loginBoot');
         });
+    }
     }
 
     const handleEdit = (id) => {
