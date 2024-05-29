@@ -12,6 +12,9 @@ import {loadState, saveState} from "../../../helper/sessionStorage";
 import {connect} from "react-redux";
 import DashboardNav from "../DashboardNav";
 import SideBarTherapist from "../SideBars/SideBarTherapist";
+
+import '../../../css/TherapistWorkDaysDashboard.css';
+
 let role;
 const isTherapistAuthenticatedBoolean = loadState("isTherapistAuthenticated",false)
 function TherapistWorkDaysDashboard({loading,error,...props}){
@@ -87,7 +90,7 @@ function TherapistWorkDaysDashboard({loading,error,...props}){
 
                         <DashboardNav data={userData} setUser={props.setUser} setTherapistAuthenticationState={props.setTherapistAuthenticationState}/>
 
-                        <div className="container-fluid" style={{marginBottom: '100px'}}>
+                        <div className="container-fluid-tWDD">
 
                             <button onClick={showCurrentWorkDays}>Show Your Work Days and Work Hours</button>
                             <button onClick={updateWorkDays}>Update Work Days and Work Hours</button>

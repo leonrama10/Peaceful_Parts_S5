@@ -8,6 +8,9 @@ import {
 import {Link, useNavigate} from 'react-router-dom';
 import '../../../css/sb-admin-2.css';
 import '../../../css/myCss.css';
+
+import '../../../css/AddBookings.css';
+
 import DashboardNav from "../DashboardNav";
 import SideBarUser from "../SideBars/SideBarUser";
 import {Alert} from "reactstrap";
@@ -113,12 +116,12 @@ function AddBookings({loading,error,...props}){
                             clientId: newBookingsData.clientId
                         })
 
-                        fetchWorkDays({therapistId: response.data.id}).then((response)=>{
-                            setWorkDays(response.data)
-                        }).catch((e)=>{
-                            localStorage.clear();
-                            history('/loginBoot');
-                        })
+//                        fetchWorkDays({therapistId: response.data.id}).then((response)=>{
+//                            setWorkDays(response.data)
+//                        }).catch((e)=>{
+//                            localStorage.clear();
+//                            history('/loginBoot');
+//                        })
 
                     } else {
                         localStorage.clear();
@@ -212,8 +215,8 @@ function AddBookings({loading,error,...props}){
                             </Alert>
                         }
 
-                        <div className="container-fluid">
-                            {connected && <div className="card">
+                        <div className="container-fluid-AB">
+                            {connected && <div className="card-AB">
                                 <div className="card-body">
                                     <p className="card-text">Select next session date and time:</p>
                                     <p>Therapist only works these days: </p>
@@ -227,7 +230,7 @@ function AddBookings({loading,error,...props}){
                                         );
                                     })}
 
-                                    <form onSubmit={handleSubmit}>
+                                    <form className="form-AddBookings" onSubmit={handleSubmit}>
                                         <label htmlFor="sessionDate">Date:</label><br/>
                                         <input type="date" id="sessionDate" name="date" defaultValue={values.date}
                                                min={new Date().toISOString().split('T')[0]}  onChange={handleChange}/><br/>
@@ -246,7 +249,7 @@ function AddBookings({loading,error,...props}){
                                         <br/><br/>
                                         <i>Info: You cant have two bookings in the same day.</i>
                                         <br/><br/>
-                                        <input type="submit" value="Submit"/>
+                                        <input className="input-AB" type="submit" value="Submit"/>
                                     </form>
 
 

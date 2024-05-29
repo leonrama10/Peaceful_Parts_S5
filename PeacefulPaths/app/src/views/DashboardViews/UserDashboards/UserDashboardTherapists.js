@@ -8,6 +8,9 @@ import {
 import {Link, useNavigate} from 'react-router-dom';
 import '../../../css/sb-admin-2.css';
 import '../../../css/myCss.css';
+
+import '../../../css/UserDashboardTherapists.css';
+
 import DashboardNav from "../DashboardNav";
 import SideBarUser from "../SideBars/SideBarUser";
 import {Alert} from "reactstrap";
@@ -182,19 +185,19 @@ function UserDashboardTherapists({loading,error,...props}){
                             </Alert>
                         }
 
-                        <div className="container-fluid">
+                        <div className="container-fluid-UserDashboardTherapists">
                             {connected && <div className="card" style={{display: "flex", flexDirection: "row"}}>
-                                <div className="card-body">
+                                <div className="card-body-UserDashboardTherapists">
                                     <h5 className="card-title">Full
                                         name: {therapistData.name} {therapistData.surname}</h5>
-                                    <p className="card-text">Email: {therapistData.email}</p>
-                                    <p className="card-text">Phone: {therapistData.number}</p>
-                                    <p className="card-text">Gender: {therapistData.gender.gender}</p>
-                                    <p className="card-text">Experience: {therapistData.experience} years</p>
-                                    <p className="card-text">Location: {therapistData.location.location}</p>
+                                    <span className="card-text-UserDashboardTherapists">Email:</span> <span>{therapistData.email}</span><br/>
+                                    <span className="card-text-UserDashboardTherapists">Phone:</span> <span> {therapistData.number}</span><br/>
+                                    <span className="card-text-UserDashboardTherapists">Gender:</span> <span> {therapistData.gender.gender}</span><br/>
+                                    <span className="card-text-UserDashboardTherapists">Experience:</span> <span> {therapistData.experience} years</span><br/>
+                                    <span className="card-text-UserDashboardTherapists">Location:</span> <span> {therapistData.location.location}</span><br/>
                                     <br/>
 
-                                    <button onClick={() => handleRemove(data.id)}>Remove Therapist</button>
+                                    <button className="button-UserDashboardTherapists" onClick={() => handleRemove(data.id)}>Remove Therapist</button>
                                 </div>
 
                                 {bookingExists ? <div className="card-body">

@@ -102,13 +102,14 @@ function BookingsInfo({loading,error,...props}){
 
                         newBookingsData.therapistId = response.data.id
 
-                        fetchBookings(newBookingsData).then((response) => {
-                            if (response.data.length === 0){
-                                setInfo(true);
-                            }else {setAllBookings(response.data);}
-                        }).catch((e) => {
-                            history('/loginBoot');
-                        });
+//                        fetchBookings(newBookingsData).then((response) => {
+//                            if (response.data.length === 0){
+//                                setInfo(true);
+//                            }else {setAllBookings(response.data);}
+//                        }
+//                        ).catch((e) => {
+//                            history('/loginBoot');
+//                        });
 
                     } else {
                         localStorage.clear();
