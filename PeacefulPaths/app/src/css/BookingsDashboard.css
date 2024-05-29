@@ -1,0 +1,24 @@
+.container-fluid-BookingsDashboard {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 400px;
+        }
+
+        .container-fluid-BookingsDashboard button {
+            background-color: blue;
+            color: white;
+            height: 40px;
+            margin: 0 10px;
+            border: none;
+            cursor: pointer;
+            border: 2px solid blue;
+            border-radius: 8px;
+        }
+
+        .container-fluid-BookingsDashboard button:hover {
+            background-color: white;
+               color: blue;
+               border: 2px solid blue;
+               transition: 0.3ms;
+        }

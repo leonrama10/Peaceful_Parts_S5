@@ -2,6 +2,9 @@ import React, {useEffect, useState} from 'react';
 import {useNavigate} from 'react-router-dom';
 import '../../../css/sb-admin-2.css';
 import '../../../css/myCss.css';
+
+import '../../../css/BookingsDashboard.css';
+
 import DashboardNav from "../DashboardNav";
 import SideBarUser from "../SideBars/SideBarUser";
 import {
@@ -79,7 +82,7 @@ function BookingsDashboard({loading,error,...props}){
 
                         <DashboardNav data={data} setUser={props.setUser} setUserAuthenticationState={props.setUserAuthenticationState}/>
 
-                        <div className="container-fluid">
+                        <div className="container-fluid-BookingsDashboard">
                             <button onClick={showBookingsInfo}>Show Your Bookings</button>
                             <button onClick={addNewBooking}>Book a session</button>
                         </div>

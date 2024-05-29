@@ -1,0 +1,19 @@
+.card-body-UserDashboardTherapists .card-text-UserDashboardTherapists{
+    font-weight: bold;
+    margin: 5px;
+}
+
+.button-UserDashboardTherapists{
+    padding: 5px 20px;
+    background-color: blue;
+    color: white;
+    border: none;
+    border-radius: 5px;
+    cursor: pointer;
+}
+
+.button-UserDashboardTherapists:hover{
+    background-color: white;
+    color: blue;
+    transition: 0.3ms;
+}
