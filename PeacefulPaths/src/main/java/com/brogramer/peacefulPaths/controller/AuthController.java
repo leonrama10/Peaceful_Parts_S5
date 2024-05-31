@@ -11,18 +11,15 @@ import jakarta.validation.Valid;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
-import org.springframework.messaging.handler.annotation.MessageMapping;
-import org.springframework.messaging.handler.annotation.SendTo;
-import org.springframework.messaging.simp.SimpMessageHeaderAccessor;
-import org.springframework.messaging.simp.SimpMessagingTemplate;
 import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.web.bind.annotation.*;
-import org.springframework.messaging.handler.annotation.Payload;
-
 
 import java.net.URI;
 import java.security.Principal;
-import java.util.*;
+import java.util.ArrayList;
+import java.util.Collection;
+import java.util.List;
+import java.util.Optional;
 import java.util.stream.Collectors;
 
 @RestController
@@ -38,7 +35,7 @@ public class AuthController {
     private UserDetailsService userDetailsService;
 
     @Autowired
-    public AuthController(UserService userService, UserAuthenticationProvider userAuthenticationProvider,TherapistRepository userRepository) {
+    public AuthController(UserService userService, UserAuthenticationProvider userAuthenticationProvider, TherapistRepository userRepository) {
         this.userService = userService;
         this.userAuthenticationProvider = userAuthenticationProvider;
         this.userRepository = userRepository;
@@ -51,8 +48,8 @@ public class AuthController {
     public UserInfo convertToUserInfo(User userDetails) {
 
         Collection<Roles> role;
-        Roles roleUser = new Roles(1,"ROLE_USER");
-        Roles roleTherapist = new Roles(2,"ROLE_THERAPIST");
+        Roles roleUser = new Roles(1, "ROLE_USER");
+        Roles roleTherapist = new Roles(2, "ROLE_THERAPIST");
 
         UserInfo userInfo = new UserInfo();
         userInfo.setId(userDetails.getId());
@@ -79,7 +76,7 @@ public class AuthController {
             userInfo.setMentalState2(userDetails.getQuestionnaire().getMentalState2());
             userInfo.setRelationshipStatus(userDetails.getQuestionnaire().getRelationshipStatus());
             userInfo.setTherapyHistory(userDetails.getQuestionnaire().getTherapyHistory());
-        }else if(role.contains(roleTherapist)){
+        } else if (role.contains(roleTherapist)) {
             userInfo.setLocation(userDetails.getLocation());
             userInfo.setGender(userDetails.getGender());
             userInfo.setLanguage(userDetails.getLanguage());
@@ -90,7 +87,7 @@ public class AuthController {
             userInfo.setTherapistTypeTherapist(userDetails.getTherapistInfo().getTherapistType());
             userInfo.setIdentityTypeTherapist(userDetails.getTherapistInfo().getIdentityType());
             userInfo.setExperience(userDetails.getExperience());
-        }else{
+        } else {
             userInfo.setGender(userDetails.getGender());
         }
         userInfo.setResetToken(userDetails.getResetToken());
@@ -101,12 +98,11 @@ public class AuthController {
     }
 
 
-
     public NoteDto convertToNoteDto(Notes notes) {
         NoteDto noteDto = new NoteDto();
         noteDto.setNotesText(notes.getNotesText());
         Collection<String> pointCollection = new ArrayList<>();
-        for (Point point : notes.getMainPoints().getPoint()){
+        for (Point point : notes.getMainPoints().getPoint()) {
             String pointString = point.getPoint();
             pointCollection.add(pointString);
         }
@@ -193,7 +189,7 @@ public class AuthController {
     private ChatDto convertToChatDto(Chat chat) {
         ChatDto chatDto = new ChatDto();
 
-        if (chat==null) {
+        if (chat == null) {
             return chatDto;
         }
         chatDto.setMessages(chat.getMessages());
@@ -231,7 +227,7 @@ public class AuthController {
     }
 
     @PostMapping("/auth/questionnaireAnswers")
-    public ResponseEntity<?>  questionnaireAnswers(@RequestBody @Valid QuestionnaireDto questionnaireDto){
+    public ResponseEntity<?> questionnaireAnswers(@RequestBody @Valid QuestionnaireDto questionnaireDto) {
         return ResponseEntity.ok(questionnaireDto);
     }
 
@@ -248,12 +244,12 @@ public class AuthController {
     }
 
     @GetMapping("/auth/userinfo")
-    public ResponseEntity<?> getUserInfo(Principal principal){
+    public ResponseEntity<?> getUserInfo(Principal principal) {
         CustomUserDetails userDetails = (CustomUserDetails) userDetailsService.loadUserByUsername(principal.getName());
 
         Collection<Roles> role;
-        Roles roleUser = new Roles(1,"ROLE_USER");
-        Roles roleTherapist = new Roles(2,"ROLE_THERAPIST");
+        Roles roleUser = new Roles(1, "ROLE_USER");
+        Roles roleTherapist = new Roles(2, "ROLE_THERAPIST");
 
         UserInfo userInfo = new UserInfo();
         userInfo.setId(userDetails.getId());
@@ -280,7 +276,7 @@ public class AuthController {
             userInfo.setMentalState2(userDetails.getQuestionnaire().getMentalState2());
             userInfo.setPhysicalHealth(userDetails.getQuestionnaire().getPhysicalHealth());
             userInfo.setRelationshipStatus(userDetails.getQuestionnaire().getRelationshipStatus());
-        }else if (role.contains(roleTherapist)){
+        } else if (role.contains(roleTherapist)) {
             userInfo.setLocation(userDetails.getLocation());
             userInfo.setGender(userDetails.getGender());
             userInfo.setDateOfBirth(userDetails.getDateOfBirth());
@@ -290,7 +286,7 @@ public class AuthController {
             userInfo.setTherapistTypeTherapist(userDetails.getTherapistInfo().getTherapistType());
             userInfo.setTherapyTypeTherapist(userDetails.getTherapistInfo().getTherapyType());
             userInfo.setIdentityTypeTherapist(userDetails.getTherapistInfo().getIdentityType());
-        }else {
+        } else {
             userInfo.setGender(userDetails.getGender());
         }
         userInfo.setExperience(userDetails.getExperience());
@@ -302,14 +298,14 @@ public class AuthController {
     }
 
     @GetMapping("/auth/allUserinfo")
-    public ResponseEntity<?> getAllUserInfo(){
+    public ResponseEntity<?> getAllUserInfo() {
         List<UserInfo> userInfos = getAllWithRole("ROLE_USER");
 
         return ResponseEntity.ok(userInfos);
     }
 
     @GetMapping("/auth/userinfoId/{id}")
-    public ResponseEntity<?> getUserInfoId(@PathVariable int id){
+    public ResponseEntity<?> getUserInfoId(@PathVariable int id) {
         User userDetails = userRepository.findById(id).get();
 
         UserInfo userInfo = convertToUserInfo(userDetails);
@@ -318,14 +314,21 @@ public class AuthController {
     }
 
     @GetMapping("/auth/allTherapistInfo")
-    public ResponseEntity<?> getAllTherapistInfo(){
+    public ResponseEntity<?> getAllTherapistInfo() {
         List<UserInfo> therapistInfos = getAllWithRole("ROLE_THERAPIST");
 
         return ResponseEntity.ok(therapistInfos);
     }
+    @PostMapping("/submitFeedback")
+    public ResponseEntity<?> submitFeedback(@RequestBody @Valid FeedbackDto feedbackDto) {
+        // Call a service method to save feedback
+        userService.saveFeedback(feedbackDto);
+        return ResponseEntity.ok("Feedback submitted successfully");
+    }
+
 
     @PostMapping("/auth/fetchAllTherapistNotConnectedData")
-    public ResponseEntity<?> fetchAllTherapistNotConnectedData(@RequestBody @Valid FilterDto filterDto){
+    public ResponseEntity<?> fetchAllTherapistNotConnectedData(@RequestBody @Valid FilterDto filterDto) {
         List<UserInfo> therapistInfos = getAllWithRole("ROLE_THERAPIST").stream()
                 .filter(userInfo -> userInfo.getId() != filterDto.getTherapistId())
                 .collect(Collectors.toList());
@@ -333,7 +336,7 @@ public class AuthController {
         return ResponseEntity.ok(therapistInfos);
     }
 
-    @PostMapping ("/auth/sendEmail")
+    @PostMapping("/auth/sendEmail")
     public ResponseEntity<UserDto> sendEmail(@RequestBody @Valid CredentialsDto credentialsDto) throws MessagingException {
         UserDto user = userService.findByEmail(credentialsDto.getEmail());
         user.setToken(userAuthenticationProvider.createToken(user.getEmail()));
@@ -350,25 +353,25 @@ public class AuthController {
     }
 
     @GetMapping("/auth/allAdminInfo")
-    public ResponseEntity<?> getAllAdminInfo(){
+    public ResponseEntity<?> getAllAdminInfo() {
         List<UserInfo> adminInfos = getAllWithRole("ROLE_ADMIN");
 
         return ResponseEntity.ok(adminInfos);
     }
 
-    @PostMapping ("/auth/userTherapistConnection")
-    public ResponseEntity<User> userTherapistConnection(@RequestBody @Valid Connection connection){
+    @PostMapping("/auth/userTherapistConnection")
+    public ResponseEntity<User> userTherapistConnection(@RequestBody @Valid Connection connection) {
         User user = userRepository.findById(connection.getUserId()).get();
         User therapist = userRepository.findById(connection.getTherapistId()).get();
         user.setToken(userAuthenticationProvider.createToken(user.getEmail()));
-        userService.connect(user.getId(),therapist.getId());
+        userService.connect(user.getId(), therapist.getId());
         return ResponseEntity.created(URI.create("/users/" + user.getId())).body(user);
     }
 
     @GetMapping("/auth/fetchUserTherapistConnectionData/{id}")
-    public ResponseEntity<?> fetchUserTherapistConnectionData(@PathVariable int id){
+    public ResponseEntity<?> fetchUserTherapistConnectionData(@PathVariable int id) {
         User user1 = userService.findUserConnectionsById(id);
-        if(user1 == null){
+        if (user1 == null) {
             return new ResponseEntity<>("Connect with a therapist!!!", HttpStatus.NOT_FOUND);
         }
         int idTherapist = userService.findTherapistIdByUserId(id);
@@ -384,14 +387,14 @@ public class AuthController {
     }
 
     @GetMapping("/auth/fetchAllUsersConnectedData/{id}")
-    public ResponseEntity<?> fetchAllUsersConnectedData(@PathVariable int id){
+    public ResponseEntity<?> fetchAllUsersConnectedData(@PathVariable int id) {
         List<UserInfo> userInfos = userService.findAllUsersConnectedById(id).stream().map(this::mapUserDetailsToUser).collect(Collectors.toList());
 
         return ResponseEntity.ok(userInfos);
     }
 
     @GetMapping("/auth/fetchAllUsersConnectedDataHistory/{id}")
-    public ResponseEntity<?> fetchAllUsersConnectedDataHistory(@PathVariable int id){
+    public ResponseEntity<?> fetchAllUsersConnectedDataHistory(@PathVariable int id) {
         List<UserInfo> userInfos = userService.findAllUsersConnectedHistoryById(id).stream().map(this::mapUserDetailsToUser).collect(Collectors.toList());
 
         return ResponseEntity.ok(userInfos);
@@ -413,14 +416,14 @@ public class AuthController {
     }
 
     @PostMapping("/auth/therapistFilterByExperience")
-    public ResponseEntity<?> therapistFilterByExperience(@RequestBody @Valid FilterDto filterObject){
+    public ResponseEntity<?> therapistFilterByExperience(@RequestBody @Valid FilterDto filterObject) {
         List<User> userInfos = userService.findAllTherapistsByExperience(filterObject.getExperience()).stream().map(this::createUserFromDetails).collect(Collectors.toList());
 
         return ResponseEntity.ok(userInfos);
     }
 
     @PostMapping("/auth/therapistFilterByExperienceNotConnected")
-    public ResponseEntity<?> therapistFilterByExperienceNotConnected(@RequestBody @Valid FilterDto filterObject){
+    public ResponseEntity<?> therapistFilterByExperienceNotConnected(@RequestBody @Valid FilterDto filterObject) {
         List<User> userInfos = userService.findAllTherapistsByExperience(filterObject.getExperience()).stream()
                 .filter(userInfo -> userInfo.getId() != filterObject.getTherapistId()).map(this::createUserFromDetails).collect(Collectors.toList());
 
@@ -429,14 +432,14 @@ public class AuthController {
 
 
     @PostMapping("/auth/therapistFilterByLocation")
-    public ResponseEntity<?> therapistFilterByLocation(@RequestBody @Valid FilterDto filterObject){
+    public ResponseEntity<?> therapistFilterByLocation(@RequestBody @Valid FilterDto filterObject) {
         List<User> userInfos = userService.findAllTherapistsByLocation(filterObject.getLocation()).stream().map(this::createUserFromDetails).collect(Collectors.toList());
 
         return ResponseEntity.ok(userInfos);
     }
 
     @PostMapping("/auth/therapistFilterByLocationNotConnected")
-    public ResponseEntity<?> therapistFilterByLocationNotConnected(@RequestBody @Valid FilterDto filterObject){
+    public ResponseEntity<?> therapistFilterByLocationNotConnected(@RequestBody @Valid FilterDto filterObject) {
         List<User> userInfos = userService.findAllTherapistsByLocation(filterObject.getLocation()).stream()
                 .filter(userInfo -> userInfo.getId() != filterObject.getTherapistId()).map(this::createUserFromDetails).collect(Collectors.toList());
 
@@ -444,7 +447,7 @@ public class AuthController {
     }
 
     @PostMapping("/auth/therapistFilterByLanguage")
-    public ResponseEntity<?> therapistFilterByLanguage(@RequestBody @Valid FilterDto filterObject){
+    public ResponseEntity<?> therapistFilterByLanguage(@RequestBody @Valid FilterDto filterObject) {
         List<UserInfo> userInfos = userService.findAllTherapistsByLanguage(filterObject.getLanguage()).stream()
                 .map(this::convertToUserInfo)
                 .collect(Collectors.toList());
@@ -463,7 +466,7 @@ public class AuthController {
     }
 
     @PostMapping("/auth/therapistFilterByGetStarted")
-    public ResponseEntity<?> therapistFilterByGetStarted(@RequestBody @Valid FilterDto filterObject){
+    public ResponseEntity<?> therapistFilterByGetStarted(@RequestBody @Valid FilterDto filterObject) {
         List<UserInfo> userInfos = userService.findAllTherapistsByGetStarted(filterObject.getUserId()).stream()
                 .map(this::convertToUserInfo)
                 .collect(Collectors.toList());
@@ -482,7 +485,7 @@ public class AuthController {
     }
 
     @PostMapping("/auth/therapistFilterByTherapyType")
-    public ResponseEntity<?> therapistFilterByTherapyType(@RequestBody @Valid FilterDto filterObject){
+    public ResponseEntity<?> therapistFilterByTherapyType(@RequestBody @Valid FilterDto filterObject) {
         List<UserInfo> userInfos = userService.findAllTherapistsByTherapyType(filterObject.getTherapyType()).stream()
                 .map(this::convertToUserInfo)
                 .collect(Collectors.toList());
@@ -501,7 +504,7 @@ public class AuthController {
     }
 
     @PostMapping("/auth/therapistFilterByIdentityType")
-    public ResponseEntity<?> therapistFilterByIdentityType(@RequestBody @Valid FilterDto filterObject){
+    public ResponseEntity<?> therapistFilterByIdentityType(@RequestBody @Valid FilterDto filterObject) {
         List<UserInfo> userInfos = userService.findAllTherapistsByIdentityType(filterObject.getIdentityType()).stream()
                 .map(this::convertToUserInfo)
                 .collect(Collectors.toList());
@@ -519,7 +522,7 @@ public class AuthController {
     }
 
     @PostMapping("/auth/therapistFilterByTherapistType")
-    public ResponseEntity<?> therapistFilterByTherapistType(@RequestBody @Valid FilterDto filterObject){
+    public ResponseEntity<?> therapistFilterByTherapistType(@RequestBody @Valid FilterDto filterObject) {
         List<UserInfo> userInfos = userService.findAllTherapistsByTherapistType(filterObject.getTherapistType()).stream()
                 .map(this::convertToUserInfo)
                 .collect(Collectors.toList());
@@ -670,11 +673,11 @@ public class AuthController {
     }
 
     @PostMapping("/auth/fetchTherapistUserConnectionData")
-    public ResponseEntity<?> fetchTherapistUserConnectionData(@RequestBody @Valid ConnectionDto connectionDto){
+    public ResponseEntity<?> fetchTherapistUserConnectionData(@RequestBody @Valid ConnectionDto connectionDto) {
         User user = userService.findTherapistConnectionById(connectionDto);
         UserInfo userInfo = new UserInfo();
 
-        if (user!=null){
+        if (user != null) {
             userInfo = convertToUserInfo(user);
         }
 
