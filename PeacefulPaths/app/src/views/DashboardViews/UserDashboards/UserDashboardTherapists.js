@@ -142,37 +142,38 @@ const UserDashboardTherapists = ({ loading, error, ...props }) => {
         toggleFeedbackModal();
     };
 
-   const handleFeedbackSubmit = () => {
-       const feedbackData = {
-           userId: data.id,
-           therapistId: therapistData.id,
-           feedback: feedback
-       };
+ const handleFeedbackSubmit = () => {
+     const feedbackData = {
+         userId: data.id,
+         therapistId: therapistData.id,
+         feedback: feedback
+     };
 
-       // Remove therapist first
-       removeTherapist(data.id)
-           .then(() => {
-               // Submit feedback after successful removal
-               return submitFeedback(feedbackData);
-           })
-           .then(() => {
-               toggleFeedbackModal();
-               setTherapistData({}); // Clear therapist data from state
-               setConnected(false);
-               saveState("connected", false);
-               history('/dashboard/userDashboard'); // Navigate to dashboard or refresh data
-           })
-           .catch((error) => {
-               console.error('Error:', error);
-               if (error.response) {
-                   console.error('Error Response:', error.response.data);
-               } else if (error.request) {
-                   console.error('Error Request:', error.request);
-               } else {
-                   console.error('Error Message:', error.message);
-               }
-           });
-   };
+     // Remove therapist first
+     removeTherapist(data.id)
+         .then(() => {
+             // Submit feedback after successful removal
+             return submitFeedback(feedbackData);
+         })
+         .then(() => {
+             toggleFeedbackModal();
+             setTherapistData({}); // Clear therapist data from state
+             setConnected(false);
+             saveState("connected", false);
+             history('/dashboard/userDashboard'); // Navigate to dashboard or refresh data
+         })
+         .catch((error) => {
+             console.error('Error:', error);
+             if (error.response) {
+                 console.error('Error Response:', error.response.data);
+             } else if (error.request) {
+                 console.error('Error Request:', error.request);
+             } else {
+                 console.error('Error Message:', error.message);
+             }
+         });
+ };
+
 
 
     function formatHour(hour) {
