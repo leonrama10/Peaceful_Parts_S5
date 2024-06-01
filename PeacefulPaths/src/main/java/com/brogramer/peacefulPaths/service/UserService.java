@@ -19,8 +19,10 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.nio.CharBuffer;
-import java.time.*;
-import java.time.format.DateTimeFormatter;
+import java.time.DayOfWeek;
+import java.time.LocalDate;
+import java.time.LocalDateTime;
+import java.time.LocalTime;
 import java.util.*;
 import java.util.stream.Collectors;
 
@@ -43,12 +45,14 @@ public class UserService implements UserDetailsService {
     private final UserTherapistMessagesRepository userTherapistMessagesRepository;
     private final MessageRepository messageRepository;
     private final ChatRepository chatRepository;
+    private final FeedbackRepository feedbackRepository;
 
     @Autowired
     private JavaMailSender javaMailSender;
 
     @Autowired
-    public UserService(TherapistRepository userRepository, PasswordEncoder passwordEncoder, RoleDao roleDao, UserDao userDao, QuestionnaireRepository questionnaireRepository, TherapistInfoRepository therapistInfoRepository, NoteRepository noteRepository, TherapistNotesRepository therapistNotesRepository, MainPointsRepository mainPointsRepository, PointRepository pointRepository, TherapistNotesHistoryRepository therapistNotesHistoryRepository, TherapistWorkDaysRepository therapistWorkDaysRepository, BookingsRepository bookingsRepository, UserTherapistMessagesRepository userTherapistMessagesRepository, MessageRepository messageRepository, ChatRepository chatRepository) {
+    public UserService(TherapistRepository userRepository, PasswordEncoder passwordEncoder, RoleDao roleDao, UserDao userDao, QuestionnaireRepository questionnaireRepository, TherapistInfoRepository therapistInfoRepository, NoteRepository noteRepository, TherapistNotesRepository therapistNotesRepository, MainPointsRepository mainPointsRepository, PointRepository pointRepository, TherapistNotesHistoryRepository therapistNotesHistoryRepository, TherapistWorkDaysRepository therapistWorkDaysRepository, BookingsRepository bookingsRepository, UserTherapistMessagesRepository userTherapistMessagesRepository, MessageRepository messageRepository, ChatRepository chatRepository,FeedbackRepository feedbackRepository) {
+
         this.userRepository = userRepository;
         this.passwordEncoder = passwordEncoder;
         this.roleDao = roleDao;
@@ -65,6 +69,7 @@ public class UserService implements UserDetailsService {
         this.userTherapistMessagesRepository = userTherapistMessagesRepository;
         this.messageRepository = messageRepository;
         this.chatRepository = chatRepository;
+        this.feedbackRepository = feedbackRepository;
     }
 
     public List<User> findAllByRole(String role) {
@@ -880,7 +885,13 @@ public class UserService implements UserDetailsService {
 
         return booking;
     }
-
+    public void saveFeedback(FeedbackDto feedbackDto) {
+        Feedback feedback = new Feedback();
+        feedback.setUserId(Long.valueOf(feedbackDto.getUserId()));
+        feedback.setTherapistId(Long.valueOf(feedbackDto.getTherapistId()));
+        feedback.setFeedback(feedbackDto.getFeedback());
+        feedbackRepository.save(feedback);
+    }
 
     public void cancelBooking(BookingsDto bookingsDto) {
         bookingsRepository.deleteById(bookingsDto.getBookingId());
@@ -976,6 +987,7 @@ public class UserService implements UserDetailsService {
 
         return userTherapistMessages.map(UserTherapistMessages::getChat).orElse(null);
     }
+
 
     public void sendMessage(MessageDto messageDto) {
         if (messageDto.getChatId()!=0){

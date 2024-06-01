@@ -1,5 +1,9 @@
 import axios from 'axios';
 
+
+
+
+
 const getToken=()=>{
     return localStorage.getItem('USER_KEY');
 }
@@ -60,6 +64,7 @@ export const fetchUserDataId=(authRequest)=>{
         }
     })
 }
+
 
 export const userDelete = (authRequest) => {
     return axios({
@@ -473,6 +478,15 @@ export const fetchWorkDays = (authRequest) => {
         }
     });
 };
+export const submitFeedback = (feedbackData) => {
+    return axios.post(`${process.env.hostUrl || 'http://localhost:8080'}/api/submitFeedback`, feedbackData, {
+        headers: {
+            'Authorization': 'Bearer ' + getToken()
+        }
+    });
+};
+
+
 
 export const fetchWorkHours = (authRequest) => {
     return axios({

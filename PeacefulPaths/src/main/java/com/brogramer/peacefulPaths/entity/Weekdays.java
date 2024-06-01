@@ -27,4 +27,12 @@ public class Weekdays {
         this.id = id;
         this.day = day;
     }
+
+    public String getDay() {
+        return day;
+    }
+
+    public Long getId() {
+        return id;
+    }
 }
