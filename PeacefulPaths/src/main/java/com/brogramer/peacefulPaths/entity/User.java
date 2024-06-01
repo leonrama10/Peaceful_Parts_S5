@@ -34,7 +34,7 @@ public class User {
     @Column(name = "email")
     private String email;
 
-    @Pattern(regexp = "^0(44|43|45|49)\\d{6}$",message = "Invalid Phone Number!")
+    @Pattern(regexp = "^\\d{7,14}$", message = "Invalid Phone Number!")
     @Column(name = "number")
     private String number;
 
