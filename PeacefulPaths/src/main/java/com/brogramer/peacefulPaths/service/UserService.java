@@ -46,13 +46,14 @@ public class UserService implements UserDetailsService {
     private final MessageRepository messageRepository;
     private final ChatRepository chatRepository;
     private final FeedbackRepository feedbackRepository;
+    private final LanguageRepository languageRepository;
 
     @Autowired
     private JavaMailSender javaMailSender;
 
     @Autowired
-    public UserService(TherapistRepository userRepository, PasswordEncoder passwordEncoder, RoleDao roleDao, UserDao userDao, QuestionnaireRepository questionnaireRepository, TherapistInfoRepository therapistInfoRepository, NoteRepository noteRepository, TherapistNotesRepository therapistNotesRepository, MainPointsRepository mainPointsRepository, PointRepository pointRepository, TherapistNotesHistoryRepository therapistNotesHistoryRepository, TherapistWorkDaysRepository therapistWorkDaysRepository, BookingsRepository bookingsRepository, UserTherapistMessagesRepository userTherapistMessagesRepository, MessageRepository messageRepository, ChatRepository chatRepository,FeedbackRepository feedbackRepository) {
-
+    public UserService(TherapistRepository userRepository, PasswordEncoder passwordEncoder, RoleDao roleDao, UserDao userDao, QuestionnaireRepository questionnaireRepository, TherapistInfoRepository therapistInfoRepository, NoteRepository noteRepository, TherapistNotesRepository therapistNotesRepository, MainPointsRepository mainPointsRepository, PointRepository pointRepository, TherapistNotesHistoryRepository therapistNotesHistoryRepository, TherapistWorkDaysRepository therapistWorkDaysRepository, BookingsRepository bookingsRepository, UserTherapistMessagesRepository userTherapistMessagesRepository, MessageRepository messageRepository, ChatRepository chatRepository,FeedbackRepository feedbackRepository,LanguageRepository languageRepository)
+    {
         this.userRepository = userRepository;
         this.passwordEncoder = passwordEncoder;
         this.roleDao = roleDao;
@@ -70,6 +71,7 @@ public class UserService implements UserDetailsService {
         this.messageRepository = messageRepository;
         this.chatRepository = chatRepository;
         this.feedbackRepository = feedbackRepository;
+        this.languageRepository = languageRepository;
     }
 
     public List<User> findAllByRole(String role) {
@@ -190,10 +192,19 @@ public class UserService implements UserDetailsService {
         return questionnaire;
     }
 
+    @Transactional
     public UserDto registerTherapist(SignUpDto userDto) {
         Optional<User> optionalUser = userRepository.findByEmail(userDto.getEmail());
         if (optionalUser.isPresent()) {
             throw new AppException("Login already exists", HttpStatus.BAD_REQUEST);
+        }
+
+        // Check if all language IDs exist in the language table
+        List<Long> languageIdLongs = userDto.getLanguage().stream().map(Language::getId).collect(Collectors.toList());
+        List<Integer> languageIds = languageIdLongs.stream().map(Long::intValue).collect(Collectors.toList());
+        List<Language> languages = languageRepository.findAllById(languageIds);
+        if (languages.size() != languageIds.size()) {
+            throw new AppException("Invalid language ID(s)", HttpStatus.BAD_REQUEST);
         }
 
         User user = new User();
@@ -209,7 +220,7 @@ public class UserService implements UserDetailsService {
         user.setGender(userDto.getGender());
         user.setUniversity(userDto.getUniversity());
         user.setLocation(userDto.getLocation());
-        user.setLanguage(userDto.getLanguage());
+        user.setLanguage(languages); // Set the validated language list
         Collection<Roles> roles = new ArrayList<>();
         roles.add(roleDao.findRoleByName("ROLE_THERAPIST"));
         user.setRoles(roles);
@@ -242,14 +253,15 @@ public class UserService implements UserDetailsService {
         return userDtoResult;
     }
 
+
+
     public UserDto registerAdmin(SignUpDto userDto) {
-        // Check if the user (Admin) already exists based on email
+
         Optional<User> optionalUser = userRepository.findByEmail(userDto.getEmail());
         if (optionalUser.isPresent()) {
             throw new AppException("Login already exists", HttpStatus.BAD_REQUEST);
         }
 
-        // Create a new User entity for the Admin
         User user = new User();
         user.setEmail(userDto.getEmail());
         user.setNumber(userDto.getNumber());
