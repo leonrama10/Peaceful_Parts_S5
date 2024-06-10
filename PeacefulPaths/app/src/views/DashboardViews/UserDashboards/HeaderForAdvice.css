@@ -1,0 +1,18 @@
+.header {
+    background-color: #2c3e50;
+    padding: 10px 20px;
+}
+
+.logo {
+    text-align: center;
+    color: white;
+}
+
+.logo h1 {
+    font-size: 2rem;
+    margin: 0;
+}
+
+.logo span {
+    color: #007CF4;
+}
