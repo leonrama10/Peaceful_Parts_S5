@@ -58,6 +58,7 @@ function UserDashboard({ loading, error, ...props }) {
         connected = loadState("connected", false);
         fetchUserData().then((response) => {
             if (response.data.roles.at(0).role === 'ROLE_USER') {
+                saveState("userId",response.data.id)
                 setData(response.data);
                 const newFilterUserData = {
                     userId: response.data.id

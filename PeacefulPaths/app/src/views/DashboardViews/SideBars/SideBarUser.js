@@ -24,6 +24,7 @@ import {connect} from "react-redux";
 import {loadState} from "../../../helper/sessionStorage";
 let connected = loadState("connected",false);
 let therapistId = 0;
+
 function SideBarUser({loading,error,...props}){
 
     const [openManaging, setOpenManaging] = useState(false);
@@ -580,7 +581,6 @@ function SideBarUser({loading,error,...props}){
 
 
     return (
-
         <ul className="navbar-nav bg-gradient-primary sidebar sidebar-dark accordion"
             id="accordionSidebar">
 
@@ -626,6 +626,7 @@ function SideBarUser({loading,error,...props}){
                                 Therapists</Link>
                             <Link className="collapse-item" to="/dashboard/userDashboard/bookingsDashboard">Manage
                                 Bookings</Link>
+                            <Link className="collapse-item" to="/dashboard/userDashboard/advice">Advice by Therapist</Link>
                         </div>
                     </div>
                 </Collapse>

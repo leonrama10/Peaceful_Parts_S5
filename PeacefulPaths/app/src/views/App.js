@@ -43,6 +43,8 @@ import ChatDashboard from "./DashboardViews/UserDashboards/ChatDashboard";
 import ChatTherapist from "./DashboardViews/UserDashboards/ChatTherapist";
 import TherapistChatDashboard from "./DashboardViews/TherapistDashboards/TherapistChatDashboard";
 import ChatClient from "./DashboardViews/TherapistDashboards/ChatClient";
+import SendAdvice from "./DashboardViews/TherapistDashboards/SendAdvice";
+import AdviceByTherapist from "./DashboardViews/UserDashboards/AdviceByTherapist";
 
 function Main() {
     const location = useLocation();
@@ -91,6 +93,8 @@ function Main() {
                 <Route path="/dashboard/therapistDashboard/currentWorkDays" element={<TherapistCurrentWorkDays />}/>
                 <Route path="/dashboard/therapistDashboard/addNewWorkDays" element={<TherapistAddNewWorkDays />}/>
                 <Route path="/dashboard/therapistDashboard/history" element={<TherapistClientHistory />}/>
+                 <Route path="/dashboard/therapistDashboard/sendAdvice" element={<SendAdvice />} />
+                <Route path="/dashboard/userDashboard/advice" element={<AdviceByTherapist />} />
                 <Route path="/dashboard/errorPage" element={<ErrorPage />}/>
                 <Route path="/" element={<Home />}/>
             </Routes>

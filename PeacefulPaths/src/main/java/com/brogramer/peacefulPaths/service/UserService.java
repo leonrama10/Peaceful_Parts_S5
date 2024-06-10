@@ -47,12 +47,13 @@ public class UserService implements UserDetailsService {
     private final ChatRepository chatRepository;
     private final FeedbackRepository feedbackRepository;
     private final LanguageRepository languageRepository;
+    private final AdviceRepository adviceRepository;
 
     @Autowired
     private JavaMailSender javaMailSender;
 
     @Autowired
-    public UserService(TherapistRepository userRepository, PasswordEncoder passwordEncoder, RoleDao roleDao, UserDao userDao, QuestionnaireRepository questionnaireRepository, TherapistInfoRepository therapistInfoRepository, NoteRepository noteRepository, TherapistNotesRepository therapistNotesRepository, MainPointsRepository mainPointsRepository, PointRepository pointRepository, TherapistNotesHistoryRepository therapistNotesHistoryRepository, TherapistWorkDaysRepository therapistWorkDaysRepository, BookingsRepository bookingsRepository, UserTherapistMessagesRepository userTherapistMessagesRepository, MessageRepository messageRepository, ChatRepository chatRepository,FeedbackRepository feedbackRepository,LanguageRepository languageRepository)
+    public UserService(TherapistRepository userRepository, PasswordEncoder passwordEncoder, RoleDao roleDao, UserDao userDao, QuestionnaireRepository questionnaireRepository, TherapistInfoRepository therapistInfoRepository, NoteRepository noteRepository, TherapistNotesRepository therapistNotesRepository, MainPointsRepository mainPointsRepository, PointRepository pointRepository, TherapistNotesHistoryRepository therapistNotesHistoryRepository, TherapistWorkDaysRepository therapistWorkDaysRepository, BookingsRepository bookingsRepository, UserTherapistMessagesRepository userTherapistMessagesRepository, MessageRepository messageRepository, ChatRepository chatRepository,FeedbackRepository feedbackRepository,LanguageRepository languageRepository,AdviceRepository adviceRepository)
     {
         this.userRepository = userRepository;
         this.passwordEncoder = passwordEncoder;
@@ -72,6 +73,7 @@ public class UserService implements UserDetailsService {
         this.chatRepository = chatRepository;
         this.feedbackRepository = feedbackRepository;
         this.languageRepository = languageRepository;
+        this.adviceRepository = adviceRepository;
     }
 
     public List<User> findAllByRole(String role) {
@@ -495,6 +497,30 @@ public class UserService implements UserDetailsService {
 
         javaMailSender.send(message);
     }
+    public void sendAdvice(AdviceDto adviceDto) {
+        Optional<User> user = userRepository.findById(adviceDto.getUserId().intValue());
+        if (user.isEmpty()) {
+            throw new AppException("User not found", HttpStatus.NOT_FOUND);
+        }
+
+        Advice advice = new Advice();
+        advice.setUser(user.get());
+        advice.setAdviceText(adviceDto.getAdvice());
+        Optional<User> therapist = userRepository.findById(adviceDto.getTherapist_id());
+        advice.setTherapist_id(therapist.get());
+        adviceRepository.save(advice);
+    }
+    public List<Advice> findAdviceByUserId(int userId) {
+        Optional<User> user = userRepository.findById(userId);
+        if (user.isEmpty()) {
+            throw new AppException("User not found", HttpStatus.NOT_FOUND);
+        }
+
+        return adviceRepository.findByUser(user.get());
+    }
+
+
+
 
     @Transactional
     public void connect(int userId, int therapistId) {

@@ -227,6 +227,27 @@ export const therapistFilterByGenderNotConnected = (authRequest) => {
         }
     });
 };
+export const sendAdviceToUser = (adviceData) => {
+    return axios({
+        method: 'POST',
+        url: `${process.env.hostUrl || 'http://localhost:8080'}/api/auth/sendAdviceToUser`,
+        data: adviceData,
+        headers: {
+            'Authorization': 'Bearer ' + getToken()
+        }
+    });
+};
+
+export const fetchAdviceForUser = (userId) => {
+    return axios({
+        method: 'GET',
+        url: `${process.env.hostUrl || 'http://localhost:8080'}/api/auth/fetchAdviceForUser/${userId}`,
+        headers: {
+            'Authorization': 'Bearer ' + getToken()
+        }
+    });
+};
+
 
 
 export const therapistFilterByExperience = (authRequest) => {

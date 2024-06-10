@@ -187,6 +187,32 @@ public class AuthController {
 
         return weekdaysDto;
     }
+    @PostMapping("/auth/sendAdviceToUser")
+    public ResponseEntity<?> sendAdviceToUser(@RequestBody AdviceDto adviceDto) {
+        userService.sendAdvice(adviceDto);
+        return ResponseEntity.ok().build();
+    }
+
+    @GetMapping("/auth/fetchAdviceForUser/{id}")
+    public ResponseEntity<?> fetchAdviceForUser(@PathVariable int id) {
+        try {
+            List<AdviceDto> adviceList = userService.findAdviceByUserId(id).stream()
+                    .map(advice -> {
+                        AdviceDto adviceDto = new AdviceDto();
+                        adviceDto.setUserId(Long.valueOf(advice.getUser().getId()));
+                        adviceDto.setTherapist_id(advice.getTherapist_id().getId());
+                        adviceDto.setAdvice(advice.getAdviceText());
+                        return adviceDto;
+                    })
+                    .collect(Collectors.toList());
+
+            return ResponseEntity.ok(adviceList);
+        } catch (Exception e) {
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body("Error fetching advice: " + e.getMessage());
+        }
+    }
+
+
 
     private ChatDto convertToChatDto(Chat chat) {
         ChatDto chatDto = new ChatDto();
