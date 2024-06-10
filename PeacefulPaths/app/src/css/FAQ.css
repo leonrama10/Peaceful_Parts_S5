@@ -1,0 +1,75 @@
+.faq-kryesori-1{
+height: 100vh;
+width: 100%;
+background-color: #f0f0f0;
+display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  padding-top: 400px;
+  padding-bottom: 400px;
+}
+
+.faq-container {
+  width: 60%;
+  margin: auto;
+  font-family: Arial, sans-serif;
+  padding: 15px;
+
+}
+
+.faq-question {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+
+  border: 1px solid #f0f0f0;
+  cursor: pointer;
+  background-color: #f1f1f1;
+  font-family: Overpass, sans-serif;
+
+}
+
+.faq-question:hover {
+  background-color: #f4f4f4;
+  border: 1px solid #007CF4;
+}
+
+.faq-answer {
+  padding: 15px;
+  border: 1px solid #007CF4;
+  border-top: none;
+  background-color: #f1f1f1;
+}
+
+.faq-toggle {
+  font-size: 20px;
+  color: #007CF4;
+}
+
+.faq-h1-1{
+font-family: Overpass, sans-serif;
+padding-bottom: 40px;
+}
+
+/* Lakimet */
+
+.faq-kryesori-1 {
+background-color: #FFF55EE;
+
+    position: relative;
+}
+
+.faq-kryesori-1::after {
+    content: '';
+    display: block;
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 50px;
+    background: white;
+    border-radius: 100% 100% 0% 0%;
+    transform: translateY(-50%);
+    background-color: #f0f0f0;
+}

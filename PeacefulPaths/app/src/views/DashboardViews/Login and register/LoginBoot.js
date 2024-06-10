@@ -96,6 +96,7 @@ function LoginBoot({loading,error,...props}){
             }
             .container{
             height: 100vh;
+            padding-top: 100px;
             }
             `}
             </style>

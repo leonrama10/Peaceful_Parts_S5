@@ -1,41 +1,58 @@
-import React from 'react';
-import {Link, useLocation} from 'react-router-dom';
-import {loadState} from "../helper/sessionStorage";
-const loggedInState = loadState("loggedInState", false)
-const role = loadState("role",'')
+import React, { useEffect, useState } from 'react';
+import { Link, useLocation } from 'react-router-dom';
+import { loadState } from "../helper/sessionStorage";
+import '../css/Header.css';
 
-export default function Header(){
+const loggedInState = loadState("loggedInState", false);
+const role = loadState("role", '');
 
-    const [loggedIn, setLoggedIn] = React.useState(false);
-    const [location, setLocation] = React.useState('');
+export default function Header() {
+    const [loggedIn, setLoggedIn] = useState(false);
+    const [location, setLocation] = useState('');
+    const [scrolled, setScrolled] = useState(false);
     const locationn = useLocation();
     const isGetStarted = locationn.pathname.startsWith('/get-started');
 
-    React.useEffect(()=>{
-        if (loggedInState){
-            setLoggedIn(l => true)
-        }else {
-            setLoggedIn(l => false)
+    useEffect(() => {
+        if (loggedInState) {
+            setLoggedIn(true);
+        } else {
+            setLoggedIn(false);
         }
-    },[])
+    }, []);
 
-    React.useEffect(()=>{
-        if (role === 'ROLE_USER'){
-            setLocation(l => l = '/userDashboard')
-        }else if (role === 'ROLE_THERAPIST'){
-            setLocation(l => l = '/therapistDashboard')
-        }else if(role === 'ROLE_ADMIN'){
-            setLocation(l => l = '/adminDashboard')
+    useEffect(() => {
+        if (role === 'ROLE_USER') {
+            setLocation('/userDashboard');
+        } else if (role === 'ROLE_THERAPIST') {
+            setLocation('/therapistDashboard');
+        } else if (role === 'ROLE_ADMIN') {
+            setLocation('/adminDashboard');
         }
-    },[])
+    }, []);
+
+    useEffect(() => {
+        const handleScroll = () => {
+            if (window.scrollY > 50) {
+                setScrolled(true);
+            } else {
+                setScrolled(false);
+            }
+        };
+
+        window.addEventListener('scroll', handleScroll);
+        return () => {
+            window.removeEventListener('scroll', handleScroll);
+        };
+    }, []);
 
     return (
-        <header>
+        <header className={scrolled ? 'scrolled' : ''}>
             <div className="logo">
                 <h1><span style={{color: '#007CF4'}}>Peaceful</span>Parts</h1>
             </div>
             <nav>
-                <Link to="/business">Business</Link>
+                <Link className="linku-i-pare" to="/business">Business</Link>
                 <Link to="/about">About</Link>
                 <Link to="/advice">Advice</Link>
                 <Link to="/faq">FAQ</Link>
@@ -47,5 +64,5 @@ export default function Header(){
                 {!isGetStarted && !loggedIn && <Link to="/get-started" className="btn costum-btn">Get Started</Link>}
             </nav>
         </header>
-    )
+    );
 }

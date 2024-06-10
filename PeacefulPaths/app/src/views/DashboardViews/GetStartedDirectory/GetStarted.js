@@ -44,6 +44,7 @@ function GetStarted({loading,error,...props}){
             answers: [
                 { text: "Man" },
                 { text: "Woman"},
+                { text: "Prefer not to say"},
             ],
             answerMethod: "button"
         },
@@ -155,6 +156,26 @@ function GetStarted({loading,error,...props}){
                       ],
                       answerMethod: "button"
                  },
+
+                 {
+                   question: "How would you rate your current eating habits?",
+                   answers: [
+                       { text: "Good"},
+                       { text: "Fair" },
+                       { text: "Poor" },
+                     ],
+                   answerMethod: "button"
+                 },
+
+                 {
+                   question: "Are you currently experiencing overwhelming sadness, grief, or depression?",
+                   answers: [
+                       { text: "Yes" },
+                       { text: "No"},
+                     ],
+                   answerMethod: "button"
+                 },
+
             {
                question: "Feeling down, depressed or hopeless.",
                answers: [
@@ -165,6 +186,39 @@ function GetStarted({loading,error,...props}){
              ],
              answerMethod:  "button"
            },
+
+           {
+             question: "Are you currently experiencing anxiety, panic attacks or have any phobias?",
+             answers: [
+                 { text: "Yes" },
+                 { text: "No"},
+               ],
+             answerMethod: "button"
+           },
+
+           {
+              question: "Feeling bad about yourself - or that you are a failure or have let yourself or your family down.",
+                          answers: [
+                             { text: "Not at all" },
+                             { text: "Several days"},
+                             { text: "More than half the days" },
+                             { text: "Nearly every day" },
+                        ],
+              answerMethod:  "button"
+           },
+
+           {
+              question: "How often do you drink alcohol?",
+                          answers: [
+                             { text: "Never" },
+                             { text: "Infrequently"},
+                             { text: "Monthly" },
+                             { text: "Weekly" },
+                             { text: "Daily" },
+                        ],
+              answerMethod:  "button"
+           },
+
            {
                 question: "Thoughts that you would be better off dead or of hurting yourself in some way.",
                 answers: [
@@ -199,7 +253,8 @@ function GetStarted({loading,error,...props}){
 
     const genderToId = {
         'Man': 1,
-        'Woman': 2
+        'Woman': 2,
+        'Prefer not to say': 3,
     };
 
     const therapistGenderToId = {
