@@ -806,6 +806,10 @@ public class UserService implements UserDetailsService {
 
         List<Workhours> workhoursFetched = new ArrayList<>(therapistWorkDays.getWorkhours());
 
+        if (therapistWorkDays == null) {
+            // Return an empty list or throw an exception based on your requirements
+            throw new AppException("Therapist work days not found", HttpStatus.NOT_FOUND);
+        }
         List<Weekdays> weekdaysFetched = new ArrayList<>(therapistWorkDays.getWeekdays());
         boolean weekdaysBoolean = false;
 

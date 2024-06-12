@@ -22,15 +22,6 @@ export default function AdviceByTherapist() {
         navigate(-1);
     };
 
-//    const formatDate = (dateString) => {
-//        const options = { year: 'numeric', month: 'long', day: 'numeric', hour: '2-digit', minute: '2-digit' };
-//        const date = new Date(dateString);
-//        if (isNaN(date)) {
-//            return 'Invalid Date';
-//        }
-//        return date.toLocaleDateString(undefined, options);
-//    };
-
     return (
         <main id="page-top">
             <div id="wrapper">
@@ -39,20 +30,20 @@ export default function AdviceByTherapist() {
                         <div className="container-fluid advice-container">
                             <div className="header">
                                 <div className="logo">
-                                    <h1><span style={{ color: '#007CF4' }}>Peaceful</span>Parts</h1>
+                                    <h1><span>Peaceful</span>Paths</h1>
                                 </div>
                             </div>
                             <div className="d-sm-flex align-items-center justify-content-between mb-4">
                                 <button className="btn btn-secondary" onClick={handleBackClick}>Back</button>
                             </div>
-                            <h2 className="text-center mb-4">Advice from Your Therapist</h2>
+                            <h2 className="text-center mb-4">Advices from Your Therapist</h2>
                             {adviceList.length > 0 ? (
                                 <ul className="list-group">
                                     {adviceList.map((advice, index) => (
                                         <li key={index} className="list-group-item advice-item">
                                             <div className="advice-header d-flex justify-content-between align-items-center mb-2">
-
-                                                <span className="badge bg-primary text-light">Therapist</span>
+                                                <strong className="advice-date">{advice.date}</strong>
+                                                <span className="badge therapist-name">{advice.therapistName}</span>
                                             </div>
                                             <p className="advice-text">{advice.advice}</p>
                                         </li>
