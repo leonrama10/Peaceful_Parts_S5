@@ -2,6 +2,8 @@ import React, {useEffect, useState} from 'react';
 import {fetchUserData, fetchUserDataId, userUpdate} from '../../api/authService';
 import {useNavigate, useParams} from 'react-router-dom';
 import {Container, Row, Col, Form, Button} from 'react-bootstrap';
+
+
 import {
     authenticate,
     authFailure,
@@ -179,132 +181,105 @@ function EditUser({loading,error,...props}){
 
 
 
-    const handleUpdate = (e) => {
-        e.preventDefault();
+const handleUpdate = (e) => {
+    e.preventDefault();
 
-        userUpdate(values).then((response)=>{
-            if(response.status===201){
-               if (role==="ROLE_ADMIN") {
-                   if(userRole==="ROLE_ADMIN"){
-                       history('/dashboard/adminDashboard/admin');
-                   }else if(userRole==="ROLE_THERAPIST"){
-                       history('/dashboard/adminDashboard/therapists');
-                   }else if(userRole==="ROLE_USER"){
-                       history('/dashboard/adminDashboard/users');
-                   }
-               }else if (role==="ROLE_THERAPIST"){
-                    history('/dashboard/therapistDashboard/users');
-               }
-            }
-            else{
-                props.loginFailure('Something LEKAAAAAAA!Please Try Again');
+    if (changedFields.length === 0) {
+        alert("Nothing has been updated.");
+        return;
+    }
+
+    userUpdate(values).then((response) => {
+        if (response.status === 201) {
+            let successMessage = 'Updated successfully: ';
+            if (changedFields.length > 0) {
+                successMessage += changedFields.map(field => field.charAt(0).toUpperCase() + field.slice(1)).join(', ');
+            } else {
+                successMessage += 'No fields were changed';
             }
 
-        }).catch((err)=>{
-
-            if(err && err.response){
-
-                switch(err.response.status){
-                    case 401:
-                        console.log("401 status");
-                        props.loginFailure("Authentication Failed.Bad Credentials");
-                        break;
-                    default:
-                        props.loginFailure('Something BABAAAAAA!Please Try Again');
+            if (role === "ROLE_ADMIN") {
+                if (userRole === "ROLE_ADMIN") {
+                    history('/dashboard/adminDashboard/admin');
+                } else if (userRole === "ROLE_THERAPIST") {
+                    history('/dashboard/adminDashboard/therapists');
+                } else if (userRole === "ROLE_USER") {
+                    history('/dashboard/adminDashboard/users');
                 }
+            } else if (role === "ROLE_THERAPIST") {
+                history('/dashboard/therapistDashboard/users');
             }
-            else{
-                console.log("ERROR: ",err)
-                props.loginFailure('Something NaNAAAAA!Please Try Again');
+            alert(successMessage); // Display success message
+        } else {
+            props.loginFailure('Something went wrong! Please try again');
+        }
+    }).catch((err) => {
+        if (err && err.response) {
+            switch (err.response.status) {
+                case 401:
+                    console.log("401 status");
+                    props.loginFailure("Authentication Failed. Bad Credentials");
+                    break;
+                default:
+                    props.loginFailure('Something went wrong! Please try again');
             }
-        });
-    };
+        } else {
+            console.log("ERROR: ", err);
+            props.loginFailure('Something went wrong! Please try again');
+        }
+    });
+};
 
-    const handleChange = (e) => {
-        const { name, value } = e.target;
-        const languageObject = { id: Number(value.split('-')[0]), language: value.split('-')[1] };
-        const therapistTypeObject = { id: Number(value.split('-')[0]), therapistType: value.split('-')[1] };
-        const therapyTypeObject = { id: Number(value.split('-')[0]), therapyType: value.split('-')[1] };
-        const identityTypeObject = { id: Number(value.split('-')[0]), identityType: value.split('-')[1] };
 
-        if (name === 'language') {
-            if (values.language.some(lang => lang.id === languageObject.id)) {
-                setValues(values => ({
-                    ...values,
-                    [name]: values[name].filter(lang => lang.id !== languageObject.id)
-                }));
-            } else {
-                setValues(values => ({
-                    ...values,
-                    [name]: [...values[name], languageObject]
-                }));
-            }
-        } else if (name === 'therapistTypeTherapist') {
-            if (values.therapistTypeTherapist.some(type => type.id === therapistTypeObject.id)) {
-                setValues(values => ({
-                    ...values,
-                    [name]: values[name].filter(type => type.id !== therapistTypeObject.id)
-                }));
-            } else {
-                setValues(values => ({
-                    ...values,
-                    [name]: [...values[name], therapistTypeObject]
-                }));
-            }
-        } else if (name === 'therapyTypeTherapist') {
-            if (values.therapyTypeTherapist.some(type => type.id === therapyTypeObject.id)) {
-                setValues(values => ({
-                    ...values,
-                    [name]: values[name].filter(type => type.id !== therapyTypeObject.id)
-                }));
-            } else {
-                setValues(values => ({
-                    ...values,
-                    [name]: [...values[name], therapyTypeObject]
-                }));
-            }
-        } else if (name === 'identityTypeTherapist') {
-            if (values.identityTypeTherapist.some(type => type.id === identityTypeObject.id)) {
-                setValues(values => ({
-                    ...values,
-                    [name]: values[name].filter(type => type.id !== identityTypeObject.id)
-                }));
-            } else {
-                setValues(values => ({
-                    ...values,
-                    [name]: [...values[name], identityTypeObject]
-                }));
-            }
-        } else if (name === 'age') {
+
+
+const [changedFields, setChangedFields] = useState([]);
+const handleChange = (e) => {
+    const { name, value } = e.target;
+    const languageObject = { id: Number(value.split('-')[0]), language: value.split('-')[1] };
+
+    if (name === 'language') {
+        if (values.language.some(lang => lang.id === languageObject.id)) {
+            // If the language is already in the array, remove it
             setValues(values => ({
                 ...values,
-                questionnaire: {
-                    ...values.questionnaire,
-                    [name]: value
-                }
+                language: values.language.filter(lang => lang.id !== languageObject.id)
             }));
         } else {
+            // If the language is not in the array, add it
             setValues(values => ({
                 ...values,
-                [name]: name === 'experience' ? Number(value) :
-                    name === 'gender' ? { id: Number(value.split('-')[0]), gender: value.split('-')[1] } :
-                        name === 'location' ? { id: Number(value.split('-')[0]), location: value.split('-')[1] } :
-                            name === 'university' ? { id: Number(value.split('-')[0]), university: value.split('-')[1] } :
-                                name === 'therapyTypeUser' ? { id: Number(value.split('-')[0]), therapyType: value.split('-')[1] } :
-                                    name === 'therapistGender' ? { id: Number(value.split('-')[0]), gender: value.split('-')[1] } :
-                                        name === 'therapistTypeUser' ? { id: Number(value.split('-')[0]), therapistType: value.split('-')[1] } :
-                                            name === 'relationshipStatus' ? { id: Number(value.split('-')[0]), answer: value.split('-')[1] } :
-                                                name === 'identityTypeUser' ? { id: Number(value.split('-')[0]), identityType: value.split('-')[1] } :
-                                                    name === 'therapyHistory' ? { id: Number(value.split('-')[0]), answer: value.split('-')[1] } :
-                                                        name === 'communication' ? { id: Number(value.split('-')[0]), answer: value.split('-')[1] } :
-                                                            name === 'medicationHistory' ? { id: Number(value.split('-')[0]), answer: value.split('-')[1] } :
-                                                                name === 'physicalHealth' ? { id: Number(value.split('-')[0]), answer: value.split('-')[1] } :
-                                                                    name === 'mentalState1' ? { id: Number(value.split('-')[0]), answer: value.split('-')[1] } :
-                                                                        name === 'mentalState2' ? { id: Number(value.split('-')[0]), answer: value.split('-')[1] } :
-                                value
+                language: [...values.language, languageObject]
             }));
         }
-    };
+    } else {
+        // Handle other changes
+        setValues(values => ({
+            ...values,
+            [name]: name === 'experience' ? Number(value) :
+                name === 'gender' ? { id: Number(value.split('-')[0]), gender: value.split('-')[1] } :
+                name === 'location' ? { id: Number(value.split('-')[0]), location: value.split('-')[1] } :
+                name === 'university' ? { id: Number(value.split('-')[0]), university: value.split('-')[1] } :
+                name === 'therapyTypeUser' ? { id: Number(value.split('-')[0]), therapyType: value.split('-')[1] } :
+                name === 'therapistGender' ? { id: Number(value.split('-')[0]), gender: value.split('-')[1] } :
+                name === 'therapistTypeUser' ? { id: Number(value.split('-')[0]), therapistType: value.split('-')[1] } :
+                name === 'relationshipStatus' ? { id: Number(value.split('-')[0]), answer: value.split('-')[1] } :
+                name === 'identityTypeUser' ? { id: Number(value.split('-')[0]), identityType: value.split('-')[1] } :
+                name === 'therapyHistory' ? { id: Number(value.split('-')[0]), answer: value.split('-')[1] } :
+                name === 'communication' ? { id: Number(value.split('-')[0]), answer: value.split('-')[1] } :
+                name === 'medicationHistory' ? { id: Number(value.split('-')[0]), answer: value.split('-')[1] } :
+                name === 'physicalHealth' ? { id: Number(value.split('-')[0]), answer: value.split('-')[1] } :
+                name === 'mentalState1' ? { id: Number(value.split('-')[0]), answer: value.split('-')[1] } :
+                name === 'mentalState2' ? { id: Number(value.split('-')[0]), answer: value.split('-')[1] } :
+                value
+        }));
+    }
+
+    if (!changedFields.includes(name)) {
+        setChangedFields([...changedFields, name]);
+    }
+};
+
 
     return (
         <main id="page-top" style={{height: '100%'}}>
