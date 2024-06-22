@@ -1,0 +1,72 @@
+.notification-container{
+    position: absolute;
+    top: 7px;
+    left: 50%;
+    transform: translateX(-50%);
+    z-index: 1000;
+}
+
+.notification {
+    background-color: #f0f0f0;
+    padding: 10px 25px 10px 10px;
+    border-radius: 5px;
+    font-size: 14px;
+}
+
+.close-button {
+    position: absolute;
+    top: 0;
+    right: 0;
+    height: 22px;
+    width: 22px;
+    background: none;
+    border-radius: 5px;
+    border-top: none;
+    border-right: none;
+    border-color: gray;
+    border-width: 1px;
+    font-size: 12px;
+    cursor: pointer;
+}
+
+.booking-timer{
+    display: flex;
+    justify-content: space-between;
+    align-items: start;
+}
+
+.timer-content {
+    position: absolute;
+    top: 0;
+    left: 50%;
+    transform: translateX(-50%);
+    border: 1px solid lightgray;
+    border-radius: 6px;
+    padding: 5px;
+}
+
+.sendBox{
+    width:100%;
+    min-height:40px;
+    height:40px;
+    max-height:100%;
+    border-radius: 15px;
+    border: 1px solid gray;
+    padding: 10px 5px 5px 10px;
+    font-size: 15px;
+    overflow-y: hidden; /* Hide vertical scrollbar */
+    resize: none;
+}
+
+.sendBox:focus{
+    border: 2px solid gray;
+    outline: none;
+    overflow-y: hidden;
+}
+
+.chat-content {
+    overflow-y: auto; /* Enable vertical scrolling */
+    max-height: calc(100vh - 125px); /* Set a max-height for the chat container */
+    padding-right: 10px;
+    padding-left: 10px;
+}

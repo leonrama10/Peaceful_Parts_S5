@@ -1,20 +1,41 @@
 package com.brogramer.peacefulPaths.entity;
 
-import jakarta.persistence.Entity;
-import jakarta.persistence.GeneratedValue;
-import jakarta.persistence.GenerationType;
-import jakarta.persistence.Id;
+import jakarta.persistence.*;
+import org.springframework.format.annotation.DateTimeFormat;
+
+import java.time.LocalDateTime;
 
 @Entity
 public class Feedback {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
-    private Long userId;
-    private Long therapistId;
+
+    @ManyToOne
+    @JoinColumn(name = "user_id")
+    private User userId;
+
+    @ManyToOne
+    @JoinColumn(name = "therapist_id")
+    private User therapistId;
+
+    @Column(name = "feedback")
     private String feedback;
 
+    @DateTimeFormat(pattern = "yyyy,MM,dd,HH,mm,ss")
+    @Column(name = "date_added", columnDefinition="TIMESTAMP DEFAULT CURRENT_TIMESTAMP")
+    private LocalDateTime dateAdded;
+
     // Getters and setters
+
+
+    public LocalDateTime getDateAdded() {
+        return dateAdded;
+    }
+
+    public void setDateAdded(LocalDateTime dateAdded) {
+        this.dateAdded = dateAdded;
+    }
 
     public Long getId() {
         return id;
@@ -24,19 +45,19 @@ public class Feedback {
         this.id = id;
     }
 
-    public Long getUserId() {
+    public User getUserId() {
         return userId;
     }
 
-    public void setUserId(Long userId) {
+    public void setUserId(User userId) {
         this.userId = userId;
     }
 
-    public Long getTherapistId() {
+    public User getTherapistId() {
         return therapistId;
     }
 
-    public void setTherapistId(Long therapistId) {
+    public void setTherapistId(User therapistId) {
         this.therapistId = therapistId;
     }
 

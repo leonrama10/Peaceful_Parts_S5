@@ -52,28 +52,25 @@ public class TherapistSecurityConfig {
                 .sessionManagement(s -> s.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
                 .authorizeHttpRequests((requests) -> requests
                         .requestMatchers(HttpMethod.POST, "/api/auth/login","/api/auth/register","/api/auth/sendEmail","/api/auth/questionnaireAnswers").permitAll()
-//                        .requestMatchers(HttpMethod.GET, "/ws/**").permitAll()
-                        .requestMatchers(HttpMethod.PUT,"/api/auth/update","/api/auth/resetPassword").hasAnyRole("USER","THERAPIST","ADMIN")
-                        .requestMatchers(HttpMethod.GET, "/api/auth/userinfo","/api/auth/userinfoId/{id}").hasAnyRole("USER","THERAPIST","ADMIN")
+                        .requestMatchers(HttpMethod.PUT,"/api/auth/update","/api/auth/resetPassword", "/api/auth/updateBookingSession").hasAnyRole("USER","THERAPIST","ADMIN")
+                        .requestMatchers(HttpMethod.GET, "/api/auth/userinfo").hasAnyRole("USER","THERAPIST","ADMIN")
+                        .requestMatchers(HttpMethod.POST,"/api/auth/userinfoId").hasAnyRole("USER","THERAPIST","ADMIN")
                         .requestMatchers(HttpMethod.GET, "/api/auth/allUserinfo").hasAnyRole("ADMIN","THERAPIST")
-                        .requestMatchers(HttpMethod.GET, "/api/auth/userinfoId/{id}").hasAnyRole("ADMIN","THERAPIST","USER")
                         .requestMatchers(HttpMethod.DELETE, "/api/auth/deleteUser").hasRole("ADMIN")
-                        .requestMatchers(HttpMethod.POST, "/api/auth/addNewNote","/api/auth/fetchOldNotesHistory","/api/auth/fetchOldNotes","/api/auth/selectWorkDays","/api/auth/fetchWorkHours").hasRole("THERAPIST")
-                        .requestMatchers(HttpMethod.POST, "/api/auth/fetchWorkDays","/api/auth/fetchUserTherapistChats","/api/auth/sendMessage").hasAnyRole("THERAPIST","USER")
-                        .requestMatchers(HttpMethod.POST, "/api/auth/registerTherapist", "/api/auth/registerAdmin").hasRole("ADMIN")
-                        .requestMatchers(HttpMethod.GET, "/api/auth/fetchUserTherapistConnectionData/{id}").hasRole("USER")
+                        .requestMatchers(HttpMethod.DELETE,"/api/auth/deleteNote/{id}").hasRole("THERAPIST")
+                        .requestMatchers(HttpMethod.POST, "/api/auth/addNewNote","/api/auth/fetchOldNotesHistory","/api/auth/fetchOldNotes","/api/auth/sendAdviceToUser","/api/auth/fetchFeedback").hasRole("THERAPIST")
+                        .requestMatchers(HttpMethod.POST, "/api/auth/fetchUserTherapistChats","/api/auth/sendMessage","/api/auth/fetchNextBooking").hasAnyRole("THERAPIST","USER")
+                        .requestMatchers(HttpMethod.POST, "/api/auth/fetchWorkHours","/api/auth/fetchAllUsersConnectedData","/api/auth/fetchAllUsersConnectedDataHistory","/api/auth/selectWorkDays").hasAnyRole("THERAPIST","ADMIN")
+                        .requestMatchers(HttpMethod.POST, "/api/auth/fetchWorkDays","/api/auth/fetchBookingByBookingId", "/api/auth/fetchBookedHoursInEdit").hasAnyRole("THERAPIST","USER","ADMIN")
+                        .requestMatchers(HttpMethod.POST, "/api/auth/registerTherapist", "/api/auth/registerAdmin","/api/auth/fetchBookingsHistory").hasRole("ADMIN")
+                        .requestMatchers(HttpMethod.POST, "/api/auth/fetchBookings","/api/auth/fetchAllUserTherapistOldConnectionData", "/api/auth/fetchUserTherapistConnectionData").hasAnyRole("ADMIN","USER")
                         .requestMatchers(HttpMethod.DELETE, "/api/auth/deleteUser/{id}").hasAnyRole("ADMIN","THERAPIST")
+                        .requestMatchers(HttpMethod.DELETE,"/api/auth/cancelBooking").hasAnyRole("ADMIN","USER")
                         .requestMatchers(HttpMethod.GET, "/api/auth/allAdminInfo").hasRole("ADMIN")
                         .requestMatchers(HttpMethod.GET, "/api/auth/allTherapistInfo").hasAnyRole("ADMIN","USER")
-                        .requestMatchers(HttpMethod.POST, "/api/auth/fetchBookedHoursInEdit","/api/auth/fetchAllUserTherapistOldConnectionData","/api/auth/userTherapistConnection","/api/auth/therapistFilterByGenderNotConnected","/api/auth/therapistFilterByExperienceNotConnected","/api/auth/therapistFilterByLocationNotConnected","/api/auth/therapistFilterByLanguageNotConnected","/api/auth/therapistFilterByLanguage","/api/auth/therapistFilterByGetStarted","/api/auth/therapistFilterByGetStartedNotConnectedData","/api/auth/fetchAllTherapistNotConnectedData","/api/auth/therapistFilterByLocation","/api/auth/therapistFilterByExperience","/api/auth/therapistFilterByGender","/api/auth/therapistFilterByTherapistTypeNotConnected","/api/auth/therapistFilterByTherapistType","/api/auth/therapistFilterByTherapyTypeNotConnected","/api/auth/therapistFilterByTherapyType","/api/auth/therapistFilterByIdentityTypeNotConnected","/api/auth/therapistFilterByIdentityType","/api/auth/fetchAvailableSlots","/api/auth/fetchBookedHours","/api/auth/bookSession","/api/auth/fetchBookings","/api/auth/fetchNextBooking","/api/auth/fetchBookingByBookingId","/fetchAdviceForUser/{id}").hasRole("USER")
-                        .requestMatchers(HttpMethod.GET, "/api/auth/fetchUserTherapistConnectionData/{id}").hasRole("USER")
-                        .requestMatchers(HttpMethod.PUT, "/api/auth/updateBookingSession").hasRole("USER")
-                        .requestMatchers(HttpMethod.DELETE, "/api/auth/removeTherapist/{id}","/api/auth/cancelBooking").hasRole("USER")
-                        .requestMatchers(HttpMethod.GET,"/api/auth/fetchAllUsersConnectedDataHistory/{id}","/api/auth/fetchAllUsersConnectedData/{id}").hasRole("THERAPIST")
+                        .requestMatchers(HttpMethod.POST,"/api/auth/userTherapistConnection","/api/auth/therapistFilterByGenderNotConnected","/api/auth/therapistFilterByExperienceNotConnected","/api/auth/therapistFilterByLocationNotConnected","/api/auth/therapistFilterByLanguageNotConnected","/api/auth/therapistFilterByLanguage","/api/auth/therapistFilterByGetStarted","/api/auth/therapistFilterByGetStartedNotConnectedData","/api/auth/fetchAllTherapistNotConnectedData","/api/auth/therapistFilterByLocation","/api/auth/therapistFilterByExperience","/api/auth/therapistFilterByGender","/api/auth/therapistFilterByTherapistTypeNotConnected","/api/auth/therapistFilterByTherapistType","/api/auth/therapistFilterByTherapyTypeNotConnected","/api/auth/therapistFilterByTherapyType","/api/auth/therapistFilterByIdentityTypeNotConnected","/api/auth/therapistFilterByIdentityType","/api/auth/fetchAvailableSlots","/api/auth/bookSession","/api/auth/fetchAdviceForUser").hasRole("USER")
+                        .requestMatchers(HttpMethod.DELETE, "/api/auth/removeTherapist/{id}").hasRole("USER")
                         .anyRequest().authenticated());
-//                .addFilterBefore(new WebSocketAuthorizationFilter(userAuthenticationProvider), BasicAuthenticationFilter.class);
-
-
         return http.build();
     }
 

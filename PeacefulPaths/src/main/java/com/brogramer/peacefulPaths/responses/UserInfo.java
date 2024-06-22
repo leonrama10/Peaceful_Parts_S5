@@ -35,6 +35,8 @@ public class UserInfo {
     private Questionnaire questionnaire;
     @JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "yyyy-MM-dd HH:mm:ss")
     private LocalDateTime dateAdded;
+    @JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "yyyy-MM-dd HH:mm:ss")
+    private LocalDateTime removeDate;
     private Collection<TherapyType> therapyTypeTherapist;
     private TherapyType therapyTypeUser;
     private Collection<TherapistType> therapistTypeTherapist;
@@ -50,6 +52,7 @@ public class UserInfo {
     private PhysicalHealth physicalHealth;
     private RelationshipStatus relationshipStatus;
     private TherapistInfo therapistInfo;
+    private String refreshToken;
 
     public Gender getTherapistGender() {
         return therapistGender;
@@ -321,5 +324,21 @@ public class UserInfo {
 
     public void setToken(String token) {
         this.token = token;
+    }
+
+    public String getRefreshToken() {
+        return refreshToken;
+    }
+
+    public void setRefreshToken(String refreshToken) {
+        this.refreshToken = refreshToken;
+    }
+
+    public LocalDateTime getRemoveDate() {
+        return removeDate;
+    }
+
+    public void setRemoveDate(LocalDateTime removeDate) {
+        this.removeDate = removeDate;
     }
 }

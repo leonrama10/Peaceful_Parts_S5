@@ -8,18 +8,18 @@ public class Point {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private Long id;
+    private int id;
 
     @Column(name = "point")
     private String point;
 
     public Point() {}
 
-    public Point(Long id) {
+    public Point(int id) {
         this.id = id;
     }
 
-    public Point(Long id, String point) {
+    public Point(int id, String point) {
         this.id = id;
         this.point = point;
     }
@@ -32,11 +32,11 @@ public class Point {
         this.point = point;
     }
 
-    public Long getId() {
+    public int getId() {
         return id;
     }
 
-    public void setId(Long id) {
+    public void setId(int id) {
         this.id = id;
     }
 }

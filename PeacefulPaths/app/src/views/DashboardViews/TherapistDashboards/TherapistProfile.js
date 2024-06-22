@@ -5,41 +5,52 @@ import {Container, Row, Col, Form, Button} from 'react-bootstrap';
 import {
     authenticate,
     authFailure,
-    authSuccess, setLocation,
-    setTherapistAuthenticationState
+    authSuccess, setLocation
 } from "../../../redux/authActions";
-import '../../../css/sb-admin-2.min.css';
 import {Alert} from "reactstrap";
 import {connect} from "react-redux";
 import DashboardNav from "../DashboardNav";
 import SideBarTherapist from "../SideBars/SideBarTherapist";
 import {loadState, saveState} from "../../../helper/sessionStorage";
-const isTherapistAuthenticatedBoolean = loadState("isTherapistAuthenticated",false)
+import {jwtDecode} from "jwt-decode";
+import {FontAwesomeIcon} from "@fortawesome/react-fontawesome";
+import {faArrowRight, faChevronLeft, faCircleInfo} from "@fortawesome/free-solid-svg-icons";
+import Loading from "../LoadingPage";
+const getRefreshToken = () => {
+    const token = localStorage.getItem('REFRESH_TOKEN');
+
+    if (!token || token==="null") {
+        return null;
+    }
+
+    const decodedToken = jwtDecode(token);
+    const currentTime = Date.now() / 1000;
+
+    if (decodedToken.exp < currentTime) {
+        console.log("Token expired.");
+        return null;
+    } else {
+        return token;
+    }
+}
+const getAccessToken = () => {
+    const token = localStorage.getItem('USER_KEY');
+
+    if (!token || token==="null") {
+        return null;
+    }
+
+    const decodedToken = jwtDecode(token);
+    const currentTime = Date.now() / 1000;
+
+    if (decodedToken.exp < currentTime) {
+        console.log("Token expired.");
+        return null;
+    } else {
+        return token;
+    }
+}
 function TherapistProfile({loading,error,...props}){
-
-    useEffect(() => {
-        props.setLocation("/dashboard/therapistDashboard/profile")
-        if(!isTherapistAuthenticatedBoolean){
-            if (!props.isTherapistAuthenticated){
-                props.setLocation('/loginBoot')
-                props.loginFailure("Authentication Failed!!!");
-                history('/loginBoot');
-            }else{
-                props.setTherapistAuthenticationState(true)
-                saveState("isTherapistAuthenticated",props.isTherapistAuthenticated)
-            }
-        }else{
-            props.setTherapistAuthenticationState(true)
-            saveState("isTherapistAuthenticated",isTherapistAuthenticatedBoolean)
-        }
-
-        if (localStorage.getItem('reloadTherapist')==="true") {
-            // Set the 'reloaded' item in localStorage
-            localStorage.setItem('reloadTherapist', "false");
-            // Reload the page
-            window.location.reload();
-        }
-    }, []);
 
     const history = useNavigate ();
     const [data,setData]=useState({});
@@ -65,40 +76,103 @@ function TherapistProfile({loading,error,...props}){
         dateOfBirth: '',
     });
 
-    React.useEffect(()=>{
-        fetchUserData().then((response)=>{
-            if (response.data.roles.at(0).role === 'ROLE_THERAPIST'){
-                setData(response.data);
-                setValues({
-                    id:response.data.id,
-                    email: response.data.email,
-                    name: response.data.name,
-                    surname: response.data.surname,
-                    password: response.data.password,
-                    number:response.data.number,
-                    location:response.data.location,
-                    gender:response.data.gender,
-                    language:response.data.language,
-                    experience:response.data.experience,
-                    university:response.data.university,
-                    roles: response.data.roles,
-                    therapistInfo: response.data.therapistInfo,
-                    therapistTypeTherapist: response.data.therapistTypeTherapist,
-                    therapyTypeTherapist: response.data.therapyTypeTherapist,
-                    identityTypeTherapist: response.data.identityTypeTherapist,
-                    dateOfBirth: response.data.dateOfBirth
-                })
-            }
-            else{
+    useEffect(() => {
+        if(getRefreshToken()) {
+            props.setLocation("/dashboard/therapistDashboard/profile")
+            fetchUserData().then((response)=>{
+                if (response.data.roles.at(0).role === 'ROLE_THERAPIST'){
+                    
+                    saveState("role",'ROLE_THERAPIST')
+                    setData(response.data);
+                    setValues({
+                        id:response.data.id,
+                        email: response.data.email,
+                        name: response.data.name,
+                        surname: response.data.surname,
+                        password: response.data.password,
+                        number:response.data.number,
+                        location:response.data.location,
+                        gender:response.data.gender,
+                        language:response.data.language,
+                        experience:response.data.experience,
+                        university:response.data.university,
+                        roles: response.data.roles,
+                        therapistInfo: response.data.therapistInfo,
+                        therapistTypeTherapist: response.data.therapistTypeTherapist,
+                        therapyTypeTherapist: response.data.therapyTypeTherapist,
+                        identityTypeTherapist: response.data.identityTypeTherapist,
+                        dateOfBirth: response.data.dateOfBirth
+                    })
+                }
+                else{
+                    localStorage.clear();
+                    history('/loginBoot');
+                }
+            }).catch((e)=>{
                 localStorage.clear();
                 history('/loginBoot');
-            }
-        }).catch((e)=>{
-            localStorage.clear();
-            history('/loginBoot');
-        })
-    },[])
+            })
 
+            if (localStorage.getItem('reloadTherapist') === "true") {
+                let userId = loadState("chatUserId",0)
+                saveState("meetingAvailableTherapist/"+userId,false)
+                saveState("chatStateLocation",'')
+                // Set the 'reloaded' item in localStorage
+                localStorage.setItem('reloadTherapist', "false");
+                // Reload the page
+                window.location.reload();
+            }
+        }else if(getAccessToken()){
+            props.setLocation("/dashboard/therapistDashboard/profile")
+            fetchUserData().then((response)=>{
+                if (response.data.roles.at(0).role === 'ROLE_THERAPIST'){
+                    
+                    saveState("role",'ROLE_THERAPIST')
+                    setData(response.data);
+                    setValues({
+                        id:response.data.id,
+                        email: response.data.email,
+                        name: response.data.name,
+                        surname: response.data.surname,
+                        password: response.data.password,
+                        number:response.data.number,
+                        location:response.data.location,
+                        gender:response.data.gender,
+                        language:response.data.language,
+                        experience:response.data.experience,
+                        university:response.data.university,
+                        roles: response.data.roles,
+                        therapistInfo: response.data.therapistInfo,
+                        therapistTypeTherapist: response.data.therapistTypeTherapist,
+                        therapyTypeTherapist: response.data.therapyTypeTherapist,
+                        identityTypeTherapist: response.data.identityTypeTherapist,
+                        dateOfBirth: response.data.dateOfBirth
+                    })
+                }
+                else{
+                    localStorage.clear();
+                    history('/loginBoot');
+                }
+            }).catch((e)=>{
+                localStorage.clear();
+                history('/loginBoot');
+            })
+
+            if (localStorage.getItem('reloadTherapist') === "true") {
+                let userId = loadState("chatUserId",0)
+                saveState("meetingAvailableTherapist/"+userId,false)
+                saveState("chatStateLocation",'')
+                // Set the 'reloaded' item in localStorage
+                localStorage.setItem('reloadTherapist', "false");
+                // Reload the page
+                window.location.reload();
+            }
+        }else{
+            props.loginFailure("Authentication Failed!!!");
+            props.setLocation("/loginBoot")
+            history('/loginBoot');
+        }
+    }, []);
 
     const handleUpdate = (e) => {
         e.preventDefault();
@@ -204,6 +278,20 @@ function TherapistProfile({loading,error,...props}){
         }
     };
 
+    const [isLoading, setIsLoading] = useState(true);
+
+    useEffect(() => {
+        const timer = setTimeout(() => {
+            setIsLoading(false);
+        }, 1000);
+
+        return () => clearTimeout(timer);
+    }, []);
+
+    if (isLoading) {
+        return <Loading />;
+    }
+
     return (
 
         <main id="page-top">
@@ -216,28 +304,38 @@ function TherapistProfile({loading,error,...props}){
 
                     <div id="content">
 
-                        <DashboardNav data={data} setUser={props.setUser} setTherapistAuthenticationState={props.setTherapistAuthenticationState}/>
+                        <DashboardNav data={data} setUser={props.setUser} />
 
                         <div className="container-fluid" style={{marginBottom: '50px'}}>
+                            <div style={{marginLeft: "-10px", marginTop: "-15px"}}>
+                                <Link to={"/dashboard/therapistDashboard"}
+                                      className="btn goBack"
+                                      style={{color: "#0d6efd"}}
+                                      type="button"
+                                ><FontAwesomeIcon icon={faChevronLeft} style={{marginRight: "3.5px"}}/>Go to Dashboard
+                                </Link>
+                            </div>
+                            <div className="d-sm-flex align-items-center justify-content-between mb-4">
+                                <h1 className="h3 mb-0 text-800" style={{color: "#5a5c69"}}>Account Information</h1>
+                            </div>
 
-                            {/*ADD ACCOUNT FEATURES HERE: */}
-
-                            <Container>
-                                <Row className="justify-content-md-center">
-                                    <Col xs={12} md={6}>
-                                        <h2>Account Information</h2>
-                                        { updateError &&
-                                            <Alert style={{marginTop:'20px'}} variant="danger">
-                                                {updateError}
-                                            </Alert>
-                                        }
-                                        { updateSuccess &&
-                                            <Alert style={{marginTop:'20px'}} variant="success">
-                                                {updateSuccess}
-                                            </Alert>
-                                        }
-                                        <Form onSubmit={handleUpdate}>
-                                            <br/>
+                            <div style={{display: 'flex', flexDirection: 'row', justifyContent: 'center'}}>
+                                {updateError &&
+                                    <Alert style={{marginTop: '20px'}} variant="danger">
+                                        {updateError}
+                                    </Alert>
+                                }
+                                {updateSuccess &&
+                                    <Alert style={{marginTop: '20px'}} variant="success">
+                                        {updateSuccess}
+                                    </Alert>
+                                }
+                                <br/>
+                                <Form onSubmit={handleUpdate} style={{width: '100%'}}>
+                                    <br/>
+                                    <div style={{display: "flex", justifyContent: 'space-evenly'}}>
+                                        <div style={{width:"450px",paddingLeft:"5px",paddingRight:"5px"}}>
+                                            <label htmlFor="specializationSelect"><h3>My Information:</h3></label>
                                             <Form.Group controlId="formName">
                                                 <Form.Label>Name</Form.Label>
                                                 <Form.Control type="text" name="name"
@@ -293,6 +391,12 @@ function TherapistProfile({loading,error,...props}){
                                                 </Form.Select>
                                             </Form.Group>
                                             <br/>
+                                            <Form.Group controlId="formBasicAddress">
+                                                <Form.Label>Years of experience</Form.Label>
+                                                <Form.Control type="number" defaultValue={data.experience}
+                                                              onChange={handleChange} name="experience" min={0}/>
+                                            </Form.Group>
+                                            <br/>
                                             <div className="custom-checkboxes">
                                                 <label>Language</label>
                                                 <div>
@@ -328,23 +432,19 @@ function TherapistProfile({loading,error,...props}){
                                                     />
                                                     <label htmlFor="serbianCheckbox">Serbian</label>
                                                 </div>
-                                                <i>You can select more than one!</i>
+                                                <br/>
+                                                <i><FontAwesomeIcon icon={faCircleInfo} style={{
+                                                    color: "#2e81fd"
+                                                }}/>You can select more than one language!</i>
                                             </div>
-                                            <br/>
-                                            <Form.Group controlId="formBasicAddress">
-                                                <Form.Label>Years of experience</Form.Label>
-                                                <Form.Control type="number" defaultValue={data.experience}
-                                                              onChange={handleChange} name="experience" min={0}/>
-                                            </Form.Group>
-                                            <br/>
-                                            <hr/>
-                                            <br/>
-                                            <div><label htmlFor="specializationSelect"><h2>What do I
-                                                specialize
-                                                in:</h2></label>
-
+                                        </div>
+                                        <div style={{width:"350px",paddingLeft:"5px",paddingRight:"5px"}}>
+                                            <div>
+                                                <label htmlFor="specializationSelect"><h3>What do I
+                                                    specialize
+                                                    in:</h3></label>
                                                 <div className="custom-checkboxes">
-                                                    <label><h5>Therapy type:</h5></label>
+                                                    <label><h5>Therapy type</h5></label>
                                                     <div>
                                                         <input
                                                             type="checkbox"
@@ -381,9 +481,9 @@ function TherapistProfile({loading,error,...props}){
                                                         <label htmlFor="TeenCheckbox">Teen Therapy</label>
                                                     </div>
                                                 </div>
-                                                <br/>
+                                                <hr/>
                                                 <div className="custom-checkboxes">
-                                                    <label><h5>Therapist type:</h5></label>
+                                                    <label><h5>Therapist type</h5></label>
                                                     <div>
                                                         <input
                                                             type="checkbox"
@@ -421,12 +521,10 @@ function TherapistProfile({loading,error,...props}){
                                                             that teaches new skills</label>
                                                     </div>
                                                 </div>
-
-                                                <br/>
-
+                                                <hr/>
                                                 <div className="custom-checkboxes">
                                                     <label>
-                                                        <h5>Identity type:</h5>
+                                                        <h5>Identity type</h5>
                                                     </label>
                                                     <div>
                                                         <input
@@ -462,47 +560,45 @@ function TherapistProfile({loading,error,...props}){
                                                         <label htmlFor="lesbianCheckbox">Lesbian</label>
                                                     </div>
                                                 </div>
-                                                <i>You can select more than one!</i>
+                                                <br/>
+                                                <i>
+                                                    <FontAwesomeIcon icon={faCircleInfo} style={{
+                                                    color: "#2e81fd"
+                                                }}/>You can select more than one!
+                                                </i>
                                             </div>
-
-                                            <br/>
-                                            <hr/>
-
-                                            <div className="text-left" style={{padding: '10px 0'}}>
-                                                <Link className="small" to="/forgotPassBoot">Change Password</Link>
-                                            </div>
-
-                                            <hr/>
-                                            <br/>
-
+                                        </div>
+                                    </div>
+                                    <br/>
+                                    <hr/>
+                                    <br/>
+                                    <div style={{display: "flex", justifyContent: "space-between"}}>
+                                        <div className="text-left">
+                                            <Link className="small" to="/forgotPassBoot"
+                                                  style={{marginLeft: "5px", textDecoration: "none", fontSize: "15px"}}>Change
+                                                Password</Link>
+                                            <FontAwesomeIcon icon={faArrowRight} style={{
+                                                marginLeft: "5px",
+                                                fontSize: "14px",
+                                                color: "#2e81fd"
+                                            }}/>
+                                        </div>
+                                        <div>
                                             <Button variant="primary" type="submit">
-                                                Update Information
+                                                Save
                                             </Button>
-                                        </Form>
-                                    </Col>
-                                </Row>
-                            </Container>
-
+                                            <Link className="btn btn-danger" to="/dashboard/therapistDashboard"
+                                                  type={"button"}
+                                                  style={{marginLeft: "5px"}}>Cancel
+                                            </Link>
+                                        </div>
+                                    </div>
+                                </Form>
+                            </div>
                         </div>
-
                     </div>
-
                 </div>
-
             </div>
-
-            <script src="../../../vendor/jquery/jquery.min.js"></script>
-            <script src="../../../vendor/bootstrap/js/bootstrap.bundle.min.js"></script>
-
-            <script src="../../../vendor/jquery-easing/jquery.easing.min.js"></script>
-
-            <script src="../../../js/sb-admin-2.min.js"></script>
-
-            <script src="../../../vendor/chart.js/Chart.min.js"></script>
-
-            <script src="../../../js/demo/chart-area-demo.js"></script>
-            <script src="../../../js/demo/chart-pie-demo.js"></script>
-
         </main>
     )
 }
@@ -512,7 +608,6 @@ const mapStateToProps = ({auth}) => {
     return {
         loading: auth.loading,
         error: auth.error,
-        isTherapistAuthenticated: auth.isTherapistAuthenticated,
         location: auth.location
     }
 }
@@ -521,8 +616,7 @@ const mapDispatchToProps = (dispatch) => {
         authenticate: () => dispatch(authenticate()),
         setUser: (data) => dispatch(authSuccess(data)),
         loginFailure: (message) => dispatch(authFailure(message)),
-        setTherapistAuthenticationState: (boolean) => dispatch(setTherapistAuthenticationState(boolean)),
         setLocation: (path) => dispatch(setLocation(path))
     }
 }
-export default connect(mapStateToProps,mapDispatchToProps)(TherapistProfile);
+export default connect(mapStateToProps, mapDispatchToProps)(TherapistProfile);

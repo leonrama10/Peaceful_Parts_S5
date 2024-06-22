@@ -52,7 +52,7 @@ public class UserDto {
     private TherapistInfo therapistInfo;
     @JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "yyyy-MM-dd HH:mm:ss")
     private LocalDateTime dateAdded;
-
+    private String refreshToken;
 
 
     public University getUniversity() {
@@ -326,5 +326,13 @@ public class UserDto {
 
     public void setDateAdded(LocalDateTime dateAdded) {
         this.dateAdded = dateAdded;
+    }
+
+    public String getRefreshToken() {
+        return refreshToken;
+    }
+
+    public void setRefreshToken(String refreshToken) {
+        this.refreshToken = refreshToken;
     }
 }

@@ -63,8 +63,7 @@ public class User {
     @Column(name = "date_added", columnDefinition="TIMESTAMP DEFAULT CURRENT_TIMESTAMP")
     private LocalDateTime dateAdded;
 
-//    @Column(name = "token")
-    @Transient
+    @Column(name = "token")
     private String token;
 
     @ManyToMany(fetch = FetchType.EAGER, cascade = CascadeType.ALL)
@@ -139,6 +138,8 @@ public class User {
         allRoles.add(ROLE_MANAGER);
         return allRoles;
     }
+
+
 
     public TherapistInfo getTherapistInfo() {
         return therapistInfo;

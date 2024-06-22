@@ -324,9 +324,10 @@ CREATE TABLE `user` (
   `surname` varchar(45) DEFAULT NULL,
   `date_of_birth` DATE DEFAULT NULL,
   `email` varchar(45) DEFAULT NULL,
-  `number` varchar(9) DEFAULT NULL,
+  `number` varchar(12) DEFAULT NULL,
   `experience` int NOT NULL DEFAULT 0,
   `reset_token` varchar(255) DEFAULT NULL,
+  `token` varchar(255) DEFAULT NULL,
   `expiration_time` long,
   `password` char(68) NOT NULL,
   `questionnaire_id` int(11),
@@ -344,15 +345,15 @@ CREATE TABLE `user` (
 ) AUTO_INCREMENT=1;
 
 -- Admin-- 
-INSERT INTO `user` (`name`, `surname`, `email`, `number`, `password`, `reset_token`, `expiration_time`, `gender_id`)
+INSERT INTO `user` (`name`, `surname`, `email`, `number`, `password`, `reset_token`, `expiration_time`, `gender_id`,`token`)
 VALUES
-('Leke', 'Markaj', 'markaj.leka@gmail.com', '044806543', '$2a$10$lAZ7fMTXoALYWY.C4rAs7u7Bdzz4qd7SIwAkWNOX5XQkTRe7vo4P.', NULL, 0, 1);
+('Leke', 'Markaj', 'markaj.leka@gmail.com', '044806543', '$2a$10$lAZ7fMTXoALYWY.C4rAs7u7Bdzz4qd7SIwAkWNOX5XQkTRe7vo4P.', NULL, 0, 1,NULL);
 
 -- Therapist -- 
-INSERT INTO `user` (`name`, `surname`, `email`, `number`, `experience`, `password`, `reset_token`, `expiration_time`, `location_id`, `gender_id`, `university_id`, `date_of_birth`,`therapist_info_id`)
+INSERT INTO `user` (`name`, `surname`, `email`, `number`, `experience`, `password`, `reset_token`, `expiration_time`, `location_id`, `gender_id`, `university_id`, `date_of_birth`,`therapist_info_id`,`token`)
 VALUES
-('Loren', 'Markaj', 'markaj.loren@gmail.com', '044333333', 1, '$2a$10$lAZ7fMTXoALYWY.C4rAs7u7Bdzz4qd7SIwAkWNOX5XQkTRe7vo4P.', NULL, 0, 1, 1, 1, '1995-08-20',1),
-('Leon', 'Markaj', 'markaj.leon@gmail.com', '044111111', 15, '$2a$10$lAZ7fMTXoALYWY.C4rAs7u7Bdzz4qd7SIwAkWNOX5XQkTRe7vo4P.', NULL, 0, 2, 2, 2, '1988-03-10',2);
+('Loren', 'Markaj', 'markaj.loren@gmail.com', '044333333', 1, '$2a$10$lAZ7fMTXoALYWY.C4rAs7u7Bdzz4qd7SIwAkWNOX5XQkTRe7vo4P.', NULL, 0, 1, 1, 1, '1995-08-20',1,NULL),
+('Leon', 'Markaj', 'markaj.leon@gmail.com', '044111111', 15, '$2a$10$lAZ7fMTXoALYWY.C4rAs7u7Bdzz4qd7SIwAkWNOX5XQkTRe7vo4P.', NULL, 0, 2, 2, 2, '1988-03-10',2,NULL);
 
 CREATE TABLE `roles` (
   `id` int(11) NOT NULL AUTO_INCREMENT, 
@@ -446,6 +447,7 @@ CREATE TABLE `user_connections` (
   `id` int(11) NOT NULL AUTO_INCREMENT,
   `user_id` int(11) NOT NULL unique,
   `connected_user_id` int(11) NOT NULL,
+  `date_added` TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
   PRIMARY KEY (`id`),
   FOREIGN KEY (`user_id`) REFERENCES `user`(`id`) ON DELETE CASCADE,
   FOREIGN KEY (`connected_user_id`) REFERENCES `user`(`id`) ON DELETE CASCADE
@@ -459,9 +461,10 @@ CREATE TABLE `user_connections_history` (
   `user_id` int(11) NOT NULL ,
   `connected_user_id` int(11) NOT NULL,
   `date_added` TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+  `remove_date` TIMESTAMP DEFAULT NULL,
   PRIMARY KEY (`id`),
-  FOREIGN KEY (`user_id`) REFERENCES `user`(`id`) ON DELETE CASCADE,
-  FOREIGN KEY (`connected_user_id`) REFERENCES `user`(`id`) ON DELETE CASCADE
+  FOREIGN KEY (`user_id`) REFERENCES `user`(`id`) ,
+  FOREIGN KEY (`connected_user_id`) REFERENCES `user`(`id`) 
 ) AUTO_INCREMENT=1;
 
 SET FOREIGN_KEY_CHECKS = 0;
@@ -478,8 +481,9 @@ DROP TABLE IF EXISTS `main_points`;
 SET FOREIGN_KEY_CHECKS = 1;
 CREATE TABLE `main_points` (
     `id` INT AUTO_INCREMENT,
-    PRIMARY KEY (`id`)
+    PRIMARY KEY (`id`) 
 ) AUTO_INCREMENT=1;
+
 
 SET FOREIGN_KEY_CHECKS = 0;
 DROP TABLE IF EXISTS `main_points_point`;
@@ -512,7 +516,7 @@ CREATE TABLE `notes` (
     `main_points_id` int(11),
     `date_added` TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
     PRIMARY KEY (`id`),
-    FOREIGN KEY (`main_points_id`) REFERENCES `main_points`(`id`) ON DELETE CASCADE
+    FOREIGN KEY (`main_points_id`) REFERENCES `main_points`(`id`) ON DELETE CASCADE on update cascade
 ) AUTO_INCREMENT=1;
 
 SET FOREIGN_KEY_CHECKS = 0;
@@ -525,9 +529,9 @@ CREATE TABLE `therapist_notes` (
 	`therapist_id` int(11) NOT NULL,
     `date_added` TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
     PRIMARY KEY (`id`),
-    FOREIGN KEY (`client_id`) REFERENCES `user`(`id`) ON DELETE CASCADE ,
+    FOREIGN KEY (`client_id`) REFERENCES `user`(`id`),
     FOREIGN KEY (`notes_id`) REFERENCES `notes`(`id`) ON DELETE CASCADE on update cascade,
-	FOREIGN KEY (`therapist_id`) REFERENCES `user`(`id`) ON DELETE CASCADE
+	FOREIGN KEY (`therapist_id`) REFERENCES `user`(`id`) 
 ) AUTO_INCREMENT=1;
 
 SET FOREIGN_KEY_CHECKS = 0;
@@ -541,8 +545,8 @@ CREATE TABLE `therapist_notes_history` (
     `date_added` TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
     PRIMARY KEY (`id`),
     FOREIGN KEY (`notes_id`) REFERENCES `notes`(`id`) ON DELETE CASCADE on update cascade,
-	FOREIGN KEY (`client_id`) REFERENCES `user`(`id`) ON DELETE CASCADE,
-	FOREIGN KEY (`therapist_id`) REFERENCES `user`(`id`) ON DELETE CASCADE
+	FOREIGN KEY (`client_id`) REFERENCES `user`(`id`) ,
+	FOREIGN KEY (`therapist_id`) REFERENCES `user`(`id`) 
 ) AUTO_INCREMENT=1;
 
 SET FOREIGN_KEY_CHECKS = 0;
@@ -629,9 +633,25 @@ CREATE TABLE `bookings` (
     `client_id` int(11),
     `date` Date NOT NULL,
     `hour` TIME NOT NULL,
+    `end_session_boolean` boolean NOT NULL default 0,
     `therapist_work_days_id` int(11), 
     PRIMARY KEY (id),
     FOREIGN KEY (`therapist_work_days_id`) REFERENCES `therapist_work_days`(`id`) ON DELETE CASCADE on update cascade
+);
+
+SET FOREIGN_KEY_CHECKS = 0;
+DROP TABLE IF EXISTS `bookings_history`;
+SET FOREIGN_KEY_CHECKS = 1;
+CREATE TABLE `bookings_history` (
+    `id` INT AUTO_INCREMENT,
+    `client_id` int(11),
+    `date` Date NOT NULL,
+    `hour` TIME NOT NULL,
+    `end_session_boolean` boolean NOT NULL default 0,
+    `therapist_work_days_id` int(11),
+    `canceled` boolean default 0,
+    PRIMARY KEY (id),
+    FOREIGN KEY (`therapist_work_days_id`) REFERENCES `therapist_work_days`(`id`)
 );
 
 SET FOREIGN_KEY_CHECKS = 0;
@@ -665,11 +685,11 @@ CREATE TABLE `chat_message` (
   
   CONSTRAINT `FK_CHAT_MESSAGE` FOREIGN KEY (`chat_id`) 
   REFERENCES `chat` (`id`) 
-  ON DELETE CASCADE ON UPDATE CASCADE,
+	ON UPDATE CASCADE,
   
   CONSTRAINT `FK_MESSAGE_CHAT` FOREIGN KEY (`message_id`) 
   REFERENCES `message` (`id`) 
-  ON DELETE CASCADE ON UPDATE CASCADE
+   ON UPDATE CASCADE
 ) ENGINE=InnoDB DEFAULT CHARSET=latin1;
 
 SET FOREIGN_KEY_CHECKS = 0;
@@ -681,7 +701,33 @@ CREATE TABLE `user_therapist_messages` (
   `therapist_id` int(11) NOT NULL,
   `chat_id` int(11) NOT NULL,
   PRIMARY KEY (`id`),
-  FOREIGN KEY (`user_id`) REFERENCES `user`(`id`) ON DELETE CASCADE,
-  FOREIGN KEY (`therapist_id`) REFERENCES `user`(`id`) ON DELETE CASCADE,
-  FOREIGN KEY (`chat_id`) REFERENCES `chat`(`id`) ON DELETE CASCADE
+  FOREIGN KEY (`user_id`) REFERENCES `user`(`id`) ,
+  FOREIGN KEY (`therapist_id`) REFERENCES `user`(`id`),
+  FOREIGN KEY (`chat_id`) REFERENCES `chat`(`id`) 
 ) AUTO_INCREMENT=1;
+
+SET FOREIGN_KEY_CHECKS = 0;
+DROP TABLE IF EXISTS `feedback`;
+SET FOREIGN_KEY_CHECKS = 1;
+CREATE TABLE `feedback` (
+  `id` INT AUTO_INCREMENT PRIMARY KEY,
+  `user_id` INT(11) NOT NULL,
+  `therapist_id` INT(11) NOT NULL,
+  `feedback` VARCHAR(255) NOT NULL,
+  `date_added` TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+  FOREIGN KEY (`user_id`) REFERENCES `user`(`id`) ON DELETE CASCADE,
+  FOREIGN KEY (`therapist_id`) REFERENCES `user`(`id`) ON DELETE CASCADE
+);
+
+SET FOREIGN_KEY_CHECKS = 0;
+DROP TABLE IF EXISTS `advice`;
+SET FOREIGN_KEY_CHECKS = 1;
+CREATE TABLE `advice` (
+  `id` INT AUTO_INCREMENT PRIMARY KEY,
+  `user_id` INT(11) NOT NULL,
+  `therapist_id` INT(11) DEFAULT 0,
+  `advice_text` VARCHAR(255) NOT NULL,
+  `date_added` TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+  FOREIGN KEY (`user_id`) REFERENCES `user`(`id`) ON DELETE CASCADE,
+  FOREIGN KEY (`therapist_id`) REFERENCES `user`(`id`) ON DELETE CASCADE
+);

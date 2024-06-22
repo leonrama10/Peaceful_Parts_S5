@@ -5,35 +5,55 @@ import {Container, Row, Col, Form, Button} from 'react-bootstrap';
 import {
     authenticate,
     authFailure,
-    authSuccess,
-    setAdminAuthenticationState
+    authSuccess
 } from "../../../redux/authActions";
-import '../../../css/sb-admin-2.min.css';
 import {Alert} from "reactstrap";
 import {connect} from "react-redux";
 import DashboardNav from "../DashboardNav";
 import SideBarAdmin from "../SideBars/SideBarAdmin";
 import {loadState, saveState} from "../../../helper/sessionStorage";
-const isAdminAuthenticatedBoolean = loadState("isAdminAuthenticated",false)
-function AdminProfile({loading,error,...props}){
+import {jwtDecode} from "jwt-decode";
+import {FontAwesomeIcon} from "@fortawesome/react-fontawesome";
+import {faArrowRight, faChevronLeft} from "@fortawesome/free-solid-svg-icons";
+import Loading from "../LoadingPage";
+const getRefreshToken = () => {
+    const token = localStorage.getItem('REFRESH_TOKEN');
 
-    useEffect(() => {
-        if(!isAdminAuthenticatedBoolean){
-            if (!props.isAdminAuthenticated){
-                props.loginFailure("Authentication Failed!!!");
-                history('/loginBoot');
-            }else{
-                saveState("isAdminAuthenticated",props.isAdminAuthenticated)
-            }
-        }else{
-            saveState("isAdminAuthenticated",isAdminAuthenticatedBoolean)
-        }
-    }, []);
+    if (!token || token==="null") {
+        return null;
+    }
+
+    const decodedToken = jwtDecode(token);
+    const currentTime = Date.now() / 1000;
+
+    if (decodedToken.exp < currentTime) {
+        console.log("Token expired.");
+        return null;
+    } else {
+        return token;
+    }
+}
+const getAccessToken = () => {
+    const token = localStorage.getItem('USER_KEY');
+
+    if (!token || token==="null") {
+        return null;
+    }
+
+    const decodedToken = jwtDecode(token);
+    const currentTime = Date.now() / 1000;
+
+    if (decodedToken.exp < currentTime) {
+        console.log("Token expired.");
+        return null;
+    } else {
+        return token;
+    }
+}
+function AdminProfile({loading,error,...props}){
 
     const history = useNavigate ();
     const [data,setData]=useState({});
-    const [updateError,setUpdateError]=useState('');
-    const [updateSuccess,setUpdateSuccess]=useState('');
     const [values, setValues] = useState({
         id:0,
         email: '',
@@ -43,39 +63,71 @@ function AdminProfile({loading,error,...props}){
         number:'',
         location:{},
         gender:{},
-        language:[],
-        roles:[],
-        experience:0,
+        roles:[]
     });
 
-    React.useEffect(()=>{
-        fetchUserData().then((response)=>{
-            if (response.data.roles.at(0).role === 'ROLE_ADMIN'){
-                setData(response.data);
-                setValues({
-                    id:response.data.id,
-                    email: response.data.email,
-                    name: response.data.name,
-                    surname: response.data.surname,
-                    roles: response.data.roles,
-                    password: response.data.password,
-                    number:response.data.number,
-                    location:response.data.location,
-                    gender:response.data.gender,
-                    language:response.data.language,
-                    experience:response.data.experience,
-                })
-            }
-            else{
-                localStorage.clear();
+    useEffect(() => {
+        if(getRefreshToken()) {
+            fetchUserData().then((response) => {
+                if (response.data.roles.at(0)){
+                    if (response.data.roles.at(0).role === 'ROLE_ADMIN') {
+                        setData(response.data);
+                        setValues({
+                            id:response.data.id,
+                            email: response.data.email,
+                            name: response.data.name,
+                            surname: response.data.surname,
+                            roles: response.data.roles,
+                            password: response.data.password,
+                            number:response.data.number,
+                            location:response.data.location,
+                            gender:response.data.gender,
+                            language:response.data.language,
+                            experience:response.data.experience,
+                        })
+                        
+                        saveState("role",'ROLE_ADMIN')
+                    }
+                }
+            }).catch((e) => {
                 history('/loginBoot');
-            }
-        }).catch((e)=>{
-            localStorage.clear();
+            });
+        }else if(getAccessToken()){
+            fetchUserData().then((response) => {
+                if (response.data.roles.at(0)){
+                    if (response.data.roles.at(0).role === 'ROLE_ADMIN') {
+                        setData(response.data);
+                        setValues({
+                            id:response.data.id,
+                            email: response.data.email,
+                            name: response.data.name,
+                            surname: response.data.surname,
+                            roles: response.data.roles,
+                            password: response.data.password,
+                            number:response.data.number,
+                            location:response.data.location,
+                            gender:response.data.gender,
+                            language:response.data.language,
+                            experience:response.data.experience,
+                        })
+                        
+                        saveState("role",'ROLE_ADMIN')
+                    }
+                }
+            }).catch((e) => {
+                history('/loginBoot');
+            });
+        }
+        else{
+            props.loginFailure("Authentication Failed!!!");
+            props.setLocation("/loginBoot")
             history('/loginBoot');
-        })
-    },[])
+        }
+    }, []);
 
+
+    const [updateError,setUpdateError]=useState('');
+    const [updateSuccess,setUpdateSuccess]=useState('');
 
     const handleUpdate = (e) => {
         e.preventDefault();
@@ -89,11 +141,8 @@ function AdminProfile({loading,error,...props}){
             else{
                 props.loginFailure('Something LEKAAAAAAA!Please Try Again');
             }
-
         }).catch((err)=>{
-
             if(err && err.response){
-
                 switch(err.response.status){
                     case 401:
                         console.log("401 status");
@@ -101,15 +150,12 @@ function AdminProfile({loading,error,...props}){
                         break;
                     default:
                         props.loginFailure('Something BABAAAAAA!Please Try Again');
-
                 }
-
             }
             else{
                 console.log("ERROR: ",err)
                 props.loginFailure('Something NaNAAAAA!Please Try Again');
             }
-
         });
     };
 
@@ -140,6 +186,20 @@ function AdminProfile({loading,error,...props}){
         }
     };
 
+    const [isLoading, setIsLoading] = useState(true);
+
+    useEffect(() => {
+        const timer = setTimeout(() => {
+            setIsLoading(false);
+        }, 1000);
+
+        return () => clearTimeout(timer);
+    }, []);
+
+    if (isLoading) {
+        return <Loading />;
+    }
+
     return (
         <main id="page-top">
 
@@ -151,23 +211,30 @@ function AdminProfile({loading,error,...props}){
 
                     <div id="content">
 
-                        <DashboardNav data={data} setUser={props.setUser} setAdminAuthenticationState={props.setAdminAuthenticationState}/>
+                        <DashboardNav data={data} setUser={props.setUser} />
 
                         <div className="container-fluid">
-
-                            {/*ADD ACCOUNT FEATURES HERE: */}
-
+                            <div style={{marginLeft: "-10px", marginTop: "-15px"}}>
+                                <Link to={"/dashboard/adminDashboard"}
+                                      className="btn goBack"
+                                      style={{color: "#0d6efd"}}
+                                      type="button"
+                                ><FontAwesomeIcon icon={faChevronLeft} style={{marginRight: "3.5px"}}/>Go to Dashboard
+                                </Link>
+                            </div>
+                            <div className="d-sm-flex align-items-center justify-content-between mb-4">
+                                <h1 className="h3 mb-0 text-800" style={{color: "#5a5c69"}}>Account Information</h1>
+                            </div>
                             <Container>
                                 <Row className="justify-content-md-center">
                                     <Col xs={12} md={6}>
-                                        <h2>Account Information</h2>
-                                        { updateError &&
-                                            <Alert style={{marginTop:'20px'}} variant="danger">
+                                        {updateError &&
+                                            <Alert style={{marginTop: '20px'}} variant="danger">
                                                 {updateError}
                                             </Alert>
                                         }
-                                        { updateSuccess &&
-                                            <Alert style={{marginTop:'20px'}} variant="success">
+                                        {updateSuccess &&
+                                            <Alert style={{marginTop: '20px'}} variant="success">
                                                 {updateSuccess}
                                             </Alert>
                                         }
@@ -178,37 +245,41 @@ function AdminProfile({loading,error,...props}){
                                                               defaultValue={data.name} onChange={handleChange}
                                                               required/>
                                             </Form.Group>
-
+                                            <br/>
                                             <Form.Group controlId="formSurname">
                                                 <Form.Label>Surname</Form.Label>
                                                 <Form.Control type="text" name="surname"
                                                               defaultValue={data.surname} onChange={handleChange}
                                                               required/>
                                             </Form.Group>
-
+                                            <br/>
                                             <Form.Group controlId="formBasicEmail">
                                                 <Form.Label>Email address</Form.Label>
                                                 <Form.Control type="email" name="email" defaultValue={data.email}
                                                               onChange={handleChange} required/>
                                             </Form.Group>
-
+                                            <br/>
                                             <Form.Group controlId="formBasicGender">
                                                 <Form.Label>Gender</Form.Label>
-                                                <Form.Select name="gender" value={values.gender ? `${values.gender.id}-${values.gender.gender}` : ''} onChange={handleChange} required>
+                                                <Form.Select name="gender"
+                                                             value={values.gender ? `${values.gender.id}-${values.gender.gender}` : ''}
+                                                             onChange={handleChange} required>
                                                     <option value="1-M">Male</option>
                                                     <option value="2-F">Female</option>
                                                 </Form.Select>
                                             </Form.Group>
-
+                                            <br/>
                                             <Form.Group controlId="formBasicPhone">
                                                 <Form.Label>Phone</Form.Label>
                                                 <Form.Control type="tel" defaultValue={data.number}
                                                               onChange={handleChange} name="number"/>
                                             </Form.Group>
-
+                                            <br/>
                                             <Form.Group controlId="formBasicAddress">
                                                 <Form.Label>Location</Form.Label>
-                                                <Form.Select name="location" value={values.location ? `${values.location.id}-${values.location.location}` : ''} onChange={handleChange} required>
+                                                <Form.Select name="location"
+                                                             value={values.location ? `${values.location.id}-${values.location.location}` : ''}
+                                                             onChange={handleChange} required>
                                                     <option value="1-Kosovo">Kosovo</option>
                                                     <option value="2-Albania">Albania</option>
                                                     <option value="3-Montenegro">Montenegro</option>
@@ -216,109 +287,38 @@ function AdminProfile({loading,error,...props}){
                                                     <option value="5-Serbia">Serbia</option>
                                                 </Form.Select>
                                             </Form.Group>
+                                            <br/>
+                                            <div style={{
+                                                display: "flex",
+                                                justifyContent: "space-between",
+                                                alignItems: "center"
+                                            }}>
+                                                <div className="text-left" style={{padding: '10px 0'}}>
+                                                    <Link className="small" to="/forgotPassBoot"
+                                                          style={{textDecoration: "none"}}>Change Password</Link>
+                                                    <FontAwesomeIcon icon={faArrowRight} style={{
+                                                        marginLeft: "5px",
+                                                        fontSize: "13px",
+                                                        color: "#2e81fd"
+                                                    }}/>
+                                                </div>
 
-                                            <div className="custom-checkboxes">
-                                                <label>Language</label>
-                                                <div>
-                                                    <input
-                                                        type="checkbox"
-                                                        id="albanianCheckbox"
-                                                        name="language"
-                                                        value="1-Albanian"
-                                                        checked={values.language.some(lang => lang.id === 1)}
-                                                        onChange={handleChange}
-                                                    />
-                                                    <label htmlFor="albanianCheckbox">Albanian</label>
-                                                </div>
-                                                <div>
-                                                    <input
-                                                        type="checkbox"
-                                                        id="albanianCheckbox"
-                                                        name="language"
-                                                        value="2-English"
-                                                        checked={values.language.some(lang => lang.id === 2)}
-                                                        onChange={handleChange}
-                                                    />
-                                                    <label htmlFor="englishCheckbox">English</label>
-                                                </div>
-                                                <div>
-                                                    <input
-                                                        type="checkbox"
-                                                        id="albanianCheckbox"
-                                                        name="language"
-                                                        value="3-Serbian"
-                                                        checked={values.language.some(lang => lang.id === 3)}
-                                                        onChange={handleChange}
-                                                    />
-                                                    <label htmlFor="serbianCheckbox">Serbian</label>
+                                                <div style={{display: "flex", justifyContent: "end"}}>
+                                                    <Button variant="primary" type="submit">
+                                                        Save
+                                                    </Button>
+                                                    <Link className="btn btn-danger" to="/dashboard/adminDashboard"
+                                                          type={"button"} style={{marginLeft: "5px"}}>Cancel</Link>
                                                 </div>
                                             </div>
-
-                                            <div className="text-left" style={{padding: '10px 0'}}>
-                                                <Link className="small" to="/forgotPassBoot">Forgot Password?</Link>
-                                            </div>
-
-                                            <Button variant="primary" type="submit">
-                                                Update Information
-                                            </Button>
                                         </Form>
                                     </Col>
                                 </Row>
                             </Container>
-
-                        </div>
-
-                    </div>
-
-                    <footer className="sticky-footer bg-white">
-                        <div className="container my-auto">
-                            <div className="copyright text-center my-auto">
-                                <span style={{color: 'grey'}}>Copyright &copy; PeacefulParts 2024</span>
-                            </div>
-                        </div>
-                    </footer>
-
-                </div>
-
-            </div>
-
-            <a className="scroll-to-top rounded" href="#page-top">
-                <i className="fas fa-angle-up"></i>
-            </a>
-
-            <div className="modal fade" id="logoutModal" tabIndex="-1" role="dialog" aria-labelledby="exampleModalLabel"
-                 aria-hidden="true">
-                <div className="modal-dialog" role="document">
-                    <div className="modal-content">
-                        <div className="modal-header">
-                            <h5 className="modal-title" id="exampleModalLabel">Ready to Leave?</h5>
-                            <button className="close" type="button" data-dismiss="modal" aria-label="Close">
-                                <span aria-hidden="true">×</span>
-                            </button>
-                        </div>
-                        <div className="modal-body">Select "Logout" below if you are ready to end your current
-                            session.
-                        </div>
-                        <div className="modal-footer">
-                            <button className="btn btn-secondary" type="button" data-dismiss="modal">Cancel</button>
-                            <Link className="btn btn-primary" to="/loginBoot">Logout</Link>
                         </div>
                     </div>
                 </div>
             </div>
-
-            <script src="../../../vendor/jquery/jquery.min.js"></script>
-            <script src="../../../vendor/bootstrap/js/bootstrap.bundle.min.js"></script>
-
-            <script src="../../../vendor/jquery-easing/jquery.easing.min.js"></script>
-
-            <script src="../../../js/sb-admin-2.min.js"></script>
-
-            <script src="../../../vendor/chart.js/Chart.min.js"></script>
-
-            <script src="../../../js/demo/chart-area-demo.js"></script>
-            <script src="../../../js/demo/chart-pie-demo.js"></script>
-
         </main>
     )
 }
@@ -327,16 +327,14 @@ const mapStateToProps = ({auth}) => {
     console.log("state ", auth)
     return {
         loading: auth.loading,
-        error: auth.error,
-        isAdminAuthenticated: auth.isAdminAuthenticated
+        error: auth.error
     }
 }
 const mapDispatchToProps = (dispatch) => {
     return {
         authenticate: () => dispatch(authenticate()),
         setUser: (data) => dispatch(authSuccess(data)),
-        loginFailure: (message) => dispatch(authFailure(message)),
-        setAdminAuthenticationState: (boolean) => dispatch(setAdminAuthenticationState(boolean))
+        loginFailure: (message) => dispatch(authFailure(message))
     }
 }
 export default connect(mapStateToProps, mapDispatchToProps)(AdminProfile);

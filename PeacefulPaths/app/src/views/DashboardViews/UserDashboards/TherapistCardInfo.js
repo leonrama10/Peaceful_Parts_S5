@@ -1,26 +1,71 @@
 import React, {useEffect, useState} from 'react';
-import {fetchUserData, fetchUserDataId, removeTherapist, userTherapistConnection} from '../../../api/authService';
-import {Link, useNavigate, useParams} from 'react-router-dom';
-import '../../../css/sb-admin-2.css';
+import {
+    fetchNextBooking,
+    fetchUserData,
+    fetchUserDataId,
+    removeTherapist,
+    userTherapistConnection
+} from '../../../api/authService';
+import {Link, useNavigate} from 'react-router-dom';
 import DashboardNav from "../DashboardNav";
 import {
     authenticate,
     authFailure,
-    authSuccess, setLocation,
-    setUserAuthenticationState
+    authSuccess, setLocation
 } from "../../../redux/authActions";
 import {connect} from "react-redux";
 import SideBarUser from "../SideBars/SideBarUser";
 import {loadState, saveState} from "../../../helper/sessionStorage";
-let connected = null;
-const isUserAuthenticatedBoolean = loadState("isUserAuthenticated",false)
-function TherapistCardInfo({loading,error,...props}){
+import {jwtDecode} from "jwt-decode";
+import "../../../css/TherapistCardInfo.css"
+import malePhoto from "../../../img/Depositphotos_484354208_S.jpg"
+import femalePhoto from "../../../img/person-gray-photo-placeholder-woman-600nw-1241538838.webp"
+import {FontAwesomeIcon} from "@fortawesome/react-fontawesome";
+import {faChevronLeft, faUserPlus} from "@fortawesome/free-solid-svg-icons";
+import '../../../css/PopupStyles.css';
+const getRefreshToken = () => {
+    const token = localStorage.getItem('REFRESH_TOKEN');
 
+    if (!token || token==="null") {
+        return null;
+    }
+
+    const decodedToken = jwtDecode(token);
+    const currentTime = Date.now() / 1000;
+
+    if (decodedToken.exp < currentTime) {
+        console.log("Token expired.");
+        return null;
+    } else {
+        return token;
+    }
+}
+const getAccessToken = () => {
+    const token = localStorage.getItem('USER_KEY');
+
+    if (!token || token==="null") {
+        return null;
+    }
+
+    const decodedToken = jwtDecode(token);
+    const currentTime = Date.now() / 1000;
+
+    if (decodedToken.exp < currentTime) {
+        console.log("Token expired.");
+        return null;
+    } else {
+        return token;
+    }
+}
+let connected = false;
+let therapistInfoId = 0;
+let connectId = false
+function TherapistCardInfo({loading,error,...props}){
     const history = useNavigate ();
     const [data,setData]=useState({});
-    const { id } = useParams();
-    const idNumber = Number(id);
     const [hideFilterMenu,setHideFilterMenu]=useState(true);
+    const [bookingExists,setBookingExists]=useState(false);
+    const [nextBooking,setNextBooking]=useState({});
     const [therapistData, setTherapistData] = useState({
         id:0,
         email: '',
@@ -33,94 +78,225 @@ function TherapistCardInfo({loading,error,...props}){
         location:{},
         gender:{},
         language:[],
-        allRoles:[]
+        allRoles:[],
+        university: {},
+        therapyTypeTherapist:[],
+        therapistTypeTherapist:[],
+        identityTypeTherapist:[]
     });
-
     const [userTherapistValues, setUserTherapistValues] = useState({
         userId:0,
         therapistId:0
     })
 
     useEffect(() => {
-        props.setLocation("/dashboard/userDashboard/therapistInfo/"+idNumber)
-        if(!isUserAuthenticatedBoolean){
-            if (!props.isUserAuthenticated){
-                props.loginFailure("Authentication Failed!!!");
-                props.setLocation("/loginBoot")
+        therapistInfoId = loadState("therapistInfoId",0)
+        connectId = loadState("connected/id:"+therapistInfoId,false)
+        connected = loadState("connected",false)
+        if(getRefreshToken()) {
+            props.setLocation("/dashboard/userDashboard/therapistInfo")
+            fetchUserData().then((response)=>{
+                if (response.data.roles.at(0).role === 'ROLE_USER'){
+                    saveState("role",'ROLE_USER')
+                    setData(response.data);
+                    setUserTherapistValues(data => {
+                        return {
+                            ...data,
+                            userId: response.data.id
+                        };
+                    });
+
+                        if (connected) {
+                            fetchNextBooking({clientId: response.data.id, therapistId: therapistInfoId}).then((response) => {
+                                if (response.data.bookingId !== 0) {
+                                    setBookingExists(true)
+                                    setNextBooking(response.data)
+                                }
+                            }).catch((e) => {
+                                history('/loginBoot');
+                            });
+                        }
+
+                        fetchUserDataId({id: therapistInfoId}).then((response) => {
+                            if (response.data.roles.at(0).role === 'ROLE_THERAPIST') {
+                                setTherapistData({
+                                    id: response.data.id,
+                                    email: response.data.email,
+                                    name: response.data.name,
+                                    surname: response.data.surname,
+                                    password: response.data.password,
+                                    roles: response.data.roles,
+                                    number: response.data.number,
+                                    experience: response.data.experience,
+                                    location: response.data.location,
+                                    gender: response.data.gender,
+                                    language: response.data.language,
+                                    allRoles: response.data.allRoles,
+                                    university: response.data.university,
+                                    therapyTypeTherapist: response.data.therapyTypeTherapist,
+                                    therapistTypeTherapist: response.data.therapistTypeTherapist,
+                                    identityTypeTherapist: response.data.identityTypeTherapist
+                                })
+
+                                //problemi munet me kon te qikjo setUserThreapistValues nese ka naj error :)
+                                setUserTherapistValues(data => {
+                                    return {
+                                        ...data,
+                                        therapistId: response.data.id
+                                    };
+                                });
+                                connected = loadState("connected", false)
+                            } else {
+                                localStorage.clear();
+                                history('/loginBoot');
+                            }
+                        }).catch((e) => {
+                            localStorage.clear();
+                            history('/loginBoot');
+                        })
+                }
+                else{
+                    history('/loginBoot');
+                }
+            }).catch((e)=>{
+                localStorage.clear();
                 history('/loginBoot');
-            }else{
-                props.setUserAuthenticationState(true)
-                saveState("isUserAuthenticated",props.isUserAuthenticated)
+            })
+
+            if (localStorage.getItem('reloadUser') === "true") {
+                saveState("chatStateLocation",'')
+                // Set the 'reloaded' item in localStorage
+                localStorage.setItem('reloadUser', "false");
+                // Reload the page
+                window.location.reload();
+            }
+        }else if(getAccessToken()){
+            props.setLocation("/dashboard/userDashboard/therapistInfo")
+            fetchUserData().then((response)=>{
+                if (response.data.roles.at(0).role === 'ROLE_USER'){
+                    saveState("role",'ROLE_USER')
+                    setData(response.data);
+                    setUserTherapistValues(data => {
+                        return {
+                            ...data,
+                            userId: response.data.id
+                        };
+                    });
+
+                        if (connected) {
+                            fetchNextBooking({clientId: response.data.id, therapistId: therapistInfoId}).then((response) => {
+                                if (response.data.bookingId !== 0) {
+                                    setBookingExists(true)
+                                    setNextBooking(response.data)
+                                }
+                            }).catch((e) => {
+                                history('/loginBoot');
+                            });
+                        }
+
+                        fetchUserDataId({id: therapistInfoId}).then((response) => {
+                            if (response.data.roles.at(0).role === 'ROLE_THERAPIST') {
+                                setTherapistData({
+                                    id: response.data.id,
+                                    email: response.data.email,
+                                    name: response.data.name,
+                                    surname: response.data.surname,
+                                    password: response.data.password,
+                                    roles: response.data.roles,
+                                    number: response.data.number,
+                                    experience: response.data.experience,
+                                    location: response.data.location,
+                                    gender: response.data.gender,
+                                    language: response.data.language,
+                                    allRoles: response.data.allRoles,
+                                    university: response.data.university,
+                                    therapyTypeTherapist: response.data.therapyTypeTherapist,
+                                    therapistTypeTherapist: response.data.therapistTypeTherapist,
+                                    identityTypeTherapist: response.data.identityTypeTherapist
+                                })
+
+                                //problemi munet me kon te qikjo setUserThreapistValues nese ka naj error :)
+                                setUserTherapistValues(data => {
+                                    return {
+                                        ...data,
+                                        therapistId: response.data.id
+                                    };
+                                });
+                                connected = loadState("connected", false)
+                            } else {
+                                localStorage.clear();
+                                history('/loginBoot');
+                            }
+                        }).catch((e) => {
+                            localStorage.clear();
+                            history('/loginBoot');
+                        })
+
+                } else{
+                    history('/loginBoot');
+                }
+            }).catch((e)=>{
+                localStorage.clear();
+                history('/loginBoot');
+            })
+
+            if (localStorage.getItem('reloadUser') === "true") {
+                saveState("chatStateLocation",'')
+                // Set the 'reloaded' item in localStorage
+                localStorage.setItem('reloadUser', "false");
+                // Reload the page
+                window.location.reload();
             }
         }else{
-            props.setUserAuthenticationState(true)
-            saveState("isUserAuthenticated",isUserAuthenticatedBoolean)
-        }
-
-        if (localStorage.getItem('reloadUser')==="true") {
-            // Set the 'reloaded' item in localStorage
-            localStorage.setItem('reloadUser', "false");
-            // Reload the page
-            window.location.reload();
+            props.loginFailure("Authentication Failed!!!");
+            props.setLocation("/loginBoot")
+            history('/loginBoot');
         }
     }, []);
 
+    const handleConnectedConnection = (e) => {
+        e.preventDefault();
 
-    React.useEffect(()=>{
-        fetchUserData().then((response)=>{
-            if (response.data.roles.at(0).role === 'ROLE_USER'){
-                setData(response.data);
-                setUserTherapistValues(data => {
-                    return {
-                        ...data,
-                        userId: response.data.id
-                    };
+        removeTherapist(data.id).then((response)=>{
+            if(response.status===200){
+                saveState("connected/id:"+therapistData.id,false)
+                userTherapistConnection(userTherapistValues).then((response)=>{
+                    if(response.status===201){
+                        saveState("connected",true)
+                        saveState("connected/id:"+userTherapistValues.therapistId,true)
+                        saveState("myTherapistInfoId",userTherapistValues.therapistId)
+                        history("/dashboard/userDashboard/myTherapistInfo")
+                    }
+                    else{
+                        props.connectionFailure('Something LEKAAAAAAA!Please Try Again');
+                    }
+
+                }).catch((err)=>{
+
+                    if(err && err.response){
+
+                        switch(err.response.status){
+                            case 401:
+                                console.log("401 status");
+                                props.connectionFailure("U cant have two therapists at the same time!!!");
+                                break;
+                            default:
+                                props.connectionFailure('Something BABAAAAAA!Please Try Again');
+                        }
+                    }
+                    else{
+                        console.log("ERROR: ",err)
+                        props.connectionFailure('Something NaNAAAAA!Please Try Again');
+                    }
+
                 });
-            }
-            else{
+            } else{
                 history('/loginBoot');
             }
-        }).catch((e)=>{
-            localStorage.clear();
+        }).catch((err)=>{
             history('/loginBoot');
-        })
-    },[])
-
-    React.useEffect(()=>{
-        fetchUserDataId(idNumber).then((response)=>{
-            if (response.data.roles.at(0).role === 'ROLE_THERAPIST'){
-                setTherapistData({
-                    id:response.data.id,
-                    email: response.data.email,
-                    name: response.data.name,
-                    surname: response.data.surname,
-                    password: response.data.password,
-                    roles: response.data.roles,
-                    number:response.data.number,
-                    experience:response.data.experience,
-                    location:response.data.location,
-                    gender:response.data.gender,
-                    language:response.data.language,
-                    allRoles: response.data.allRoles
-                })
-                setUserTherapistValues(data => {
-                    return {
-                        ...data,
-                        therapistId: response.data.id
-                    };
-                });
-                connected = loadState("connected",false)
-            }
-            else{
-                localStorage.clear();
-                history('/loginBoot');
-            }
-        }).catch((e)=>{
-            localStorage.clear();
-            history('/loginBoot');
-        })
-    },[])
-
+        });
+    };
 
     const handleConnection = (e) => {
         e.preventDefault();
@@ -128,7 +304,9 @@ function TherapistCardInfo({loading,error,...props}){
         userTherapistConnection(userTherapistValues).then((response)=>{
             if(response.status===201){
                 saveState("connected",true)
-                history('/dashboard/userDashboard/therapists');
+                saveState("connected/id:"+userTherapistValues.therapistId,true)
+                saveState("myTherapistInfoId",userTherapistValues.therapistId)
+                history("/dashboard/userDashboard/myTherapistInfo")
             }
             else{
                 props.connectionFailure('Something LEKAAAAAAA!Please Try Again');
@@ -155,73 +333,188 @@ function TherapistCardInfo({loading,error,...props}){
         });
     };
 
+    const [isPopupVisible, setIsPopupVisible] = useState(false);
+
+    const showPopup = () => setIsPopupVisible(true);
+    const hidePopup = () => setIsPopupVisible(false);
 
     return (
         <main id="page-top">
-
             <div id="wrapper">
-
                 <SideBarUser hideFilterMenu={hideFilterMenu}/>
-
                 <div id="content-wrapper" className="d-flex flex-column">
-
                     <div id="content">
-
-                        <DashboardNav data={data} setUser={props.setUser} setUserAuthenticationState={props.setUserAuthenticationState}/>
-
+                        <DashboardNav data={data} setUser={props.setUser}/>
                         <div className="container-fluid">
-
-                            <div className="card-details">
-                                <h3>Therapist Details</h3>
-                                {/* Other card details */}
-                                <p>Email: {therapistData.email}</p>
-                                <p>Name: {therapistData.name}</p>
-                                <p>Surname: {therapistData.surname}</p>
-                                <p>Gender: {therapistData.gender.gender}</p>
-                                <p>Number: {therapistData.number}</p>
-                                <p>Experience: {therapistData.experience} years</p>
-                                <p>Location: {therapistData.location.location}</p>
-                                <p>Language: {therapistData.language.map(lang => lang.language).join(', ')}</p>
+                            <div style={{marginLeft: "-10px", marginTop: "-15px"}}>
+                                <Link to={"/dashboard/userDashboard"}
+                                      className="btn goBack"
+                                      style={{color: "#0d6efd"}}
+                                      type="button"
+                                ><FontAwesomeIcon icon={faChevronLeft} style={{marginRight: "3.5px"}}/>Go to Dashboard
+                                </Link>
                             </div>
-                            {!connected ? <button onClick={handleConnection}>Connect</button> :
-                                <p>You already are connected with another therapist.
-                                    <br/>If you want to change your therapist,
-                                    you need to remove them first.
-                                    <br/>Click the link below so you can change your therapist:
-                                    <br/><Link to="/dashboard/userDashboard/therapists">Manage Therapists</Link></p>}
-
+                            <div className="d-sm-flex align-items-center justify-content-between mb-4">
+                                <h1 className="h3 mb-0 text-800" style={{color: "#858796"}}>Therapist Info</h1>
+                            </div>
+                            {isPopupVisible && (
+                                <div className="overlay">
+                                    <div className="popup">
+                                        <div style={{
+                                            display: "flex",
+                                            justifyContent: "space-between",
+                                            alignItems: "center"
+                                        }}>
+                                            <h4>{therapistData.name} {therapistData.surname}</h4>
+                                            <button className="closeButton" onClick={hidePopup}>×</button>
+                                        </div>
+                                        <hr/>
+                                        <h5>Contact Info</h5>
+                                        <p><b>Email</b>: {therapistData.email}</p>
+                                        <p><b>Phone number</b>: {therapistData.number}</p>
+                                    </div>
+                                </div>
+                            )}
+                            <div className="card therapistCardInfo">
+                                <div className={"card-body"}>
+                                    <div className="cardBackground"></div>
+                                    {therapistData.gender.gender === "M" ? <img src={malePhoto} alt={"Photo"}/> :
+                                        <img src={femalePhoto} alt={"Photo"}/>}
+                                    <div className="card-body"
+                                         style={{display: "flex", justifyContent: "space-between"}}>
+                                        <div>
+                                            <h3 style={{marginTop: "60px"}}> {therapistData.name} {therapistData.surname}</h3>
+                                            <p>Therapist</p>
+                                            <p style={{
+                                                fontSize: "14px",
+                                                color: "gray"
+                                            }}>{therapistData.location.location}<span
+                                                style={{padding: "0 3px 0 3px"}}>·</span>
+                                                <button className={"contactButton"} onClick={showPopup}>Contact info
+                                                </button>
+                                            </p>
+                                            <p style={{fontSize: "14px", color: "gray"}}>500+ connections</p>
+                                            {connected ?
+                                                <div>
+                                                    <i>You are already connected with another therapist!!!</i>
+                                                    <br/>
+                                                    <br/>
+                                                    <button className={"connectButton"}
+                                                            onClick={handleConnectedConnection}>
+                                                        <FontAwesomeIcon icon={faUserPlus}/>
+                                                        <span style={{
+                                                            paddingLeft: "4px",
+                                                            fontSize: "16px"
+                                                        }}>Connect</span>
+                                                    </button>
+                                                </div> :
+                                                <button className={"connectButton"} onClick={handleConnection}>
+                                                    <FontAwesomeIcon icon={faUserPlus}/>
+                                                    <span style={{
+                                                        paddingLeft: "4px",
+                                                        fontSize: "16px"
+                                                    }}>Connect</span>
+                                                </button>
+                                            }
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                            <div className="card therapistCardInfo">
+                                <div className="card-body">
+                                    <h4>About</h4>
+                                    <p style={{fontSize: "14px"}}>Lorem Ipsum is simply dummy text of the printing and
+                                        typesetting industry. Lorem Ipsum has been the industry's standard dummy text
+                                        ever since the 1500s, when an unknown printer took a galley of type and
+                                        scrambled it to make a type specimen book. It has survived not only five
+                                        centuries, but also the leap into electronic typesetting, remaining essentially
+                                        unchanged. It was popularised in the 1960s with the release of Letraset sheets
+                                        containing Lorem Ipsum passages, and more recently with desktop publishing
+                                        software like Aldus PageMaker including versions of Lorem Ipsum.</p>
+                                </div>
+                            </div>
+                            <div className="card therapistCardInfo">
+                                <div className="card-body">
+                                    <h4>Areas of Expertise</h4>
+                                    <p style={{fontSize: "16px"}}>
+                                        {therapistData.therapyTypeTherapist.map((type, index) => (
+                                            <React.Fragment key={index}>
+                                                <span> {type.therapyType}</span>
+                                                {index < therapistData.therapyTypeTherapist.length - 1 && (
+                                                    <span style={{
+                                                        display: 'block',
+                                                        height: '1px',
+                                                        background: 'lightgray',
+                                                        margin: '0.5em 0'
+                                                    }}></span>
+                                                )}
+                                            </React.Fragment>
+                                        ))}
+                                    </p>
+                                    <hr/>
+                                    <p style={{fontSize: "16px"}}>
+                                        {therapistData.therapistTypeTherapist.map((type, index) => (
+                                            <React.Fragment key={index}>
+                                                <span> {type.therapistType}</span>
+                                                {index < therapistData.therapistTypeTherapist.length - 1 && (
+                                                    <span style={{
+                                                        display: 'block',
+                                                        height: '1px',
+                                                        background: 'lightgray',
+                                                        margin: '0.5em 0'
+                                                    }}></span>
+                                                )}
+                                            </React.Fragment>
+                                        ))}
+                                    </p>
+                                    <hr/>
+                                    <p style={{fontSize: "16px"}}>
+                                        {therapistData.identityTypeTherapist.map((type, index) => (
+                                            <React.Fragment key={index}>
+                                                <span> {type.identityType}</span>
+                                                {index < therapistData.identityTypeTherapist.length - 1 && (
+                                                    <span style={{
+                                                        display: 'block',
+                                                        height: '1px',
+                                                        background: 'lightgray',
+                                                        margin: '0.5em 0'
+                                                    }}></span>
+                                                )}
+                                            </React.Fragment>
+                                        ))}
+                                    </p>
+                                </div>
+                            </div>
+                            <div className="card therapistCardInfo">
+                                <div className="card-body">
+                                    <h4>Education</h4>
+                                    <p style={{fontSize: "16px"}}>{therapistData.university.university}</p>
+                                </div>
+                            </div>
+                            <div className="card therapistCardInfo">
+                                <div className="card-body">
+                                    <h4>Languages</h4>
+                                    <p style={{fontSize: "16px"}}>
+                                        {therapistData.language.map((language, index) => (
+                                            <React.Fragment key={index}>
+                                                <span>{language.language}</span>
+                                                {index < therapistData.language.length - 1 && (
+                                                    <span style={{
+                                                        display: 'block',
+                                                        height: '1px',
+                                                        background: 'lightgray',
+                                                        margin: '0.5em 0'
+                                                    }}></span>
+                                                )}
+                                            </React.Fragment>
+                                        ))}
+                                    </p>
+                                </div>
+                            </div>
                         </div>
-
                     </div>
-
-                    <footer className="sticky-footer bg-white">
-                        <div className="container my-auto">
-                            <div className="copyright text-center my-auto">
-                                <span>&copy; 2024 PeacefulPaths</span>
-                            </div>
-                        </div>
-                    </footer>
-
                 </div>
-
             </div>
-
-            <a className="scroll-to-top rounded" href="#page-top">
-                <i className="fas fa-angle-up"></i>
-            </a>
-
-            <script src="../../../vendor/jquery/jquery.min.js"></script>
-            <script src="../../../vendor/bootstrap/js/bootstrap.bundle.min.js"></script>
-
-            <script src="../../../vendor/jquery-easing/jquery.easing.min.js"></script>
-
-            <script src="../../../js/sb-admin-2.min.js"></script>
-
-            <script src="../../../vendor/chart.js/Chart.min.js"></script>
-
-            <script src="../../../js/demo/chart-area-demo.js"></script>
-            <script src="../../../js/demo/chart-pie-demo.js"></script>
-
         </main>
     )
 }
@@ -231,7 +524,6 @@ const mapStateToProps = ({auth}) => {
     return {
         loading: auth.loading,
         error: auth.error,
-        isUserAuthenticated: auth.isUserAuthenticated,
         location: auth.location
     }
 }
@@ -240,7 +532,6 @@ const mapDispatchToProps = (dispatch) => {
         authenticate: () => dispatch(authenticate()),
         setUser: (data) => dispatch(authSuccess(data)),
         connectionFailure: (message) => dispatch(authFailure(message)),
-        setUserAuthenticationState: (boolean) => dispatch(setUserAuthenticationState(boolean)),
         setLocation: (path) => dispatch(setLocation(path))
     }
 }

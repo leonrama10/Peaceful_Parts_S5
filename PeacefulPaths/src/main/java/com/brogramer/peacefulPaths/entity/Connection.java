@@ -1,6 +1,9 @@
 package com.brogramer.peacefulPaths.entity;
 
 import jakarta.persistence.*;
+import org.springframework.format.annotation.DateTimeFormat;
+
+import java.time.LocalDateTime;
 
 @Entity
 @Table(name = "user_connections")
@@ -17,6 +20,10 @@ public class Connection {
     @Column(name = "connected_user_id")
     private int therapistId;
 
+    @DateTimeFormat(pattern = "yyyy,MM,dd,HH,mm,ss")
+    @Column(name = "date_added", columnDefinition="TIMESTAMP DEFAULT CURRENT_TIMESTAMP")
+    private LocalDateTime dateAdded;
+
     public Connection() {}
 
     public Connection(int id, int userId, int therapistId) {
@@ -25,6 +32,13 @@ public class Connection {
         this.therapistId = therapistId;
     }
 
+    public LocalDateTime getDateAdded() {
+        return dateAdded;
+    }
+
+    public void setDateAdded(LocalDateTime dateAdded) {
+        this.dateAdded = dateAdded;
+    }
     public int getId() {
         return id;
     }

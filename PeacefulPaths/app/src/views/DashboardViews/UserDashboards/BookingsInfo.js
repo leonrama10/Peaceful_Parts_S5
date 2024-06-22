@@ -6,142 +6,193 @@ import {
     fetchUserTherapistConnectionData
 } from '../../../api/authService';
 import {Link, useNavigate} from 'react-router-dom';
-import '../../../css/sb-admin-2.css';
 import '../../../css/myCss.css';
+import '../../../css/Bookings.css';
 import DashboardNav from "../DashboardNav";
 import SideBarUser from "../SideBars/SideBarUser";
 import {
     authenticate,
     authFailure,
-    authSuccess, setLocation,
-    setUserAuthenticationState
+    authSuccess, setLocation
 } from "../../../redux/authActions";
 import {connect} from "react-redux";
 import {loadState, saveState} from "../../../helper/sessionStorage";
+import {jwtDecode} from "jwt-decode";
+import {FontAwesomeIcon} from "@fortawesome/react-fontawesome";
+import {faArrowRight, faChevronLeft, faPlus} from "@fortawesome/free-solid-svg-icons";
+import photo from "../../../img/3585145_66102-removebg-preview.jpg";
 let connected = null;
-const isUserAuthenticatedBoolean = loadState("isUserAuthenticated",false)
+const getRefreshToken = () => {
+    const token = localStorage.getItem('REFRESH_TOKEN');
+
+    if (!token || token==="null") {
+        return null;
+    }
+
+    const decodedToken = jwtDecode(token);
+    const currentTime = Date.now() / 1000;
+
+    if (decodedToken.exp < currentTime) {
+        console.log("Token expired.");
+        return null;
+    } else {
+        return token;
+    }
+}
+const getAccessToken = () => {
+    const token = localStorage.getItem('USER_KEY');
+
+    if (!token || token==="null") {
+        return null;
+    }
+
+    const decodedToken = jwtDecode(token);
+    const currentTime = Date.now() / 1000;
+
+    if (decodedToken.exp < currentTime) {
+        console.log("Token expired.");
+        return null;
+    } else {
+        return token;
+    }
+}
 function BookingsInfo({loading,error,...props}){
-
-    useEffect(() => {
-        props.setLocation("/dashboard/userDashboard/bookingsInfo")
-        if(!isUserAuthenticatedBoolean){
-            if (!props.isUserAuthenticated){
-                props.loginFailure("Authentication Failed!!!");
-                props.setLocation("/loginBoot")
-                history('/loginBoot');
-            }else{
-                props.setUserAuthenticationState(true)
-                saveState("isUserAuthenticated",props.isUserAuthenticated)
-            }
-        }else{
-            props.setUserAuthenticationState(true)
-            saveState("isUserAuthenticated",isUserAuthenticatedBoolean)
-        }
-
-        if (localStorage.getItem('reloadUser')==="true") {
-            // Set the 'reloaded' item in localStorage
-            localStorage.setItem('reloadUser', "false");
-            // Reload the page
-            window.location.reload();
-        }
-    }, []);
-
     const history = useNavigate ();
     const [data,setData]=useState({});
     const [allBookings, setAllBookings] = useState([]);
     const [hideFilterMenu,setHideFilterMenu]=useState(true);
+    let emptyBoolean=false;
+    let emptyAvailableBoolean=false;
+    let emptyExpiredBoolean=false;
     const [info, setInfo] = useState(false);
-    const [therapistData, setTherapistData] = useState({
-        id:0,
-        email: '',
-        name:'',
-        surname:'',
-        password:'',
-        roles:[],
-        number:'',
-        experience:0,
-        allRoles:[],
-        university: '',
-        location:{},
-        gender:{},
-    });
 
-    React.useEffect(() => {
-        connected = loadState("connected",false)
-        fetchUserData().then((response) => {
-            if (response.data.roles.at(0).role === 'ROLE_USER') {
-                setData(response.data);
+    useEffect(() => {
+        if(getRefreshToken()) {
+            props.setLocation("/dashboard/userDashboard/bookingsInfo")
+            connected = loadState("connected",false)
+            fetchUserData().then((response) => {
+                if (response.data.roles.at(0).role === 'ROLE_USER') {
+                    setData(response.data);
+                    
+                    saveState("role",'ROLE_USER')
 
-                const newBookingsData = {
-                    clientId: response.data.id,
-                    therapistId: 0
-                };
+                    const newBookingsData = {
+                        clientId: response.data.id,
+                        therapistId: 0
+                    };
 
-                fetchUserTherapistConnectionData(response.data.id).then((response) => {
-                    if (response.data.roles.at(0).role === 'ROLE_THERAPIST') {
-                        setTherapistData({
-                            id: response.data.id,
-                            email: response.data.email,
-                            name: response.data.name,
-                            surname: response.data.surname,
-                            password: response.data.password,
-                            roles: response.data.roles,
-                            number: response.data.number,
-                            experience: response.data.experience,
-                            location: response.data.location,
-                            allRoles: response.data.allRoles,
-                            University: response.data.University,
-                            gender: response.data.gender
-                        });
-                        connected = loadState("connected",false)
-                        if(response.data.id===0){
-                            saveState("connected",false)
-                        }else {
-                            saveState("connected",true)
-                        }
-
+                    fetchUserTherapistConnectionData({id:response.data.id}).then((response) => {
+                        saveState("connected",true)
                         newBookingsData.therapistId = response.data.id
 
-//                        fetchBookings(newBookingsData).then((response) => {
-//                            if (response.data.length === 0){
-//                                setInfo(true);
-//                            }else {setAllBookings(response.data);}
-//                        }
-//                        ).catch((e) => {
-//                            history('/loginBoot');
-//                        });
+                        fetchBookings(newBookingsData).then((response) => {
+                            if (response.data.length === 0){
+                                setInfo(true);
+                                saveState("bookingsMessage", true)
+                                history("/dashboard/userDashboard/addBookings")
+                            }else {
+                                setAllBookings(response.data);
+                                saveState("bookingsMessage", false)
+                            }
+                        }).catch((e) => {
+                            history('/loginBoot');
+                        });
 
-                    } else {
-                        localStorage.clear();
-                        history('/loginBoot');
-                    }
-                }).catch((e) => {
-                    connected = loadState("connected",false)
-                    if (e.response) {
-                        // The request was made and the server responded with a status code
-                        // that falls out of the range of 2xx
-                        console.log(e.response.data); // This will log 'Connect with a therapist!!!'
-                        console.log(e.response.status); // This will log 404 (NOT_FOUND)
-                    } else if (e.request) {
-                        // The request was made but no response was received
-                        console.log(e.request);
-                    } else {
-                        // Something happened in setting up the request that triggered an Error
-                        console.log('Error', e.message);
-                    }
-                });
-            } else {
+                    }).catch((e) => {
+                        saveState("connected",false)
+                        if (e.response) {
+                            // The request was made and the server responded with a status code
+                            // that falls out of the range of 2xx
+                            console.log(e.response.data); // This will log 'Connect with a therapist!!!'
+                            console.log(e.response.status); // This will log 404 (NOT_FOUND)
+                        } else if (e.request) {
+                            // The request was made but no response was received
+                            console.log(e.request);
+                        } else {
+                            // Something happened in setting up the request that triggered an Error
+                            console.log('Error', e.message);
+                        }
+                    });
+                } else {
+                    history('/loginBoot');
+                }
+            }).catch((e) => {
                 history('/loginBoot');
+            });
+
+            if (localStorage.getItem('reloadUser') === "true") {
+                saveState("chatStateLocation",'')
+                // Set the 'reloaded' item in localStorage
+                localStorage.setItem('reloadUser', "false");
+                // Reload the page
+                window.location.reload();
             }
-        }).catch((e) => {
+        }else if(getAccessToken()){
+            props.setLocation("/dashboard/userDashboard/bookingsInfo")
+            connected = loadState("connected",false)
+            fetchUserData().then((response) => {
+                if (response.data.roles.at(0).role === 'ROLE_USER') {
+                    setData(response.data);
+                    
+                    saveState("role",'ROLE_USER')
+
+                    const newBookingsData = {
+                        clientId: response.data.id,
+                        therapistId: 0
+                    };
+
+                    fetchUserTherapistConnectionData({id:response.data.id}).then((response) => {
+                        saveState("connected",true)
+                        newBookingsData.therapistId = response.data.id
+
+                        fetchBookings(newBookingsData).then((response) => {
+                            if (response.data.length === 0){
+                                setInfo(true);
+                                saveState("bookingsMessage", true)
+                                history("/dashboard/userDashboard/addBookings")
+                            }else {
+                                setAllBookings(response.data);
+                                saveState("bookingsMessage", false)
+                            }
+                        }).catch((e) => {
+                            history('/loginBoot');
+                        });
+
+                    }).catch((e) => {
+                        saveState("connected",false)
+                        if (e.response) {
+                            // The request was made and the server responded with a status code
+                            // that falls out of the range of 2xx
+                            console.log(e.response.data); // This will log 'Connect with a therapist!!!'
+                            console.log(e.response.status); // This will log 404 (NOT_FOUND)
+                        } else if (e.request) {
+                            // The request was made but no response was received
+                            console.log(e.request);
+                        } else {
+                            // Something happened in setting up the request that triggered an Error
+                            console.log('Error', e.message);
+                        }
+                    });
+                } else {
+                    history('/loginBoot');
+                }
+            }).catch((e) => {
+                history('/loginBoot');
+            });
+
+            if (localStorage.getItem('reloadUser') === "true") {
+                saveState("chatStateLocation",'')
+                // Set the 'reloaded' item in localStorage
+                localStorage.setItem('reloadUser', "false");
+                // Reload the page
+                window.location.reload();
+            }
+        }else{
+            props.loginFailure("Authentication Failed!!!");
+            props.setLocation("/loginBoot")
             history('/loginBoot');
-        });
+        }
     }, []);
-
-
-    function handleEdit(id) {
-        history(`/dashboard/userDashboard/editBooking/${id}`);
-    }
 
     function handleCanceling(id) {
         cancelBooking({bookingId:id}).then((response)=>{
@@ -161,7 +212,6 @@ function BookingsInfo({loading,error,...props}){
         history(`/dashboard/userDashboard/chatDashboard`);
     }
 
-
     return (
         <main id="page-top">
 
@@ -173,143 +223,279 @@ function BookingsInfo({loading,error,...props}){
 
                     <div id="content">
 
-                        <DashboardNav data={data} setUser={props.setUser}
-                                      setUserAuthenticationState={props.setUserAuthenticationState}/>
+                        <DashboardNav data={data} setUser={props.setUser}/>
 
                         <div className="container-fluid">
-                            {connected && <div className="card">
-                                {!info ? <div className="card-body">
-                                        <h2>Session in progress</h2>
-                                        {allBookings
-                                            .filter(booking => {
-                                                const date = booking.date;
-                                                const formattedDate = `${date[0]}-${date[1] < 10 ? '0' + date[1] : date[1]}-${date[2] < 10 ? '0' + date[2] : date[2]}`;
-                                                const hour = booking.hour;
-                                                const formattedHour = `${hour[0] < 10 ? '0' + hour[0] : hour[0]}:${hour[1] < 10 ? '0' + hour[1] : hour[1]}`;
+                            <div style={{marginLeft: "-10px", marginTop: "-15px"}}>
+                                <Link to={"/dashboard/userDashboard"}
+                                      className="btn goBack"
+                                      style={{color: "#0d6efd"}}
+                                      type="button"
+                                ><FontAwesomeIcon icon={faChevronLeft} style={{marginRight: "3.5px"}}/>Go to Dashboard
+                                </Link>
+                            </div>
+                            <div className="d-sm-flex align-items-center justify-content-between mb-4">
+                                <h1 className="h3 mb-0 text-800" style={{color: "#5a5c69"}}>My Bookings</h1>
+                                {connected && <Link to={"/dashboard/userDashboard/addBookings"} className="btn btn-primary"
+                                      type="button"
+                                ><FontAwesomeIcon icon={faPlus} style={{marginRight: "3.5px"}}/>Book a Session
+                                </Link>}
+                            </div>
+                            <br/>
+                            {connected ? <div >
+                                {!info && <div>
+                                    <div className={"card shadow"}>
+                                        <div className={"card-body"}>
+                                            <h4>Session in progress</h4>
+                                            {allBookings
+                                                .filter(booking => {
+                                                    if (booking.endSessionBoolean) return false;
+                                                    const date = booking.date;
+                                                    const formattedDate = `${date[0]}-${date[1] < 10 ? '0' + date[1] : date[1]}-${date[2] < 10 ? '0' + date[2] : date[2]}`;
+                                                    const hour = booking.hour;
+                                                    const formattedHour = `${hour[0] < 10 ? '0' + hour[0] : hour[0]}:${hour[1] < 10 ? '0' + hour[1] : hour[1]}`;
 
-                                                const currentDate = new Date();
-                                                const bookingDate = new Date(formattedDate);
-                                                const bookingTime = new Date(formattedDate + 'T' + formattedHour);
+                                                    const currentDate = new Date();
+                                                    const bookingDate = new Date(formattedDate);
+                                                    const bookingTime = new Date(formattedDate + 'T' + formattedHour);
 
-                                                // If the booking is today and the current time is within the booking time, return true
-                                                if (currentDate.toDateString() === bookingDate.toDateString() && currentDate.getTime() >= bookingTime.getTime() && currentDate.getTime() <= bookingTime.getTime() + 50 * 60 * 1000) {
-                                                    return true;
-                                                }
-                                            })
-                                            .sort((a, b) => {
-                                                const dateA = new Date(`${a.date[0]}-${a.date[1] < 10 ? '0' + a.date[1] : a.date[1]}-${a.date[2] < 10 ? '0' + a.date[2] : a.date[2]}`);
-                                                const dateB = new Date(`${b.date[0]}-${b.date[1] < 10 ? '0' + b.date[1] : b.date[1]}-${b.date[2] < 10 ? '0' + b.date[2] : b.date[2]}`);
-                                                return dateA - dateB;
-                                            })
-                                            .map((booking, index) => {
-                                                const date = booking.date;
-                                                const formattedDate = `${date[0]}-${date[1] < 10 ? '0' + date[1] : date[1]}-${date[2] < 10 ? '0' + date[2] : date[2]}`;
-                                                const hour = booking.hour;
-                                                const formattedHour = `${hour[0] < 10 ? '0' + hour[0] : hour[0]}:${hour[1] < 10 ? '0' + hour[1] : hour[1]}`;
+                                                    // If the booking is today and the current time is within the booking time, return true
+                                                    if (currentDate.toDateString() === bookingDate.toDateString() && currentDate.getTime() >= bookingTime.getTime() && currentDate.getTime() <= bookingTime.getTime() + 50 * 60 * 1000) {
+                                                        return true;
+                                                    }
+                                                })
+                                                .sort((a, b) => {
+                                                    const dateA = new Date(`${a.date[0]}-${a.date[1] < 10 ? '0' + a.date[1] : a.date[1]}-${a.date[2] < 10 ? '0' + a.date[2] : a.date[2]}`);
+                                                    const dateB = new Date(`${b.date[0]}-${b.date[1] < 10 ? '0' + b.date[1] : b.date[1]}-${b.date[2] < 10 ? '0' + b.date[2] : b.date[2]}`);
+                                                    return dateA - dateB;
+                                                })
+                                                .map((booking, index) => {
+                                                    emptyBoolean = true;
+                                                    const date = booking.date;
+                                                    const formattedDate = `${date[0]}-${date[1] < 10 ? '0' + date[1] : date[1]}-${date[2] < 10 ? '0' + date[2] : date[2]}`;
+                                                    const hour = booking.hour;
+                                                    const formattedHour = `${hour[0] < 10 ? '0' + hour[0] : hour[0]}:${hour[1] < 10 ? '0' + hour[1] : hour[1]}`;
 
-                                                return (
-                                                    <div key={index} className="card" style={{marginTop: '10px', display: "flex", flexDirection: "row"}}>
-                                                        <div className="card-body">
-                                                            <h5 className="card-title">Booking:</h5>
-                                                            <p className="card-text">Date: {formattedDate}</p>
-                                                            <p className="card-text">Hour: {formattedHour}</p>
+                                                    return (
+                                                        <div key={index}
+                                                             style={{
+                                                                 marginTop: '10px',
+                                                                 display: "flex",
+                                                                 flexDirection: "row",
+                                                                 justifyContent: "space-between",
+                                                                 alignItems: "center"
+                                                             }}>
+                                                            <div className="card-body">
+                                                                <h5 className="card-title"
+                                                                    style={{color: "#0d6efd"}}>Booking</h5>
+                                                                <p className="card-text"
+                                                                   style={{marginLeft: "10px"}}>Booking
+                                                                    Id: {booking.bookingId}</p>
+                                                                <p className="card-text"
+                                                                   style={{marginLeft: "10px"}}>Therapist
+                                                                    Id: {booking.therapistId}</p>
+                                                                <p className="card-text"
+                                                                   style={{marginLeft: "10px"}}>Client
+                                                                    Id: {booking.clientId}</p>
+                                                                <p className="card-text"
+                                                                   style={{marginLeft: "10px"}}>Date: {formattedDate}</p>
+                                                                <p className="card-text"
+                                                                   style={{marginLeft: "10px"}}>Hour: {formattedHour}</p>
+                                                            </div>
+
+                                                            <button style={{color: "white"}} className="btn btn-info "
+                                                                    onClick={handleClick}>
+                                                                Go to Session <FontAwesomeIcon icon={faArrowRight}
+                                                                                               style={{marginLeft: "3.5px"}}/>
+                                                            </button>
                                                         </div>
+                                                    )
+                                                })
+                                            }
+                                            {!emptyBoolean && <i style={{color:"#d10606"}}>No bookings right now!</i>}
+                                        </div>
+                                    </div>
+                                    <br/>
+                                    <div className={"card shadow"}>
+                                        <div className={"card-body"}>
+                                            <h4>Available bookings</h4>
+                                            {allBookings
+                                                .filter(booking => {
+                                                    if (booking.endSessionBoolean) return false;
+                                                    const date = booking.date;
+                                                    const formattedDate = `${date[0]}-${date[1] < 10 ? '0' + date[1] : date[1]}-${date[2] < 10 ? '0' + date[2] : date[2]}`;
+                                                    const hour = booking.hour;
+                                                    const formattedHour = `${hour[0] < 10 ? '0' + hour[0] : hour[0]}:${hour[1] < 10 ? '0' + hour[1] : hour[1]}`;
 
-                                                        <div className="card-body" style={{marginLeft: '800px',marginTop:"39px"}}>
-                                                            <button className="btn btn-info btn-sm" onClick={handleClick}>Go to Session</button>
-                                                        </div>
-                                                    </div>
-                                                )
-                                            })}
-                                        <hr/>
-                                        <h2>Available bookings</h2>
-                                        {allBookings
-                                            .filter(booking => {
-                                                const date = booking.date;
-                                                const formattedDate = `${date[0]}-${date[1] < 10 ? '0' + date[1] : date[1]}-${date[2] < 10 ? '0' + date[2] : date[2]}`;
-                                                const currentDate = new Date();
-                                                const bookingDate = new Date(formattedDate);
-                                                return currentDate <= bookingDate;
-                                            })
-                                            .sort((a, b) => {
-                                                const dateA = new Date(`${a.date[0]}-${a.date[1] < 10 ? '0' + a.date[1] : a.date[1]}-${a.date[2] < 10 ? '0' + a.date[2] : a.date[2]}`);
-                                                const dateB = new Date(`${b.date[0]}-${b.date[1] < 10 ? '0' + b.date[1] : b.date[1]}-${b.date[2] < 10 ? '0' + b.date[2] : b.date[2]}`);
-                                                return dateA - dateB;
-                                            })
-                                            .map((booking, index) => {
-                                                const date = booking.date;
-                                                const formattedDate = `${date[0]}-${date[1] < 10 ? '0' + date[1] : date[1]}-${date[2] < 10 ? '0' + date[2] : date[2]}`;
-                                                const hour = booking.hour;
-                                                const formattedHour = `${hour[0] < 10 ? '0' + hour[0] : hour[0]}:${hour[1] < 10 ? '0' + hour[1] : hour[1]}`;
+                                                    const currentDate = new Date();
+                                                    const bookingTime = new Date(formattedDate + 'T' + formattedHour);
 
-                                                return (
-                                                    <div key={index} className="card" style={{marginTop: '10px', display: "flex", flexDirection: "row"}}>
-                                                        <div className="card-body">
-                                                            <h5 className="card-title">Booking:</h5>
-                                                            <p className="card-text">Date: {formattedDate}</p>
-                                                            <p className="card-text">Hour: {formattedHour}</p>
-                                                        </div>
+                                                    // Include bookings that are today or in the future
+                                                    return currentDate <= bookingTime;
+                                                })
+                                                .sort((a, b) => {
+                                                    const dateA = new Date(`${a.date[0]}-${a.date[1] < 10 ? '0' + a.date[1] : a.date[1]}-${a.date[2] < 10 ? '0' + a.date[2] : a.date[2]}`);
+                                                    const dateB = new Date(`${b.date[0]}-${b.date[1] < 10 ? '0' + b.date[1] : b.date[1]}-${b.date[2] < 10 ? '0' + b.date[2] : b.date[2]}`);
+                                                    return dateA - dateB;
+                                                })
+                                                .map((booking, index,array) => {
+                                                    emptyAvailableBoolean = true
+                                                    const date = booking.date;
+                                                    const formattedDate = `${date[0]}-${date[1] < 10 ? '0' + date[1] : date[1]}-${date[2] < 10 ? '0' + date[2] : date[2]}`;
+                                                    const hour = booking.hour;
+                                                    const formattedHour = `${hour[0] < 10 ? '0' + hour[0] : hour[0]}:${hour[1] < 10 ? '0' + hour[1] : hour[1]}`;
 
-                                                        <div className="card-body" style={{marginLeft: '800px'}}>
-                                                            <button className="btn btn-info btn-sm" onClick={() => handleEdit(booking.bookingId)}>Edit Session</button>
-                                                            <br/>
-                                                            <br/>
-                                                            <button className="btn btn-danger btn-sm" onClick={() => handleCanceling(booking.bookingId)}>Cancel Session</button>
-                                                        </div>
-                                                    </div>
-                                                )
-                                            })}
-                                        <hr/>
-                                        <h2>Expired bookings</h2>
-                                        {allBookings
-                                            .filter(booking => {
-                                                const date = booking.date;
-                                                const formattedDate = `${date[0]}-${date[1] < 10 ? '0' + date[1] : date[1]}-${date[2] < 10 ? '0' + date[2] : date[2]}`;
-                                                const hour = booking.hour;
-                                                const formattedHour = `${hour[0] < 10 ? '0' + hour[0] : hour[0]}:${hour[1] < 10 ? '0' + hour[1] : hour[1]}`;
-                                                const currentDate = new Date();
-                                                const bookingDate = new Date(formattedDate + ' ' + formattedHour);
-                                                return currentDate > bookingDate;
-                                            })
-                                            .sort((a, b) => {
-                                                const dateA = new Date(`${a.date[0]}-${a.date[1] < 10 ? '0' + a.date[1] : a.date[1]}-${a.date[2] < 10 ? '0' + a.date[2] : a.date[2]}`);
-                                                const dateB = new Date(`${b.date[0]}-${b.date[1] < 10 ? '0' + b.date[1] : b.date[1]}-${b.date[2] < 10 ? '0' + b.date[2] : b.date[2]}`);
-                                                return dateA - dateB;
-                                            })
-                                            .map((booking, index) => {
-                                                const date = booking.date;
-                                                const formattedDate = `${date[0]}-${date[1] < 10 ? '0' + date[1] : date[1]}-${date[2] < 10 ? '0' + date[2] : date[2]}`;
-                                                const hour = booking.hour;
-                                                const formattedHour = `${hour[0] < 10 ? '0' + hour[0] : hour[0]}:${hour[1] < 10 ? '0' + hour[1] : hour[1]}`;
+                                                    return (
+                                                        <div key={index}>
+                                                            <div style={{
+                                                                marginTop: '10px',
+                                                                display: "flex",
+                                                                flexDirection: "row"
+                                                            }}>
+                                                                <div className="card-body">
+                                                                    <h5 className="card-title"
+                                                                        style={{color: "#0d6efd"}}>Booking</h5>
+                                                                    <p className="card-text"
+                                                                       style={{marginLeft: "10px"}}>Booking
+                                                                        Id: {booking.bookingId}</p>
+                                                                    <p className="card-text"
+                                                                       style={{marginLeft: "10px"}}>Therapist
+                                                                        Id: {booking.therapistId}</p>
+                                                                    <p className="card-text"
+                                                                       style={{marginLeft: "10px"}}>Client
+                                                                        Id: {booking.clientId}</p>
+                                                                    <p className="card-text"
+                                                                       style={{marginLeft: "10px"}}>Date: {formattedDate}</p>
+                                                                    <p className="card-text"
+                                                                       style={{marginLeft: "10px"}}>Hour: {formattedHour}</p>
+                                                                </div>
 
-                                                return (
-                                                    <div key={index} className="card" style={{marginTop: '10px', display: "flex", flexDirection: "row"}}>
-                                                        <div className="card-body">
-                                                            <h5 className="card-title">Booking:</h5>
-                                                            <p className="card-text">Date: {formattedDate}</p>
-                                                            <p className="card-text">Hour: {formattedHour}</p>
+                                                                <div className="card-body" style={{
+                                                                    display: "flex",
+                                                                    flexDirection: "column",
+                                                                    justifyContent: "center",
+                                                                    alignItems: "end"
+                                                                }}>
+                                                                    <button className="btn btn-danger "
+                                                                            style={{marginTop: "5px"}}
+                                                                            onClick={() => handleCanceling(booking.bookingId)}>Cancel
+                                                                        Booking
+                                                                    </button>
+                                                                </div>
+                                                            </div>
+                                                            {index !== array.length - 1 && <hr/>}
                                                         </div>
-                                                    </div>
-                                                )
-                                            })}
-                                    </div> :
-                                    <p>You need to make booking first: <Link to="/dashboard/userDashboard/addBookings">Click
-                                        here to book your first session.</Link></p>}
-                            </div>}
+                                                    )
+                                                })}
+                                            {!emptyAvailableBoolean && <i style={{color:"#d10606"}}>No bookings in the future!</i>}
+                                        </div>
+                                    </div>
+                                    <br/>
+                                    <div className={"card shadow"} style={{marginBottom:"10px"}}>
+                                        <div className={"card-body"}>
+                                            <h4>Expired bookings</h4>
+                                            {allBookings
+                                                .filter(booking => {
+                                                    if (booking.endSessionBoolean) return true;
+                                                    const date = booking.date;
+                                                    const formattedDate = `${date[0]}-${date[1] < 10 ? '0' + date[1] : date[1]}-${date[2] < 10 ? '0' + date[2] : date[2]}`;
+                                                    const hour = booking.hour;
+                                                    const formattedHour = `${hour[0] < 10 ? '0' + hour[0] : hour[0]}:${hour[1] < 10 ? '0' + hour[1] : hour[1]}`;
+                                                    const currentDate = new Date();
+                                                    const bookingDate = new Date(formattedDate + ' ' + formattedHour);
+
+                                                    const bookingDateTest = new Date(formattedDate);
+                                                    const bookingTime = new Date(formattedDate + 'T' + formattedHour);
+
+                                                    if (currentDate.toDateString() === bookingDateTest.toDateString() && currentDate.getTime() >= bookingTime.getTime() && currentDate.getTime() <= bookingTime.getTime() + 50 * 60 * 1000) {
+                                                        return false;
+                                                    }
+
+                                                    return currentDate > bookingDate;
+                                                })
+                                                .sort((a, b) => {
+                                                    const dateA = new Date(`${a.date[0]}-${a.date[1] < 10 ? '0' + a.date[1] : a.date[1]}-${a.date[2] < 10 ? '0' + a.date[2] : a.date[2]}`);
+                                                    const dateB = new Date(`${b.date[0]}-${b.date[1] < 10 ? '0' + b.date[1] : b.date[1]}-${b.date[2] < 10 ? '0' + b.date[2] : b.date[2]}`);
+                                                    return dateB - dateA;
+                                                })
+                                                .map((booking, index, array) => {
+                                                    emptyExpiredBoolean = true
+                                                    const date = booking.date;
+                                                    const formattedDate = `${date[0]}-${date[1] < 10 ? '0' + date[1] : date[1]}-${date[2] < 10 ? '0' + date[2] : date[2]}`;
+                                                    const hour = booking.hour;
+                                                    const formattedHour = `${hour[0] < 10 ? '0' + hour[0] : hour[0]}:${hour[1] < 10 ? '0' + hour[1] : hour[1]}`;
+
+                                                    return (
+                                                        <div key={index}>
+                                                            <div
+                                                                style={{
+                                                                    marginTop: '10px',
+                                                                    display: "flex",
+                                                                    flexDirection: "row"
+                                                                }}>
+                                                                <div className="card-body">
+                                                                    <h5 className="card-title"
+                                                                        style={{color: "#90d3fc"}}>Booking</h5>
+                                                                    <p className="card-text"
+                                                                       style={{
+                                                                           marginLeft: "10px",
+                                                                           color: "#a1a1a1"
+                                                                       }}>Booking
+                                                                        Id: {booking.bookingId}</p>
+                                                                    <p className="card-text"
+                                                                       style={{
+                                                                           marginLeft: "10px",
+                                                                           color: "#a1a1a1"
+                                                                       }}>Therapist
+                                                                        Id: {booking.therapistId}</p>
+                                                                    <p className="card-text"
+                                                                       style={{
+                                                                           marginLeft: "10px",
+                                                                           color: "#a1a1a1"
+                                                                       }}>Client
+                                                                        Id: {booking.clientId}</p>
+                                                                    <p className="card-text" style={{
+                                                                        marginLeft: "10px",
+                                                                        color: "#a1a1a1"
+                                                                    }}>Date: {formattedDate}</p>
+                                                                    <p className="card-text" style={{
+                                                                        marginLeft: "10px",
+                                                                        color: "#a1a1a1"
+                                                                    }}>Hour: {formattedHour}</p>
+                                                                </div>
+                                                            </div>
+                                                            {index !== array.length - 1 && <hr/>}
+                                                        </div>
+                                                    )
+                                                })
+                                            }
+                                            {!emptyExpiredBoolean && <i style={{color:"#d10606"}}>No bookings in the past!</i>}
+                                        </div>
+                                    </div>
+                                </div>
+                                }
+                            </div>:
+                                <div style={{
+                                    display: "flex",
+                                    flexDirection: "column",
+                                    justifyContent: "center",
+                                    alignItems: "center",
+                                    paddingTop: "20px"
+                                }}>
+                                    <img src={photo} style={{maxWidth: "250px"}} alt={"photo"}/>
+                                    <h4 style={{color: "#5b5c63", fontSize: "28px"}}>No Bookings Available</h4>
+                                    <p style={{
+                                        maxWidth: "400px",
+                                        textAlign: "center",
+                                        color: "#858796"
+                                    }}>You need to connect with a therapist first!</p>
+                                    <Link to={"/dashboard/userDashboard"} className={"discoverButton"} type={"button"}>Discover</Link>
+                                </div>
+                            }
                         </div>
-
                     </div>
                 </div>
             </div>
-
-            <a className="scroll-to-top rounded" href="#page-top">
-                <i className="fas fa-angle-up"></i>
-            </a>
-
-            <script src="../../../vendor/jquery/jquery.min.js"></script>
-            <script src="../../../vendor/bootstrap/js/bootstrap.bundle.min.js"></script>
-            <script src="../../../vendor/jquery-easing/jquery.easing.min.js"></script>
-
         </main>
     )
 
@@ -320,7 +506,6 @@ const mapStateToProps = ({auth}) => {
     return {
         loading: auth.loading,
         error: auth.error,
-        isUserAuthenticated: auth.isUserAuthenticated,
         location: auth.location
     }
 }
@@ -329,7 +514,6 @@ const mapDispatchToProps = (dispatch) => {
         authenticate: () => dispatch(authenticate()),
         setUser: (data) => dispatch(authSuccess(data)),
         loginFailure: (message) => dispatch(authFailure(message)),
-        setUserAuthenticationState: (boolean) => dispatch(setUserAuthenticationState(boolean)),
         setLocation: (path) => dispatch(setLocation(path))
     }
 }

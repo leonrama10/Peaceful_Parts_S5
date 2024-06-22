@@ -1,15 +1,45 @@
 .therapist-card{
-width: calc(33.33% - 20px);
-height: 200px;
-  margin: 10px;
-  float: left;
-   border: 1px solid #ccc;
+    color: white;
+    min-height: 290px;
+    margin: 10px;
+    float: left;
+    border: 1px solid #ccc;
     border-radius: 5px;
-    background-color: #f0f0f0;
+    background-color: #456bd8;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    flex-direction: column;
+    width: 297px;
+    padding-bottom: 5px;
+    padding-top: 5px;
 }
 
-.therapist-personal p{
-margin-bottom: 2px;
-position: relative;
-top: 55px;
+.therapistCardButton{
+    display: flex;
+    flex-direction: row;
+    gap: 10px;
+}
+
+
+.therapistCardButton button{
+    border: 1px solid white;
+    border-radius: 5px;
+    background-color: transparent;
+    color: white;
+    padding: 10px 0 10px 0;
+    width:100px;
+    transition: box-shadow 0.1s ease;
+}
+
+.therapistCardButton button:hover{
+    box-shadow: 0 0 0 2px white;
+}
+
+.therapist-card img{
+    box-shadow: 0 0 0 2px white;
+    width: 100px;
+    height: 100px;
+    border-radius: 50%;
+    object-fit: cover;
 }

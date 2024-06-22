@@ -3,53 +3,62 @@ import {
     bookSession,
     fetchBookedHours,
     fetchUserData,
-    fetchUserTherapistConnectionData, fetchWorkDays, removeTherapist, selectWorkDays
+    fetchUserTherapistConnectionData, fetchWorkDays,
 } from '../../../api/authService';
 import {Link, useNavigate} from 'react-router-dom';
-import '../../../css/sb-admin-2.css';
 import '../../../css/myCss.css';
-
 import '../../../css/AddBookings.css';
-
 import DashboardNav from "../DashboardNav";
 import SideBarUser from "../SideBars/SideBarUser";
 import {Alert} from "reactstrap";
 import {
     authenticate,
     authFailure,
-    authSuccess, setLocation,
-    setUserAuthenticationState
+    authSuccess, setLocation
 } from "../../../redux/authActions";
 import {connect} from "react-redux";
 import {loadState, saveState} from "../../../helper/sessionStorage";
+import {jwtDecode} from "jwt-decode";
+import '../../../css/Bookings.css';
+import {faChevronLeft} from "@fortawesome/free-solid-svg-icons";
+import {FontAwesomeIcon} from "@fortawesome/react-fontawesome";
 let connected = null;
-const isUserAuthenticatedBoolean = loadState("isUserAuthenticated",false)
+const getRefreshToken = () => {
+    const token = localStorage.getItem('REFRESH_TOKEN');
+
+    if (!token || token==="null") {
+        return null;
+    }
+
+    const decodedToken = jwtDecode(token);
+    const currentTime = Date.now() / 1000;
+
+    if (decodedToken.exp < currentTime) {
+        console.log("Token expired.");
+        return null;
+    } else {
+        return token;
+    }
+}
+const getAccessToken = () => {
+    const token = localStorage.getItem('USER_KEY');
+
+    if (!token || token==="null") {
+        return null;
+    }
+
+    const decodedToken = jwtDecode(token);
+    const currentTime = Date.now() / 1000;
+
+    if (decodedToken.exp < currentTime) {
+        console.log("Token expired.");
+        return null;
+    } else {
+        return token;
+    }
+}
+let bookingsMessage = false
 function AddBookings({loading,error,...props}){
-
-    useEffect(() => {
-        props.setLocation("/dashboard/userDashboard/addBookings")
-        if(!isUserAuthenticatedBoolean){
-            if (!props.isUserAuthenticated){
-                props.loginFailure("Authentication Failed!!!");
-                props.setLocation("/loginBoot")
-                history('/loginBoot');
-            }else{
-                props.setUserAuthenticationState(true)
-                saveState("isUserAuthenticated",props.isUserAuthenticated)
-            }
-        }else{
-            props.setUserAuthenticationState(true)
-            saveState("isUserAuthenticated",isUserAuthenticatedBoolean)
-        }
-
-        if (localStorage.getItem('reloadUser')==="true") {
-            // Set the 'reloaded' item in localStorage
-            localStorage.setItem('reloadUser', "false");
-            // Reload the page
-            window.location.reload();
-        }
-    }, []);
-
     const history = useNavigate ();
     const [data,setData]=useState({});
     const [hideFilterMenu,setHideFilterMenu]=useState(true);
@@ -57,21 +66,6 @@ function AddBookings({loading,error,...props}){
     const [hours, setHours] = useState([]);
     const [successfullyBooked, setSuccessfullyBooked] = useState(false);
     const [workDays,setWorkDays]=useState([]);
-    const [therapistData, setTherapistData] = useState({
-        id:0,
-        email: '',
-        name:'',
-        surname:'',
-        password:'',
-        roles:[],
-        number:'',
-        experience:0,
-        allRoles:[],
-        university: '',
-        location:{},
-        gender:{},
-    });
-
     const [values, setValues] = useState({
         clientId:0,
         therapistId: 0,
@@ -79,84 +73,136 @@ function AddBookings({loading,error,...props}){
         hour:''
     });
 
-    React.useEffect(() => {
-        connected = loadState("connected",false)
-        fetchUserData().then((response) => {
-            if (response.data.roles.at(0).role === 'ROLE_USER') {
-                setData(response.data);
-                const newBookingsData = {
-                    clientId: response.data.id,
-                };
+    useEffect(() => {
+        bookingsMessage = loadState("bookingsMessage",false)
+        if(getRefreshToken()) {
+            props.setLocation("/dashboard/userDashboard/addBookings")
+            connected = loadState("connected",false)
+            fetchUserData().then((response) => {
+                if (response.data.roles.at(0).role === 'ROLE_USER') {
+                    
+                    saveState("role",'ROLE_USER')
+                    setData(response.data);
+                    const newBookingsData = {
+                        clientId: response.data.id,
+                    };
 
-                fetchUserTherapistConnectionData(response.data.id).then((response) => {
-                    if (response.data.roles.at(0).role === 'ROLE_THERAPIST') {
-                        setTherapistData({
-                            id: response.data.id,
-                            email: response.data.email,
-                            name: response.data.name,
-                            surname: response.data.surname,
-                            password: response.data.password,
-                            roles: response.data.roles,
-                            number: response.data.number,
-                            experience: response.data.experience,
-                            location: response.data.location,
-                            allRoles: response.data.allRoles,
-                            University: response.data.University,
-                            gender: response.data.gender
-                        });
-                        connected = loadState("connected",false)
-                        if(response.data.id===0){
-                            saveState("connected",false)
-                        }else {
-                            saveState("connected",true)
+                    fetchUserTherapistConnectionData({id:response.data.id}).then((response) => {
+                        saveState("connected",true)
+                        setValues({
+                            therapistId: response.data.id,
+                            clientId: newBookingsData.clientId
+                        })
+
+                        fetchWorkDays({therapistId: response.data.id}).then((response)=>{
+                            setWorkDays(response.data)
+                        }).catch((e)=>{
+                            localStorage.clear();
+                            history('/loginBoot');
+                        })
+
+                    }).catch((e) => {
+                        saveState("connected",false)
+                        if (e.response) {
+                            // The request was made and the server responded with a status code
+                            // that falls out of the range of 2xx
+                            setConnectionFailure(e.response.data);
+                            console.log(e.response.data); // This will log 'Connect with a therapist!!!'
+                            console.log(e.response.status); // This will log 404 (NOT_FOUND)
+                        } else if (e.request) {
+                            // The request was made but no response was received
+                            console.log(e.request);
+                        } else {
+                            // Something happened in setting up the request that triggered an Error
+                            console.log('Error', e.message);
                         }
+                    });
+                } else {
+                    history('/loginBoot');
+                }
+            }).catch((e) => {
+                history('/loginBoot');
+            });
+
+            if (localStorage.getItem('reloadUser') === "true") {
+                saveState("chatStateLocation",'')
+                // Set the 'reloaded' item in localStorage
+                localStorage.setItem('reloadUser', "false");
+                // Reload the page
+                window.location.reload();
+            }
+        }else if(getAccessToken()){
+            props.setLocation("/dashboard/userDashboard/addBookings")
+            connected = loadState("connected",false)
+            fetchUserData().then((response) => {
+                if (response.data.roles.at(0).role === 'ROLE_USER') {
+                    
+                    saveState("role",'ROLE_USER')
+                    setData(response.data);
+                    const newBookingsData = {
+                        clientId: response.data.id,
+                    };
+
+                    fetchUserTherapistConnectionData({id:response.data.id}).then((response) => {
+                        saveState("connected",true)
 
                         setValues({
                             therapistId: response.data.id,
                             clientId: newBookingsData.clientId
                         })
 
-//                        fetchWorkDays({therapistId: response.data.id}).then((response)=>{
-//                            setWorkDays(response.data)
-//                        }).catch((e)=>{
-//                            localStorage.clear();
-//                            history('/loginBoot');
-//                        })
+                        fetchWorkDays({therapistId: response.data.id}).then((response)=>{
+                            setWorkDays(response.data)
+                        }).catch((e)=>{
+                            localStorage.clear();
+                            history('/loginBoot');
+                        })
 
-                    } else {
-                        localStorage.clear();
-                        history('/loginBoot');
-                    }
-                }).catch((e) => {
-                    connected = loadState("connected",false)
-                    if (e.response) {
-                        // The request was made and the server responded with a status code
-                        // that falls out of the range of 2xx
-                        setConnectionFailure(e.response.data);
-                        console.log(e.response.data); // This will log 'Connect with a therapist!!!'
-                        console.log(e.response.status); // This will log 404 (NOT_FOUND)
-                    } else if (e.request) {
-                        // The request was made but no response was received
-                        console.log(e.request);
-                    } else {
-                        // Something happened in setting up the request that triggered an Error
-                        console.log('Error', e.message);
-                    }
-                });
-            } else {
+                    }).catch((e) => {
+                        saveState("connected",false)
+                        if (e.response) {
+                            // The request was made and the server responded with a status code
+                            // that falls out of the range of 2xx
+                            setConnectionFailure(e.response.data);
+                            console.log(e.response.data); // This will log 'Connect with a therapist!!!'
+                            console.log(e.response.status); // This will log 404 (NOT_FOUND)
+                        } else if (e.request) {
+                            // The request was made but no response was received
+                            console.log(e.request);
+                        } else {
+                            // Something happened in setting up the request that triggered an Error
+                            console.log('Error', e.message);
+                        }
+                    });
+                } else {
+                    history('/loginBoot');
+                }
+            }).catch((e) => {
                 history('/loginBoot');
+            });
+
+            if (localStorage.getItem('reloadUser') === "true") {
+                saveState("chatStateLocation",'')
+                // Set the 'reloaded' item in localStorage
+                localStorage.setItem('reloadUser', "false");
+                // Reload the page
+                window.location.reload();
             }
-        }).catch((e) => {
+        }else{
+            props.loginFailure("Authentication Failed!!!");
+            props.setLocation("/loginBoot")
             history('/loginBoot');
-        });
+        }
     }, []);
+
 
 
     function handleSubmit(evt) {
         evt.preventDefault();
 
         bookSession(values).then((response) => {
-            setSuccessfullyBooked(true)
+            saveState("bookingsMessage",false)
+            history("/dashboard/userDashboard/bookingsInfo")
         }).catch((err) => {
             if (err && err.response) {
                 switch (err.response.status) {
@@ -188,7 +234,6 @@ function AddBookings({loading,error,...props}){
     useEffect(() => {
         if (values.date) {
             fetchBookedHours(values).then((response) => {
-                console.log("RESPONSE",response.data)
                 setHours(response.data);
             }).catch((e) => {
                 history('/loginBoot');
@@ -207,7 +252,7 @@ function AddBookings({loading,error,...props}){
 
                     <div id="content">
 
-                        <DashboardNav data={data} setUser={props.setUser} setUserAuthenticationState={props.setUserAuthenticationState}/>
+                        <DashboardNav data={data} setUser={props.setUser} />
 
                         { connectionFailure &&
                             <Alert style={{marginTop:'20px'}} variant="danger">
@@ -215,27 +260,65 @@ function AddBookings({loading,error,...props}){
                             </Alert>
                         }
 
-                        <div className="container-fluid-AB">
-                            {connected && <div className="card-AB">
+                        <div className="container-fluid">
+                            <div style={{display: "flex", justifyContent: "start", alignItems: 'center'}}>
+                                <Link  to={"/dashboard/userDashboard/bookingsInfo"} className="btn goBack" style={{color:"#0d6efd",marginLeft:"-10px"}}
+                                      type="button"
+                                ><FontAwesomeIcon icon={faChevronLeft} style={{marginRight:"3.5px"}}/>Go to Bookings
+                                </Link>
+                            </div>
+                            <div className="d-sm-flex align-items-center justify-content-between mb-4">
+                                <h1 className="h3 mb-0 text-800" style={{color: "#5a5c69"}}>Book a Session</h1>
+                            </div>
+                        </div>
+                        <div style={{display:"flex",justifyContent:"center"}}>
+                            {connected && <div className="card shadow" style={{width:"500px"}}>
                                 <div className="card-body">
-                                    <p className="card-text">Select next session date and time:</p>
-                                    <p>Therapist only works these days: </p>
-                                    {workDays.map((workDay, index) => {
-                                        // Access the day property from the workDay object
-                                        const day = workDay.day;
+                                    {bookingsMessage &&
+                                        <Alert style={{marginTop: '20px'}} variant="info">
+                                            Make your first booking :)
+                                        </Alert>
+                                    }
 
-                                        // Return a paragraph element with the day
-                                        return (
-                                            <p key={index}>{day}</p>
-                                        );
-                                    })}
+                                    <h4>Therapist works these days:</h4>
+                                    <div style={{
+                                        display: 'flex',
+                                        justifyContent: 'space-around',
+                                        alignItems: 'center',
+                                        marginTop: "50px",
+                                        marginBottom: "50px"
+                                    }}>
+                                        <div style={{display: 'flex'}}>
+                                            {workDays.map((workDay, index) => {
+                                                const day = workDay.day;
+                                                return (
+                                                    <div key={index} style={{
+                                                        display: 'flex',
+                                                        flexDirection: 'column',
+                                                        justifyContent: 'center',
+                                                        alignItems: 'center',
+                                                        margin: '0 5px',
+                                                        width: '45px',
+                                                        height: '45px',
+                                                        borderRadius: '50%',
+                                                        background: '#0d6efd',
+                                                        color: 'white',
+                                                        fontWeight: 'bold'
+                                                    }}>
+                                                        <span>{day.slice(0, 3).toUpperCase()}</span>
+                                                    </div>
+                                                );
+                                            })}
+                                        </div>
+                                    </div>
 
                                     <form className="form-AddBookings" onSubmit={handleSubmit}>
-                                        <label htmlFor="sessionDate">Date:</label><br/>
+                                        <label htmlFor="sessionDate">Select Date:</label><br/>
                                         <input type="date" id="sessionDate" name="date" defaultValue={values.date}
-                                               min={new Date().toISOString().split('T')[0]}  onChange={handleChange}/><br/>
+                                               min={new Date().toISOString().split('T')[0]}
+                                               onChange={handleChange}/><br/>
                                         <select name="hour" onChange={handleChange}>
-                                            <option value="">Select an hour</option>
+                                            <option value="">Select Hour</option>
                                             {hours.map((hourObj, index) => {
                                                 // Format the hour to look like time
                                                 const hour = hourObj.hour.map(num => num < 10 ? `0${num}` : num).join(':');
@@ -246,31 +329,30 @@ function AddBookings({loading,error,...props}){
                                                 );
                                             })}
                                         </select>
+
+                                        <i style={{marginTop: "15px", marginBottom: "15px"}}>Info: You cant have two
+                                            bookings in the same day.</i>
                                         <br/><br/>
-                                        <i>Info: You cant have two bookings in the same day.</i>
-                                        <br/><br/>
-                                        <input className="input-AB" type="submit" value="Submit"/>
+                                        <div style={{
+                                            display: "flex",
+                                            justifyContent: "center",
+                                            alignItems: "center",
+                                            marginBottom:"20px"
+                                        }}>
+                                            <input type="submit" value="Save" className="btn btn-primary "/>
+                                            <Link className="btn btn-danger" style={{marginLeft: "5px"}}
+                                                  type={"button"}
+                                                  to="/dashboard/userDashboard/bookingsInfo">
+                                                Cancel
+                                            </Link>
+                                        </div>
                                     </form>
-
-
-                                    {successfullyBooked && <p>Head to your bookings, to manage your bookings: <Link
-                                        to="/dashboard/userDashboard/bookingsInfo">Manage Bookings</Link></p>}
                                 </div>
                             </div>}
                         </div>
                     </div>
                 </div>
-
             </div>
-
-            <a className="scroll-to-top rounded" href="#page-top">
-                <i className="fas fa-angle-up"></i>
-            </a>
-
-            <script src="../../../vendor/jquery/jquery.min.js"></script>
-            <script src="../../../vendor/bootstrap/js/bootstrap.bundle.min.js"></script>
-            <script src="../../../vendor/jquery-easing/jquery.easing.min.js"></script>
-
         </main>
     )
 
@@ -281,7 +363,6 @@ const mapStateToProps = ({auth}) => {
     return {
         loading: auth.loading,
         error: auth.error,
-        isUserAuthenticated: auth.isUserAuthenticated,
         location: auth.location
     }
 }
@@ -290,7 +371,6 @@ const mapDispatchToProps = (dispatch) => {
         authenticate: () => dispatch(authenticate()),
         setUser: (data) => dispatch(authSuccess(data)),
         loginFailure: (message) => dispatch(authFailure(message)),
-        setUserAuthenticationState: (boolean) => dispatch(setUserAuthenticationState(boolean)),
         setLocation: (path) => dispatch(setLocation(path))
     }
 }

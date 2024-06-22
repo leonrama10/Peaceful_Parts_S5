@@ -17,3 +17,27 @@
     color: blue;
     transition: 0.3ms;
 }
+.container-fluid-UserDashboardTherapists{
+    display: flex;
+    justify-content: space-around;
+    align-items: center;
+}
+
+.card-UserDashboardTherapists{
+    /*display: flex;*/
+    /*flex-direction: row;*/
+    /*justify-content: space-between;*/
+    /*align-items: center;*/
+    width: 300px;
+    padding: 20px;
+}
+.card-body-UserDashboardTherapists{
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+}
+
+.card-nextSession{
+    padding: 140px;
+}

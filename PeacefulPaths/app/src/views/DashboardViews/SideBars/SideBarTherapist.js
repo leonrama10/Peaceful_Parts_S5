@@ -1,54 +1,62 @@
-import React, { useState } from 'react';
+import React from 'react';
 import { Link } from 'react-router-dom';
-import { Collapse } from "react-bootstrap";
-import arrow from "../../../img/arrow.png";
+import {FontAwesomeIcon} from "@fortawesome/react-fontawesome";
+import {faCalendarCheck, faHouseUser, faInbox, faUsers} from "@fortawesome/free-solid-svg-icons";
+import {faCalendarDays, faCommentDots} from "@fortawesome/free-regular-svg-icons";
 
-export default function SideBarTherapist() {
-    const [open, setOpen] = useState(false);
+export default function SideBarTherapist(){
 
     return (
-        <ul className="navbar-nav bg-gradient-primary sidebar sidebar-dark accordion" id="accordionSidebar">
-            <Link className="sidebar-brand d-flex align-items-center justify-content-center" to="/">
-                <div className="sidebar-brand-icon rotate-n-15">
-                    <i className="fas fa-laugh-wink"></i>
-                </div>
+
+        <ul className="navbar-nav bg-gradient-primary sidebar sidebar-dark accordion"
+            id="accordionSidebar">
+
+            <div className="sidebar-brand d-flex align-items-center justify-content-center">
                 <div className="sidebar-brand-text mx-3">PeacefulParts</div>
-            </Link>
-            <hr className="sidebar-divider my-0" />
+            </div>
+
+            <hr className="sidebar-divider my-0"/>
+
             <li className="nav-item active">
                 <Link className="nav-link" to="/dashboard/therapistDashboard">
-                    <i className="fas fa-fw fa-tachometer-alt"></i>
-                    <span>Dashboard</span></Link>
+                    <FontAwesomeIcon style={{fontSize: "15px"}} icon={faHouseUser}/>
+                    <span style={{marginLeft: "3px", fontSize: "15px"}}>Dashboard</span></Link>
             </li>
-            <hr className="sidebar-divider" />
+
+            <hr className="sidebar-divider"/>
+
             <div className="sidebar-heading">
                 Interface
             </div>
-            <li className="nav-item" style={{ marginTop: "10px", marginBottom: "10px" }}>
-                <a style={{
-                    textDecoration: "none",
-                    color: "white",
-                    fontSize: "13px",
-                    marginLeft: "20px",
-                    fontWeight: "550"
-                }} onClick={() => setOpen(!open)} aria-controls="collapse-text" aria-expanded={open}>
-                    <span>Managing</span>
-                    <img style={{ marginLeft: "99px", width: "15px" }} src={arrow} alt="arrow" />
-                </a>
-                <Collapse in={open}>
-                    <div id="collapse-text">
-                        <div className="bg-white py-2 collapse-inner rounded">
-                            <h6 className="collapse-header">Custom Components:</h6>
-                            <Link className="collapse-item" to="/dashboard/therapistDashboard/therapistChatDashboard">Message Center</Link>
-                            <Link className="collapse-item" to="/dashboard/therapistDashboard/workDaysDashboard">Manage Work Days</Link>
-                            <Link className="collapse-item" to="/dashboard/therapistDashboard/users">Manage Clients</Link>
-                            <Link className="collapse-item" to="/dashboard/therapistDashboard/history">Client History</Link>
 
-                        </div>
-                    </div>
-                </Collapse>
-            </li>
-            <hr className="sidebar-divider" />
+            <Link className="nav-item sidebar-generate" style={{marginTop: "10px"}}
+                  to={"/dashboard/therapistDashboard/therapistChatDashboard"}>
+                <FontAwesomeIcon style={{fontSize:"15px"}} icon={faInbox}/>
+                <span style={{marginLeft:"3px",fontSize:"14px"}}>Messaging</span>
+            </Link>
+
+            <Link className="nav-item sidebar-generate"  style={{marginTop: "10px"}} to={"/dashboard/therapistDashboard/addNewWorkDays"}>
+                <FontAwesomeIcon style={{fontSize:"15px"}} icon={faCalendarDays}/>
+                <span style={{marginLeft:"3px",fontSize:"14px"}}>Work Days</span>
+            </Link>
+
+            <Link className="nav-item sidebar-generate"  style={{marginTop: "10px"}} to={"/dashboard/therapistDashboard/bookings"}>
+                <FontAwesomeIcon style={{fontSize:"15px"}} icon={faCalendarCheck}/>
+                <span style={{marginLeft:"3px",fontSize:"14px"}}>Bookings</span>
+            </Link>
+
+            <Link className="nav-item sidebar-generate"  style={{marginTop: "10px"}} to={"/dashboard/therapistDashboard/users"}>
+                <FontAwesomeIcon style={{fontSize:"15px"}} icon={faUsers}/>
+                <span style={{marginLeft:"3px",fontSize:"14px"}}>Clients</span>
+            </Link>
+
+            <Link className="nav-item sidebar-generate"  style={{marginTop: "10px"}} to={"/dashboard/therapistDashboard/feedbacks"}>
+                <FontAwesomeIcon style={{fontSize:"15px"}} icon={faCommentDots}/>
+                <span style={{marginLeft:"3px",fontSize:"14px"}}>Feedbacks</span>
+            </Link>
+
+            <hr className="sidebar-divider d-none d-md-block"/>
+
         </ul>
-    );
+    )
 }

@@ -1,12 +1,31 @@
 import React,{useState} from 'react';
-import {userSendEmail} from '../../../api/authService';
+import {fetchUserData, userSendEmail} from '../../../api/authService';
 import {Link, useNavigate} from 'react-router-dom';
 import '../../../css/sb-admin-2.min.css';
 import {Alert} from "reactstrap";
 import {authenticate, authFailure, authSuccess} from "../../../redux/authActions";
 import {connect} from "react-redux";
 import {loadState, saveState} from "../../../helper/sessionStorage";
+import {jwtDecode} from "jwt-decode";
 loadState("ResetPassword",false)
+const getRefreshToken = () => {
+    const token = localStorage.getItem('REFRESH_TOKEN');
+
+    if (!token || token==="null") {
+        return null;
+    }
+
+    const decodedToken = jwtDecode(token);
+    const currentTime = Date.now() / 1000;
+
+    if (decodedToken.exp < currentTime) {
+        console.log("Token expired.");
+        return null;
+    } else {
+        return token;
+    }
+}
+
 function ForgotPasswordBoot({loading,error,...props}){
 
     const history = useNavigate ();
@@ -14,6 +33,45 @@ function ForgotPasswordBoot({loading,error,...props}){
     const [values, setValues] = useState({
         email: ''
     });
+
+    React.useEffect(()=>{
+        if(getRefreshToken()) {
+            //throw a alert telling that you are already logged in do you want to log out
+            let confirmLogout = window.confirm("You are already logged in. Do you want to log out?");
+
+            if (confirmLogout) {
+                
+                saveState("role", '')
+                props.setUser(null);
+            }else {
+                fetchUserData().then((response) => {
+                    if (response.data.roles.at(0)){
+                        if (response.data.roles.at(0).role === 'ROLE_ADMIN') {
+                            
+                            saveState("role",'ROLE_ADMIN')
+                            props.setLocation("/dashboard/adminDashboard")
+                            history('/dashboard/adminDashboard');
+                        }else if (response.data.roles.at(0).role === 'ROLE_USER') {
+                            
+                            saveState("role",'ROLE_USER')
+                            props.setLocation("/dashboard/userDashboard")
+                            history('/dashboard/userDashboard');
+                        } else if(response.data.roles.at(0).role === 'ROLE_THERAPIST'){
+                            
+                            saveState("role",'ROLE_THERAPIST')
+                            props.setLocation("/dashboard/therapistDashboard")
+                            history('/dashboard/therapistDashboard');
+                        }
+                    }
+                }).catch((e) => {
+                    history('/loginBoot');
+                });
+            }
+        }else {
+            saveState("role", '')
+            props.setUser(null);
+        }
+    },[])
 
     const handleSubmit=(evt)=>{
         evt.preventDefault();
@@ -101,7 +159,7 @@ function ForgotPasswordBoot({loading,error,...props}){
                                             </form>
                                             <hr/>
                                             <div className="text-center">
-                                                <Link className="small" to="/registerBoot">Create an Account!</Link>
+                                                <Link className="small" to="/get-started">Create an Account!</Link>
                                             </div>
                                             <div className="text-center">
                                                 <Link className="small" to="/loginBoot">Already have an account? Login!</Link>

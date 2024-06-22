@@ -1,14 +1,25 @@
 @import '~@fortawesome/fontawesome-free/css/all.min.css';
 
 .footer {
-    background-color: #282c34;
+    background-color: #1c4278;
     padding: 20px 0;
     text-align: center;
     font-family: Arial, sans-serif;
-    border-top: 1px solid #eaeaea;  /* vija e footer */
+    /*border-top: 1px solid #eaeaea;  !* vija e footer *!*/
     position: relative;
-        bottom: 0;
-        width: 100%;
+    bottom: 0;
+    width: 100%;
+}
+
+footer.isLoginFooter{
+    background-color: white;
+    padding: 20px 0 0 0;
+    text-align: center;
+    font-family: Arial, sans-serif;
+    position: relative;
+    bottom: 0;
+    width: 100%;
+    color:#007CF4;
 }
 
 .footer-nav {
@@ -26,6 +37,25 @@
 
 .footer-nav a:hover {
     text-decoration: none;
+    color: #007cf4;
+}
+
+.isLoginFooterNav{
+    display: flex;
+    justify-content: center;
+    gap: 15px;
+    margin-bottom: 10px;
+}
+
+.isLoginFooterNav a {
+    text-decoration: none;
+    color: #007cf4;
+    font-size: 14px;
+}
+
+.isLoginFooterNav a:hover {
+    text-decoration: none;
+    color: #024b91;
 }
 
 .social-media-icons {
@@ -45,8 +75,25 @@
     color: #0073e6;
 }
 
+.isLoginSocial{
+    display: flex;
+    justify-content: center;
+    gap: 15px;
+    margin-bottom: 10px;
+}
+
+.isLoginSocial a {
+    color: #007cf4;
+    font-size: 20px;
+    text-decoration: none;
+}
+
+.isLoginSocial a:hover {
+    color: #024b91;
+}
+
 .footer p {
-    color: #777;
+    color: white;
     font-size: 14px;
     margin: 0;
 }

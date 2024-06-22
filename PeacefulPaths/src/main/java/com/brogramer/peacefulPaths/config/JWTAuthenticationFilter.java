@@ -1,6 +1,7 @@
 package com.brogramer.peacefulPaths.config;
 
 import org.springframework.http.HttpHeaders;
+import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.web.filter.OncePerRequestFilter;
 
@@ -26,8 +27,8 @@ public class JWTAuthenticationFilter extends OncePerRequestFilter {
             if (authElements.length == 2
                     && "Bearer".equals(authElements[0])) {
                 try {
-                    SecurityContextHolder.getContext().setAuthentication(
-                            userAuthenticationProvider.validateToken(authElements[1]));
+                    Authentication auth = userAuthenticationProvider.validateToken(authElements[1]);
+                    SecurityContextHolder.getContext().setAuthentication(auth);
                 } catch (RuntimeException e) {
                     SecurityContextHolder.clearContext();
                     throw e;

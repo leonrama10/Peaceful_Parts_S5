@@ -1,27 +1,58 @@
 import React, {useEffect, useState} from 'react';
 import {addNewNote, fetchUserData, fetchUserDataId} from '../../../api/authService';
-import {useNavigate, useParams} from 'react-router-dom';
+import {useNavigate} from 'react-router-dom';
 import {Container, Row, Col, Form, Button} from 'react-bootstrap';
 import {
     authenticate,
     authFailure,
-    authSuccess, setLocation,
-    setTherapistAuthenticationState
+    authSuccess, setLocation
 } from "../../../redux/authActions";
-import '../../../css/sb-admin-2.min.css';
+import '../../../css/Notes.css';
 import {Alert} from "reactstrap";
 import {loadState, saveState} from "../../../helper/sessionStorage";
 import {connect} from "react-redux";
 import DashboardNav from "../DashboardNav";
 import SideBarTherapist from "../SideBars/SideBarTherapist";
-let role;
+import {jwtDecode} from "jwt-decode";
 let userRole;
-let therapistId;
-const isTherapistAuthenticatedBoolean = loadState("isTherapistAuthenticated",false)
+const getRefreshToken = () => {
+    const token = localStorage.getItem('REFRESH_TOKEN');
+
+    if (!token || token==="null") {
+        return null;
+    }
+
+    const decodedToken = jwtDecode(token);
+    const currentTime = Date.now() / 1000;
+
+    if (decodedToken.exp < currentTime) {
+        console.log("Token expired.");
+        return null;
+    } else {
+        return token;
+    }
+}
+const getAccessToken = () => {
+    const token = localStorage.getItem('USER_KEY');
+
+    if (!token || token==="null") {
+        return null;
+    }
+
+    const decodedToken = jwtDecode(token);
+    const currentTime = Date.now() / 1000;
+
+    if (decodedToken.exp < currentTime) {
+        console.log("Token expired.");
+        return null;
+    } else {
+        return token;
+    }
+}
+let userId = null
+let addNotesBoolean = null
 function TherapistAddNotes({loading,error,...props}){
 
-    const { id } = useParams();
-    const idNumber = Number(id);
     const history = useNavigate ();
     const [data,setData]=useState({});
     const [userData,setUserData]=useState({});
@@ -36,84 +67,103 @@ function TherapistAddNotes({loading,error,...props}){
     });
 
     useEffect(() => {
-        props.setLocation("/dashboard/therapistDashboard/users/addNotes/"+idNumber)
-        if(isTherapistAuthenticatedBoolean){
-            props.setTherapistAuthenticationState(true)
-            saveState("isTherapistAuthenticated",isTherapistAuthenticatedBoolean)
-            fetchUserData().then((response)=>{
-                if (response.data.roles.at(0).role === 'ROLE_THERAPIST'){
-                    setUserData(response.data);
-                    role = loadState("role",'');
-                    therapistId = response.data.id
-                }
-                else{
-                    history('/loginBoot');
-                }
-            }).catch((e)=>{
-                localStorage.clear();
-                history('/loginBoot');
-            })
+        userId = loadState("chatUserId",0)
+        addNotesBoolean = loadState("addNotesBoolean",false)
+        if (addNotesBoolean) {
+            if (getRefreshToken()) {
+                props.setLocation("/dashboard/therapistDashboard/users/addNotes")
 
-            fetchUserDataId(idNumber).then((response)=>{
-                setData(response.data);
-                setValues({
-                    clientId:response.data.id,
-                    therapistId:therapistId,
-                    mainPoints: response.data.mainPoints,
-                    notesText: response.data.notesText,
-                    patientMoodBefore: response.data.patientMoodBefore,
-                    patientMoodAfter: response.data.patientMoodAfter
-                })
-                userRole = loadState("userRole",'')
-                saveState("userRole",response.data.roles.at(0).role);
-            }).catch((e)=>{
-                localStorage.clear();
-                history('/loginBoot');
-            })
-        }else if(props.isTherapistAuthenticated){
-            props.setTherapistAuthenticationState(true)
-            saveState("isTherapistAuthenticated",props.isTherapistAuthenticated)
-            fetchUserData().then((response)=>{
-                if (response.data.roles.at(0).role === 'ROLE_THERAPIST'){
-                    setUserData(response.data);
-                    role = loadState("role",'');
-                    therapistId = response.data.id
-                }
-                else{
-                    history('/loginBoot');
-                }
-            }).catch((e)=>{
-                localStorage.clear();
-                history('/loginBoot');
-            })
+                fetchUserData().then((response) => {
+                    if (response.data.roles.at(0).role === 'ROLE_THERAPIST') {
+                        setUserData(response.data);
+                        saveState("role", 'ROLE_THERAPIST')
+                        let therapistId = response.data.id
 
-            fetchUserDataId(idNumber).then((response)=>{
-                setData(response.data);
-                setValues({
-                    clientId:response.data.id,
-                    therapistId:therapistId,
-                    mainPoints: response.data.mainPoints,
-                    notesText: response.data.notesText,
-                    patientMoodBefore: response.data.patientMoodBefore,
-                    patientMoodAfter: response.data.patientMoodAfter
+                        fetchUserDataId({id:userId}).then((response) => {
+                            setData(response.data);
+                            setValues({
+                                clientId: response.data.id,
+                                therapistId: therapistId,
+                                mainPoints: response.data.mainPoints,
+                                notesText: response.data.notesText,
+                                patientMoodBefore: response.data.patientMoodBefore,
+                                patientMoodAfter: response.data.patientMoodAfter
+                            })
+                            userRole = loadState("userRole", '')
+                            saveState("userRole", response.data.roles.at(0).role);
+                        }).catch((e) => {
+                            localStorage.clear();
+                            history('/loginBoot');
+                        })
+                    } else {
+                        history('/loginBoot');
+                    }
+                }).catch((e) => {
+                    localStorage.clear();
+                    history('/loginBoot');
                 })
-                userRole = loadState("userRole",'')
-                saveState("userRole",response.data.roles.at(0).role);
-            }).catch((e)=>{
-                localStorage.clear();
+
+
+                if (localStorage.getItem('reloadTherapist') === "true") {
+                    let userId = loadState("chatUserId", 0)
+                    saveState("meetingAvailableTherapist/" + userId, false)
+                    saveState("chatStateLocation",'')
+                    // Set the 'reloaded' item in localStorage
+                    localStorage.setItem('reloadTherapist', "false");
+                    // Reload the page
+                    window.location.reload();
+                }
+            } else if (getAccessToken()) {
+                props.setLocation("/dashboard/therapistDashboard/users/addNotes")
+
+                fetchUserData().then((response) => {
+                    if (response.data.roles.at(0).role === 'ROLE_THERAPIST') {
+                        setUserData(response.data);
+                        saveState("role", 'ROLE_THERAPIST')
+                        let therapistId = response.data.id
+
+                        fetchUserDataId({id:userId}).then((response) => {
+                            setData(response.data);
+                            setValues({
+                                clientId: response.data.id,
+                                therapistId: therapistId,
+                                mainPoints: response.data.mainPoints,
+                                notesText: response.data.notesText,
+                                patientMoodBefore: response.data.patientMoodBefore,
+                                patientMoodAfter: response.data.patientMoodAfter
+                            })
+                            userRole = loadState("userRole", '')
+                            saveState("userRole", response.data.roles.at(0).role);
+                        }).catch((e) => {
+                            localStorage.clear();
+                            history('/loginBoot');
+                        })
+                    } else {
+                        history('/loginBoot');
+                    }
+                }).catch((e) => {
+                    localStorage.clear();
+                    history('/loginBoot');
+                })
+
+                if (localStorage.getItem('reloadTherapist') === "true") {
+                    let userId = loadState("chatUserId", 0)
+                    saveState("meetingAvailableTherapist/" + userId, false)
+                    saveState("chatStateLocation",'')
+                    // Set the 'reloaded' item in localStorage
+                    localStorage.setItem('reloadTherapist', "false");
+                    // Reload the page
+                    window.location.reload();
+                }
+            } else {
+                props.loginFailure("Authentication Failed!!!");
+                props.setLocation("/loginBoot")
                 history('/loginBoot');
-            })
-        }else{
-            props.setLocation('/loginBoot')
+            }
+        }else {
             props.loginFailure("Authentication Failed!!!");
+            props.setLocation("/loginBoot")
             history('/loginBoot');
-        }
-
-        if (localStorage.getItem('reloadTherapist')==="true") {
-            // Set the 'reloaded' item in localStorage
-            localStorage.setItem('reloadTherapist', "false");
-            // Reload the page
-            window.location.reload();
         }
     }, []);
 
@@ -122,7 +172,7 @@ function TherapistAddNotes({loading,error,...props}){
 
         addNewNote(values).then((response)=>{
             if(response.status===200){
-                history('/dashboard/therapistDashboard/users');
+                history('/dashboard/therapistDashboard/therapistChatDashboard');
             }
             else{
                 props.loginFailure('Something LEKAAAAAAA!Please Try Again');
@@ -175,6 +225,12 @@ function TherapistAddNotes({loading,error,...props}){
         console.log("Current values state:", values);
     }, [values]); // This effect runs whenever `values` changes
 
+    const handleRemovePoint = (index) => {
+        setValues(prevValues => ({
+            ...prevValues,
+            mainPoints: prevValues.mainPoints.filter((_, i) => i !== index),
+        }));
+    };
 
     return (
         <main id="page-top" style={{height: '100%'}}>
@@ -187,7 +243,7 @@ function TherapistAddNotes({loading,error,...props}){
 
                     <div id="content">
 
-                        <DashboardNav data={userData} setUser={props.setUser} setTherapistAuthenticationState={props.setTherapistAuthenticationState}/>
+                        <DashboardNav data={userData} setUser={props.setUser} />
 
                         <div className="container-fluid" style={{marginBottom: '100px'}}>
 
@@ -205,7 +261,12 @@ function TherapistAddNotes({loading,error,...props}){
                                                 <Form.Label>Main Points of Discussion:</Form.Label>
                                                 <ul>
                                                     {values.mainPoints && values.mainPoints.map((point, index) => (
-                                                        <li key={index}>
+                                                        <li key={index} style={{
+                                                            marginBottom: '10px',
+                                                            display: 'flex',
+                                                            alignItems: 'center'
+                                                        }}>
+                                                            <span style={{marginRight: '10px'}}>•</span>
                                                             <Form.Control
                                                                 name="mainPoints"
                                                                 type="text"
@@ -213,12 +274,15 @@ function TherapistAddNotes({loading,error,...props}){
                                                                 onChange={(e) => handleChange(e, index)}
                                                                 required
                                                             />
+                                                            <button onClick={() => handleRemovePoint(index)}
+                                                                    className={"button-mainPoints"}> ̶
+                                                            </button>
                                                         </li>
                                                     ))}
                                                 </ul>
                                                 <Button onClick={handleAddPoint}>Add Point</Button>
                                             </Form.Group>
-                                            <br />
+                                            <br/>
                                             <Form.Group controlId="formNotesText">
                                                 <Form.Label>Session Notes & Observations:</Form.Label>
                                                 <Form.Control
@@ -230,9 +294,9 @@ function TherapistAddNotes({loading,error,...props}){
                                                     required
                                                 />
                                             </Form.Group>
-                                            <br />
+                                            <br/>
                                             <Form.Group controlId="formPatientMoodBefore">
-                                                <Form.Label>Patient Mood (Before):</Form.Label>
+                                            <Form.Label>Patient Mood (Before):</Form.Label>
                                                 <br/>
                                                 {Array.from({length: 10}, (_, i) => i + 1).map((value) => (
                                                     <Form.Check
@@ -274,35 +338,8 @@ function TherapistAddNotes({loading,error,...props}){
                             </Container>
                         </div>
                     </div>
-
-                    <footer className="bg-white">
-                        <div className="container my-auto">
-                            <div className="copyright text-center my-auto">
-                                <span style={{color: 'grey'}}>Copyright © PeacefulParts 2024</span>
-                            </div>
-                        </div>
-                    </footer>
-
                 </div>
-
             </div>
-
-            <a className="scroll-to-top rounded" href="#page-top">
-                <i className="fas fa-angle-up"></i>
-            </a>
-
-            <script src="../../../vendor/jquery/jquery.min.js"></script>
-            <script src="../../../vendor/bootstrap/js/bootstrap.bundle.min.js"></script>
-
-            <script src="../../../vendor/jquery-easing/jquery.easing.min.js"></script>
-
-            <script src="../../../js/sb-admin-2.min.js"></script>
-
-            <script src="../../../vendor/chart.js/Chart.min.js"></script>
-
-            <script src="../../../js/demo/chart-area-demo.js"></script>
-            <script src="../../../js/demo/chart-pie-demo.js"></script>
-
         </main>
     )
 }
@@ -312,7 +349,6 @@ const mapStateToProps = ({auth}) => {
     return {
         loading: auth.loading,
         error: auth.error,
-        isTherapistAuthenticated: auth.isTherapistAuthenticated,
         location: auth.location
     }
 }
@@ -321,7 +357,6 @@ const mapDispatchToProps = (dispatch) => {
         authenticate: () => dispatch(authenticate()),
         setUser: (data) => dispatch(authSuccess(data)),
         loginFailure: (message) => dispatch(authFailure(message)),
-        setTherapistAuthenticationState: (boolean) => dispatch(setTherapistAuthenticationState(boolean)),
         setLocation: (path) => dispatch(setLocation(path))
     }
 }

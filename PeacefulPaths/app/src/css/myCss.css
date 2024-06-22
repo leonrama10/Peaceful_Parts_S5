@@ -4,4 +4,81 @@
     outline: none !important;
 }
 
+.custom-gridlines{
+    border: 1px solid #b1b1b1;
+}
+
+/* Header styles */
+.custom-gridlines .p-datatable-thead > tr > th {
+    background-color: #f3f3f3; /* Header background color */
+    color: #495057; /* Header text color */
+    border: 1px solid #b1b1b1;
+    border-top: none;
+    height: 50px;
+    padding-left:10px;
+}
+
+/* Body styles */
+.custom-gridlines .p-datatable-tbody > tr > td {
+    border: 1px solid #b1b1b1;
+    height: 50px;
+    padding-left:10px;
+}
+
+/* Paginator styles */
+.custom-gridlines .p-paginator {
+    text-align: center;
+    height:50px;
+    /*background-color: #e6e6e6; !* Paginator background color *!*/
+    color: #495057; /* Paginator text color */
+}
+
+.custom-gridlines .p-paginator .p-paginator-page {
+    margin: 0 20px; /* Add space to both left and right of each button */
+    /* Other styles */
+}
+
+.custom-gridlines .p-paginator .p-paginator-page.p-highlight {
+    background-color: #b6d2f4; /* Active button background color */
+    color: #535353; /* Active button text color */
+    padding:5px;
+    border-radius: 100%;
+    width: 30px;
+    height: 30px;
+}
+
+.custom-gridlines .p-paginator .p-paginator-page:not(.p-highlight):hover {
+    background-color: #f0f0f0; /* Hover background color for other buttons */
+}
+
+.custom-gridlines .p-paginator .p-dropdown {
+    border: 1px solid #acb1b6; /* Set the border color */
+    border-radius: 0.25rem; /* Rounded corners */
+    margin-left:20px;
+}
+
+.custom-gridlines .p-paginator .p-dropdown .p-dropdown-label,
+.custom-gridlines .p-paginator .p-dropdown .p-dropdown-trigger {
+    padding: 5px 10px; /* Adjust padding */
+}
+
+.p-dropdown-panel{
+    color: #535353; /* Change text color */
+}
+
+.p-dropdown-items{
+    margin-left:-33px;
+    text-align: center;
+    background-color: white; /* Change background color */
+    border: 1px solid #ddd;
+}
+
+.p-dropdown-item{
+    border: 1px solid #ddd;
+}
+
+.p-dropdown-item:hover{
+    background-color: #b6d2f4;
+}
+
 

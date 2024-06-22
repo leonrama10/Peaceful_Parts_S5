@@ -1,21 +1,60 @@
 import React, {useEffect, useState} from 'react';
-import {fetchUserData, selectWorkDays, userRegister} from '../../../api/authService';
-import {useNavigate} from 'react-router-dom';
+import {fetchUserData, fetchWorkDays, fetchWorkHours, selectWorkDays} from '../../../api/authService';
+import {Link, useNavigate} from 'react-router-dom';
 import {
     authenticate,
     authFailure,
-    authSuccess, setLocation,
-    setTherapistAuthenticationState
+    authSuccess, setLocation
 } from "../../../redux/authActions";
-import '../../../css/sb-admin-2.min.css';
+import '../../../css/TherapistDashboard.css';
 import {loadState, saveState} from "../../../helper/sessionStorage";
 import {connect} from "react-redux";
 import DashboardNav from "../DashboardNav";
 import SideBarTherapist from "../SideBars/SideBarTherapist";
-let role;
-const isTherapistAuthenticatedBoolean = loadState("isTherapistAuthenticated",false)
+import {jwtDecode} from "jwt-decode";
+import { Range, getTrackBackground } from 'react-range';
+import {FontAwesomeIcon} from "@fortawesome/react-fontawesome";
+import {faChevronLeft} from "@fortawesome/free-solid-svg-icons";
+const getRefreshToken = () => {
+    const token = localStorage.getItem('REFRESH_TOKEN');
+
+    if (!token || token==="null") {
+        return null;
+    }
+
+    const decodedToken = jwtDecode(token);
+    const currentTime = Date.now() / 1000;
+
+    if (decodedToken.exp < currentTime) {
+        console.log("Token expired.");
+        return null;
+    } else {
+        return token;
+    }
+}
+const getAccessToken = () => {
+    const token = localStorage.getItem('USER_KEY');
+
+    if (!token || token==="null") {
+        return null;
+    }
+
+    const decodedToken = jwtDecode(token);
+    const currentTime = Date.now() / 1000;
+
+    if (decodedToken.exp < currentTime) {
+        console.log("Token expired.");
+        return null;
+    } else {
+        return token;
+    }
+}
 function TherapistAddNewWorkDays({loading,error,...props}){
 
+    const STEP = 1;
+    const MIN = 0;
+    const MAX = 23;
+    const [rangeValues, setRangeValues] = useState([MIN, MAX]);
     const history = useNavigate ();
     const [userData,setUserData]=useState({});
     const [values, setValues] = useState({
@@ -27,50 +66,136 @@ function TherapistAddNewWorkDays({loading,error,...props}){
     });
 
     useEffect(() => {
-        props.setLocation("/dashboard/therapistDashboard/addNewWorkDays")
-        if(isTherapistAuthenticatedBoolean){
-            props.setTherapistAuthenticationState(true)
-            saveState("isTherapistAuthenticated",isTherapistAuthenticatedBoolean)
-            fetchUserData().then((response)=>{
-                if (response.data.roles.at(0).role === 'ROLE_THERAPIST'){
-                    setUserData(response.data);
-                    values.therapistId = response.data.id
-                    role = loadState("role",'');
-                }
-                else{
-                    history('/loginBoot');
-                }
-            }).catch((e)=>{
-                localStorage.clear();
-                history('/loginBoot');
-            })
-        }else if(props.isTherapistAuthenticated){
-            props.setTherapistAuthenticationState(true)
-            saveState("isTherapistAuthenticated",props.isTherapistAuthenticated)
-            fetchUserData().then((response)=>{
-                if (response.data.roles.at(0).role === 'ROLE_THERAPIST'){
-                    setUserData(response.data);
-                    values.therapistId = response.data.id
-                    role = loadState("role",'');
-                }
-                else{
-                    history('/loginBoot');
-                }
-            }).catch((e)=>{
-                localStorage.clear();
-                history('/loginBoot');
-            })
-        }else{
-            props.setLocation('/loginBoot')
-            props.loginFailure("Authentication Failed!!!");
-            history('/loginBoot');
-        }
+        if(getRefreshToken()) {
+            props.setLocation("/dashboard/therapistDashboard/addNewWorkDays")
 
-        if (localStorage.getItem('reloadTherapist')==="true") {
-            // Set the 'reloaded' item in localStorage
-            localStorage.setItem('reloadTherapist', "false");
-            // Reload the page
-            window.location.reload();
+                fetchUserData().then((response) => {
+                    if (response.data.roles.at(0).role === 'ROLE_THERAPIST') {
+                        setUserData(response.data);
+                        let therapistId = response.data.id
+                        saveState("role",'ROLE_THERAPIST')
+
+                        fetchWorkDays({therapistId: response.data.id}).then((response) => {
+                            if (response.data.length > 0) {
+                                const workDays = response.data
+
+                                fetchWorkHours({therapistId: therapistId}).then((response) => {
+                                    if (response.data.length > 0) {
+
+                                        setValues({
+                                            startTime: response.data[0].hour,
+                                            endTime: response.data[response.data.length - 1].hour,
+                                            therapistId: therapistId,
+                                            days: workDays,
+                                            workhours: response.data
+                                        })
+
+                                        setRangeValues([response.data[0].hour[0],response.data[response.data.length - 1].hour[0]])
+                                    }
+                                }).catch((e) => {
+                                    localStorage.clear();
+                                    history('/loginBoot');
+                                })
+                            }else{
+                                setValues({
+                                    startTime: [0, 0],
+                                    endTime: [23, 0],
+                                    therapistId: therapistId,
+                                    days: [],
+                                    workhours: []
+                                })
+
+                                setRangeValues([MIN,MAX])
+                            }
+                        }).catch((e) => {
+                            localStorage.clear();
+                            history('/loginBoot');
+                        })
+
+
+                    } else {
+                        history('/loginBoot');
+                    }
+                }).catch((e) => {
+                    localStorage.clear();
+                    history('/loginBoot');
+                })
+
+
+            if (localStorage.getItem('reloadTherapist') === "true") {
+                let userId = loadState("chatUserId",0)
+                saveState("meetingAvailableTherapist/"+userId,false)
+                saveState("chatStateLocation",'')
+                // Set the 'reloaded' item in localStorage
+                localStorage.setItem('reloadTherapist', "false");
+                // Reload the page
+                window.location.reload();
+            }
+        }else if(getAccessToken()){
+            props.setLocation("/dashboard/therapistDashboard/addNewWorkDays")
+
+            fetchUserData().then((response) => {
+                if (response.data.roles.at(0).role === 'ROLE_THERAPIST') {
+                    setUserData(response.data);
+                    let therapistId = response.data.id
+                    saveState("role",'ROLE_THERAPIST')
+
+                    fetchWorkDays({therapistId: response.data.id}).then((response) => {
+                        if (response.data.length > 0) {
+                            const workDays = response.data
+
+                            fetchWorkHours({therapistId: therapistId}).then((response) => {
+                                if (response.data.length > 0) {
+
+                                    setValues({
+                                        startTime: response.data[0].hour,
+                                        endTime: response.data[response.data.length - 1].hour,
+                                        therapistId: therapistId,
+                                        days: workDays,
+                                        workhours: response.data
+                                    })
+
+                                    setRangeValues([response.data[0].hour[0],response.data[response.data.length - 1].hour[0]])
+                                }
+                            }).catch((e) => {
+                                localStorage.clear();
+                                history('/loginBoot');
+                            })
+                        }else{
+                            setValues({
+                                startTime: [0, 0],
+                                endTime: [23, 0],
+                                therapistId: therapistId,
+                                days: [],
+                                workhours: []
+                            })
+                        }
+                    }).catch((e) => {
+                        localStorage.clear();
+                        history('/loginBoot');
+                    })
+
+                } else {
+                    history('/loginBoot');
+                }
+            }).catch((e) => {
+                localStorage.clear();
+                history('/loginBoot');
+            })
+
+            if (localStorage.getItem('reloadTherapist') === "true") {
+                let userId = loadState("chatUserId",0)
+                saveState("meetingAvailableTherapist/"+userId,false)
+                saveState("chatStateLocation",'')
+                // Set the 'reloaded' item in localStorage
+                localStorage.setItem('reloadTherapist', "false");
+                // Reload the page
+                window.location.reload();
+            }
+        }else{
+            props.loginFailure("Authentication Failed!!!");
+            props.setLocation("/loginBoot")
+            history('/loginBoot');
         }
     }, []);
 
@@ -85,28 +210,28 @@ function TherapistAddNewWorkDays({loading,error,...props}){
         'Sunday': 7
     };
 
-    useEffect(() => {
-        if (values.startTime && values.endTime) {
-            const startHour = parseInt(values.startTime.split(':')[0]);
-            const endHour = parseInt(values.endTime.split(':')[0]);
-            const workhours = [];
+    const handleChange = (e) => {
+        const { name, type, checked, value } = e.target;
 
-            for (let i = startHour; i <= endHour; i++) {
-                const hour = i < 10 ? `0${i}:00` : `${i}:00`;
-                workhours.push({ id: i, hour });
+        if (type === 'checkbox') {
+            // Create a new array from the current day values
+            let newDaysArray = [...values.days];
+
+            // Find the index of the day object in the array
+            const dayIndex = newDaysArray.findIndex(day => day.day === value);
+
+            if (checked && dayIndex === -1) {
+                // If the checkbox is checked and the day isn't in the array, add the new day object
+                newDaysArray.push({ id: dayToNumber[value], day: value });
+            } else if (!checked && dayIndex !== -1) {
+                // If the checkbox is unchecked and the day is in the array, remove the day object
+                newDaysArray = newDaysArray.filter(day => day.day !== value);
             }
 
-            setValues(values => ({ ...values, 'workhours': workhours }));
-        }
-    }, [values.startTime, values.endTime]);
-
-    const handleChange = (e) => {
-        const { name, value } = e.target;
-
-        if (name === 'days') {
-            const selectedDays = Array.from(e.target.selectedOptions, option => ({ id: dayToNumber[option.value], day: option.value }));
-            setValues(values => ({ ...values, [name]: selectedDays }));
+            // Update the state with the new array
+            setValues(values => ({ ...values, [name]: newDaysArray }));
         } else {
+            // Handle other inputs like before
             setValues(values => ({ ...values, [name]: value }));
         }
     };
@@ -120,7 +245,7 @@ function TherapistAddNewWorkDays({loading,error,...props}){
         evt.preventDefault();
 
         selectWorkDays(values).then((response) => {
-            history("/dashboard/therapistDashboard/currentWorkDays")
+            window.location.reload()
         }).catch((err) => {
             if (err && err.response) {
                 switch (err.response.status) {
@@ -139,6 +264,12 @@ function TherapistAddNewWorkDays({loading,error,...props}){
         });
     }
 
+    const formatTime = (timeArray) => {
+        const hours = timeArray[0];
+        const mins = timeArray[1];
+        return `${hours < 10 ? '0' + hours : hours}:${mins < 10 ? '0' + mins : mins}`;
+    };
+
     return (
         <main id="page-top" style={{height: '100%'}}>
 
@@ -150,66 +281,238 @@ function TherapistAddNewWorkDays({loading,error,...props}){
 
                     <div id="content">
 
-                        <DashboardNav data={userData} setUser={props.setUser} setTherapistAuthenticationState={props.setTherapistAuthenticationState}/>
+                        <DashboardNav data={userData} setUser={props.setUser}/>
 
-                        <div className="container-fluid" style={{marginBottom: '100px'}}>
-
-                            <form onSubmit={handleSubmit}>
-                                <input type="hidden" name="therapistId" value={values.therapistId}/>
-                                <label htmlFor="days">Select work days for the week:</label><br/>
-                                <select multiple={true} id="days" name="days"
-                                        value={values.days.map(dayObj => dayObj.day)} onChange={handleChange}>
-                                    <option value="Monday">Monday</option>
-                                    <option value="Tuesday">Tuesday</option>
-                                    <option value="Wednesday">Wednesday</option>
-                                    <option value="Thursday">Thursday</option>
-                                    <option value="Friday">Friday</option>
-                                    <option value="Saturday">Saturday</option>
-                                    <option value="Sunday">Sunday</option>
-                                </select><br/><br/>
-                                <label htmlFor="startTime">Start Time:</label><br/>
-                                <input type="time" id="startTime" name="startTime" value={values.startTime}
-                                       onChange={handleChange}/><br/><br/>
-                                <label htmlFor="endTime">End Time:</label><br/>
-                                <input type="time" id="endTime" name="endTime" value={values.endTime}
-                                       onChange={handleChange}/><br/><br/>
-
-                                <button type="submit" className="btn btn-primary btn-user btn-block">
-                                    Submit
-                                </button>
-                            </form>
-
+                        <div style={{display: "flex", justifyContent: "start", alignItems: 'center',marginTop:"-14px"}}>
+                            <Link to={"/dashboard/therapistDashboard"} className="btn goBack"
+                                  style={{color: "#0d6efd"}}
+                                  type="button"
+                            ><FontAwesomeIcon icon={faChevronLeft} style={{marginRight: "3.5px"}}/>Go to Dashboard
+                            </Link>
                         </div>
-                    </div>
 
-                    <footer className="bg-white">
-                        <div className="container my-auto">
-                            <div className="copyright text-center my-auto">
-                                <span style={{color: 'grey'}}>Copyright © PeacefulParts 2024</span>
+                        <div style={{marginLeft: "10px"}}
+                             className="d-sm-flex align-items-center justify-content-between mb-4">
+                            <h1 className="h3 mb-0 text-800" style={{color: "#5a5c69"}}>Work Days</h1>
+                        </div>
+
+                        <div style={{
+                            marginBottom: '100px', display: "flex",
+                            justifyContent: "space-evenly", textAlign: "center"
+                        }}>
+                            {/*{workDays.length > 0 && <div style={{marginBottom: '100px'}}>*/}
+                            {/*    <h4>Work Days:</h4>*/}
+                            {/*    {workDays.length > 0 && workDays.map((workDay, index) => {*/}
+                            {/*        // Access the day property from the workDay object*/}
+                            {/*        const day = workDay.day;*/}
+
+                            {/*        // Return a paragraph element with the day*/}
+                            {/*        return (*/}
+                            {/*            <p key={index}>{day}</p>*/}
+                            {/*        );*/}
+                            {/*    })}*/}
+                            {/*    <br/>*/}
+                            {/*    <h4>From:</h4>*/}
+                            {/*    <p>{formatTime(workHours.startTime)}</p>*/}
+
+                            {/*    <br/>*/}
+                            {/*    <h4>To:</h4>*/}
+                            {/*    <p>{formatTime(workHours.endTime)}</p>*/}
+                            {/*</div>}*/}
+                            <div className={"card shadow"} style={{
+                                height: "550px",
+                                width: "550px",
+                                display: "flex",
+                                flexDirection: "column",
+                                textAlign: "left",
+                                padding: "10px"
+                            }}>
+                                <label htmlFor="days" style={{
+                                    fontSize: "25px",
+                                    color: "#5a5c69",
+                                    paddingTop: "5px",
+                                    paddingLeft: "10px"
+                                }}>Update work days and
+                                    hours</label>
+                                <form onSubmit={handleSubmit}
+                                      style={{display: "flex", flexDirection: "column", padding: "30px"}}>
+                                    <input type="hidden" name="therapistId" value={values.therapistId}/>
+
+                                    <div style={{display: "flex", textAlign: "left", color: "#5a5c69"}}>
+                                        <label>Days of Week</label>
+                                    </div>
+                                    <div style={{display: "flex", justifyContent: "center", alignItems: "center"}}>
+                                        {['Sunday', 'Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday'].map((day) => (
+                                            <div key={day} className="checkbox-container">
+                                                <input
+                                                    type="checkbox"
+                                                    id={day}
+                                                    name="days"
+                                                    value={day}
+                                                    checked={values.days.some(dayObj => dayObj.day === day)}
+                                                    onChange={handleChange}
+                                                    className="checkbox-custom"
+                                                />
+                                                <label htmlFor={day} className="checkbox-label">{day[0]}</label>
+                                            </div>
+                                        ))}
+                                    </div>
+
+                                    <div className="time-picker-container">
+                                        <div style={{
+                                            display: "flex",
+                                            textAlign: "left",
+                                            color: "#5a5c69",
+                                            paddingTop: "30px"
+                                        }}>
+                                            <label>Time of day</label>
+                                        </div>
+                                        <div
+                                            style={{
+                                                display: 'flex',
+                                                justifyContent: 'center',
+                                                flexWrap: 'wrap',
+                                                margin: '2em'
+                                            }}
+                                        >
+                                            <output style={{
+                                                fontFamily: 'Arial, sans-serif',
+                                                fontSize: '16px',
+                                                color: "#0d6efd",
+                                                marginBottom: "10px",
+                                                marginTop: "-10px"
+                                            }}>
+                                                <span style={{
+                                                    border: "1px solid grey",
+                                                    padding: "5px",
+                                                    borderRadius: "5px"
+                                                }}>
+                                                    {formatTime(values.startTime)}
+                                                </span>
+                                                <span> - </span>
+                                                <span style={{
+                                                    border: "1px solid grey",
+                                                    padding: "5px",
+                                                    borderRadius: "5px"
+                                                }}>
+                                                    {formatTime(values.endTime)}
+                                                </span>
+                                            </output>
+                                            <div style={{
+                                                display: "flex",
+                                                justifyContent: "space-between",
+                                                width: "100%",
+                                                alignItems: "center"
+                                            }}>
+                                                <span style={{
+                                                    marginRight: "21px",
+                                                    marginLeft: "-35px",
+                                                    color: "#5a5c69"
+                                                }}>00:00</span>
+                                                <Range
+                                                    values={rangeValues}
+                                                    step={STEP}
+                                                    min={MIN}
+                                                    max={MAX}
+                                                    onChange={(newRangeValues) => {
+                                                        setRangeValues(newRangeValues);
+                                                        const [start, end] = newRangeValues;
+                                                        const startTime = [start, 0]; // Assuming start is the hour and 0 is the minute
+                                                        const endTime = [end, 0];
+                                                        const workhours = [];
+
+                                                        for (let i = startTime[0]; i <= endTime[0]; i++) {
+                                                            const hourArray = i < 10 ? [i, 0] : [i, 0]; // Format as array [hour, minute]
+                                                            workhours.push({id: i, hour: hourArray});
+                                                        }
+
+                                                        setValues(values => ({
+                                                            ...values,
+                                                            'workhours': workhours,
+                                                            startTime,
+                                                            endTime
+                                                        }));
+                                                    }}
+                                                    renderTrack={({props, children}) => (
+                                                        <div
+                                                            onMouseDown={props.onMouseDown}
+                                                            onTouchStart={props.onTouchStart}
+                                                            style={{
+                                                                ...props.style,
+                                                                height: '36px',
+                                                                display: 'flex',
+                                                                width: '100%'
+                                                            }}
+                                                        >
+                                                            <div
+                                                                ref={props.ref}
+                                                                style={{
+                                                                    height: '8px',
+                                                                    width: '100%',
+                                                                    borderRadius: '4px',
+                                                                    background: getTrackBackground({
+                                                                        values: rangeValues,
+                                                                        colors: ['#ccc', '#548BF4', '#ccc'],
+                                                                        min: MIN,
+                                                                        max: MAX
+                                                                    }),
+                                                                    alignSelf: 'center'
+                                                                }}
+                                                            >
+                                                                {children}
+                                                            </div>
+                                                        </div>
+                                                    )}
+                                                    renderThumb={({props, isDragged}) => (
+                                                        <div
+                                                            {...props}
+                                                            style={{
+                                                                ...props.style,
+                                                                height: '30px',
+                                                                width: '40px',
+                                                                borderRadius: '4px',
+                                                                backgroundColor: '#FFF',
+                                                                display: 'flex',
+                                                                justifyContent: 'center',
+                                                                alignItems: 'center',
+                                                                boxShadow: '0px 2px 6px #AAA'
+                                                            }}
+                                                        >
+                                                            <div
+                                                                style={{
+                                                                    height: '16px',
+                                                                    width: '5px',
+                                                                    backgroundColor: isDragged ? '#548BF4' : '#CCC'
+                                                                }}
+                                                            />
+                                                        </div>
+                                                    )}
+                                                />
+                                                <span style={{
+                                                    marginLeft: "21px",
+                                                    marginRight: "-35px",
+                                                    color: "#5a5c69"
+                                                }}>23:00</span>
+                                            </div>
+                                        </div>
+                                    </div>
+                                    <div style={{
+                                        display: "flex",
+                                        justifyContent: "center",
+                                        alignItems: "center",
+                                        paddingTop: "80px"
+                                    }}>
+                                        <button type="submit" className="btn btn-primary btn-user btn-block"
+                                                style={{width: '20%'}}>
+                                            Submit
+                                        </button>
+                                    </div>
+                                </form>
                             </div>
                         </div>
-                    </footer>
-
+                    </div>
                 </div>
-
             </div>
-
-            <a className="scroll-to-top rounded" href="#page-top">
-                <i className="fas fa-angle-up"></i>
-            </a>
-
-            <script src="../../../vendor/jquery/jquery.min.js"></script>
-            <script src="../../../vendor/bootstrap/js/bootstrap.bundle.min.js"></script>
-
-            <script src="../../../vendor/jquery-easing/jquery.easing.min.js"></script>
-
-            <script src="../../../js/sb-admin-2.min.js"></script>
-
-            <script src="../../../vendor/chart.js/Chart.min.js"></script>
-
-            <script src="../../../js/demo/chart-area-demo.js"></script>
-            <script src="../../../js/demo/chart-pie-demo.js"></script>
-
         </main>
     )
 }
@@ -219,7 +522,6 @@ const mapStateToProps = ({auth}) => {
     return {
         loading: auth.loading,
         error: auth.error,
-        isTherapistAuthenticated: auth.isTherapistAuthenticated,
         location: auth.location
     }
 }
@@ -228,7 +530,6 @@ const mapDispatchToProps = (dispatch) => {
         authenticate: () => dispatch(authenticate()),
         setUser: (data) => dispatch(authSuccess(data)),
         loginFailure: (message) => dispatch(authFailure(message)),
-        setTherapistAuthenticationState: (boolean) => dispatch(setTherapistAuthenticationState(boolean)),
         setLocation: (path) => dispatch(setLocation(path))
     }
 }

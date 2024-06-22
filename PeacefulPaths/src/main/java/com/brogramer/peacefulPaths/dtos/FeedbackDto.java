@@ -1,33 +1,48 @@
 package com.brogramer.peacefulPaths.dtos;
 
+import com.fasterxml.jackson.annotation.JsonFormat;
 import jakarta.validation.constraints.NotNull;
+
+import java.time.LocalDateTime;
 
 public class FeedbackDto {
 
-    @NotNull
-    private Long userId;
+//    @NotNull
+    private int userId;
 
-    @NotNull
-    private Long therapistId;
+//    @NotNull
+    private int therapistId;
 
-    @NotNull
+//    @NotNull
     private String feedback;
+
+    @JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "yyyy-MM-dd HH:mm:ss")
+    private LocalDateTime dateAdded;
 
     // Getters and Setters
 
-    public Long getUserId() {
+
+    public LocalDateTime getDateAdded() {
+        return dateAdded;
+    }
+
+    public void setDateAdded(LocalDateTime dateAdded) {
+        this.dateAdded = dateAdded;
+    }
+
+    public int getUserId() {
         return userId;
     }
 
-    public void setUserId(Long userId) {
+    public void setUserId(int userId) {
         this.userId = userId;
     }
 
-    public Long getTherapistId() {
+    public int getTherapistId() {
         return therapistId;
     }
 
-    public void setTherapistId(Long therapistId) {
+    public void setTherapistId(int therapistId) {
         this.therapistId = therapistId;
     }
 

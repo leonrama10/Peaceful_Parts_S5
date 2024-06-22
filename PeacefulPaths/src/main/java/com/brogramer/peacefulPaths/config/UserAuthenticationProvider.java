@@ -48,6 +48,18 @@ public class UserAuthenticationProvider {
                 .sign(algorithm);
     }
 
+    public String createRefreshToken(String login) {
+        Date now = new Date();
+        Date validity = new Date(now.getTime() + 604800000);// 1 week
+
+        Algorithm algorithm = Algorithm.HMAC256(secretKey);
+        return JWT.create()
+                .withSubject(login)
+                .withIssuedAt(now)
+                .withExpiresAt(validity)
+                .sign(algorithm);
+    }
+
     public Authentication validateToken(String token) {
         Algorithm algorithm = Algorithm.HMAC256(secretKey);
 
@@ -55,6 +67,12 @@ public class UserAuthenticationProvider {
                 .build();
 
         DecodedJWT decoded = verifier.verify(token);
+
+        long currentTimeInSeconds = System.currentTimeMillis() / 1000;
+        if (decoded.getExpiresAt().getTime() / 1000 < currentTimeInSeconds) {
+            // Token has expired
+            return null;
+        }
 
         UserDto user = userService.findByLogin(decoded.getSubject(),token);
 

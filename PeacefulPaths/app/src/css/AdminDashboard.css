@@ -1,0 +1,9 @@
+.hover-scale {
+    text-decoration: none; /* Remove underline */
+    transition: transform 0.3s ease; /* Add smooth transition */
+}
+
+.hover-scale:hover {
+    text-decoration: none;
+    transform: scale(1.05); /* Scale up on hover */
+}

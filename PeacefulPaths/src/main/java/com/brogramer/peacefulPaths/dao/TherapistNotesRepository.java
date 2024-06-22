@@ -19,5 +19,7 @@ public interface TherapistNotesRepository extends JpaRepository<TherapistNotes,I
     @Query(value = "INSERT INTO therapist_notes_history (notes_id, client_id,therapist_id) VALUES (:notesId, :clientId, :therapistId)", nativeQuery = true)
     void saveTherapistNotesHistory(@Param("notesId") Long notesId, @Param("clientId") Long clientId, @Param("therapistId") Long therapistId);
 
+    @Query("SELECT t.id FROM TherapistNotes t WHERE t.notes.id = :notesId")
+    int findByNotesId(@Param("notesId") int notesId);
 }
 

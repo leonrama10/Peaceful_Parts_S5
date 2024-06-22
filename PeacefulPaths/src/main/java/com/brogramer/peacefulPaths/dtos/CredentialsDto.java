@@ -10,6 +10,7 @@ public class CredentialsDto {
 
     private String email;
     private char[] password;
+    private boolean rememberMe;
 
     public String getEmail() {
         return email;
@@ -17,5 +18,9 @@ public class CredentialsDto {
 
     public char[] getPassword() {
         return password;
+    }
+
+    public boolean getRememberMe() {
+        return rememberMe;
     }
 }

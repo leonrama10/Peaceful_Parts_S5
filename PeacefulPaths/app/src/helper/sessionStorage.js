@@ -14,5 +14,7 @@ export const loadState = (key, defaultValue) => {
 export const saveState = (key,obj) =>{
     try {
         sessionStorage.setItem(key,JSON.stringify(obj));
-    }catch (error){}
+    }catch (error){
+        console.error("Failed to save state:", error);
+    }
 };

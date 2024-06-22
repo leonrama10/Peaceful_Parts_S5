@@ -1,24 +1,44 @@
 package com.brogramer.peacefulPaths.dtos;
 
-public class AdviceDto {
-    private Long userId;
-    private String advice;
-    private int therapist_id;
+import com.fasterxml.jackson.annotation.JsonFormat;
+import lombok.AllArgsConstructor;
+import lombok.Builder;
+import lombok.Data;
+import lombok.NoArgsConstructor;
+import java.time.LocalDateTime;
 
-    // Getters and Setters
-    public Long getUserId() {
+@Data
+@AllArgsConstructor
+@NoArgsConstructor
+@Builder
+public class AdviceDto {
+    private int userId;
+    private String advice;
+    private int therapistId;
+    @JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "yyyy-MM-dd HH:mm:ss")
+    private LocalDateTime dateAdded;
+
+    public LocalDateTime getDateAdded() {
+        return dateAdded;
+    }
+
+    public void setDateAdded(LocalDateTime dateAdded) {
+        this.dateAdded = dateAdded;
+    }
+
+    public int getUserId() {
         return userId;
     }
 
-    public int getTherapist_id() {
-        return therapist_id;
+    public int getTherapistId() {
+        return therapistId;
     }
 
-    public void setTherapist_id(int therapist_id) {
-        this.therapist_id = therapist_id;
+    public void setTherapistId(int therapistId) {
+        this.therapistId = therapistId;
     }
 
-    public void setUserId(Long userId) {
+    public void setUserId(int userId) {
         this.userId = userId;
     }
 

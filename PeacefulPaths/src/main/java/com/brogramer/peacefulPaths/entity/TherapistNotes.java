@@ -15,7 +15,7 @@ public class TherapistNotes {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private Long id;
+    private int id;
 
     @ManyToOne
     @JoinColumn(name = "notes_id")
@@ -33,11 +33,11 @@ public class TherapistNotes {
 
     public TherapistNotes() {}
 
-    public TherapistNotes(Long id) {
+    public TherapistNotes(int id) {
         this.id = id;
     }
 
-    public TherapistNotes(Long id, Notes notes, int clientId, int therapistId, LocalDateTime dateAdded) {
+    public TherapistNotes(int id, Notes notes, int clientId, int therapistId, LocalDateTime dateAdded) {
         this.id = id;
         this.notes = notes;
         this.clientId = clientId;
@@ -45,11 +45,11 @@ public class TherapistNotes {
         this.dateAdded = dateAdded;
     }
 
-    public Long getId() {
+    public int getId() {
         return id;
     }
 
-    public void setId(Long id) {
+    public void setId(int id) {
         this.id = id;
     }
 

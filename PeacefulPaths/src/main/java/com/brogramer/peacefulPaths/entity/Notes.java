@@ -11,7 +11,7 @@ public class Notes {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private Long id;
+    private int id;
 
     @Column(name = "notes_text")
     private String notesText;
@@ -32,11 +32,11 @@ public class Notes {
 
     public Notes() {}
 
-    public Notes(Long id) {
+    public Notes(int id) {
         this.id = id;
     }
 
-    public Notes(Long id, String notesText, int patientMoodAfter, int patientMoodBefore, LocalDateTime dateAdded, MainPoints mainPoints) {
+    public Notes(int id, String notesText, int patientMoodAfter, int patientMoodBefore, LocalDateTime dateAdded, MainPoints mainPoints) {
         this.id = id;
         this.notesText = notesText;
         this.patientMoodAfter = patientMoodAfter;
@@ -85,11 +85,11 @@ public class Notes {
         this.dateAdded = dateAdded;
     }
 
-    public Long getId() {
+    public int getId() {
         return id;
     }
 
-    public void setId(Long id) {
+    public void setId(int id) {
         this.id = id;
     }
 

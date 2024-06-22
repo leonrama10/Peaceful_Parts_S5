@@ -1,50 +1,181 @@
 import React, {useEffect, useState} from 'react';
 import {fetchUserData} from '../../../api/authService';
-import {useNavigate} from 'react-router-dom';
-import '../../../css/sb-admin-2.css';
+import {Link, useNavigate} from 'react-router-dom';
+import '../../../css/AdminDashboard.css';
 import DataTable from 'datatables.net-dt';
 import DashboardNav from "../DashboardNav";
+import CanvasJSReact from '@canvasjs/react-charts';
 import {
     authenticate,
     authFailure,
-    authSuccess,
-    setAdminAuthenticationState
+    authSuccess
 } from "../../../redux/authActions";
 import {connect} from "react-redux";
 import SideBarAdmin from "../SideBars/SideBarAdmin";
 import {loadState, saveState} from "../../../helper/sessionStorage";
-const isAdminAuthenticatedBoolean = loadState("isAdminAuthenticated",false)
+import {jwtDecode} from "jwt-decode";
+import Loading from "../LoadingPage";
+import {faArrowRight} from "@fortawesome/free-solid-svg-icons";
+import {FontAwesomeIcon} from "@fortawesome/react-fontawesome";
+const getRefreshToken = () => {
+    const token = localStorage.getItem('REFRESH_TOKEN');
+
+    if (!token || token==="null") {
+        return null;
+    }
+
+    const decodedToken = jwtDecode(token);
+    const currentTime = Date.now() / 1000;
+
+    if (decodedToken.exp < currentTime) {
+        console.log("Token expired.");
+        return null;
+    } else {
+        return token;
+    }
+}
+
+const getAccessToken = () => {
+    const token = localStorage.getItem('USER_KEY');
+
+    if (!token || token==="null") {
+        return null;
+    }
+
+    const decodedToken = jwtDecode(token);
+    const currentTime = Date.now() / 1000;
+
+    if (decodedToken.exp < currentTime) {
+        console.log("Token expired.");
+        return null;
+    } else {
+        return token;
+    }
+}
+const CanvasJS = CanvasJSReact.CanvasJS;
+const CanvasJSChart = CanvasJSReact.CanvasJSChart;
+let loadPage = false
 function AdminDashboard({loading,error,...props}){
-
-    useEffect(() => {
-        if(!isAdminAuthenticatedBoolean){
-            if (!props.isAdminAuthenticated){
-                props.loginFailure("Authentication Failed!!!");
-                history('/loginBoot');
-            }else{
-                saveState("isAdminAuthenticated",props.isAdminAuthenticated)
-            }
-        }else{
-            saveState("isAdminAuthenticated",isAdminAuthenticatedBoolean)
-        }
-    }, []);
-
     const history = useNavigate ();
     const [data,setData]=useState({});
 
-    React.useEffect(()=>{
-        fetchUserData().then((response)=>{
-            if (response.data.roles.at(0).role === 'ROLE_ADMIN'){
-                setData(response.data);
-            }
-            else{
+    useEffect(() => {
+        if(getRefreshToken()) {
+            fetchUserData().then((response) => {
+                if (response.data.roles.at(0)){
+                    if (response.data.roles.at(0).role === 'ROLE_ADMIN') {
+                        setData(response.data);
+                        
+                        saveState("role",'ROLE_ADMIN')
+                    }
+                }
+            }).catch((e) => {
                 history('/loginBoot');
-            }
-        }).catch((e)=>{
-            localStorage.clear();
+            });
+        } else if(getAccessToken()){
+            fetchUserData().then((response) => {
+                if (response.data.roles.at(0)){
+                    if (response.data.roles.at(0).role === 'ROLE_ADMIN') {
+                        setData(response.data);
+                        
+                        saveState("role",'ROLE_ADMIN')
+                    }
+                }
+            }).catch((e) => {
+                history('/loginBoot');
+            });
+        } else{
+            props.loginFailure("Authentication Failed!!!");
             history('/loginBoot');
-        })
-    },[])
+        }
+    }, []);
+
+    const chart1 = {
+        animationEnabled: true,
+        // title:{
+        //     text: "Monthly Users - 2024"
+        // },
+        axisX: {
+            valueFormatString: "MMM"
+        },
+        axisY: {
+            title: "Number Of Users",
+            titleFontColor: "#858796",
+            // prefix: "$"
+        },
+        data: [{
+            // yValueFormatString: "$#,###",
+            xValueFormatString: "MMMM",
+            type: "spline",
+            dataPoints: [
+                { x: new Date(2024, 0), y: 1 },
+                { x: new Date(2024, 1), y: 1 },
+                { x: new Date(2024, 2), y: 2 },
+                { x: new Date(2024, 3), y: 3 },
+                { x: new Date(2024, 4), y: 3 },
+            ]
+        }]
+    }
+
+    const addSymbols = (e) => {
+        const suffixes = ["", "K", "M", "B"];
+        let order = Math.max(Math.floor(Math.log(Math.abs(e.value)) / Math.log(1000)), 0);
+        if (order > suffixes.length - 1)
+            order = suffixes.length - 1;
+        const suffix = suffixes[order];
+        return CanvasJS.formatNumber(e.value / Math.pow(1000, order)) + suffix;
+    }
+
+    const chart2 = {
+        animationEnabled: true,
+        theme:"light2",
+        title: {
+            // text: "Most Popular Social Networking Sites"
+        },
+        axisX: {
+            title: "Therapists",
+            titleFontColor: "#858796",
+            reversed: true,
+        },
+        axisY: {
+            // title: "Monthly Active Users",
+            includeZero: true,
+            labelFormatter: addSymbols
+        },
+        data: [{
+            type: "bar",
+            dataPoints: [
+                { y: 3, label: "Loren Markaj" },
+                { y: 5, label: "Leon Rama" },
+            ]
+        }]
+    };
+
+    const [isLoading, setIsLoading] = useState(true);
+
+    useEffect(() => {
+        loadPage = loadState("loadPage", false)
+        // Simulate a loading process
+        if (loadPage) {
+
+            const timer = setTimeout(() => {
+                setIsLoading(false);
+                saveState("loadPage",false)
+            }, 3000);
+
+            return () => clearTimeout(timer);
+        }else{
+            const timer = setTimeout(() => {
+                setIsLoading(false);
+            }, 600);
+
+            return () => clearTimeout(timer);
+        }
+    }, []);
+
+    if (isLoading) {
+        return <Loading />;
+    }
 
     return (
             <main id="page-top">
@@ -57,147 +188,66 @@ function AdminDashboard({loading,error,...props}){
 
                         <div id="content">
 
-                            <DashboardNav data={data} setUser={props.setUser} setAdminAuthenticationState={props.setAdminAuthenticationState}/>
+                            <DashboardNav data={data} setUser={props.setUser} />
 
                             <div className="container-fluid">
 
                                 <div className="d-sm-flex align-items-center justify-content-between mb-4">
-                                    <h1 className="h3 mb-0 text-gray-800">Dashboard</h1>
-                                    <a href="#" className="d-none d-sm-inline-block btn btn-sm btn-primary shadow-sm"><i
-                                        className="fas fa-download fa-sm text-white-50"></i> Generate Report</a>
+                                    <h1 className="h3 mb-0 text-800" style={{color: "#5a5c69"}}>Admin Dashboard</h1>
                                 </div>
+                                <br/>
 
-                                <div className="row">
-
-                                    <div className="col-xl-3 col-md-6 mb-4">
+                                <div className="row" style={{display:"flex", flexDirection:"row", justifyContent:"space-around", alignItems:"center",marginBottom:"30px"}}>
+                                    <Link className="col-xl-2 col-md-6 mb-4 hover-scale" to={"/dashboard/adminDashboard/admin"}>
                                         <div className="card border-left-primary shadow h-100 py-2">
                                             <div className="card-body">
-                                                <div className="row no-gutters align-items-center">
-                                                    <div className="col mr-2">
-                                                        <div
-                                                            className="text-xs font-weight-bold text-primary text-uppercase mb-1">
-                                                            Earnings (Monthly)
-                                                        </div>
-                                                        <div
-                                                            className="h5 mb-0 font-weight-bold text-gray-800">$40,000
-                                                        </div>
-                                                    </div>
-                                                    <div className="col-auto">
-                                                        <i className="fas fa-calendar fa-2x text-gray-300"></i>
-                                                    </div>
+                                                <div
+                                                    className="text-xs font-weight-bold text-primary text-uppercase mb-1">
+                                                    Manage Admins <FontAwesomeIcon style={{marginLeft: "7px"}}
+                                                                                   icon={faArrowRight}/>
                                                 </div>
                                             </div>
                                         </div>
-                                    </div>
+                                    </Link>
 
-                                    <div className="col-xl-3 col-md-6 mb-4">
-                                        <div className="card border-left-success shadow h-100 py-2">
+                                    <Link className="col-xl-2 col-md-6 mb-4 hover-scale" to={"/dashboard/adminDashboard/therapists"}>
+                                        <div className="card shadow h-100 py-2" style={{borderLeft: "4px solid #1ed4fc"}}>
                                             <div className="card-body">
-                                                <div className="row no-gutters align-items-center">
-                                                    <div className="col mr-2">
-                                                        <div
-                                                            className="text-xs font-weight-bold text-success text-uppercase mb-1">
-                                                            Earnings (Annual)
-                                                        </div>
-                                                        <div
-                                                            className="h5 mb-0 font-weight-bold text-gray-800">$215,000
-                                                        </div>
-                                                    </div>
-                                                    <div className="col-auto">
-                                                        <i className="fas fa-dollar-sign fa-2x text-gray-300"></i>
-                                                    </div>
+                                                <div
+                                                    className="text-xs font-weight-bold text-uppercase mb-1" style={{color: "#1ed4fc"}}>
+                                                    Manage Therapists <FontAwesomeIcon style={{marginLeft: "7px"}}
+                                                                                       icon={faArrowRight}/>
                                                 </div>
                                             </div>
                                         </div>
-                                    </div>
+                                    </Link>
 
-                                    <div className="col-xl-3 col-md-6 mb-4">
-                                        <div className="card border-left-info shadow h-100 py-2">
+                                    <Link className="col-xl-2 col-md-6 mb-4 hover-scale" to={"/dashboard/adminDashboard/users"}>
+                                        <div className="card  shadow h-100 py-2" style={{borderLeft: "4px solid #28aac7"}}>
                                             <div className="card-body">
-                                                <div className="row no-gutters align-items-center"
-                                                     style={{padding: '0 20px'}}>
-                                                    <div className="col mr-2">
-                                                        <div
-                                                            className="text-xs font-weight-bold text-info text-uppercase mb-1">Tasks
-                                                        </div>
-                                                        <div className="row no-gutters align-items-center"
-                                                             style={{paddingLeft: '12px'}}>
-                                                            <div className="col-auto">
-                                                                <div
-                                                                    className="h5 mb-0 mr-3 font-weight-bold text-gray-800">50%
-                                                                </div>
-                                                            </div>
-                                                            <div className="col">
-                                                                <div className="progress progress-sm mr-2"
-                                                                     style={{height: '8px'}}>
-                                                                    <div className="progress-bar bg-info"
-                                                                         role="progressbar"
-                                                                         style={{width: '50%'}} aria-valuenow="50"
-                                                                         aria-valuemin="0"
-                                                                         aria-valuemax="100"></div>
-                                                                </div>
-                                                            </div>
-                                                        </div>
-                                                    </div>
-                                                    <div className="col-auto">
-                                                        <i className="fas fa-clipboard-list fa-2x text-gray-300"></i>
-                                                    </div>
+                                                <div
+                                                    className="text-xs font-weight-bold text-uppercase mb-1" style={{color: "#28aac7"}}>
+                                                    Manage Users <FontAwesomeIcon style={{marginLeft: "7px"}}
+                                                                                  icon={faArrowRight}/>
                                                 </div>
                                             </div>
                                         </div>
-                                    </div>
+                                    </Link>
 
-                                    <div className="col-xl-3 col-md-6 mb-4">
-                                        <div className="card border-left-warning shadow h-100 py-2">
-                                            <div className="card-body">
-                                                <div className="row no-gutters align-items-center">
-                                                    <div className="col mr-2">
-                                                        <div
-                                                            className="text-xs font-weight-bold text-warning text-uppercase mb-1">
-                                                            Pending Requests
-                                                        </div>
-                                                        <div className="h5 mb-0 font-weight-bold text-gray-800">18</div>
-                                                    </div>
-                                                    <div className="col-auto">
-                                                        <i className="fas fa-comments fa-2x text-gray-300"></i>
-                                                    </div>
-                                                </div>
-                                            </div>
-                                        </div>
-                                    </div>
                                 </div>
 
                                 <div className="row">
 
                                     <div className="col-xl-8 col-lg-7">
                                         <div className="card shadow mb-4">
-
                                             <div
                                                 className="card-header py-3 d-flex flex-row align-items-center justify-content-between">
-                                                <h6 className="m-0 font-weight-bold text-primary">Earnings Overview</h6>
-                                                <div className="dropdown no-arrow">
-                                                    <a className="dropdown-toggle" href="#" role="button"
-                                                       id="dropdownMenuLink"
-                                                       data-toggle="dropdown" aria-haspopup="true"
-                                                       aria-expanded="false">
-                                                        <i className="fas fa-ellipsis-v fa-sm fa-fw text-gray-400"></i>
-                                                    </a>
-                                                    <div
-                                                        className="dropdown-menu dropdown-menu-right shadow animated--fade-in"
-                                                        aria-labelledby="dropdownMenuLink">
-                                                        <div className="dropdown-header">Dropdown Header:</div>
-                                                        <a className="dropdown-item" href="#">Action</a>
-                                                        <a className="dropdown-item" href="#">Another action</a>
-                                                        <div className="dropdown-divider"></div>
-                                                        <a className="dropdown-item" href="#">Something else here</a>
-                                                    </div>
-                                                </div>
+                                                <h6 className="m-0 font-weight-bold " style={{color:"#858796"}}>Monthly Users -
+                                                    2024</h6>
                                             </div>
 
                                             <div className="card-body">
-                                                <div className="chart-area">
-                                                    <canvas id="myAreaChart"></canvas>
-                                                </div>
+                                                <CanvasJSChart options={chart1}/>
                                             </div>
                                         </div>
                                     </div>
@@ -207,166 +257,19 @@ function AdminDashboard({loading,error,...props}){
 
                                             <div
                                                 className="card-header py-3 d-flex flex-row align-items-center justify-content-between">
-                                                <h6 className="m-0 font-weight-bold text-primary">Revenue Sources</h6>
-                                                <div className="dropdown no-arrow">
-                                                    <a className="dropdown-toggle" href="#" role="button"
-                                                       id="dropdownMenuLink"
-                                                       data-toggle="dropdown" aria-haspopup="true"
-                                                       aria-expanded="false">
-                                                        <i className="fas fa-ellipsis-v fa-sm fa-fw text-gray-400"></i>
-                                                    </a>
-                                                    <div
-                                                        className="dropdown-menu dropdown-menu-right shadow animated--fade-in"
-                                                        aria-labelledby="dropdownMenuLink">
-                                                        <div className="dropdown-header">Dropdown Header:</div>
-                                                        <a className="dropdown-item" href="#">Action</a>
-                                                        <a className="dropdown-item" href="#">Another action</a>
-                                                        <div className="dropdown-divider"></div>
-                                                        <a className="dropdown-item" href="#">Something else here</a>
-                                                    </div>
-                                                </div>
+                                                <h6 className="m-0 font-weight-bold " style={{color:"#858796"}}>Therapists With The Most Clients</h6>
                                             </div>
 
                                             <div className="card-body">
-                                                <div className="chart-pie pt-4 pb-2">
-                                                    <canvas id="myPieChart"></canvas>
-                                                </div>
-                                                <div className="mt-4 text-center small">
-                                        <span className="mr-2">
-                                            <i className="fas fa-circle text-primary"></i> Direct
-                                        </span>
-                                                    <span className="mr-2">
-                                            <i className="fas fa-circle text-success"></i> Social
-                                        </span>
-                                                    <span className="mr-2">
-                                            <i className="fas fa-circle text-info"></i> Referral
-                                        </span>
-                                                </div>
+                                                <CanvasJSChart options={chart2}/>
                                             </div>
                                         </div>
                                     </div>
                                 </div>
-
-                                <div className="row">
-
-                                    <div className="col-lg-6 mb-4">
-
-                                        <div className="card shadow mb-4">
-                                            <div className="card-header py-3">
-                                                <h6 className="m-0 font-weight-bold text-primary">Projects</h6>
-                                            </div>
-                                            <div className="card-body">
-                                                <h4 className="small font-weight-bold">Server Migration <span
-                                                    className="float-right">20%</span></h4>
-                                                <div className="progress mb-4">
-                                                    <div className="progress-bar bg-danger" role="progressbar"
-                                                         style={{width: '20%'}}
-                                                         aria-valuenow="20" aria-valuemin="0" aria-valuemax="100"></div>
-                                                </div>
-                                                <h4 className="small font-weight-bold">Sales Tracking <span
-                                                    className="float-right">40%</span></h4>
-                                                <div className="progress mb-4">
-                                                    <div className="progress-bar bg-warning" role="progressbar"
-                                                         style={{width: '40%'}}
-                                                         aria-valuenow="40" aria-valuemin="0" aria-valuemax="100"></div>
-                                                </div>
-                                                <h4 className="small font-weight-bold">Customer Database <span
-                                                    className="float-right">60%</span></h4>
-                                                <div className="progress mb-4">
-                                                    <div className="progress-bar" role="progressbar"
-                                                         style={{width: '60%'}}
-                                                         aria-valuenow="60" aria-valuemin="0" aria-valuemax="100"></div>
-                                                </div>
-                                                <h4 className="small font-weight-bold">Payout Details <span
-                                                    className="float-right">80%</span></h4>
-                                                <div className="progress mb-4">
-                                                    <div className="progress-bar bg-info" role="progressbar"
-                                                         style={{width: '80%'}}
-                                                         aria-valuenow="80" aria-valuemin="0" aria-valuemax="100"></div>
-                                                </div>
-                                                <h4 className="small font-weight-bold">Account Setup <span
-                                                    className="float-right">Complete!</span></h4>
-                                                <div className="progress">
-                                                    <div className="progress-bar bg-success" role="progressbar"
-                                                         style={{width: '100%'}}
-                                                         aria-valuenow="100" aria-valuemin="0"
-                                                         aria-valuemax="100"></div>
-                                                </div>
-                                            </div>
-                                        </div>
-
-                                    </div>
-
-                                    <div className="col-lg-6 mb-4">
-
-                                        <div className="card shadow mb-4">
-                                            <div className="card-header py-3">
-                                                <h6 className="m-0 font-weight-bold text-primary">Illustrations</h6>
-                                            </div>
-                                            <div className="card-body">
-                                                <div className="text-center">
-                                                </div>
-                                                <p>Add some quality, svg illustrations to your project courtesy ,
-                                                    a
-                                                    constantly updated collection of beautiful svg images that you can
-                                                    use
-                                                    completely free and without attribution!</p>
-
-                                            </div>
-                                        </div>
-
-                                        <div className="card shadow mb-4">
-                                            <div className="card-header py-3">
-                                                <h6 className="m-0 font-weight-bold text-primary">Development
-                                                    Approach</h6>
-                                            </div>
-                                            <div className="card-body">
-                                                <p>SB Admin 2 makes extensive use of Bootstrap 4 utility classNamees in
-                                                    order to reduce
-                                                    CSS bloat and poor page performance. Custom CSS classNamees are used
-                                                    to create
-                                                    custom components and custom utility classNamees.</p>
-                                                <p className="mb-0">Before working with this theme, you should become
-                                                    familiar with the
-                                                    Bootstrap framework, especially the utility classNames.</p>
-                                            </div>
-                                        </div>
-
-                                    </div>
-                                </div>
-
                             </div>
-
                         </div>
-
-                        <footer className="sticky-footer bg-white">
-                            <div className="container my-auto">
-                                <div className="copyright text-center my-auto">
-                                    <span>&copy; 2024 PeacefulPaths</span>
-                                </div>
-                            </div>
-                        </footer>
-
                     </div>
-
                 </div>
-
-                <a className="scroll-to-top rounded" href="#page-top">
-                    <i className="fas fa-angle-up"></i>
-                </a>
-
-                <script src="../../../vendor/jquery/jquery.min.js"></script>
-                <script src="../../../vendor/bootstrap/js/bootstrap.bundle.min.js"></script>
-
-                <script src="../../../vendor/jquery-easing/jquery.easing.min.js"></script>
-
-                <script src="../../../js/sb-admin-2.min.js"></script>
-
-                <script src="../../../vendor/chart.js/Chart.min.js"></script>
-
-                <script src="../../../js/demo/chart-area-demo.js"></script>
-                <script src="../../../js/demo/chart-pie-demo.js"></script>
-
             </main>
     )
 }
@@ -375,16 +278,14 @@ const mapStateToProps = ({auth}) => {
     console.log("state ", auth)
     return {
         loading: auth.loading,
-        error: auth.error,
-        isAdminAuthenticated: auth.isAdminAuthenticated
+        error: auth.error
     }
 }
 const mapDispatchToProps = (dispatch) => {
     return {
         authenticate: () => dispatch(authenticate()),
         setUser: (data) => dispatch(authSuccess(data)),
-        loginFailure: (message) => dispatch(authFailure(message)),
-        setAdminAuthenticationState: (boolean) => dispatch(setAdminAuthenticationState(boolean))
+        loginFailure: (message) => dispatch(authFailure(message))
     }
 }
 export default connect(mapStateToProps, mapDispatchToProps)(AdminDashboard);

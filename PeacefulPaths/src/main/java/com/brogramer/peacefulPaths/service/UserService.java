@@ -19,10 +19,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.nio.CharBuffer;
-import java.time.DayOfWeek;
-import java.time.LocalDate;
-import java.time.LocalDateTime;
-import java.time.LocalTime;
+import java.time.*;
 import java.util.*;
 import java.util.stream.Collectors;
 
@@ -30,6 +27,7 @@ import java.util.stream.Collectors;
 public class UserService implements UserDetailsService {
 
     private final TherapistRepository userRepository;
+    private final UserConnectionsHistoryRepository userConnectionsHistoryRepository;
     private final QuestionnaireRepository questionnaireRepository;
     private final TherapistInfoRepository therapistInfoRepository;
     private final NoteRepository noteRepository;
@@ -38,6 +36,7 @@ public class UserService implements UserDetailsService {
     private final TherapistWorkDaysRepository therapistWorkDaysRepository;
     private final MainPointsRepository mainPointsRepository;
     private final BookingsRepository bookingsRepository;
+    private final BookingsHistoryRepository bookingsHistoryRepository;
     private final PointRepository pointRepository;
     private final RoleDao roleDao;
     private final PasswordEncoder passwordEncoder;
@@ -46,16 +45,15 @@ public class UserService implements UserDetailsService {
     private final MessageRepository messageRepository;
     private final ChatRepository chatRepository;
     private final FeedbackRepository feedbackRepository;
-    private final LanguageRepository languageRepository;
     private final AdviceRepository adviceRepository;
 
     @Autowired
     private JavaMailSender javaMailSender;
 
     @Autowired
-    public UserService(TherapistRepository userRepository, PasswordEncoder passwordEncoder, RoleDao roleDao, UserDao userDao, QuestionnaireRepository questionnaireRepository, TherapistInfoRepository therapistInfoRepository, NoteRepository noteRepository, TherapistNotesRepository therapistNotesRepository, MainPointsRepository mainPointsRepository, PointRepository pointRepository, TherapistNotesHistoryRepository therapistNotesHistoryRepository, TherapistWorkDaysRepository therapistWorkDaysRepository, BookingsRepository bookingsRepository, UserTherapistMessagesRepository userTherapistMessagesRepository, MessageRepository messageRepository, ChatRepository chatRepository,FeedbackRepository feedbackRepository,LanguageRepository languageRepository,AdviceRepository adviceRepository)
-    {
+    public UserService(TherapistRepository userRepository, UserConnectionsHistoryRepository userConnectionsHistoryRepository, PasswordEncoder passwordEncoder, RoleDao roleDao, UserDao userDao, QuestionnaireRepository questionnaireRepository, TherapistInfoRepository therapistInfoRepository, NoteRepository noteRepository, TherapistNotesRepository therapistNotesRepository, MainPointsRepository mainPointsRepository, PointRepository pointRepository, TherapistNotesHistoryRepository therapistNotesHistoryRepository, TherapistWorkDaysRepository therapistWorkDaysRepository, BookingsRepository bookingsRepository, BookingsHistoryRepository bookingsHistoryRepository, UserTherapistMessagesRepository userTherapistMessagesRepository, MessageRepository messageRepository, ChatRepository chatRepository,FeedbackRepository feedbackRepository,AdviceRepository adviceRepository) {
         this.userRepository = userRepository;
+        this.userConnectionsHistoryRepository = userConnectionsHistoryRepository;
         this.passwordEncoder = passwordEncoder;
         this.roleDao = roleDao;
         this.userDao = userDao;
@@ -68,11 +66,11 @@ public class UserService implements UserDetailsService {
         this.pointRepository = pointRepository;
         this.therapistWorkDaysRepository = therapistWorkDaysRepository;
         this.bookingsRepository = bookingsRepository;
+        this.bookingsHistoryRepository = bookingsHistoryRepository;
         this.userTherapistMessagesRepository = userTherapistMessagesRepository;
         this.messageRepository = messageRepository;
         this.chatRepository = chatRepository;
         this.feedbackRepository = feedbackRepository;
-        this.languageRepository = languageRepository;
         this.adviceRepository = adviceRepository;
     }
 
@@ -140,22 +138,13 @@ public class UserService implements UserDetailsService {
         return userDto;
     }
 
-    public UserDto login(CredentialsDto credentialsDto) {
+    public User login(CredentialsDto credentialsDto) {
         Optional<User> user1 = userRepository.findByEmail(credentialsDto.getEmail());
 
         User user = user1.get();
 
         if (passwordEncoder.matches(CharBuffer.wrap(credentialsDto.getPassword()), user.getPassword())) {
-            UserDto userDto = new UserDto();
-
-            userDto.setEmail( user.getEmail() );
-            userDto.setId( user.getId() );
-            userDto.setName( user.getName() );
-            userDto.setSurname( user.getSurname() );
-            userDto.setRoles( user.getRoles() );
-            userDto.setPassword( user.getPassword() );
-
-            return userDto;
+            return user;
         }else {
             throw new AppException("Invalid password", HttpStatus.BAD_REQUEST);
         }
@@ -194,19 +183,10 @@ public class UserService implements UserDetailsService {
         return questionnaire;
     }
 
-    @Transactional
     public UserDto registerTherapist(SignUpDto userDto) {
         Optional<User> optionalUser = userRepository.findByEmail(userDto.getEmail());
         if (optionalUser.isPresent()) {
             throw new AppException("Login already exists", HttpStatus.BAD_REQUEST);
-        }
-
-        // Check if all language IDs exist in the language table
-        List<Long> languageIdLongs = userDto.getLanguage().stream().map(Language::getId).collect(Collectors.toList());
-        List<Integer> languageIds = languageIdLongs.stream().map(Long::intValue).collect(Collectors.toList());
-        List<Language> languages = languageRepository.findAllById(languageIds);
-        if (languages.size() != languageIds.size()) {
-            throw new AppException("Invalid language ID(s)", HttpStatus.BAD_REQUEST);
         }
 
         User user = new User();
@@ -222,7 +202,7 @@ public class UserService implements UserDetailsService {
         user.setGender(userDto.getGender());
         user.setUniversity(userDto.getUniversity());
         user.setLocation(userDto.getLocation());
-        user.setLanguage(languages); // Set the validated language list
+        user.setLanguage(userDto.getLanguage());
         Collection<Roles> roles = new ArrayList<>();
         roles.add(roleDao.findRoleByName("ROLE_THERAPIST"));
         user.setRoles(roles);
@@ -255,15 +235,14 @@ public class UserService implements UserDetailsService {
         return userDtoResult;
     }
 
-
-
     public UserDto registerAdmin(SignUpDto userDto) {
-
+        // Check if the user (Admin) already exists based on email
         Optional<User> optionalUser = userRepository.findByEmail(userDto.getEmail());
         if (optionalUser.isPresent()) {
             throw new AppException("Login already exists", HttpStatus.BAD_REQUEST);
         }
 
+        // Create a new User entity for the Admin
         User user = new User();
         user.setEmail(userDto.getEmail());
         user.setNumber(userDto.getNumber());
@@ -470,6 +449,17 @@ public class UserService implements UserDetailsService {
         userRepository.deleteById(id);
     }
 
+    public void deleteNote(int id) {
+        Optional<Notes> note = noteRepository.findById(id);
+        if (note.isPresent()) {
+            MainPoints mainPoints = note.get().getMainPoints();
+            if (mainPoints != null) {
+                pointRepository.deleteAll(mainPoints.getPoint());
+                mainPointsRepository.deleteBySpecificId(mainPoints.getId());
+            }
+        }
+    }
+
     public UserDto findByEmail(String email) {
 
         return findUserByEmailAndConvert(email);
@@ -497,8 +487,9 @@ public class UserService implements UserDetailsService {
 
         javaMailSender.send(message);
     }
+
     public void sendAdvice(AdviceDto adviceDto) {
-        Optional<User> user = userRepository.findById(adviceDto.getUserId().intValue());
+        Optional<User> user = userRepository.findById(adviceDto.getUserId());
         if (user.isEmpty()) {
             throw new AppException("User not found", HttpStatus.NOT_FOUND);
         }
@@ -506,8 +497,9 @@ public class UserService implements UserDetailsService {
         Advice advice = new Advice();
         advice.setUser(user.get());
         advice.setAdviceText(adviceDto.getAdvice());
-        Optional<User> therapist = userRepository.findById(adviceDto.getTherapist_id());
+        Optional<User> therapist = userRepository.findById(adviceDto.getTherapistId());
         advice.setTherapist_id(therapist.get());
+        advice.setDateAdded(LocalDateTime.now());
         adviceRepository.save(advice);
     }
     public List<Advice> findAdviceByUserId(int userId) {
@@ -533,6 +525,14 @@ public class UserService implements UserDetailsService {
     }
 
     public void removeTherapist(int userId) {
+        LocalDateTime date = userRepository.findConnectionByUserId(userId);
+
+        UserConnectionsHistory user = userConnectionsHistoryRepository.findByUserIdAndDateAdded(userId,date);
+
+        user.setRemoveDate(LocalDateTime.now());
+
+        userConnectionsHistoryRepository.save(user);
+
         userRepository.deleteConnection(userId);
     }
 
@@ -557,11 +557,22 @@ public class UserService implements UserDetailsService {
         return users;
     }
 
-    public Collection<User> findAllUsersConnectedHistoryById(int id) {
-        Collection<User> users = new ArrayList<>();
-        Collection<Integer> userId = userRepository.findAllUsersConnectedHistoryById(id);
-        for (Integer i : userId) {
-            users.add(userRepository.findById(i).get());
+    public Collection<UserConnectionsHistoryDto> findAllUsersConnectedHistoryById(int id) {
+        Collection<UserConnectionsHistoryDto> users = new ArrayList<>();
+        Collection<UserConnectionsHistory> userId = userConnectionsHistoryRepository.findAllByConnectedUserId(id);
+        for (UserConnectionsHistory i : userId) {
+            User user = userRepository.findById(i.getUserId()).get();
+            UserConnectionsHistoryDto userConnectionsHistoryDto = new UserConnectionsHistoryDto();
+            userConnectionsHistoryDto.setId(user.getId());
+            userConnectionsHistoryDto.setDateAdded(i.getDateAdded());
+            userConnectionsHistoryDto.setEmail(user.getEmail());
+            userConnectionsHistoryDto.setLocation(user.getQuestionnaire().getLocation());
+            userConnectionsHistoryDto.setGender(user.getQuestionnaire().getGender());
+            userConnectionsHistoryDto.setNumber(user.getNumber());
+            userConnectionsHistoryDto.setName(user.getName());
+            userConnectionsHistoryDto.setSurname(user.getSurname());
+            userConnectionsHistoryDto.setRemoveDate(i.getRemoveDate());
+            users.add(userConnectionsHistoryDto);
         }
 
         return users;
@@ -712,7 +723,7 @@ public class UserService implements UserDetailsService {
     public void addNewNote(NoteDto noteDto) {
         List<String> mainPointsList = new ArrayList<>(noteDto.getMainPoints());
 
-        Collection<Point> pointCollection = new ArrayList<>();
+        List<Point> pointCollection = new ArrayList<>();
         Point savedPoint;
         for (String pointString : mainPointsList){
             Point point = new Point();
@@ -730,6 +741,7 @@ public class UserService implements UserDetailsService {
         notes.setMainPoints(mainPoints);
         notes.setPatientMoodAfter(noteDto.getPatientMoodAfter());
         notes.setPatientMoodBefore(noteDto.getPatientMoodBefore());
+        notes.setDateAdded(LocalDateTime.now());
 
         Notes savedNote = noteRepository.save(notes);
 
@@ -737,6 +749,7 @@ public class UserService implements UserDetailsService {
         therapistNotes.setNotes(savedNote);
         therapistNotes.setTherapistId(noteDto.getTherapistId());
         therapistNotes.setClientId(noteDto.getClientId());
+        therapistNotes.setDateAdded(LocalDateTime.now());
 
         therapistNotesRepository.save(therapistNotes);
 
@@ -744,6 +757,7 @@ public class UserService implements UserDetailsService {
         therapistNotesHistory.setNotes(savedNote);
         therapistNotesHistory.setTherapistId(noteDto.getTherapistId());
         therapistNotesHistory.setClientId(noteDto.getClientId());
+        therapistNotesHistory.setDateAdded(LocalDateTime.now());
 
         therapistNotesHistoryRepository.save(therapistNotesHistory);
     }
@@ -806,10 +820,6 @@ public class UserService implements UserDetailsService {
 
         List<Workhours> workhoursFetched = new ArrayList<>(therapistWorkDays.getWorkhours());
 
-        if (therapistWorkDays == null) {
-            // Return an empty list or throw an exception based on your requirements
-            throw new AppException("Therapist work days not found", HttpStatus.NOT_FOUND);
-        }
         List<Weekdays> weekdaysFetched = new ArrayList<>(therapistWorkDays.getWeekdays());
         boolean weekdaysBoolean = false;
 
@@ -827,40 +837,110 @@ public class UserService implements UserDetailsService {
         }
 
         if (weekdaysBoolean) {
-            // Convert the fetched work hours to a set for faster lookup
-            Set<LocalTime> workhoursSet = workhoursFetched.stream()
-                    .map(Workhours::getHour)  // replace with your method to get the hour from Workhours object
-                    .collect(Collectors.toSet());
+            boolean todayBoolean = date.equals(LocalDate.now());
 
-            List<Bookings> bookings = bookingsRepository.fetchBookedHours(bookingsDto.getDate(), bookingsDto.getTherapistId());
+            if (!todayBoolean) {
+                // Convert the fetched work hours to a set for faster lookup
+                Set<LocalTime> workhoursSet = workhoursFetched.stream()
+                        .map(Workhours::getHour)  // replace with your method to get the hour from Workhours object
+                        .collect(Collectors.toSet());
 
-            List<Workhours> workhoursFiltered = new ArrayList<>();
-            if (bookings.isEmpty()) {
-                return workhoursFetched;
-            } else {
-                for (Bookings booking : bookings) {
-                    if (booking.getClientId() == bookingsDto.getClientId()) {
-                        return new ArrayList<>();
+                List<Bookings> bookings = bookingsRepository.fetchBookedHours(bookingsDto.getDate(), bookingsDto.getTherapistId());
+
+                List<Workhours> workhoursFiltered = new ArrayList<>();
+                if (bookings.isEmpty()) {
+                    return workhoursFetched;
+                } else {
+                    for (Bookings booking : bookings) {
+                        if (booking.getClientId() == bookingsDto.getClientId()) {
+                            return new ArrayList<>();
+                        }
                     }
-                }
 
-                for (Bookings booking : bookings) {
-                    LocalTime bookingHour = booking.getHour();  // replace with your method to get the hour from Booking object
+                    List<LocalTime> bookingHour = new ArrayList<>();
+                    for (Bookings booking : bookings) {
+                        bookingHour.add(booking.getHour());
+                    }
 
-                    // If the booking hour is not in the work hours set, add it to the filtered bookings
+                        // If the booking hour is not in the work hours set, add it to the filtered bookings
                     for (LocalTime hour : workhoursSet) {
-                        if (!hour.equals(bookingHour)) {
-                            Workhours workhour = new Workhours();  // replace with your method to create a new Workhours object
-                            workhour.setHour(hour);  // replace with your method to set the hour of a Workhours object
-                            workhoursFiltered.add(workhour);
+                        boolean doubleGanger = false;
+                        for (LocalTime bookingHour2 : bookingHour) {
+                            if (!hour.equals(bookingHour2) && !doubleGanger) {
+                                Workhours workhour = new Workhours();  // replace with your method to create a new Workhours object
+                                workhour.setHour(hour);  // replace with your method to set the hour of a Workhours object
+                                if(!workhoursFiltered.contains(workhour)){
+                                    workhoursFiltered.add(workhour);
+                                }
+                            }else {
+                                doubleGanger = true;
+                                Workhours workhour = new Workhours();  // replace with your method to create a new Workhours object
+                                workhour.setHour(hour);
+                                workhoursFiltered.remove(workhour);
+                            }
                         }
                     }
                 }
+
+
+                workhoursFiltered.sort(Comparator.comparing(Workhours::getHour));
+
+                return workhoursFiltered;
+            }else {
+                LocalTime currentTime = LocalTime.now();
+
+                Set<LocalTime> workhoursSet = workhoursFetched.stream()
+                        .map(Workhours::getHour)
+                        .filter(hour -> !hour.isBefore(currentTime))
+                        .collect(Collectors.toSet());
+
+                if (!workhoursSet.isEmpty()) {
+                    List<Bookings> bookings = bookingsRepository.fetchBookedHours(bookingsDto.getDate(), bookingsDto.getTherapistId());
+
+                    List<Workhours> workhoursFiltered = new ArrayList<>();
+                    if (bookings.isEmpty()) {
+                        return workhoursSet.stream()
+                                .map(hour -> new Workhours(hour))
+                                .sorted(Comparator.comparing(Workhours::getHour))
+                                .collect(Collectors.toList());
+                    } else {
+                        for (Bookings booking : bookings) {
+                            if (booking.getClientId() == bookingsDto.getClientId()) {
+                                return new ArrayList<>();
+                            }
+                        }
+
+                        List<LocalTime> bookingHour = new ArrayList<>();
+                        for (Bookings booking : bookings) {
+                            bookingHour.add(booking.getHour());
+                        }
+
+                        // If the booking hour is not in the work hours set, add it to the filtered bookings
+                        for (LocalTime hour : workhoursSet) {
+                            boolean doubleGanger = false;
+                            for (LocalTime bookingHour2 : bookingHour) {
+                                if (!hour.equals(bookingHour2) && !doubleGanger) {
+                                    Workhours workhour = new Workhours();  // replace with your method to create a new Workhours object
+                                    workhour.setHour(hour);  // replace with your method to set the hour of a Workhours object
+                                    if (!workhoursFiltered.contains(workhour)) {
+                                        workhoursFiltered.add(workhour);
+                                    }
+                                } else {
+                                    doubleGanger = true;
+                                    Workhours workhour = new Workhours();  // replace with your method to create a new Workhours object
+                                    workhour.setHour(hour);
+                                    workhoursFiltered.remove(workhour);
+                                }
+                            }
+                        }
+                    }
+                    workhoursFetched.sort(Comparator.comparing(Workhours::getHour));
+
+                    return workhoursFetched;
+                }
+
+                return new ArrayList<>();
             }
-
-            workhoursFiltered.sort(Comparator.comparing(Workhours::getHour));
-
-            return workhoursFiltered;
         }
 
         return new ArrayList<>();
@@ -874,12 +954,22 @@ public class UserService implements UserDetailsService {
         booking.setDate(bookingsDto.getDate());
         booking.setHour(bookingsDto.getHour());
         booking.setClientId(bookingsDto.getClientId());
+        booking.setEndSessionBoolean(false);
 
         bookingsRepository.save(booking);
+        bookingsRepository.saveHistory(booking.getClientId(),booking.getDate(),booking.getHour(),booking.getEndSessionBoolean(),booking.getTherapistWorkDays().getId());
     }
 
     public Collection<Bookings> fetchByClientIdAndTherapistId(BookingsDto bookingsDto) {
         return bookingsRepository.fetchBookingsClientIdAndTherapistId(bookingsDto.getClientId(),bookingsDto.getTherapistId());
+    }
+
+    public Collection<BookingsHistory> fetchBookingsHistoryByClientId(BookingsDto bookingsDto) {
+        return bookingsHistoryRepository.fetchBookingsHistoryByClientId(bookingsDto.getClientId());
+    }
+
+    public Collection<BookingsHistory> fetchBookingsHistoryByTherapistId(BookingsDto bookingsDto) {
+        return bookingsHistoryRepository.fetchBookingsHistoryByTherapistId(bookingsDto.getTherapistId());
     }
 
     public Collection<Weekdays> fetchWorkDays(WeekdaysDto weekdaysDto) {
@@ -909,16 +999,36 @@ public class UserService implements UserDetailsService {
                 .filter(b -> {
                     LocalDateTime bookingDateTime = LocalDateTime.of(b.getDate(), b.getHour());
                     LocalDateTime bookingEnd = bookingDateTime.plusMinutes(50);
-                    if (bookingDateTime.toLocalDate().isEqual(now.toLocalDate())) {
-                        // If the booking is today, check if it's in progress
-                        if (bookingDateTime.toLocalTime().equals(now.toLocalTime())) {
-                            // If it's the current time, check if it's in progress
-                            return now.isAfter(bookingDateTime) && now.isBefore(bookingEnd);
+                    LocalDateTime bookingNextStartTime = bookingDateTime.plusMinutes(60);
+                    if (!b.getEndSessionBoolean()) {
+                        if (!bookingsDto.getEndSessionBoolean()) {
+                            if (bookingDateTime.toLocalDate().isEqual(now.toLocalDate())) {
+                                // If the booking is today, check if it's in progress
+                                if (now.isAfter(bookingDateTime) && now.isBefore(bookingEnd)) {
+                                    // If it's the current time, check if it's in progress
+                                    return true;
+                                } else if (now.isAfter(bookingEnd) && now.isBefore(bookingNextStartTime)) {
+                                    return false;
+                                } else {
+                                    // If it's not the current time, return the booking
+                                    return now.isBefore(bookingDateTime);
+                                }
+                            } else {
+                                // If the booking is not today, return it if it's in the future
+                                return now.isBefore(bookingDateTime);
+                            }
                         } else {
-                            // If it's not the current time, return the booking
-                            return true;
+                            if (!b.getEndSessionBoolean()) {
+                                b.setEndSessionBoolean(true);
+                                bookingsRepository.save(b);
+                                Optional<BookingsHistory> bookingsHistory = bookingsHistoryRepository.findById(b.getId());
+                                bookingsHistory.get().setEndSessionBoolean(true);
+                                bookingsHistoryRepository.save(bookingsHistory.get());
+                            }
+                            // If the booking is not today, return it if it's in the future
+                            return now.isBefore(bookingDateTime);
                         }
-                    } else {
+                    }else {
                         // If the booking is not today, return it if it's in the future
                         return now.isBefore(bookingDateTime);
                     }
@@ -927,16 +1037,15 @@ public class UserService implements UserDetailsService {
 
         return booking;
     }
-    public void saveFeedback(FeedbackDto feedbackDto) {
-        Feedback feedback = new Feedback();
-        feedback.setUserId(Long.valueOf(feedbackDto.getUserId()));
-        feedback.setTherapistId(Long.valueOf(feedbackDto.getTherapistId()));
-        feedback.setFeedback(feedbackDto.getFeedback());
-        feedbackRepository.save(feedback);
-    }
+
+
 
     public void cancelBooking(BookingsDto bookingsDto) {
         bookingsRepository.deleteById(bookingsDto.getBookingId());
+
+        Optional<BookingsHistory> bookingsHistory = bookingsHistoryRepository.findById(bookingsDto.getBookingId());
+        bookingsHistory.get().setCanceled(true);
+        bookingsHistoryRepository.save(bookingsHistory.get());
     }
 
     public Bookings fetchBookingByBookingId(BookingsDto bookingsDto) {
@@ -956,6 +1065,15 @@ public class UserService implements UserDetailsService {
         booking.setClientId(bookingsDto.getClientId());
 
         bookingsRepository.save(booking);
+
+        BookingsHistory bookingsHistory = new BookingsHistory();
+        bookingsHistory.setId(bookingsDto.getBookingId());
+        bookingsHistory.setTherapistWorkDays(therapistWorkDays);
+        bookingsHistory.setDate(bookingsDto.getDate());
+        bookingsHistory.setHour(bookingsDto.getHour());
+        bookingsHistory.setClientId(bookingsDto.getClientId());
+
+        bookingsHistoryRepository.save(bookingsHistory);
     }
 
     public List<Workhours> fetchBookedHoursInEdit(BookingsDto bookingsDto) {
@@ -980,48 +1098,96 @@ public class UserService implements UserDetailsService {
         }
 
         if (weekdaysBoolean) {
-            // Convert the fetched work hours to a set for faster lookup
-            Set<LocalTime> workhoursSet = workhoursFetched.stream()
-                    .map(Workhours::getHour)  // replace with your method to get the hour from Workhours object
-                    .collect(Collectors.toSet());
-
-            List<Bookings> bookings = bookingsRepository.fetchBookedHours(bookingsDto.getDate(), bookingsDto.getTherapistId());
-
-            List<Workhours> workhoursFiltered = new ArrayList<>();
-            if (bookings.isEmpty()) {
-                return workhoursFetched;
-            } else {
-                for (Bookings booking : bookings) {
-                    LocalTime bookingHour = booking.getHour();  // replace with your method to get the hour from Booking object
-
-                    // If the booking hour is not in the work hours set, add it to the filtered bookings
-                    for (LocalTime hour : workhoursSet) {
-                        if (!hour.equals(bookingHour)) {
-                            Workhours workhour = new Workhours();  // replace with your method to create a new Workhours object
-                            workhour.setHour(hour);  // replace with your method to set the hour of a Workhours object
-                            workhoursFiltered.add(workhour);
-                        }
-                    }
-                }
+            boolean todayBoolean = date.equals(LocalDate.now());
+            Set<LocalTime> workhoursSet;
+            if (!todayBoolean) {
+                // Convert the fetched work hours to a set for faster lookup
+                workhoursSet = workhoursFetched.stream()
+                        .map(Workhours::getHour)
+                        .collect(Collectors.toSet());
+            }else {
+                LocalTime currentTime = LocalTime.now();
+                workhoursSet = workhoursFetched.stream()
+                        .map(Workhours::getHour)
+                        .filter(hour -> !hour.isBefore(currentTime))
+                        .collect(Collectors.toSet());
             }
 
-            workhoursFiltered.sort(Comparator.comparing(Workhours::getHour));
+            if (!workhoursSet.isEmpty()) {
 
-            return workhoursFiltered;
+                List<Bookings> bookings = bookingsRepository.fetchBookedHours(bookingsDto.getDate(), bookingsDto.getTherapistId());
+
+                List<Workhours> workhoursFiltered = new ArrayList<>();
+                if (bookings.isEmpty()) {
+                    return workhoursSet.stream()
+                            .map(hour -> new Workhours(hour))
+                            .sorted(Comparator.comparing(Workhours::getHour))
+                            .collect(Collectors.toList());
+                } else {
+                    List<LocalTime> bookingHour = new ArrayList<>();
+                    for (Bookings booking : bookings) {
+                        if(booking.getId()!=bookingsDto.getBookingId()){
+                            bookingHour.add(booking.getHour());
+                        }
+                    }
+
+                    if (!bookingHour.isEmpty()){
+                        // If the booking hour is not in the work hours set, add it to the filtered bookings
+                        for (LocalTime hour : workhoursSet) {
+                            boolean doubleGanger = false;
+                            for (LocalTime bookingHour2 : bookingHour) {
+                                if (!hour.equals(bookingHour2) && !doubleGanger) {
+                                    Workhours workhour = new Workhours();  // replace with your method to create a new Workhours object
+                                    workhour.setHour(hour);  // replace with your method to set the hour of a Workhours object
+                                    if (!workhoursFiltered.contains(workhour)) {
+                                        workhoursFiltered.add(workhour);
+                                    }
+                                } else {
+                                    doubleGanger = true;
+                                    Workhours workhour = new Workhours();  // replace with your method to create a new Workhours object
+                                    workhour.setHour(hour);
+                                    workhoursFiltered.remove(workhour);
+                                }
+                            }
+                        }
+                    }else {
+                        return workhoursSet.stream()
+                                .map(hour -> new Workhours(hour))
+                                .sorted(Comparator.comparing(Workhours::getHour))
+                                .collect(Collectors.toList());
+                    }
+                }
+
+                workhoursFiltered.sort(Comparator.comparing(Workhours::getHour));
+
+                return workhoursFiltered;
+            }else {
+                return new ArrayList<>();
+            }
         }
 
         return new ArrayList<>();
     }
 
-    public List<User> fetchAllUserTherapistOldConnectionData(ConnectionDto connectionDto) {
-        List<User> users = new ArrayList<>();
-        List<Integer> therapistIdsList = userRepository.fetchAllUserTherapistOldConnectionData(connectionDto.getUserId(),connectionDto.getTherapistId());
+    public List<UserConnectionsHistoryDto> fetchAllUserTherapistOldConnectionData(ConnectionDto connectionDto) {
+        List<UserConnectionsHistory> connectionsHistoryList = userConnectionsHistoryRepository.findAllByUserId(connectionDto.getUserId());
+        List<UserConnectionsHistoryDto> connectionsHistoryListDto = new ArrayList<>();
 
-        for (Integer i : therapistIdsList) {
-            users.add(userRepository.findById(i).get());
+        for (UserConnectionsHistory i : connectionsHistoryList) {
+            UserConnectionsHistoryDto userConnectionsHistoryDto = new UserConnectionsHistoryDto();
+            userConnectionsHistoryDto.setUserId(i.getUserId());
+            userConnectionsHistoryDto.setTherapistId(i.getTherapistId());
+            userConnectionsHistoryDto.setRemoveDate(i.getRemoveDate());
+            userConnectionsHistoryDto.setDateAdded(i.getDateAdded());
+            User user = userRepository.findById(i.getTherapistId()).get();
+            userConnectionsHistoryDto.setName(user.getName());
+            userConnectionsHistoryDto.setSurname(user.getSurname());
+            userConnectionsHistoryDto.setGender(user.getGender());
+
+            connectionsHistoryListDto.add(userConnectionsHistoryDto);
         }
 
-        return users;
+        return connectionsHistoryListDto;
     }
 
     public Chat fetchUserTherapistChats(ConnectionDto connectionDto) {
@@ -1029,7 +1195,6 @@ public class UserService implements UserDetailsService {
 
         return userTherapistMessages.map(UserTherapistMessages::getChat).orElse(null);
     }
-
 
     public void sendMessage(MessageDto messageDto) {
         if (messageDto.getChatId()!=0){
@@ -1083,5 +1248,145 @@ public class UserService implements UserDetailsService {
         Optional<User> optionalUser = userRepository.findById(userId);
 
         return optionalUser.orElse(null);
+    }
+
+    public List<Bookings> fetchAllNextBookings(BookingsDto bookingsDto) {
+        List<Bookings> bookings = bookingsRepository.fetchNextBookingsByTherapistId(bookingsDto.getTherapistId());
+        LocalDateTime now = LocalDateTime.now();
+        return bookings.stream()
+                .filter(b -> {
+                    LocalDateTime bookingDateTime = LocalDateTime.of(b.getDate(), b.getHour());
+                    LocalDateTime bookingEnd = bookingDateTime.plusMinutes(50);
+                    LocalDateTime bookingNextStartTime = bookingDateTime.plusMinutes(60);
+                    if (!b.getEndSessionBoolean()) {
+                        if (!bookingsDto.getEndSessionBoolean()) {
+                            if (bookingDateTime.toLocalDate().isEqual(now.toLocalDate())) {
+                                // If the booking is today, check if it's in progress
+                                if (now.isAfter(bookingDateTime) && now.isBefore(bookingEnd)) {
+                                    // If it's the current time, check if it's in progress
+                                    return true;
+                                } else if (now.isAfter(bookingEnd) && now.isBefore(bookingNextStartTime)) {
+                                    return false;
+                                } else {
+                                    // If it's not the current time, return the booking
+                                    return now.isBefore(bookingDateTime);
+                                }
+                            } else {
+                                // If the booking is not today, return it if it's in the future
+                                return now.isBefore(bookingDateTime);
+                            }
+                        } else {
+                            if (!b.getEndSessionBoolean()) {
+                                b.setEndSessionBoolean(true);
+                                bookingsRepository.save(b);
+                                Optional<BookingsHistory> bookingsHistory = bookingsHistoryRepository.findById(b.getId());
+                                bookingsHistory.get().setEndSessionBoolean(true);
+                                bookingsHistoryRepository.save(bookingsHistory.get());
+                            }
+                            // If the booking is not today, return it if it's in the future
+                            return now.isBefore(bookingDateTime);
+                        }
+                    }else {
+                        // If the booking is not today, return it if it's in the future
+                        return now.isBefore(bookingDateTime);
+                    }
+                })
+                .collect(Collectors.toList());
+    }
+
+    public Notes fetchNote(NoteDto noteDto) {
+        Optional<Notes> note = noteRepository.findById(noteDto.getId());
+
+        return note.orElse(null);
+    }
+
+    public void updateNote(NoteDto noteDto) {
+        List<String> mainPointsList = new ArrayList<>(noteDto.getMainPoints());
+
+        int mainPointId = noteDto.getMainPointsId();
+
+        Optional<MainPoints> mainPointFetched =  mainPointsRepository.findById(mainPointId);
+
+        List<Point> pointsFetched = mainPointFetched.get().getPoint();
+
+        ArrayList<Point> pointCollection = new ArrayList<>();
+        Point savedPoint;
+        for (int i = 0;i<mainPointsList.size();i++) {
+            if (i<pointsFetched.size()) {
+                Point point = new Point();
+                point.setId(pointsFetched.get(i).getId());
+                point.setPoint(mainPointsList.get(i));
+                savedPoint = pointRepository.save(point);
+                pointCollection.add(savedPoint);
+            }else {
+                Point point = new Point();
+                point.setPoint(mainPointsList.get(i));
+                savedPoint = pointRepository.save(point);
+                pointCollection.add(savedPoint);
+            }
+        }
+
+        if (mainPointsList.size()<pointsFetched.size()) {
+            for (int i = pointsFetched.size()-mainPointsList.size();i<=pointsFetched.size();i++) {
+                pointRepository.deleteById(pointsFetched.get(i-1).getId());
+            }
+        }
+
+        MainPoints mainPoints = new MainPoints();
+        mainPoints.setPoint(pointCollection);
+        mainPoints.setId(mainPointId);
+        mainPointsRepository.save(mainPoints);
+
+        Notes notes = new Notes();
+        notes.setId(noteDto.getId());
+        notes.setNotesText(noteDto.getNotesText());
+        notes.setMainPoints(mainPoints);
+        notes.setPatientMoodAfter(noteDto.getPatientMoodAfter());
+        notes.setPatientMoodBefore(noteDto.getPatientMoodBefore());
+        notes.setDateAdded(noteDto.getDateAdded());
+        Notes savedNote = noteRepository.save(notes);
+
+        int therapistNotesId = therapistNotesRepository.findByNotesId(noteDto.getId());
+
+        TherapistNotes therapistNotes = new TherapistNotes();
+        therapistNotes.setId(therapistNotesId);
+        therapistNotes.setNotes(savedNote);
+        therapistNotes.setTherapistId(noteDto.getTherapistId());
+        therapistNotes.setClientId(noteDto.getClientId());
+
+        therapistNotesRepository.save(therapistNotes);
+
+        TherapistNotesHistory therapistNotesHistory = new TherapistNotesHistory();
+        therapistNotesHistory.setId(therapistNotesId);
+        therapistNotesHistory.setNotes(savedNote);
+        therapistNotesHistory.setTherapistId(noteDto.getTherapistId());
+        therapistNotesHistory.setClientId(noteDto.getClientId());
+
+        therapistNotesHistoryRepository.save(therapistNotesHistory);
+    }
+
+    public void endSessionBoolean(BookingsDto bookingsDto) {
+        Optional<Bookings> bookings = bookingsRepository.findById(bookingsDto.getBookingId());
+
+        if (bookings.isPresent()) {
+            bookings.get().setEndSessionBoolean(true);
+            bookingsRepository.save(bookings.get());
+        }
+    }
+
+    public void saveFeedback(FeedbackDto feedbackDto) {
+        Feedback feedback = new Feedback();
+        Optional<User> user  = userRepository.findById(feedbackDto.getUserId());
+        feedback.setUserId(user.get());
+        Optional<User> therapist  = userRepository.findById(feedbackDto.getTherapistId());
+        feedback.setTherapistId(therapist.get());
+        feedback.setFeedback(feedbackDto.getFeedback());
+        feedback.setDateAdded(LocalDateTime.now());
+        feedbackRepository.save(feedback);
+    }
+
+    public List<Feedback> fetchFeedback(FeedbackDto feedbackDto) {
+        User therapist = userRepository.findById(feedbackDto.getTherapistId()).get();
+        return feedbackRepository.findAllByTherapistId(therapist);
     }
 }

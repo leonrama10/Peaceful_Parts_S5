@@ -4,13 +4,125 @@ import '../../../css/sb-admin-2.min.css';
 import Questionnaire from "./Questionnaire";
 import RegisterBoot from "../Login and register/RegisterBoot";
 import "../../../css/QuestionnaireForm.css";
-import {questionnaireAnswers} from "../../../api/authService";
+import {fetchUserData, questionnaireAnswers} from "../../../api/authService";
 import {authenticate, authFailure, authSuccess} from "../../../redux/authActions";
 import {connect} from "react-redux";
+import {jwtDecode} from "jwt-decode";
+import {saveState} from "../../../helper/sessionStorage";
+const getRefreshToken = () => {
+    const token = localStorage.getItem('REFRESH_TOKEN');
 
+    if (!token || token==="null") {
+        return null;
+    }
+
+    const decodedToken = jwtDecode(token);
+    const currentTime = Date.now() / 1000;
+
+    if (decodedToken.exp < currentTime) {
+        console.log("Token expired.");
+        return null;
+    } else {
+        return token;
+    }
+}
 function GetStarted({loading,error,...props}){
 
     const history = useNavigate ();
+
+    React.useEffect(()=>{
+        if(getRefreshToken()) {
+            let confirmLogout = window.confirm("You are already logged in. Do you want to log out?");
+
+            if (confirmLogout) {
+                saveState("chatTherapistId", 0);
+                saveState("chatUserId", 0);
+                saveState("therapistBookingId", 0);
+                saveState("addNotesBoolean",false)
+                saveState("endSessionTherapist",false);
+                saveState("startTimerTherapist",false)
+                saveState("startTimerValueTherapist",0)
+                saveState("userRole", null);
+                saveState("editUserBookingId", 0);
+                saveState("editUserTherapistId", 0);
+                saveState("editUserId", 0);
+                saveState("editTherapistPastClientId", 0);
+                saveState("editTherapistClientId", 0);
+                saveState("editTherapistClientBookingId", 0);
+                saveState("clientHistoryNotesId",0)
+                saveState("meetingAvailableUser",false)
+                saveState("startTimer",false)
+                saveState("endSession",false);
+                saveState("startTimerValue",0)
+                saveState("clientInfoId",0)
+                saveState("clientNotesId",0)
+                saveState("therapistClientNoteId", 0);
+                saveState("editTherapistId", 0);
+                saveState("userInfoId", 0);
+                saveState("therapistInfoId",0)
+                saveState("chatStateLocation",'')
+                saveState("therapistId",0)
+                saveState("role", '')
+                props.setUser(null);
+                saveState("connected",false)
+            }else {
+                fetchUserData().then((response) => {
+                    if (response.data.roles.at(0)){
+                        if (response.data.roles.at(0).role === 'ROLE_ADMIN') {
+                            
+                            saveState("role",'ROLE_ADMIN')
+                            props.setLocation("/dashboard/adminDashboard")
+                            history('/dashboard/adminDashboard');
+                        }else if (response.data.roles.at(0).role === 'ROLE_USER') {
+                            
+                            saveState("role",'ROLE_USER')
+                            props.setLocation("/dashboard/userDashboard")
+                            history('/dashboard/userDashboard');
+                        } else if(response.data.roles.at(0).role === 'ROLE_THERAPIST'){
+                            
+                            saveState("role",'ROLE_THERAPIST')
+                            props.setLocation("/dashboard/therapistDashboard")
+                            history('/dashboard/therapistDashboard');
+                        }
+                    }
+                }).catch((e) => {
+                    history('/loginBoot');
+                });
+            }
+        }else {
+            saveState("chatTherapistId", 0);
+            saveState("chatUserId", 0);
+            saveState("therapistBookingId", 0);
+            saveState("addNotesBoolean",false)
+            saveState("endSessionTherapist",false);
+            saveState("startTimerTherapist",false)
+            saveState("startTimerValueTherapist",0)
+            saveState("userRole", null);
+            saveState("editUserBookingId", 0);
+            saveState("editUserTherapistId", 0);
+            saveState("editUserId", 0);
+            saveState("editTherapistPastClientId", 0);
+            saveState("editTherapistClientId", 0);
+            saveState("editTherapistClientBookingId", 0);
+            saveState("clientHistoryNotesId",0)
+            saveState("meetingAvailableUser",false)
+            saveState("startTimer",false)
+            saveState("endSession",false);
+            saveState("startTimerValue",0)
+            saveState("clientInfoId",0)
+            saveState("clientNotesId",0)
+            saveState("therapistClientNoteId", 0);
+            saveState("editTherapistId", 0);
+            saveState("userInfoId", 0);
+            saveState("therapistInfoId",0)
+            saveState("chatStateLocation",'')
+            saveState("therapistId",0)
+            saveState("role", '')
+            props.setUser(null);
+            saveState("connected",false)
+        }
+    },[])
+
     const [selectedAnswer, setSelectedAnswer] = useState({
         therapyType: '',
         gender: null,
@@ -157,24 +269,24 @@ function GetStarted({loading,error,...props}){
                       answerMethod: "button"
                  },
 
-                 {
-                   question: "How would you rate your current eating habits?",
-                   answers: [
-                       { text: "Good"},
-                       { text: "Fair" },
-                       { text: "Poor" },
-                     ],
-                   answerMethod: "button"
-                 },
-
-                 {
-                   question: "Are you currently experiencing overwhelming sadness, grief, or depression?",
-                   answers: [
-                       { text: "Yes" },
-                       { text: "No"},
-                     ],
-                   answerMethod: "button"
-                 },
+                 // {
+                 //   question: "How would you rate your current eating habits?",
+                 //   answers: [
+                 //       { text: "Good"},
+                 //       { text: "Fair" },
+                 //       { text: "Poor" },
+                 //     ],
+                 //   answerMethod: "button"
+                 // },
+                 //
+                 // {
+                 //   question: "Are you currently experiencing overwhelming sadness, grief, or depression?",
+                 //   answers: [
+                 //       { text: "Yes" },
+                 //       { text: "No"},
+                 //     ],
+                 //   answerMethod: "button"
+                 // },
 
             {
                question: "Feeling down, depressed or hopeless.",
@@ -187,37 +299,37 @@ function GetStarted({loading,error,...props}){
              answerMethod:  "button"
            },
 
-           {
-             question: "Are you currently experiencing anxiety, panic attacks or have any phobias?",
-             answers: [
-                 { text: "Yes" },
-                 { text: "No"},
-               ],
-             answerMethod: "button"
-           },
+           // {
+           //   question: "Are you currently experiencing anxiety, panic attacks or have any phobias?",
+           //   answers: [
+           //       { text: "Yes" },
+           //       { text: "No"},
+           //     ],
+           //   answerMethod: "button"
+           // },
 
-           {
-              question: "Feeling bad about yourself - or that you are a failure or have let yourself or your family down.",
-                          answers: [
-                             { text: "Not at all" },
-                             { text: "Several days"},
-                             { text: "More than half the days" },
-                             { text: "Nearly every day" },
-                        ],
-              answerMethod:  "button"
-           },
+           // {
+           //    question: "Feeling bad about yourself - or that you are a failure or have let yourself or your family down.",
+           //                answers: [
+           //                   { text: "Not at all" },
+           //                   { text: "Several days"},
+           //                   { text: "More than half the days" },
+           //                   { text: "Nearly every day" },
+           //              ],
+           //    answerMethod:  "button"
+           // },
 
-           {
-              question: "How often do you drink alcohol?",
-                          answers: [
-                             { text: "Never" },
-                             { text: "Infrequently"},
-                             { text: "Monthly" },
-                             { text: "Weekly" },
-                             { text: "Daily" },
-                        ],
-              answerMethod:  "button"
-           },
+           // {
+           //    question: "How often do you drink alcohol?",
+           //                answers: [
+           //                   { text: "Never" },
+           //                   { text: "Infrequently"},
+           //                   { text: "Monthly" },
+           //                   { text: "Weekly" },
+           //                   { text: "Daily" },
+           //              ],
+           //    answerMethod:  "button"
+           // },
 
            {
                 question: "Thoughts that you would be better off dead or of hurting yourself in some way.",
@@ -348,7 +460,7 @@ function GetStarted({loading,error,...props}){
     const [getStartedFinished, setGetStartedFinished] = useState(false);
     const [questionIndex, setQuestionIndex] = useState(0);
     const properties = ['therapyType', 'gender', 'age', 'identityType', 'relationshipStatus', 'therapyHistory', 'medicationHistory', 'communication', 'therapistGender', 'therapistType', 'physicalHealth', 'mentalState1', 'mentalState2', 'location', 'language'];
-    // questionIndex >= questions.length
+
     React.useEffect(() => {
         if (continueButton) {
                 questionnaireAnswers(selectedAnswer).then((response)=>{
@@ -444,45 +556,63 @@ function GetStarted({loading,error,...props}){
         }
     }
 
-    console.log("VALUESSSSSSSSSSSSSSSS",selectedAnswer)
-
     return (
-        <main className="bg-gradient-primary">
-            <div className="container">
-                <div className="card o-hidden border-0 shadow-lg my-5">
-                    <div className="card-body p-0">
-                        <div className="row">
-                                {isQuizOver ? (
-                                    <RegisterBoot questionnaire={questionnaire} getStartedFinished={getStartedFinished}/>
-                                ) : (
-                                    <div className="QuestionnaireForm">
-                                    <Questionnaire
-                                        questions={questions}
-                                        currentQuestion={currentQuestion}
-                                        handleAnswerClick={handleAnswerClick}
-                                        setContinueButton={setContinueButton}
-                                    />
-                                    </div>
-                                )}
+        <main className="bg-gradient-primary" style={{minHeight:"calc(100vh - 190px)",paddingTop:"58.4px"}}>
+            {isQuizOver ? (
+                <RegisterBoot questionnaire={questionnaire} getStartedFinished={getStartedFinished}/>
+            ) : (
+                <div className="container" style={{
+                    display: 'flex',
+                    flexDirection:"column",
+                    justifyContent: 'center',
+                    alignItems: 'center',
+                    padding: "10px",
+                    minHeight: "calc(100vh - 190px)",
+                    overflow: "auto"
+                }}>
+                    <div style={{
+                            display: 'flex',
+                            flexDirection:"column",
+                            alignItems: 'center',
+                            paddingTop:"10px",
+                            flexWrap:'wrap'}}>
+                            <h1 style={{color:"#2e4057",fontSize:"50px",paddingBottom:"20px"}}>Help us match you to the <span style={{color:"white"}}>right therapist</span></h1>
+                            <p style={{maxWidth:"850px",textAlign:"center",paddingBottom:"20px",fontSize:"17px"}}>It's important to have a therapist who you can establish a personal connection with. The following questions are designed to help match you to a licensed therapist based on your needs and personal preferences.</p>
+                    </div>
+
+                    <div className="card o-hidden border-0 shadow-lg" style={{width: '68%'}}>
+                        <div className="QuestionnaireForm">
+                            <Questionnaire
+                                questions={questions}
+                                currentQuestion={currentQuestion}
+                                handleAnswerClick={handleAnswerClick}
+                                setContinueButton={setContinueButton}
+                            />
                         </div>
                     </div>
+                    <p></p>
+                    <p></p>
+                    <p></p>
+                    <p></p>
                 </div>
-            </div>
+            )}
         </main>
     )
 }
-const mapStateToProps=({auth})=>{
-    console.log("state ",auth)
+
+const mapStateToProps = ({auth}) => {
+    console.log("state ", auth)
     return {
-        loading:auth.loading,
-        error:auth.error
-    }}
-const mapDispatchToProps=(dispatch)=>{
+        loading: auth.loading,
+        error: auth.error
+    }
+}
+const mapDispatchToProps = (dispatch) => {
 
     return {
-        authenticate :()=> dispatch(authenticate()),
-        setUser:(data)=> dispatch(authSuccess(data)),
-        loginFailure:(message)=>dispatch(authFailure(message))
+        authenticate: () => dispatch(authenticate()),
+        setUser: (data) => dispatch(authSuccess(data)),
+        loginFailure: (message) => dispatch(authFailure(message))
     }
 }
 export default connect(mapStateToProps,mapDispatchToProps)(GetStarted);

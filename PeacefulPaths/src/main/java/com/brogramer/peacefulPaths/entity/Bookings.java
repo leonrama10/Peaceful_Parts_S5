@@ -3,7 +3,6 @@ package com.brogramer.peacefulPaths.entity;
 import jakarta.persistence.*;
 
 import java.time.LocalDate;
-import java.time.LocalDateTime;
 import java.time.LocalTime;
 
 @Entity
@@ -27,18 +26,22 @@ public class Bookings {
     @JoinColumn(name = "therapist_work_days_id")
     private TherapistWorkDays therapistWorkDays;
 
+    @Column(name = "end_session_boolean")
+    private boolean endSessionBoolean;
+
     public Bookings() {}
 
     public Bookings(int id) {
         this.id = id;
     }
 
-    public Bookings(int id, int clientId, LocalDate date, LocalTime hour, TherapistWorkDays therapistWorkDays) {
+    public Bookings(int id, int clientId, LocalDate date, LocalTime hour, TherapistWorkDays therapistWorkDays,boolean endSessionBoolean) {
         this.id = id;
         this.clientId = clientId;
         this.date = date;
         this.hour = hour;
         this.therapistWorkDays = therapistWorkDays;
+        this.endSessionBoolean = endSessionBoolean;
     }
 
     public int getId() {
@@ -79,5 +82,13 @@ public class Bookings {
 
     public void setTherapistWorkDays(TherapistWorkDays therapistWorkDays) {
         this.therapistWorkDays = therapistWorkDays;
+    }
+
+    public boolean getEndSessionBoolean() {
+        return endSessionBoolean;
+    }
+
+    public void setEndSessionBoolean(boolean endSessionBoolean) {
+        this.endSessionBoolean = endSessionBoolean;
     }
 }

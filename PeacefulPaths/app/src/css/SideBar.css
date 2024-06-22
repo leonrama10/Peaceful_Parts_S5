@@ -1,0 +1,39 @@
+.sidebar-generate{
+    text-decoration: none;
+    color: white;
+    font-size: 13px;
+    padding-left: 20px;
+    font-weight: 550;
+    height: 40px;
+    display: flex;
+    align-items: center;
+}
+
+.sidebar-generate:hover{
+    text-decoration: none;
+    color: white;
+    font-size: 13px;
+    padding-left: 20px;
+    font-weight: 550;
+    background-color: cornflowerblue;
+}
+
+.sidebar-manage{
+    text-decoration: none;
+    color: white;
+    font-size: 13px;
+    padding-left: 20px;
+    padding-top: 10px;
+    padding-bottom: 10px;
+    font-weight: 550;
+}
+
+.sidebar-manage:hover{
+    cursor: pointer;
+    text-decoration: none;
+    color: white;
+    font-size: 13px;
+    padding-left: 20px;
+    font-weight: 550;
+    background-color: cornflowerblue;
+}

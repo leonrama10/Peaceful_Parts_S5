@@ -1,70 +1,215 @@
 import React, { useEffect, useState } from 'react';
-import { fetchAdviceForUser } from '../../../api/authService';
-import { loadState } from '../../../helper/sessionStorage';
-import { useNavigate } from 'react-router-dom';
-import './AdviceByTherapist.css';
+import {
+    fetchAdviceForUser,
+    fetchUserData, fetchUserDataId
+} from '../../../api/authService';
+import {loadState, saveState} from '../../../helper/sessionStorage';
+import '../../../css/AdviceByTherapist.css';
+import photo from '../../../img/3585145_66102.jpg';
+import DashboardNav from "../DashboardNav";
+import {Link, useNavigate} from "react-router-dom";
+import {FontAwesomeIcon} from "@fortawesome/react-fontawesome";
+import {faChevronLeft} from "@fortawesome/free-solid-svg-icons";
+import {authenticate, authFailure, authSuccess, setLocation} from "../../../redux/authActions";
+import {connect} from "react-redux";
+import {jwtDecode} from "jwt-decode";
+import SideBarUser from "../SideBars/SideBarUser";
+let connected = null;
+const getRefreshToken = () => {
+    const token = localStorage.getItem('REFRESH_TOKEN');
 
-export default function AdviceByTherapist() {
+    if (!token || token==="null") {
+        return null;
+    }
+
+    const decodedToken = jwtDecode(token);
+    const currentTime = Date.now() / 1000;
+
+    if (decodedToken.exp < currentTime) {
+        console.log("Token expired.");
+        return null;
+    } else {
+        return token;
+    }
+}
+const getAccessToken = () => {
+    const token = localStorage.getItem('USER_KEY');
+
+    if (!token || token==="null") {
+        return null;
+    }
+
+    const decodedToken = jwtDecode(token);
+    const currentTime = Date.now() / 1000;
+
+    if (decodedToken.exp < currentTime) {
+        console.log("Token expired.");
+        return null;
+    } else {
+        return token;
+    }
+}
+function AdviceByTherapist({loading,error,...props}) {
     const [adviceList, setAdviceList] = useState([]);
-    const navigate = useNavigate();
-    let userId = 0;
+    const [data,setData]=useState({});
+    const history = useNavigate ();
 
     useEffect(() => {
-        userId = loadState("userId", 0);
-        fetchAdviceForUser(userId).then(response => {
-            setAdviceList(response.data);
-        }).catch(error => {
-            console.error('Error fetching advice', error);
-        });
-    }, [userId]);
+        if(getRefreshToken()) {
+            props.setLocation("/dashboard/userDashboard/advice")
+            connected = loadState("connected",false)
+            fetchUserData().then((response) => {
+                if (response.data.roles.at(0).role === 'ROLE_USER') {
+                    setData(response.data);
+                    saveState("role",'ROLE_USER')
 
-    const handleBackClick = () => {
-        navigate(-1);
-    };
+                    fetchAdviceForUser({userId:response.data.id}).then(response => {
+                        setAdviceList(response.data);
+                    }).catch(error => {
+                        console.error('Error fetching advice', error);
+                    });
+                } else {
+                    history('/loginBoot');
+                }
+            }).catch((e) => {
+                history('/loginBoot');
+            });
+
+            if (localStorage.getItem('reloadUser') === "true") {
+                saveState("chatStateLocation",'')
+                // Set the 'reloaded' item in localStorage
+                localStorage.setItem('reloadUser', "false");
+                // Reload the page
+                window.location.reload();
+            }
+        }else if(getAccessToken()){
+            props.setLocation("/dashboard/userDashboard/advice")
+            connected = loadState("connected",false)
+            fetchUserData().then((response) => {
+                if (response.data.roles.at(0).role === 'ROLE_USER') {
+                    setData(response.data);
+                    saveState("role",'ROLE_USER')
+
+                    fetchAdviceForUser({userId:response.data.id}).then(response => {
+                        setAdviceList(response.data);
+                    }).catch(error => {
+                        console.error('Error fetching advice', error);
+                    });
+                } else {
+                    history('/loginBoot');
+                }
+            }).catch((e) => {
+                history('/loginBoot');
+            });
+
+            if (localStorage.getItem('reloadUser') === "true") {
+                saveState("chatStateLocation",'')
+                // Set the 'reloaded' item in localStorage
+                localStorage.setItem('reloadUser', "false");
+                // Reload the page
+                window.location.reload();
+            }
+        }else{
+            props.loginFailure("Authentication Failed!!!");
+            props.setLocation("/loginBoot")
+            history('/loginBoot');
+        }
+    }, []);
+
 
     return (
         <main id="page-top">
+
             <div id="wrapper">
+
+                <SideBarUser/>
+
                 <div id="content-wrapper" className="d-flex flex-column">
+
                     <div id="content">
-                        <div className="container-fluid advice-container">
-                            <div className="header">
-                                <div className="logo">
-                                    <h1><span>Peaceful</span>Paths</h1>
+
+                        <DashboardNav data={data} setUser={props.setUser}/>
+
+                        <div className="container-fluid">
+                            <div style={{
+                                display: "flex",
+                                justifyContent: "start",
+                                alignItems: 'center',
+                                marginTop: "-14px"
+                            }}>
+                                <Link to={"/dashboard/userDashboard"} className="btn goBack"
+                                      style={{color: "#0d6efd", marginLeft: "-10px"}}
+                                      type="button"
+                                ><FontAwesomeIcon icon={faChevronLeft} style={{marginRight: "3.5px"}}/>Go to
+                                    Dashboard
+                                </Link>
+                            </div>
+                            <div style={{
+                                display: "flex",
+                                justifyContent: "space-between",
+                                alignItems: "center"
+                            }}>
+                                <div className="d-sm-flex align-items-center justify-content-between mb-4">
+                                    <h1 className="h3 mb-0 text-800" style={{color: "#5a5c69"}}>Advices from My Therapist</h1>
                                 </div>
                             </div>
-                            <div className="d-sm-flex align-items-center justify-content-between mb-4">
-                                <button className="btn btn-secondary" onClick={handleBackClick}>Back</button>
-                            </div>
-                            <h2 className="text-center mb-4">Advices from Your Therapist</h2>
-                            {adviceList.length > 0 ? (
-                                <ul className="list-group">
-                                    {adviceList.map((advice, index) => (
-                                        <li key={index} className="list-group-item advice-item">
-                                            <div className="advice-header d-flex justify-content-between align-items-center mb-2">
-                                                <strong className="advice-date">{advice.date}</strong>
-                                                <span className="badge therapist-name">{advice.therapistName}</span>
+
+                            <div >
+                                {adviceList.length > 0 ? (
+                                        adviceList
+                                            .sort((a, b) => new Date(b.dateAdded) - new Date(a.dateAdded))
+                                            .map((advice, index) => (
+                                            <div key={index} className={"card shadow"} style={{marginBottom:"20px"}}>
+                                                <div className="card-body">
+                                                    <div className="card-body" style={{border:"1px solid lightgray"}}>
+                                                        <p>- {advice.advice}</p>
+                                                    </div>
+                                                    <br/>
+                                                    <div style={{display: "flex", justifyContent: "space-between"}}>
+                                                        <i>Therapist Id: {advice.therapistId}</i>
+                                                        <i>Date created: {advice.dateAdded}</i>
+                                                    </div>
+                                                </div>
                                             </div>
-                                            <p className="advice-text">{advice.advice}</p>
-                                        </li>
-                                    ))}
-                                </ul>
-                            ) : (
-                                <div className="text-center">
-                                    <p>No advice available at the moment.</p>
-                                </div>
-                            )}
+                                        ))
+                                ) : (
+                                    <div className="card shadow text-center" style={{
+                                        display: "flex",
+                                        justifyContent: "center",
+                                        flexDirection: "column",
+                                        alignItems: "center"
+                                    }}>
+                                    <img src={photo} alt={"photo"} style={{width: "400px"}}/>
+                                        <h4 style={{color: "#5b5c63", fontSize: "28px"}}>No advice available.</h4>
+                                        <p style={{width: "400px", textAlign: "center", color: "#858796"}}>Find more
+                                            about yourself by having more conversations.</p>
+                                        <Link style={{marginBottom:"30px"}} to={"/dashboard/userDashboard/chatDashboard"}
+                                              className={"discoverButton"} type={"button"}>Discover</Link>
+                                    </div>
+                                )}
+                            </div>
                         </div>
                     </div>
-                    <footer className="sticky-footer bg-white">
-                        <div className="container my-auto">
-                            <div className="copyright text-center my-auto">
-                                <span>&copy; 2024 PeacefulPaths</span>
-                            </div>
-                        </div>
-                    </footer>
                 </div>
             </div>
         </main>
-    );
+    )
 }
+
+const mapStateToProps = ({auth}) => {
+    console.log("state ", auth)
+    return {
+        loading: auth.loading,
+        error: auth.error,
+        location: auth.location
+    }
+}
+const mapDispatchToProps = (dispatch) => {
+    return {
+        authenticate: () => dispatch(authenticate()),
+        setUser: (data) => dispatch(authSuccess(data)),
+        loginFailure: (message) => dispatch(authFailure(message)),
+        setLocation: (path) => dispatch(setLocation(path))
+    }
+}
+export default connect(mapStateToProps, mapDispatchToProps)(AdviceByTherapist);

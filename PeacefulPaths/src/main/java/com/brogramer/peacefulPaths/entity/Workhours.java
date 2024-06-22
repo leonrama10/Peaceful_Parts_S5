@@ -21,8 +21,7 @@ public class Workhours {
         this.id = id;
     }
 
-    public Workhours(Long id, LocalTime hour) {
-        this.id = id;
+    public Workhours( LocalTime hour) {
         this.hour = hour;
     }
 
@@ -40,5 +39,13 @@ public class Workhours {
 
     public void setHour(LocalTime hour) {
         this.hour = hour;
+    }
+
+    @Override
+    public boolean equals(Object obj) {
+        if (this == obj) return true;
+        if (obj == null || getClass() != obj.getClass()) return false;
+        Workhours that = (Workhours) obj;
+        return hour == that.hour;
     }
 }

@@ -2,9 +2,7 @@ import {
     AUTH_REQ,
     AUTH_SUCCESS,
     AUTH_FAILURE,
-    ADMIN_AUTH_STATE,
-    THERAPIST_AUTH_STATE,
-    USER_AUTH_STATE, USER_LOCATION
+    USER_LOCATION
 } from './types';
 
 export const authenticate=()=>{
@@ -14,11 +12,12 @@ export const authenticate=()=>{
 }
 
 export const authSuccess = (content) => {
-    if (content === null) {
+    if (content===null ) {
         localStorage.removeItem('USER_KEY');
-        console.log("YOYOOOOOOOOOOOOOOOOOO")
+        localStorage.removeItem('REFRESH_TOKEN');
     } else {
         localStorage.setItem('USER_KEY', content.token);
+        localStorage.setItem('REFRESH_TOKEN', content.refreshToken);
     }
 
     return {
@@ -34,24 +33,6 @@ export const authFailure=(error)=>{
     }
 }
 
-export const setAdminAuthenticationState=(boolean)=>{
-    return {
-        type:ADMIN_AUTH_STATE,
-        payload:boolean
-    }
-}
-export const setTherapistAuthenticationState=(boolean)=>{
-    return {
-        type:THERAPIST_AUTH_STATE,
-        payload:boolean
-    }
-}
-export const setUserAuthenticationState=(boolean)=>{
-    return {
-        type:USER_AUTH_STATE,
-        payload:boolean
-    }
-}
 export const setLocation=(path)=>{
     return {
         type:USER_LOCATION,

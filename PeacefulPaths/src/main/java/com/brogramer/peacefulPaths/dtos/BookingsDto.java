@@ -17,8 +17,26 @@ public class BookingsDto {
     private int clientId;
     private int bookingId;
     private int therapistId;
+    private boolean endSessionBoolean;
+    private boolean canceled;
     private LocalDate date;
     private LocalTime hour;
+
+    public boolean getCanceled() {
+        return canceled;
+    }
+
+    public void setCanceled(boolean canceled) {
+        this.canceled = canceled;
+    }
+
+    public boolean getEndSessionBoolean() {
+        return endSessionBoolean;
+    }
+
+    public void setEndSessionBoolean(boolean endSessionBoolean) {
+        this.endSessionBoolean = endSessionBoolean;
+    }
 
     public int getClientId() {
         return clientId;

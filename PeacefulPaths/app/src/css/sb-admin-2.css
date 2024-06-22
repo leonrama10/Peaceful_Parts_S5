@@ -11315,7 +11315,7 @@ body.sidebar-toggled footer.sticky-footer {
 .custom-dropdown label {
     display: block;
     margin-bottom: 8px;
-    font-weight: bold;
+    /*font-weight: bold;*/
     color: #333;
 }
 
@@ -11328,8 +11328,8 @@ body.sidebar-toggled footer.sticky-footer {
     color: #444;
     background-color: #ffffff;
     background-image: none; /* Remove default arrow in Chrome and Firefox */
-    border: 2px solid #007bff; /* Custom border color */
-    border-radius: 4px; /* Rounded borders */
+    border: 1px solid lightgray; /* Custom border color */
+    border-radius: 25px; /* Rounded borders */
     -webkit-appearance: none; /* Remove default style in iOS */
     -moz-appearance: none;
     appearance: none;

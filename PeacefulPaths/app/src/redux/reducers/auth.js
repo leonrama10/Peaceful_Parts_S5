@@ -2,9 +2,6 @@ import {
     AUTH_REQ,
     AUTH_SUCCESS,
     AUTH_FAILURE,
-    ADMIN_AUTH_STATE,
-    THERAPIST_AUTH_STATE,
-    USER_AUTH_STATE,
     USER_LOCATION
 } from '../types';
 
@@ -12,9 +9,6 @@ const initialState={
     user:{},
     error:'',
     loading:false,
-    isAdminAuthenticated: false,
-    isTherapistAuthenticated: false,
-    isUserAuthenticated: false,
     location: '',
 };
 
@@ -30,15 +24,6 @@ const auth=(state=initialState,action)=>{
         case AUTH_FAILURE:
             const error=action.payload;
             return {...state,loading:false,error:error};
-
-        case ADMIN_AUTH_STATE:
-            return {...state, loading: false, error: '', isAdminAuthenticated: action.payload};
-
-        case THERAPIST_AUTH_STATE:
-            return {...state, loading: false, error: '', isTherapistAuthenticated: action.payload};
-
-        case USER_AUTH_STATE:
-            return {...state, loading: false, error: '', isUserAuthenticated: action.payload};
 
         case USER_LOCATION:
             return {...state, loading: false, error: '', location: action.payload};

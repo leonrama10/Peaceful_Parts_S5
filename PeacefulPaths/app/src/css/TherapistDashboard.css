@@ -1,0 +1,47 @@
+.checkbox-container {
+    display: flex;
+    align-items: center;
+    margin: 8px 0;
+    /*background-color: darkblue; !* Dark blue background for the container *!*/
+}
+
+.checkbox-label {
+    display: inline-block;
+    width: 2em;
+    height: 2em;
+    line-height: 2em; /* Align text vertically */
+    text-align: center;
+    margin-left: 8px;
+    border-radius: 50%;
+    background-color: #fff; /* White background for the circle */
+    color: #0d6efd; /* Dark blue text color */
+    cursor: pointer;
+}
+
+/* Hide the default checkbox */
+.checkbox-custom {
+    display: none;
+}
+
+/* Style the label when the checkbox is checked */
+.checkbox-custom:checked + .checkbox-label {
+    background-color: #0d6efd; /* Dark blue background for the circle */
+    color: #fff; /* White text color */
+}
+
+.loadMoreButton{
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    border-radius: 5px;
+    border: 1px solid lightgray;
+    width: 100%;
+    padding: 5px;
+    text-align: center;
+    text-decoration: none;
+}
+
+.loadMoreButton:hover{
+    text-decoration: none;
+    background-color: #ededed;
+}

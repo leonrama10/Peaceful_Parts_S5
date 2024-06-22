@@ -56,9 +56,11 @@ export const fetchAllUserData=()=>{
 }
 
 export const fetchUserDataId=(authRequest)=>{
+    console.log("LALALALLALALAL",authRequest)
     return axios({
-        method:'GET',
-        url:`${process.env.hostUrl||'http://localhost:8080'}/api/auth/userinfoId/${authRequest}`,
+        method:'POST',
+        url:`${process.env.hostUrl||'http://localhost:8080'}/api/auth/userinfoId`,
+        data:authRequest,
         headers:{
             'Authorization':'Bearer '+getToken()
         }
@@ -70,6 +72,16 @@ export const userDelete = (authRequest) => {
     return axios({
         method: 'DELETE',
         url: `${process.env.hostUrl || 'http://localhost:8080'}/api/auth/deleteUser/${authRequest}`,
+        headers: {
+            'Authorization': 'Bearer ' + getToken()
+        }
+    })
+}
+
+export const deleteNote = (authRequest) => {
+    return axios({
+        method: 'DELETE',
+        url: `${process.env.hostUrl || 'http://localhost:8080'}/api/auth/deleteNote/${authRequest}`,
         headers: {
             'Authorization': 'Bearer ' + getToken()
         }
@@ -167,8 +179,9 @@ console.log("DATAa",authRequest)
 
 export const fetchUserTherapistConnectionData = (authRequest) => {
     return axios({
-        method: 'GET',
-        url: `${process.env.hostUrl || 'http://localhost:8080'}/api/auth/fetchUserTherapistConnectionData/${authRequest}`,
+        method: 'POST',
+        url: `${process.env.hostUrl || 'http://localhost:8080'}/api/auth/fetchUserTherapistConnectionData`,
+        data: authRequest,
         headers: {
             'Authorization': 'Bearer ' + getToken()
         }
@@ -185,11 +198,11 @@ export const removeTherapist = (authRequest) => {
     })
 }
 
-
 export const fetchAllUsersConnectedData = (authRequest) => {
     return axios({
-        method: 'GET',
-        url: `${process.env.hostUrl || 'http://localhost:8080'}/api/auth/fetchAllUsersConnectedData/${authRequest}`,
+        method: 'POST',
+        url: `${process.env.hostUrl || 'http://localhost:8080'}/api/auth/fetchAllUsersConnectedData`,
+        data:authRequest,
         headers: {
             'Authorization': 'Bearer ' + getToken()
         }
@@ -198,8 +211,9 @@ export const fetchAllUsersConnectedData = (authRequest) => {
 
 export const fetchAllUsersConnectedDataHistory = (authRequest) => {
     return axios({
-        method: 'GET',
-        url: `${process.env.hostUrl || 'http://localhost:8080'}/api/auth/fetchAllUsersConnectedDataHistory/${authRequest}`,
+        method: 'POST',
+        url: `${process.env.hostUrl || 'http://localhost:8080'}/api/auth/fetchAllUsersConnectedDataHistory`,
+        data:authRequest,
         headers: {
             'Authorization': 'Bearer ' + getToken()
         }
@@ -228,6 +242,7 @@ export const therapistFilterByGenderNotConnected = (authRequest) => {
     });
 };
 export const sendAdviceToUser = (adviceData) => {
+    console.log("Sending advice data:", adviceData);
     return axios({
         method: 'POST',
         url: `${process.env.hostUrl || 'http://localhost:8080'}/api/auth/sendAdviceToUser`,
@@ -238,16 +253,16 @@ export const sendAdviceToUser = (adviceData) => {
     });
 };
 
-export const fetchAdviceForUser = (userId) => {
+export const fetchAdviceForUser = (adviceData) => {
     return axios({
-        method: 'GET',
-        url: `${process.env.hostUrl || 'http://localhost:8080'}/api/auth/fetchAdviceForUser/${userId}`,
+        method: 'POST',
+        url: `${process.env.hostUrl || 'http://localhost:8080'}/api/auth/fetchAdviceForUser`,
+        data: adviceData,
         headers: {
             'Authorization': 'Bearer ' + getToken()
         }
     });
 };
-
 
 
 export const therapistFilterByExperience = (authRequest) => {
@@ -489,6 +504,28 @@ export const fetchBookings = (authRequest) => {
     });
 };
 
+export const fetchBookingsHistory = (authRequest) => {
+    return axios({
+        method: 'POST',
+        url: `${process.env.hostUrl || 'http://localhost:8080'}/api/auth/fetchBookingsHistory`,
+        data:authRequest,
+        headers: {
+            'Authorization': 'Bearer ' + getToken()
+        }
+    });
+};
+
+export const fetchTherapistBookingsHistory = (authRequest) => {
+    return axios({
+        method: 'POST',
+        url: `${process.env.hostUrl || 'http://localhost:8080'}/api/auth/fetchTherapistBookingsHistory`,
+        data:authRequest,
+        headers: {
+            'Authorization': 'Bearer ' + getToken()
+        }
+    });
+};
+
 export const fetchWorkDays = (authRequest) => {
     return axios({
         method: 'POST',
@@ -499,14 +536,17 @@ export const fetchWorkDays = (authRequest) => {
         }
     });
 };
-export const submitFeedback = (feedbackData) => {
-    return axios.post(`${process.env.hostUrl || 'http://localhost:8080'}/api/submitFeedback`, feedbackData, {
+
+export const submitFeedback = (authRequest) => {
+    return axios({
+        method: 'POST',
+        url: `${process.env.hostUrl || 'http://localhost:8080'}/api/auth/submitFeedback`,
+        data:authRequest,
         headers: {
             'Authorization': 'Bearer ' + getToken()
         }
     });
 };
-
 
 
 export const fetchWorkHours = (authRequest) => {
@@ -612,6 +652,72 @@ export const fetchTherapistUserConnectionData = (authRequest) => {
     return axios({
         method: 'POST',
         url: `${process.env.hostUrl || 'http://localhost:8080'}/api/auth/fetchTherapistUserConnectionData`,
+        data:authRequest,
+        headers: {
+            'Authorization': 'Bearer ' + getToken()
+        }
+    });
+};
+
+export const fetchAllNextBookings = (authRequest) => {
+    return axios({
+        method: 'POST',
+        url: `${process.env.hostUrl || 'http://localhost:8080'}/api/auth/fetchAllNextBookings`,
+        data:authRequest,
+        headers: {
+            'Authorization': 'Bearer ' + getToken()
+        }
+    });
+};
+
+export const fetchAllBookings = (authRequest) => {
+    return axios({
+        method: 'POST',
+        url: `${process.env.hostUrl || 'http://localhost:8080'}/api/auth/fetchAllBookings`,
+        data:authRequest,
+        headers: {
+            'Authorization': 'Bearer ' + getToken()
+        }
+    });
+};
+
+export const fetchNote = (authRequest) => {
+    return axios({
+        method: 'POST',
+        url: `${process.env.hostUrl || 'http://localhost:8080'}/api/auth/fetchNote`,
+        data:authRequest,
+        headers: {
+            'Authorization': 'Bearer ' + getToken()
+        }
+    });
+};
+
+export const updateNote = (authRequest) => {
+    return axios({
+        method: 'PUT',
+        url: `${process.env.hostUrl || 'http://localhost:8080'}/api/auth/updateNote`,
+        data:authRequest,
+        headers: {
+            'Authorization': 'Bearer ' + getToken()
+        }
+    });
+};
+
+export const endSessionBoolean = (authRequest) => {
+    return axios({
+        method: 'PUT',
+        url: `${process.env.hostUrl || 'http://localhost:8080'}/api/auth/endSessionBoolean`,
+        data:authRequest,
+        headers: {
+            'Authorization': 'Bearer ' + getToken()
+        }
+    });
+};
+
+export const fetchFeedback = (authRequest) => {
+    return axios({
+        method: 'POST',
+        url: `${process.env.hostUrl || 'http://localhost:8080'}/api/auth/fetchFeedback`,
         data:authRequest,
         headers: {
             'Authorization': 'Bearer ' + getToken()

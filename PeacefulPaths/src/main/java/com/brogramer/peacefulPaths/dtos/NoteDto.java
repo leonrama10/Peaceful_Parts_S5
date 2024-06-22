@@ -1,10 +1,15 @@
 package com.brogramer.peacefulPaths.dtos;
 
+import com.fasterxml.jackson.annotation.JsonFormat;
+import jakarta.persistence.Column;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
+import org.springframework.format.annotation.DateTimeFormat;
 
+import java.time.LocalDateTime;
+import java.util.ArrayList;
 import java.util.Collection;
 
 @Data
@@ -13,12 +18,32 @@ import java.util.Collection;
 @Builder
 public class NoteDto {
 
+    private int id;
     private int clientId;
     private int therapistId;
     private int patientMoodAfter;
     private int patientMoodBefore;
     private String notesText;
-    private Collection<String> mainPoints;
+    private ArrayList<String> mainPoints;
+    private int mainPointsId;
+    @JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "yyyy-MM-dd HH:mm:ss")
+    private LocalDateTime dateAdded;
+
+    public int getMainPointsId() {
+        return mainPointsId;
+    }
+
+    public void setMainPointsId(int mainPointsId) {
+        this.mainPointsId = mainPointsId;
+    }
+
+    public int getId() {
+        return id;
+    }
+
+    public void setId(int id) {
+        this.id = id;
+    }
 
     public int getClientId() {
         return clientId;
@@ -60,11 +85,19 @@ public class NoteDto {
         this.notesText = notesText;
     }
 
-    public Collection<String> getMainPoints() {
+    public ArrayList<String> getMainPoints() {
         return mainPoints;
     }
 
-    public void setMainPoints(Collection<String> mainPoints) {
+    public void setMainPoints(ArrayList<String> mainPoints) {
         this.mainPoints = mainPoints;
+    }
+
+    public LocalDateTime getDateAdded() {
+        return dateAdded;
+    }
+
+    public void setDateAdded(LocalDateTime dateAdded) {
+        this.dateAdded = dateAdded;
     }
 }

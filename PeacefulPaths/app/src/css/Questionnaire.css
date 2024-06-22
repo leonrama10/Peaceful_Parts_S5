@@ -5,12 +5,12 @@
 }
 
 .question-number {
-    font-weight: 900;
-    font-size: 16px;
+    font-weight: 1000;
+    font-size: 18px;
 }
 
 .question-text {
-    font-size: 28px;
+    font-size: 29px;
     font-weight: lighter;
     margin-bottom: 25px;
     text-align: center;
@@ -25,9 +25,10 @@
 }
 
 .answer button{
-border-radius: 15px;
-background-color: #2e4057;
-color: white;
+    height: 40px;
+    border-radius: 15px;
+    background-color: #2e4057;
+    color: white;
 }
 
 .answer button:hover{
@@ -65,4 +66,20 @@ transition: 3ms;
 .customCheckbox input[type="checkbox"]:checked + label:before {
     background-color: #2e4057;
 }
+
+.dropdownGetStarted {
+    border: 1px solid #2e4057;
+    padding:10px;
+    background-color:transparent;
+    color:#1c2736;
+    border-radius:5px;
+    font-size:large;
+    transition: box-shadow 0.1s ease;
+}
+
+.dropdownGetStarted:hover{
+    cursor: pointer;
+    box-shadow: 0 0 0 3px #2e4057;
+}
+
 

@@ -1,30 +1,136 @@
 import React,{useState} from 'react';
 import {connect} from 'react-redux';
-import {userLogin} from '../../../api/authService';
+import {fetchUserData, userLogin} from '../../../api/authService';
 import {Link, useNavigate} from 'react-router-dom';
-import '../../../css/sb-admin-2.min.css';
+import blueDog from "../../../img/wp8767335.jpg.png";
 import {
     authenticate,
     authFailure,
     authSuccess,
-    setAdminAuthenticationState,
-    setTherapistAuthenticationState, setUserAuthenticationState
+    setLocation
 } from "../../../redux/authActions";
 import {Alert} from "reactstrap";
 import {saveState} from "../../../helper/sessionStorage";
+import {jwtDecode} from "jwt-decode";
+const getRefreshToken = () => {
+    const token = localStorage.getItem('REFRESH_TOKEN');
+
+    if (!token || token==="null") {
+        return null;
+    }
+
+    const decodedToken = jwtDecode(token);
+    const currentTime = Date.now() / 1000;
+
+    if (decodedToken.exp < currentTime) {
+        console.log("Token expired.");
+        return null;
+    } else {
+        return token;
+    }
+}
 
 function LoginBoot({loading,error,...props}){
 
     const history = useNavigate ();
-
     const [values, setValues] = useState({
         email: '',
-        password: ''
+        password: '',
+        rememberMe:false
     });
 
     React.useEffect(()=>{
-        saveState("loggedInState", false)
-        saveState("role",'')
+        if(getRefreshToken()) {
+
+            let confirmLogout = window.confirm("You are already logged in. Do you want to log out?");
+
+            if (confirmLogout) {
+                saveState("chatTherapistId", 0);
+                saveState("chatUserId", 0);
+                saveState("therapistBookingId", 0);
+                saveState("addNotesBoolean",false)
+                saveState("endSessionTherapist",false);
+                saveState("startTimerTherapist",false)
+                saveState("startTimerValueTherapist",0)
+                saveState("userRole", null);
+                saveState("editUserBookingId", 0);
+                saveState("editUserTherapistId", 0);
+                saveState("editUserId", 0);
+                saveState("editTherapistPastClientId", 0);
+                saveState("editTherapistClientId", 0);
+                saveState("editTherapistClientBookingId", 0);
+                saveState("clientHistoryNotesId",0)
+                saveState("meetingAvailableUser",false)
+                saveState("startTimer",false)
+                saveState("endSession",false);
+                saveState("startTimerValue",0)
+                saveState("clientInfoId",0)
+                saveState("clientNotesId",0)
+                saveState("therapistClientNoteId", 0);
+                saveState("editTherapistId", 0);
+                saveState("userInfoId", 0);
+                saveState("therapistInfoId",0)
+                saveState("chatStateLocation",'')
+                saveState("therapistId",0)
+                saveState("role", '')
+                props.setUser(null);
+                saveState("connected",false)
+            }else {
+                fetchUserData().then((response) => {
+                    if (response.data.roles.at(0)){
+                        if (response.data.roles.at(0).role === 'ROLE_ADMIN') {
+
+                            saveState("role",'ROLE_ADMIN')
+                            props.setLocation("/dashboard/adminDashboard")
+                            history('/dashboard/adminDashboard');
+                        }else if (response.data.roles.at(0).role === 'ROLE_USER') {
+
+                            saveState("role",'ROLE_USER')
+                            props.setLocation("/dashboard/userDashboard")
+                            history('/dashboard/userDashboard');
+                        } else if(response.data.roles.at(0).role === 'ROLE_THERAPIST'){
+
+                            saveState("role",'ROLE_THERAPIST')
+                            props.setLocation("/dashboard/therapistDashboard")
+                            history('/dashboard/therapistDashboard');
+                        }
+                    }
+                }).catch((e) => {
+                    history('/loginBoot');
+                });
+            }
+        }else {
+            saveState("chatTherapistId", 0);
+            saveState("chatUserId", 0);
+            saveState("therapistBookingId", 0);
+            saveState("addNotesBoolean",false)
+            saveState("endSessionTherapist",false);
+            saveState("startTimerTherapist",false)
+            saveState("startTimerValueTherapist",0)
+            saveState("userRole", null);
+            saveState("editUserBookingId", 0);
+            saveState("editUserTherapistId", 0);
+            saveState("editUserId", 0);
+            saveState("editTherapistPastClientId", 0);
+            saveState("editTherapistClientId", 0);
+            saveState("editTherapistClientBookingId", 0);
+            saveState("clientHistoryNotesId",0)
+            saveState("meetingAvailableUser",false)
+            saveState("startTimer",false)
+            saveState("endSession",false);
+            saveState("startTimerValue",0)
+            saveState("clientInfoId",0)
+            saveState("clientNotesId",0)
+            saveState("therapistClientNoteId", 0);
+            saveState("editTherapistId", 0);
+            saveState("userInfoId", 0);
+            saveState("therapistInfoId",0)
+            saveState("chatStateLocation",'')
+            saveState("therapistId",0)
+            saveState("role", '')
+            props.setUser(null);
+            saveState("connected",false)
+        }
     },[])
 
     const handleSubmit=(evt)=>{
@@ -36,20 +142,20 @@ function LoginBoot({loading,error,...props}){
                 props.setUser(response.data);
                 if (response.data.roles.at(0)){
                     if (response.data.roles.at(0).role === 'ROLE_ADMIN') {
-                        saveState("loggedInState",true)
+                        saveState("loadPage",true)
                         saveState("role",'ROLE_ADMIN')
-                        props.setAdminAuthenticationState(true)
+                        props.setLocation("/dashboard/adminDashboard")
                         history('/dashboard/adminDashboard');
                     }else if (response.data.roles.at(0).role === 'ROLE_USER') {
-                        saveState("loggedInState",true)
+                        saveState("loadPage",true)
                         saveState("role",'ROLE_USER')
-                        props.setUserAuthenticationState(true)
+                        props.setLocation("/dashboard/userDashboard")
                         history('/dashboard/userDashboard');
                     } else if(response.data.roles.at(0).role === 'ROLE_THERAPIST'){
-                        saveState("loggedInState",true)
+                        saveState("loadPage",true)
                         saveState("role",'ROLE_THERAPIST')
-                        props.setTherapistAuthenticationState(true)
-                         history('/dashboard/therapistDashboard');
+                        props.setLocation("/dashboard/therapistDashboard")
+                        history('/dashboard/therapistDashboard');
                     }
                 }
                 else{
@@ -81,106 +187,90 @@ function LoginBoot({loading,error,...props}){
 
     const handleChange = (e) => {
         e.persist();
-        setValues(values => ({
+        setValues((values) => ({
             ...values,
-            [e.target.name]: e.target.value
+            [e.target.name]: e.target.type === 'checkbox' ? e.target.checked : e.target.value,
         }));
     };
 
+
     return (
-            <main className="bg-gradient-primary">
-            <style>
-            {`
-            .bg-gradient-primary{
-            height: 100vh;
-            }
-            .container{
-            height: 100vh;
-            padding-top: 100px;
-            }
-            `}
-            </style>
-
-            <div className="container">
-
-
-                <div className="row justify-content-center">
-
-                    <div className="col-xl-10 col-lg-12 col-md-9">
-
-                        <div className="card o-hidden border-0 shadow-lg my-5">
-                            <div className="card-body p-0">
-
-                                <div className="row">
-                                    <div className="col-lg-6 d-none d-lg-block bg-login-image"></div>
-                                    <div className="col-lg-6">
-                                        <div className="p-5">
-                                            <div className="text-center">
-                                                <h1 className="h4 text-gray-900 mb-4">Welcome Back!</h1>
-                                            </div>
-                                            { error &&
-                                                <Alert style={{marginTop:'20px'}} variant="danger">
-                                                    {error}
-                                                </Alert>
-                                            }
-                                            <form className="user" onSubmit={handleSubmit}>
-                                                <div className="form-group">
-                                                    <input type="email" className="form-control form-control-user"
-                                                           id="exampleInputEmail" aria-describedby="emailHelp"
-                                                           placeholder="Enter Email Address..." value={values.email} name="email" onChange={handleChange} required/>
-                                                </div>
-                                                <div className="form-group">
-                                                    <input type="password" className="form-control form-control-user"
-                                                           id="exampleInputPassword" placeholder="Password" value={values.password} onChange={handleChange} name="password"
-                                                           autoComplete="new-password" required/>
-                                                </div>
-                                                <div className="form-group">
-                                                    <div className="custom-control custom-checkbox small">
-                                                        <input type="checkbox" className="custom-control-input" id="customCheck"/>
-                                                            <label className="custom-control-label" htmlFor="customCheck">Remember
-                                                                Me</label>
-                                                    </div>
-                                                </div>
-                                                <button type="submit" className="btn btn-primary btn-user btn-block">
-                                                    Login
-                                                </button>
-                                            </form>
-                                            <hr/>
-                                                <div className="text-center">
-                                                    <Link className="small" to="/forgotPassBoot">Forgot Password?</Link>
-                                                </div>
+        <main className="bg-gradient-primary" style={{paddingTop:"58.4px"}}>
+            <div className="container" style={{
+                display: 'flex',
+                justifyContent: 'center',
+                alignItems: 'center',
+                padding: "10px",
+                minHeight: "calc(100vh - 190px)",
+                overflow: "auto"
+            }}>
+                <div className="card o-hidden border-0 shadow-lg " style={{width: '90%'}}>
+                    <div className="row">
+                        <div className="col-lg-6 d-none d-lg-block"
+                             style={{backgroundImage: `url(${blueDog})`, backgroundSize: 'cover'}}></div>
+                        <div className="col-lg-6">
+                            <div className="p-5">
+                                <div className="text-center">
+                                    <h1 className="h4 text-gray-900 mb-4">Welcome Back!</h1>
+                                </div>
+                                {error &&
+                                    <Alert style={{marginTop: '20px'}} variant="danger">
+                                        {error}
+                                    </Alert>
+                                }
+                                <form className="user" onSubmit={handleSubmit}>
+                                    <div className="form-group">
+                                        <input type="email" className="form-control form-control-user"
+                                               id="exampleInputEmail" aria-describedby="emailHelp"
+                                               placeholder="Enter Email Address..." value={values.email}
+                                               name="email" onChange={handleChange} required/>
+                                    </div>
+                                    <div className="form-group">
+                                        <input type="password" className="form-control form-control-user"
+                                               id="exampleInputPassword" placeholder="Password"
+                                               value={values.password} onChange={handleChange}
+                                               name="password"
+                                               autoComplete="new-password" required/>
+                                    </div>
+                                    <div className="form-group">
+                                        <div className="custom-control custom-checkbox small">
+                                            <input
+                                                type="checkbox"
+                                                className="custom-control-input"
+                                                id="customCheck"
+                                                checked={values.rememberMe}
+                                                onChange={handleChange}
+                                                name="rememberMe"
+                                            />
+                                            <label className="custom-control-label" htmlFor="customCheck">
+                                                Remember Me
+                                            </label>
                                         </div>
                                     </div>
+                                    <button type="submit" className="btn btn-primary btn-user btn-block">
+                                        Login
+                                    </button>
+                                </form>
+                                <hr/>
+                                <div className="text-center">
+                                    <Link className="small" to="/forgotPassBoot">Forgot Password?</Link>
                                 </div>
                             </div>
                         </div>
-
                     </div>
-
                 </div>
-
             </div>
-
-
-            <script src="../../../vendor/jquery/jquery.min.js"></script>
-            <script src="../../../vendor/bootstrap/js/bootstrap.bundle.min.js"></script>
-
-            <script src="../../../vendor/jquery-easing/jquery.easing.min.js"></script>
-
-            <script src="../../../js/sb-admin-2.min.js"></script>
-
-            </main>
+        </main>
     )
 
 }
+
 const mapStateToProps = ({auth}) => {
     console.log("state ", auth)
     return {
         loading: auth.loading,
         error: auth.error,
-        isAdminAuthenticated: auth.isAdminAuthenticated,
-        isTherapistAuthenticated: auth.isTherapistAuthenticated,
-        isUserAuthenticated: auth.isUserAuthenticated
+        location: auth.location
     }
 }
 const mapDispatchToProps = (dispatch) => {
@@ -188,9 +278,7 @@ const mapDispatchToProps = (dispatch) => {
         authenticate: () => dispatch(authenticate()),
         setUser: (data) => dispatch(authSuccess(data)),
         loginFailure: (message) => dispatch(authFailure(message)),
-        setAdminAuthenticationState: (boolean) => dispatch(setAdminAuthenticationState(boolean)),
-        setTherapistAuthenticationState: (boolean) => dispatch(setTherapistAuthenticationState(boolean)),
-        setUserAuthenticationState: (boolean) => dispatch(setUserAuthenticationState(boolean))
+        setLocation: (path) => dispatch(setLocation(path))
     }
 }
-export default connect(mapStateToProps,mapDispatchToProps)(LoginBoot);
+export default connect(mapStateToProps, mapDispatchToProps)(LoginBoot);

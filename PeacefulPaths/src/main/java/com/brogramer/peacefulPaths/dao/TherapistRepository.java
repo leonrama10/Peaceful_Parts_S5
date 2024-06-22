@@ -8,6 +8,7 @@ import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.time.LocalDateTime;
 import java.util.Collection;
 import java.util.List;
 import java.util.Optional;
@@ -40,12 +41,9 @@ public interface TherapistRepository extends JpaRepository<User,Integer> {
     @Query(value = "SELECT uc.user_id FROM user_connections uc WHERE uc.connected_user_id = :id", nativeQuery = true)
     Collection<Integer> findAllUsersConnectedById(@Param("id") int id);
 
-    @Query(value = "SELECT uc.user_id FROM user_connections_history uc WHERE uc.connected_user_id = :id", nativeQuery = true)
-    Collection<Integer> findAllUsersConnectedHistoryById(int id);
-
-    @Query(value = "SELECT uc.connected_user_id FROM user_connections_history uc WHERE uc.user_id = :userId AND NOT uc.connected_user_id = :therapistId", nativeQuery = true)
-    List<Integer> fetchAllUserTherapistOldConnectionData(@Param("userId")int userId, @Param("therapistId")int therapistId);
-
     @Query("SELECT uc.userId FROM Connection uc WHERE uc.userId = :userId AND uc.therapistId = :therapistId")
     Integer findTherapistConnectionByUserIdAndTherapistId(@Param("therapistId") int therapistId, @Param("userId") int userId);
+
+    @Query(value = "SELECT uc.date_added FROM user_connections uc WHERE uc.user_id = :userId", nativeQuery = true)
+    LocalDateTime findConnectionByUserId(int userId);
 }
