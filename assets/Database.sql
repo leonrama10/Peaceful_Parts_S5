@@ -344,16 +344,16 @@ CREATE TABLE `user` (
   FOREIGN KEY (`university_id`) REFERENCES `university`(`id`) ON DELETE CASCADE on update cascade
 ) AUTO_INCREMENT=1;
 
--- Admin-- 
+-- Admin   password: loren54321--  
 INSERT INTO `user` (`name`, `surname`, `email`, `number`, `password`, `reset_token`, `expiration_time`, `gender_id`,`token`)
 VALUES
-('Leke', 'Markaj', 'markaj.leka@gmail.com', '044806543', '$2a$10$lAZ7fMTXoALYWY.C4rAs7u7Bdzz4qd7SIwAkWNOX5XQkTRe7vo4P.', NULL, 0, 1,NULL);
+('Leke', 'Markaj', 'markaj.leka@gmail.com', '044806543', '$2a$10$WQQ/Gzyrym1MTII0mHBSI.QE3X1U0gYUuF8bStTyiCXuKOo6.w/V6', NULL, 0, 1,NULL);
 
 -- Therapist -- 
 INSERT INTO `user` (`name`, `surname`, `email`, `number`, `experience`, `password`, `reset_token`, `expiration_time`, `location_id`, `gender_id`, `university_id`, `date_of_birth`,`therapist_info_id`,`token`)
 VALUES
-('Loren', 'Markaj', 'markaj.loren@gmail.com', '044333333', 1, '$2a$10$lAZ7fMTXoALYWY.C4rAs7u7Bdzz4qd7SIwAkWNOX5XQkTRe7vo4P.', NULL, 0, 1, 1, 1, '1995-08-20',1,NULL),
-('Leon', 'Markaj', 'markaj.leon@gmail.com', '044111111', 15, '$2a$10$lAZ7fMTXoALYWY.C4rAs7u7Bdzz4qd7SIwAkWNOX5XQkTRe7vo4P.', NULL, 0, 2, 2, 2, '1988-03-10',2,NULL);
+('Loren', 'Markaj', 'markaj.loren@gmail.com', '044333333', 1, '$2a$10$WQQ/Gzyrym1MTII0mHBSI.QE3X1U0gYUuF8bStTyiCXuKOo6.w/V6', NULL, 0, 1, 1, 1, '1995-08-20',1,NULL),
+('Leon', 'Markaj', 'markaj.leon@gmail.com', '044111111', 15, '$2a$10$WQQ/Gzyrym1MTII0mHBSI.QE3X1U0gYUuF8bStTyiCXuKOo6.w/V6', NULL, 0, 2, 2, 2, '1988-03-10',2,NULL);
 
 CREATE TABLE `roles` (
   `id` int(11) NOT NULL AUTO_INCREMENT, 
