@@ -14,6 +14,7 @@ import {saveState} from "../../../../helper/sessionStorage";
 import {jwtDecode} from "jwt-decode";
 import {FontAwesomeIcon} from "@fortawesome/react-fontawesome";
 import {faChevronLeft} from "@fortawesome/free-solid-svg-icons";
+import PhoneInput from "react-phone-input-2";
 const getRefreshToken = () => {
     const token = localStorage.getItem('REFRESH_TOKEN');
 
@@ -103,15 +104,112 @@ function RegisterBootTherapist({loading,error,...props}){
     }, []);
 
 
-    useEffect(() => {
-      console.log("Current values state:", values);
-    }, [values]); // This effect runs whenever `values` changes
-
     const [confirmPassword, setConfirmPassword] = useState('')
 
     const handleSubmit=(evt)=>{
         evt.preventDefault();
         props.authenticate();
+
+        const nameSurnameRegex = /^[a-zA-Z]+$/; // Matches any string with one or more letters
+        const phoneNumberRegex = /^\d{11}$/; // Matches any string with exactly 12 digits
+
+        // Validate name, surname and phoneNumber
+        if (!nameSurnameRegex.test(values.name) || !nameSurnameRegex.test(values.surname)) {
+            setRegisterTherapistError("Name and surname fields cannot be empty and should only contain letters!");
+            return;
+        }
+
+        // Regex for dateOfBirth
+        // Get the current date
+        const currentDate = new Date();
+
+        // Get the date of birth entered by the user
+        const dateOfBirth = new Date(values.dateOfBirth);
+
+        // Calculate the difference in years
+        const age = currentDate.getFullYear() - dateOfBirth.getFullYear();
+
+        // Check if the user is at least 24 years old
+        if (age < 24) {
+            setRegisterTherapistError("Invalid date of birth. You must be at least 24 years old.");
+            return;
+        }
+
+        // Regex for university
+        const universityRegex = /^(AAB|UBT|KAKTUS|UNIVERSITETI I PRISHTINES)$/;
+
+        // Validate university
+        if (!universityRegex.test(values.university.university)) {
+            setRegisterTherapistError("Invalid selection. Please select a university.");
+            return;
+        }
+
+
+        if (!phoneNumberRegex.test(values.number)) {
+            setRegisterTherapistError("Phone number field should be exactly 11 digits long!");
+            return;
+        }
+
+        const emailRegex = /^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$/;
+        const passwordRegex = /^(?=.*[A-Za-z])(?=.*\d)[A-Za-z\d]{8,}$/; // Minimum eight characters, at least one letter and one number
+
+
+        const locationRegex = /^(Kosovo|Albania|Montenegro|North Macedonia|Serbia)$/;
+
+        // Validate location
+        if (!locationRegex.test(values.location.location)) {
+            setRegisterTherapistError("Invalid selection. Please select a location.");
+            return;
+        }
+
+        // Validate language
+        if (!values.language.length) {
+            setRegisterTherapistError("Invalid selection. Please select at least one language.");
+            return;
+        }
+
+        // Validate gender
+        if (!values.gender.gender) {
+            setRegisterTherapistError("Invalid selection. Please select a gender.");
+            return;
+        }
+
+        // Regex for experience
+        const experienceRegex = /^[3-9]$|^([1-4][0-9]|50)$/; // Matches any number from 3 to 50
+
+        // Validate experience
+        if (!experienceRegex.test(values.experience)) {
+            setRegisterTherapistError("Invalid input. Work experience should be a number between 3 and 50.");
+            return;
+        }
+
+
+        // Validate therapyType
+        if (!values.therapyType.length) {
+            setRegisterTherapistError("Invalid selection. Please select at least one therapy type.");
+            return;
+        }
+
+        if (!values.therapistType.length) {
+            setRegisterTherapistError("Invalid selection. Please select at least one therapist type.");
+            return;
+        }
+
+        if (!values.identityType.length) {
+            setRegisterTherapistError("Invalid selection. Please select at least one identity type.");
+            return;
+        }
+
+        // Validate email and password
+        if (!emailRegex.test(values.email)) {
+            setRegisterTherapistError("Invalid email format!");
+            return;
+        }
+        if (!passwordRegex.test(values.password)) {
+            setRegisterTherapistError(" Minimum eight characters, at least one letter and one number!");
+            return;
+        }
+
 
         if (values.password === confirmPassword) {
             // hapi 1: registerAdmin
@@ -216,6 +314,13 @@ function RegisterBootTherapist({loading,error,...props}){
                                 value
             }));
         }
+    };
+
+    const handlePhoneChange = (value) => {
+        setValues(values => ({
+            ...values,
+            number: value
+        }));
     };
 
    return (
@@ -423,10 +528,8 @@ function RegisterBootTherapist({loading,error,...props}){
                                                                       id="exampleExperience" name="experience"
                                                                       value={values.experience}
                                                                       onChange={handleChange}
-                                                                      placeholder="Work Experience" min="0" max="99"
+                                                                      placeholder="Work Experience" min="3" max="50"
                                                                       required />
-                                                               {/*{values.experience &&*/}
-                                                               {/*    // <span className="years-label">years of work experience</span>}*/}
                                                            </div>
 
                                                            <hr/>
@@ -566,13 +669,16 @@ function RegisterBootTherapist({loading,error,...props}){
                                                            </div>
 
                                                            <div className="form-group">
-                                                               <input type="text"
-                                                                      className="form-control form-control-user"
-                                                                      aria-describedby="numberHelp"
-                                                                      id="exampleInputNumber" name="number"
-                                                                      value={values.number}
-                                                                      onChange={handleChange}
-                                                                      placeholder="Phone number" required/>
+                                                               <PhoneInput
+                                                                   buttonClass={"buttonClass"}
+                                                                   buttonStyle={{borderTopLeftRadius:"20px",borderBottomLeftRadius:"20px"}}
+                                                                   country={'xk'}
+                                                                   value={values.number}
+                                                                   onChange={handlePhoneChange}
+                                                                   inputClass="form-control form-control-user"
+                                                                   specialLabel="Phone Number"
+                                                                   required
+                                                               />
                                                            </div>
 
                                                            <div className="form-group row">

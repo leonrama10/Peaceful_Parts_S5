@@ -12,9 +12,12 @@ import {connect} from "react-redux";
 import SideBarAdmin from "../../SideBars/SideBarAdmin";
 import {loadState, saveState} from "../../../../helper/sessionStorage";
 import {jwtDecode} from "jwt-decode";
-import $ from "jquery";
 import {FontAwesomeIcon} from "@fortawesome/react-fontawesome";
 import {faChevronLeft, faChevronRight} from "@fortawesome/free-solid-svg-icons";
+import {Column} from "primereact/column";
+import {DataTable} from "primereact/datatable";
+import photo from "../../../../img/3585145_66102-removebg-preview.jpg";
+import Loading from "../../LoadingPage";
 const getRefreshToken = () => {
     const token = localStorage.getItem('REFRESH_TOKEN');
 
@@ -99,15 +102,6 @@ function EditTherapistClients({loading,error,...props}){
         }
     }, []);
 
-    React.useEffect(() => {
-        if (allUsers.length > 0) {
-            if ($.fn.dataTable.isDataTable('#dataTable')) {
-                $('#dataTable').DataTable().destroy();
-            }
-            $('#dataTable').DataTable();
-        }
-    }, [allUsers]);
-
     function handleDelete(id) {
         const confirmation = window.confirm("Are you sure you want to remove this connection?");
         if(confirmation) {
@@ -130,18 +124,50 @@ function EditTherapistClients({loading,error,...props}){
         history("/dashboard/adminDashboard/therapists/editTherapistClients/bookings");
     };
 
+    const actionBodyTemplate = (rowData) => {
+        return (
+            <React.Fragment>
+                <button className="btn btn-info btn-sm" style={{color: "white"}}
+                        onClick={() => handleClientBookings(rowData.id, rowData.name, rowData.surname)}>
+                    Bookings
+                </button>
+                <button style={{marginLeft: "5px"}}
+                        className="btn btn-danger btn-sm"
+                        onClick={() => handleDelete(rowData.id)}>
+                    Remove Connection
+                </button>
+            </React.Fragment>
+        );
+    };
+
+    const [isLoading, setIsLoading] = useState(true);
+
+    useEffect(() => {
+
+        const timer = setTimeout(() => {
+            setIsLoading(false);
+        }, 100);
+
+        return () => clearTimeout(timer);
+
+    }, []);
+
+    if (isLoading) {
+        return <Loading />;
+    }
+
     return (
         <main id="page-top">
 
             <div id="wrapper">
 
-                <SideBarAdmin />
+                <SideBarAdmin/>
 
                 <div id="content-wrapper" className="d-flex flex-column">
 
                     <div id="content">
 
-                        <DashboardNav data={data} setUser={props.setUser} />
+                        <DashboardNav data={data} setUser={props.setUser}/>
 
                         <div className="container-fluid">
                             <div style={{display: "flex", justifyContent: "space-between"}}>
@@ -167,66 +193,42 @@ function EditTherapistClients({loading,error,...props}){
                                 <h1 className="h3 mb-0 text-800" style={{color: "#5a5c69"}}>Current Clients</h1>
                             </div>
 
-                            <div className="card shadow mb-4">
-                                <div className="card-body">
-                                    <div className="table-responsive">
-                                        <table className="table table-bordered" id="dataTable" width="100%"
-                                               cellSpacing="0">
-                                            <thead>
-                                            <tr>
-                                                <th>Id</th>
-                                                <th>Name</th>
-                                                <th>Email</th>
-                                                <th>Phone Number</th>
-                                                <th>Gender</th>
-                                                <th>Location</th>
-                                                <th>Date Added</th>
-                                                <th>Actions</th>
-                                            </tr>
-                                            </thead>
-                                            <tfoot>
-                                            <tr>
-                                                <th>Id</th>
-                                                <th>Name</th>
-                                                <th>Email</th>
-                                                <th>Phone Number</th>
-                                                <th>Gender</th>
-                                                <th>Location</th>
-                                                <th>Date Added</th>
-                                                <th>Actions</th>
-                                            </tr>
-                                            </tfoot>
-                                            <tbody>
-                                            {allUsers.map((tempEmployee) => (
-                                                <tr key={tempEmployee.id}>
-                                                    <td>{tempEmployee.id}</td>
-                                                    <td>{tempEmployee.name} {tempEmployee.surname}</td>
-                                                    <td>{tempEmployee.email}</td>
-                                                    <td>{tempEmployee.number}</td>
-                                                    <td>{tempEmployee.gender.gender}</td>
-                                                    <td>{tempEmployee.location.location}</td>
-                                                    <td>{tempEmployee.dateAdded}</td>
-                                                    <td style={{
-                                                        display: "flex",
-                                                        justifyContent: "center", alignItems: "center"
-                                                    }}>
-                                                        <button className="btn btn-info btn-sm" style={{color: "white"}}
-                                                                onClick={() => handleClientBookings(tempEmployee.id, tempEmployee.name, tempEmployee.surname)}>
-                                                            Bookings
-                                                        </button>
-                                                        <button style={{marginLeft: "5px"}}
-                                                                className="btn btn-danger btn-sm"
-                                                                onClick={() => handleDelete(tempEmployee.id)}>
-                                                            Remove Connection
-                                                        </button>
-                                                    </td>
-                                                </tr>
-                                            ))}
-                                            </tbody>
-                                        </table>
+                            {allUsers.length > 0 ? <div className="card shadow mb-4">
+                                    <div className="card-body">
+                                        <DataTable value={allUsers} removableSort className="custom-gridlines"
+                                                   tableStyle={{minWidth: '50rem'}}
+                                                   paginator rows={5} rowsPerPageOptions={[5, 10, 25, 50]}>
+                                            <Column field="id" header="Id" sortable
+                                            ></Column>
+                                            <Column field="name" header="Name" sortable
+                                            ></Column>
+                                            <Column field="surname" header="Surname" sortable
+                                            ></Column>
+                                            <Column field="email" header="Email" sortable
+                                            ></Column>
+                                            <Column field="number" header="Phone Number" sortable
+                                            ></Column>
+                                            <Column field="gender.gender" header="Gender" sortable
+                                            ></Column>
+                                            <Column field="location.location" header="Location" sortable
+                                            ></Column>
+                                            <Column field="dateAdded" header="Date Added" sortable
+                                            ></Column>
+                                            <Column header="Actions" body={actionBodyTemplate}></Column>
+                                        </DataTable>
                                     </div>
+                                </div> :
+                                <div style={{
+                                    display: "flex",
+                                    flexDirection: "column",
+                                    justifyContent: "center",
+                                    alignItems: "center",
+                                    paddingTop: "20px"
+                                }}>
+                                    <img src={photo} style={{maxWidth: "250px"}} alt={"photo"}/>
+                                    <h4 style={{color: "#5b5c63", fontSize: "28px"}}>No Current Clients</h4>
                                 </div>
-                            </div>
+                            }
                         </div>
                     </div>
                 </div>

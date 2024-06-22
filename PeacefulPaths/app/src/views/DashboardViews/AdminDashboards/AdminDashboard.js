@@ -2,7 +2,6 @@ import React, {useEffect, useState} from 'react';
 import {fetchUserData} from '../../../api/authService';
 import {Link, useNavigate} from 'react-router-dom';
 import '../../../css/AdminDashboard.css';
-import DataTable from 'datatables.net-dt';
 import DashboardNav from "../DashboardNav";
 import CanvasJSReact from '@canvasjs/react-charts';
 import {

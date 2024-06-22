@@ -95,6 +95,16 @@ function EditTherapistWorkDays({loading,error,...props}){
                                 localStorage.clear();
                                 history('/loginBoot');
                             })
+                        }else{
+                            setValues({
+                                startTime: [0, 0],
+                                endTime: [23, 0],
+                                therapistId: editTherapistId,
+                                days: [],
+                                workhours: []
+                            })
+
+                            setRangeValues([MIN,MAX])
                         }
                     }).catch((e) => {
                         localStorage.clear();
@@ -134,6 +144,16 @@ function EditTherapistWorkDays({loading,error,...props}){
                                 localStorage.clear();
                                 history('/loginBoot');
                             })
+                        }else{
+                            setValues({
+                                startTime: [0, 0],
+                                endTime: [23, 0],
+                                therapistId: editTherapistId,
+                                days: [],
+                                workhours: []
+                            })
+
+                            setRangeValues([MIN,MAX])
                         }
                     }).catch((e) => {
                         localStorage.clear();
@@ -251,25 +271,6 @@ function EditTherapistWorkDays({loading,error,...props}){
                             marginBottom: '100px', display: "flex",
                             justifyContent: "space-evenly", textAlign: "center"
                         }}>
-                            {/*{workDays.length > 0 && <div style={{marginBottom: '100px'}}>*/}
-                            {/*    <h4>Work Days:</h4>*/}
-                            {/*    {workDays.length > 0 && workDays.map((workDay, index) => {*/}
-                            {/*        // Access the day property from the workDay object*/}
-                            {/*        const day = workDay.day;*/}
-
-                            {/*        // Return a paragraph element with the day*/}
-                            {/*        return (*/}
-                            {/*            <p key={index}>{day}</p>*/}
-                            {/*        );*/}
-                            {/*    })}*/}
-                            {/*    <br/>*/}
-                            {/*    <h4>From:</h4>*/}
-                            {/*    <p>{formatTime(workHours.startTime)}</p>*/}
-
-                            {/*    <br/>*/}
-                            {/*    <h4>To:</h4>*/}
-                            {/*    <p>{formatTime(workHours.endTime)}</p>*/}
-                            {/*</div>}*/}
                             <div className={"card shadow"} style={{
                                 height: "550px",
                                 width: "550px",

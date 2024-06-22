@@ -35,6 +35,34 @@ function RegisterBoot({loading,error,...props}){
         evt.preventDefault();
         props.authenticate();
 
+        // Regex for name, surname and phoneNumber
+        const nameSurnameRegex = /^[a-zA-Z]+$/; // Matches any string with one or more letters
+        const phoneNumberRegex = /^\d{11}$/; // Matches any string with exactly 12 digits
+
+        // Validate name, surname and phoneNumber
+        if (!nameSurnameRegex.test(values.name) || !nameSurnameRegex.test(values.surname)) {
+            setRegisterFailure("Name and surname fields cannot be empty and should only contain letters!");
+            return;
+        }
+        if (!phoneNumberRegex.test(values.number)) {
+            setRegisterFailure("Phone number field should be exactly 11 digits long!");
+            return;
+        }
+
+        const emailRegex = /^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$/;
+        const passwordRegex = /^(?=.*[A-Za-z])(?=.*\d)[A-Za-z\d]{8,}$/; // Minimum eight characters, at least one letter and one number
+
+        // Validate email and password
+        if (!emailRegex.test(values.email)) {
+            setRegisterFailure("Invalid email format!");
+            return;
+        }
+        if (!passwordRegex.test(values.password)) {
+            setRegisterFailure(" Minimum eight characters, at least one letter and one number!");
+            return;
+        }
+
+
         if (values.password === confirmPassword) {
             // Remove the + sign before sending to the backend
             const phoneNumber = values.number.startsWith('+') ? values.number.slice(1) : values.number;

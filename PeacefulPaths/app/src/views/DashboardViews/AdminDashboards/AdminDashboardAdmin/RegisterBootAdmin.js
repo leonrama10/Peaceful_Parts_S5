@@ -14,6 +14,7 @@ import {saveState} from "../../../../helper/sessionStorage";
 import {jwtDecode} from "jwt-decode";
 import {FontAwesomeIcon} from "@fortawesome/react-fontawesome";
 import {faChevronLeft} from "@fortawesome/free-solid-svg-icons";
+import PhoneInput from "react-phone-input-2";
 const getRefreshToken = () => {
     const token = localStorage.getItem('REFRESH_TOKEN');
 
@@ -103,6 +104,33 @@ function RegisterBootAdmin({loading,error,...props}){
     const handleSubmit=(evt)=>{
         evt.preventDefault();
         props.authenticate();
+
+        const emailRegex = /^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$/;
+        const passwordRegex = /^(?=.*[A-Za-z])(?=.*\d)[A-Za-z\d]{8,}$/; // Minimum eight characters, at least one letter and one number
+        const phoneNumberRegex = /^\d{11}$/; // Matches any string with exactly 12 digits
+
+        // Validate gender
+        if (!values.gender.gender) {
+            setRegisterAdminError("Invalid selection. Please select a gender.");
+            return;
+        }
+
+        if (!phoneNumberRegex.test(values.number)) {
+            setRegisterAdminError("Phone number field should be exactly 11 digits long!");
+            return;
+        }
+
+        // Validate email and password
+        if (!emailRegex.test(values.email)) {
+            setRegisterAdminError("Invalid email format!");
+            return;
+        }
+        if (!passwordRegex.test(values.password)) {
+            setRegisterAdminError(" Minimum eight characters, at least one letter and one number!");
+            return;
+        }
+
+
         if (values.password === confirmPassword) {
             registerAdmin(values).then((response) => {
                 if (response.status === 201) {
@@ -162,6 +190,13 @@ function RegisterBootAdmin({loading,error,...props}){
                 [name]: name === 'gender' ? { id: Number(value.split('-')[0]), gender: value.split('-')[1] } : value
             }));
         }
+    };
+
+    const handlePhoneChange = (value) => {
+        setValues(values => ({
+            ...values,
+            number: value
+        }));
     };
 
    return (
@@ -279,13 +314,16 @@ function RegisterBootAdmin({loading,error,...props}){
                                                            </div>
 
                                                            <div className="form-group">
-                                                               <input type="text"
-                                                                      className="form-control form-control-user"
-                                                                      aria-describedby="numberHelp"
-                                                                      id="exampleInputNumber" name="number"
-                                                                      value={values.number}
-                                                                      onChange={handleChange}
-                                                                      placeholder="Phone number" required/>
+                                                               <PhoneInput
+                                                                   buttonClass={"buttonClass"}
+                                                                   buttonStyle={{borderTopLeftRadius:"20px",borderBottomLeftRadius:"20px"}}
+                                                                   country={'xk'}
+                                                                   value={values.number}
+                                                                   onChange={handlePhoneChange}
+                                                                   inputClass="form-control form-control-user"
+                                                                   specialLabel="Phone Number"
+                                                                   required
+                                                               />
                                                            </div>
 
                                                            <div className="form-group row">

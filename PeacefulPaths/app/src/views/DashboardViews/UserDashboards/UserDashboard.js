@@ -21,7 +21,8 @@ import {
     therapistFilterByTherapyType,
     therapistFilterByTherapyTypeNotConnected
 } from '../../../api/authService';
-import {Link, useNavigate} from 'react-router-dom';
+import {Link, useNavigate} from 'react-router-dom'
+import '@fortawesome/fontawesome-free/css/all.min.css';
 import DashboardNav from "../DashboardNav";
 import "../../../css/UserDashboard.css"
 import {
@@ -151,10 +152,12 @@ function UserDashboard({loading,error,...props}) {
                             };
                             therapistFilterByGetStartedNotConnectedData(newFilterData).then((response) => {
                                 if (response.data.length > 0) {
+                                    setFilterName('')
                                     setAllUsers(response.data)
                                 } else {
                                     fetchAllTherapistNotConnectedData(newFilterData).then((response) => {
                                         if (response.status === 200) {
+                                            setFilterName('All')
                                             setAllUsers(response.data)
                                             setHideTherapists(true);
                                         } else {
@@ -186,10 +189,12 @@ function UserDashboard({loading,error,...props}) {
                     }).catch((e) => {
                         therapistFilterByGetStarted(newFilterUserData).then((response) => {
                             if (response.data.length > 0) {
+                                setFilterName('')
                                 setAllUsers(response.data)
                             } else {
                                 fetchAllTherapistData().then((response) => {
                                     if (response.status === 200) {
+                                        setFilterName('All')
                                         setAllUsers(response.data)
                                         setHideTherapists(true);
                                     } else {
@@ -282,10 +287,12 @@ function UserDashboard({loading,error,...props}) {
                             };
                             therapistFilterByGetStartedNotConnectedData(newFilterData).then((response) => {
                                 if (response.data.length > 0) {
+                                    setFilterName('')
                                     setAllUsers(response.data)
                                 } else {
                                     fetchAllTherapistNotConnectedData(newFilterData).then((response) => {
                                         if (response.status === 200) {
+                                            setFilterName("All")
                                             setAllUsers(response.data)
                                             setHideTherapists(true);
                                         } else {
@@ -315,9 +322,11 @@ function UserDashboard({loading,error,...props}) {
                         therapistFilterByGetStarted(newFilterUserData).then((response) => {
                             if (response.data.length > 0) {
                                 setAllUsers(response.data)
+                                setFilterName('')
                             } else {
                                 fetchAllTherapistData().then((response) => {
                                     if (response.status === 200) {
+                                        setFilterName('All')
                                         setAllUsers(response.data)
                                         setHideTherapists(true);
                                     } else {
@@ -941,11 +950,12 @@ function UserDashboard({loading,error,...props}) {
     const timeDifference = (currentTime - meetingTime) / 1000 / 60;
 
     useEffect(() => {
+        handleFilterByAll()
         const results = allUsers.filter(user =>
             user.name.toLowerCase().includes(searchTerm.toLowerCase())
         );
         setFilteredUsers(results);
-    }, [searchTerm, allUsers]);
+    }, [searchTerm]);
 
     const [isLoading, setIsLoading] = useState(true);
 
@@ -972,24 +982,6 @@ function UserDashboard({loading,error,...props}) {
     if (isLoading) {
         return <Loading/>;
     }
-
-    // <div className="container-fluid">
-    //     <div className="row mb-3">
-    //         <div className="col-md-6">
-    //             <input
-    //                 type="text"
-    //                 className="form-control"
-    //                 placeholder="Search therapists by name..."
-    //                 value={searchTerm}
-    //                 onChange={(e) => setSearchTerm(e.target.value)}
-    //             />
-    //         </div>
-    //     </div>
-    //     {filteredUsers.map((card, index) => (
-    //         <TherapistCards key={index} title={card.name} email={card.email}
-    //                         experience={card.experience} number={card.number} id={card.id} />
-    //     ))}
-    // </div>
 
     return (
         <main id="page-top">
@@ -1121,147 +1113,191 @@ function UserDashboard({loading,error,...props}) {
                             </div>
                             }
                             <br/>
-                            <h2 style={{textAlign: "center", color: "#858796"}}>{filterName.trim()===''?"Recommended":filterName} Therapists</h2>
+                            <h2 style={{
+                                textAlign: "center",
+                                color: "#858796"
+                            }}>{filterName.trim() === '' ? "Recommended" : filterName} Therapists</h2>
 
-                            <a className={"filterMenu"}
-                               onClick={() => setOpenFilter(!openFilter)}
-                               aria-controls="collapseUtilities"
-                               aria-expanded={openFilter}>
-                                <span style={{fontSize: "15px"}}>Filter Menu</span>
-                                <FontAwesomeIcon style={{marginLeft: "16px"}} icon={faAngleDown}/>
-                            </a>
-                            <Collapse in={openFilter}>
-                                <div id="collapse-text" className="bg-white  collapse-inner rounded collapseDiv">
-                                    <button className="collapse-item"
-                                            onClick={() => handleFilterByAll()}>Show All Therapists
-                                    </button>
-                                    <button className="collapse-item"
-                                            onClick={() => setOpenGenderFilter(!openGenderFilter)}>Filter By Gender
-                                    </button>
-                                    <Collapse in={openGenderFilter}>
-                                        <div>
-                                            <input type="radio" id="male" name="gender" value="M"
-                                                   onChange={() => handleFilterByGender('M')}/>
-                                            <label htmlFor="male" style={{color: "#0a66c2"}}>Male</label>
-                                            <input type="radio" id="female" name="gender" value="F"
-                                                   onChange={() => handleFilterByGender('F')}
-                                                   style={{marginLeft: "3px"}}/>
-                                            <label htmlFor="female" style={{color: "#0a66c2"}}>Female</label>
-                                        </div>
-                                    </Collapse>
-                                    <button className="collapse-item"
-                                            onClick={() => setOpenExperienceFilter(!openExperienceFilter)}>Filter
-                                        By
-                                        Experience
-                                    </button>
-                                    <Collapse in={openExperienceFilter}>
-                                        <div>
-                                            <select className={"collapseSelect"}
-                                                    onChange={(event) => handleFilterByExperience(event.target.value)}>
-                                                <option value="">Select Number</option>
-                                                {[...Array(50).keys()].map((value, index) =>
-                                                    <option key={index} value={value + 1}>{value + 1}</option>
-                                                )}
-                                            </select>
-                                        </div>
-                                    </Collapse>
-                                    <button className="collapse-item"
-                                            onClick={() => setOpenLocationFilter(!openLocationFilter)}>Filter By
-                                        Location
-                                    </button>
-                                    <Collapse in={openLocationFilter}>
-                                        <div>
-                                            <select className={"collapseSelect"}
-                                                    onChange={(event) => handleFilterByLocation(event.target.value)}>
-                                                <option value="">Select Location</option>
-                                                <option value="Kosovo">Kosovo</option>
-                                                <option value="Albania">Albania</option>
-                                                <option value="Montenegro">Montenegro</option>
-                                                <option value="North Macedonia">North Macedonia</option>
-                                                <option value="Serbia">Serbia</option>
-                                            </select>
-                                        </div>
-                                    </Collapse>
-                                    <button className="collapse-item"
-                                            onClick={() => setOpenLanguageFilter(!openLanguageFilter)}>Filter By
-                                        Language
-                                    </button>
-                                    <Collapse in={openLanguageFilter}>
-                                        <div>
-                                            <select className={"collapseSelect"}
-                                                    onChange={(event) => handleFilterByLanguage(event.target.value)}>
-                                                <option value="">Select Language</option>
-                                                <option value="Albanian">Albanian</option>
-                                                <option value="English">English</option>
-                                                <option value="Serbian">Serbian</option>
-                                            </select>
-                                        </div>
-                                    </Collapse>
-                                    <button className="collapse-item"
-                                            onClick={() => setOpenTherapyTypeFilter(!openTherapyTypeFilter)}>Filter
-                                        By Therapy Type
-                                    </button>
-                                    <Collapse in={openTherapyTypeFilter}>
-                                        <div>
-                                            <select className={"collapseSelect"}
-                                                    onChange={(event) => handleFilterByTherapyType(event.target.value)}>
-                                                <option value="">Therapy Type</option>
-                                                <option value="Individual">Individual Therapy</option>
-                                                <option value="Couples">Couples Therapy</option>
-                                                <option value="Teen">Teen Therapy</option>
-                                            </select>
-                                        </div>
-                                    </Collapse>
 
-                                    <button className="collapse-item"
-                                            onClick={() => setOpenIdentityTypeFilter(!openIdentityTypeFilter)}>Filter
-                                        By Identity Type
-                                    </button>
-                                    <Collapse in={openIdentityTypeFilter}>
-                                        <div>
-                                            <select className={"collapseSelect"}
-                                                    onChange={(event) => handleFilterByIdentityType(event.target.value)}>
-                                                <option value="">Identity Type</option>
-                                                <option value="Straight">Straight</option>
-                                                <option value="Gay">Gay</option>
-                                                <option value="Lesbian">Lesbian</option>
-                                            </select>
-                                        </div>
-                                    </Collapse>
+                                <a className={"filterMenu"}
+                                   onClick={() => setOpenFilter(!openFilter)}
+                                   aria-controls="collapseUtilities"
+                                   aria-expanded={openFilter}>
+                                    <span style={{fontSize: "15px"}}>Filter Menu</span>
+                                    <FontAwesomeIcon style={{marginLeft: "16px"}} icon={faAngleDown}/>
+                                </a>
+                                <Collapse in={openFilter}>
+                                    <div id="collapse-text" className="bg-white  collapse-inner rounded collapseDiv">
+                                        <button className="collapse-item"
+                                                onClick={() => handleFilterByAll()}>Show All Therapists
+                                        </button>
+                                        <button className="collapse-item"
+                                                onClick={() => setOpenGenderFilter(!openGenderFilter)}>Filter By Gender
+                                        </button>
+                                        <Collapse in={openGenderFilter}>
+                                            <div>
+                                                <input type="radio" id="male" name="gender" value="M"
+                                                       onChange={() => handleFilterByGender('M')}/>
+                                                <label htmlFor="male" style={{color: "#0a66c2"}}>Male</label>
+                                                <input type="radio" id="female" name="gender" value="F"
+                                                       onChange={() => handleFilterByGender('F')}
+                                                       style={{marginLeft: "3px"}}/>
+                                                <label htmlFor="female" style={{color: "#0a66c2"}}>Female</label>
+                                            </div>
+                                        </Collapse>
+                                        <button className="collapse-item"
+                                                onClick={() => setOpenExperienceFilter(!openExperienceFilter)}>Filter
+                                            By
+                                            Experience
+                                        </button>
+                                        <Collapse in={openExperienceFilter}>
+                                            <div>
+                                                <select className={"collapseSelect"}
+                                                        onChange={(event) => handleFilterByExperience(event.target.value)}>
+                                                    <option value="">Select Number</option>
+                                                    {[...Array(50).keys()].map((value, index) =>
+                                                        <option key={index} value={value + 1}>{value + 1}</option>
+                                                    )}
+                                                </select>
+                                            </div>
+                                        </Collapse>
+                                        <button className="collapse-item"
+                                                onClick={() => setOpenLocationFilter(!openLocationFilter)}>Filter By
+                                            Location
+                                        </button>
+                                        <Collapse in={openLocationFilter}>
+                                            <div>
+                                                <select className={"collapseSelect"}
+                                                        onChange={(event) => handleFilterByLocation(event.target.value)}>
+                                                    <option value="">Select Location</option>
+                                                    <option value="Kosovo">Kosovo</option>
+                                                    <option value="Albania">Albania</option>
+                                                    <option value="Montenegro">Montenegro</option>
+                                                    <option value="North Macedonia">North Macedonia</option>
+                                                    <option value="Serbia">Serbia</option>
+                                                </select>
+                                            </div>
+                                        </Collapse>
+                                        <button className="collapse-item"
+                                                onClick={() => setOpenLanguageFilter(!openLanguageFilter)}>Filter By
+                                            Language
+                                        </button>
+                                        <Collapse in={openLanguageFilter}>
+                                            <div>
+                                                <select className={"collapseSelect"}
+                                                        onChange={(event) => handleFilterByLanguage(event.target.value)}>
+                                                    <option value="">Select Language</option>
+                                                    <option value="Albanian">Albanian</option>
+                                                    <option value="English">English</option>
+                                                    <option value="Serbian">Serbian</option>
+                                                </select>
+                                            </div>
+                                        </Collapse>
+                                        <button className="collapse-item"
+                                                onClick={() => setOpenTherapyTypeFilter(!openTherapyTypeFilter)}>Filter
+                                            By Therapy Type
+                                        </button>
+                                        <Collapse in={openTherapyTypeFilter}>
+                                            <div>
+                                                <select className={"collapseSelect"}
+                                                        onChange={(event) => handleFilterByTherapyType(event.target.value)}>
+                                                    <option value="">Therapy Type</option>
+                                                    <option value="Individual">Individual Therapy</option>
+                                                    <option value="Couples">Couples Therapy</option>
+                                                    <option value="Teen">Teen Therapy</option>
+                                                </select>
+                                            </div>
+                                        </Collapse>
 
-                                    <button className="collapse-item" style={{borderBottom: 'none'}}
-                                            onClick={() => setOpenTherapistTypeFilter(!openTherapistTypeFilter)}>Filter
-                                        By Therapist Type
-                                    </button>
-                                    <Collapse in={openTherapistTypeFilter}>
-                                        <div>
-                                            <select className={"collapseSelect"}
-                                                    onChange={(event) => handleFilterByTherapistType(event.target.value)}>
-                                                <option value="">Therapist Type</option>
-                                                <option value="Listens">A therapist that listens</option>
-                                                <option value="ExploresPast">A therapist that explores my past
-                                                </option>
-                                                <option value="TeachesSkills">A therapist that teaches new skills
-                                                </option>
-                                            </select>
-                                        </div>
-                                    </Collapse>
+                                        <button className="collapse-item"
+                                                onClick={() => setOpenIdentityTypeFilter(!openIdentityTypeFilter)}>Filter
+                                            By Identity Type
+                                        </button>
+                                        <Collapse in={openIdentityTypeFilter}>
+                                            <div>
+                                                <select className={"collapseSelect"}
+                                                        onChange={(event) => handleFilterByIdentityType(event.target.value)}>
+                                                    <option value="">Identity Type</option>
+                                                    <option value="Straight">Straight</option>
+                                                    <option value="Gay">Gay</option>
+                                                    <option value="Lesbian">Lesbian</option>
+                                                </select>
+                                            </div>
+                                        </Collapse>
+
+                                        <button className="collapse-item" style={{borderBottom: 'none'}}
+                                                onClick={() => setOpenTherapistTypeFilter(!openTherapistTypeFilter)}>Filter
+                                            By Therapist Type
+                                        </button>
+                                        <Collapse in={openTherapistTypeFilter}>
+                                            <div>
+                                                <select className={"collapseSelect"}
+                                                        onChange={(event) => handleFilterByTherapistType(event.target.value)}>
+                                                    <option value="">Therapist Type</option>
+                                                    <option value="Listens">A therapist that listens</option>
+                                                    <option value="ExploresPast">A therapist that explores my past
+                                                    </option>
+                                                    <option value="TeachesSkills">A therapist that teaches new skills
+                                                    </option>
+                                                </select>
+                                            </div>
+                                        </Collapse>
+                                    </div>
+                                </Collapse>
+
+                            <div style={{display: "flex", justifyContent: "end", alignItems: "start"}}>
+                                <div style={{position: "relative"}}>
+                                    <input
+                                        type="text"
+                                        className="form-control"
+                                        placeholder="Search therapists by name..."
+                                        value={searchTerm}
+                                        onChange={(e) => setSearchTerm(e.target.value)}
+                                        style={{paddingLeft: "30px"}}
+                                    />
+                                    <i style={{
+                                        position: "absolute",
+                                        left: "10px",
+                                        top: "50%",
+                                        transform: "translateY(-50%)"
+                                    }} className="fa fa-search"></i>
                                 </div>
-                            </Collapse>
+                            </div>
+
                             {allUsers.length > 0 ?
-                                <div>
-                                    <br/>
-                                    <br/>
-                                    {allUsers.map((card, index) => (
-                                        <TherapistCards key={index} title={card.name + " " + card.surname}
-                                                        email={card.email}
-                                                        experience={card.experience} number={card.number} id={card.id}
-                                                        gender={card.gender} userId={data.id} connected={connected}
-                                        />
-                                    ))}
-                                </div> :
+                                searchTerm.length > 0 ?
+                                    filteredUsers.length > 0 ? <div>
+                                            <br/>
+                                            <br/>
+                                            {filteredUsers.map((card, index) => (
+                                                <TherapistCards key={index} title={card.name + " " + card.surname}
+                                                                email={card.email}
+                                                                experience={card.experience} number={card.number}
+                                                                id={card.id}
+                                                                gender={card.gender} userId={data.id} connected={connected}
+                                                />
+                                            ))}
+                                        </div> :
+                                        <h3 style={{textAlign: "center", color: "red", marginBottom: "240px"}}>There are
+                                            no
+                                            therapists that match the filtering!!!
+                                        </h3>
+                                    :
+                                    <div>
+                                        <br/>
+                                        <br/>
+                                        {allUsers.map((card, index) => (
+                                            <TherapistCards key={index} title={card.name + " " + card.surname}
+                                                            email={card.email}
+                                                            experience={card.experience} number={card.number}
+                                                            id={card.id}
+                                                            gender={card.gender} userId={data.id} connected={connected}
+                                            />
+                                        ))}
+                                    </div> :
                                 <h3 style={{textAlign: "center", color: "red", marginBottom: "240px"}}>There are no
-                                    therapists that match the filtering!!!</h3>
+                                    therapists that match the filtering!!!
+                                </h3>
                             }
                         </div>
                     </div>

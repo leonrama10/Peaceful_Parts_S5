@@ -1,11 +1,11 @@
 import React, { useEffect, useState } from 'react';
 import {
     fetchAdviceForUser,
-    fetchUserData, fetchUserDataId
+    fetchUserData
 } from '../../../api/authService';
 import {loadState, saveState} from '../../../helper/sessionStorage';
 import '../../../css/AdviceByTherapist.css';
-import photo from '../../../img/3585145_66102.jpg';
+import photo from '../../../img/3585145_66102-removebg-preview.jpg';
 import DashboardNav from "../DashboardNav";
 import {Link, useNavigate} from "react-router-dom";
 import {FontAwesomeIcon} from "@fortawesome/react-fontawesome";
@@ -173,7 +173,7 @@ function AdviceByTherapist({loading,error,...props}) {
                                             </div>
                                         ))
                                 ) : (
-                                    <div className="card shadow text-center" style={{
+                                    <div className=" text-center" style={{
                                         display: "flex",
                                         justifyContent: "center",
                                         flexDirection: "column",

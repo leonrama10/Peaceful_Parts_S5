@@ -137,6 +137,20 @@ function LoginBoot({loading,error,...props}){
         evt.preventDefault();
         props.authenticate();
 
+        // Email and password regex
+        const emailRegex = /^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$/;
+        const passwordRegex = /^(?=.*[A-Za-z])(?=.*\d)[A-Za-z\d]{8,}$/; // Minimum eight characters, at least one letter and one number
+
+        // Validate email and password
+        if (!emailRegex.test(values.email)) {
+            console.log("Invalid email format");
+            return;
+        }
+        if (!passwordRegex.test(values.password)) {
+            props.loginFailure('Minimum eight characters, at least one letter and one number!');
+            return;
+        }
+
         userLogin(values).then((response)=>{
             if(response.status===200){
                 props.setUser(response.data);
@@ -204,7 +218,7 @@ function LoginBoot({loading,error,...props}){
                 minHeight: "calc(100vh - 190px)",
                 overflow: "auto"
             }}>
-                <div className="card o-hidden border-0 shadow-lg " style={{width: '90%'}}>
+                <div className="card o-hidden border-0 shadow-lg " style={{width: '100%'}}>
                     <div className="row">
                         <div className="col-lg-6 d-none d-lg-block"
                              style={{backgroundImage: `url(${blueDog})`, backgroundSize: 'cover'}}></div>

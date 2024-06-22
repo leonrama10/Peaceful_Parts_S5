@@ -23,6 +23,7 @@ import {faMessage} from "@fortawesome/free-regular-svg-icons";
 import {faChevronLeft, faMessage as faSolidMessage, faPlus} from "@fortawesome/free-solid-svg-icons";
 import malePhoto from "../../../img/Depositphotos_484354208_S.jpg";
 import femalePhoto from "../../../img/person-gray-photo-placeholder-woman-600nw-1241538838.webp";
+import photo from "../../../img/3585145_66102-removebg-preview.jpg";
 let connected = null;
 const getRefreshToken = () => {
     const token = localStorage.getItem('REFRESH_TOKEN');
@@ -372,7 +373,7 @@ function ChatDashboard({loading,error,...props}){
                                     </div>
                                 }
 
-                            {allTherapistData.length > 0 && <>
+                            {allTherapistData.length > 0 ?
                                 <div className="card shadow" style={{
                                     display: 'flex',
                                     flexDirection: "row",
@@ -385,61 +386,79 @@ function ChatDashboard({loading,error,...props}){
                                         <h4>Chats</h4>
                                         {allTherapistData
                                             .filter((data, index, self) =>
-                                                        index === self.findIndex((t) => (
-                                                            t.therapistId === data.therapistId
-                                                        ))
-                                                )
-                                                .map((data, index,array) => (
-                                                    <div key={index} >
-                                                        <div >
-                                                            <div className="card-body" style={{
-                                                                display: 'flex',
+                                                    index === self.findIndex((t) => (
+                                                        t.therapistId === data.therapistId
+                                                    ))
+                                            )
+                                            .map((data, index, array) => (
+                                                <div key={index}>
+                                                    <div>
+                                                        <div className="card-body" style={{
+                                                            display: 'flex',
+                                                            flexDirection: "row",
+                                                            justifyContent: "space-between",
+                                                            alignItems: "center"
+                                                        }}>
+
+                                                            <div style={{
+                                                                display: "flex",
                                                                 flexDirection: "row",
-                                                                justifyContent: "space-between",
                                                                 alignItems: "center"
                                                             }}>
-
-                                                                <div style={{
-                                                                    display: "flex",
-                                                                    flexDirection: "row",
-                                                                    alignItems: "center"
-                                                                }}>
-                                                                    {data.gender && data.gender.gender === "M" ?
-                                                                        <img style={{
-                                                                            borderRadius: "100px",
-                                                                            border: "1px solid grey"
-                                                                        }}
-                                                                             width={"40px"} src={malePhoto}
-                                                                             alt={"photo"}/> :
-                                                                        <img style={{
-                                                                            borderRadius: "100px",
-                                                                            border: "1px solid grey"
-                                                                        }}
-                                                                             width={"40px"} src={femalePhoto}
-                                                                             alt={"photo"}/>
-                                                                    }
-                                                                    <h5 className="card-title"
-                                                                        style={{paddingLeft: "10px"}}>{data.name} {data.surname}</h5>
-                                                                </div>
-                                                                <br/>
-
-                                                                <button className={"connectButton"}
-                                                                        onClick={() => handleOldClick(data.therapistId)}>
-                                                                    <FontAwesomeIcon icon={faSolidMessage}/>
-                                                                    <span style={{
-                                                                        paddingLeft: "4px",
-                                                                        fontSize: "16px"
-                                                                    }}>See Old Chats</span>
-                                                                </button>
+                                                                {data.gender && data.gender.gender === "M" ?
+                                                                    <img style={{
+                                                                        borderRadius: "100px",
+                                                                        border: "1px solid grey"
+                                                                    }}
+                                                                         width={"40px"} src={malePhoto}
+                                                                         alt={"photo"}/> :
+                                                                    <img style={{
+                                                                        borderRadius: "100px",
+                                                                        border: "1px solid grey"
+                                                                    }}
+                                                                         width={"40px"} src={femalePhoto}
+                                                                         alt={"photo"}/>
+                                                                }
+                                                                <h5 className="card-title"
+                                                                    style={{paddingLeft: "10px"}}>{data.name} {data.surname}</h5>
                                                             </div>
+                                                            <br/>
+
+                                                            <button className={"connectButton"}
+                                                                    onClick={() => handleOldClick(data.therapistId)}>
+                                                                <FontAwesomeIcon icon={faSolidMessage}/>
+                                                                <span style={{
+                                                                    paddingLeft: "4px",
+                                                                    fontSize: "16px"
+                                                                }}>See Old Chats</span>
+                                                            </button>
                                                         </div>
-                                                        {index !== array.length - 1 && <hr/>}
                                                     </div>
-                                                ))
+                                                    {index !== array.length - 1 && <hr/>}
+                                                </div>
+                                            ))
                                         }
                                     </div>
                                 </div>
-                            </>}
+                                :
+                                <div style={{
+                                    display: "flex",
+                                    flexDirection: "column",
+                                    justifyContent: "center",
+                                    alignItems: "center",
+                                    paddingTop: "20px"
+                                }}>
+                                    <img src={photo} style={{maxWidth: "250px"}} alt={"photo"}/>
+                                    <h4 style={{color: "#5b5c63", fontSize: "28px"}}>No Chats Available</h4>
+                                    <p style={{
+                                        maxWidth: "400px",
+                                        textAlign: "center",
+                                        color: "#858796"
+                                    }}>You need to connect with a therapist first!</p>
+                                    <Link to={"/dashboard/userDashboard"} className={"discoverButton"}
+                                          type={"button"}>Discover</Link>
+                                </div>
+                            }
                         </div>
                     </div>
                 </div>

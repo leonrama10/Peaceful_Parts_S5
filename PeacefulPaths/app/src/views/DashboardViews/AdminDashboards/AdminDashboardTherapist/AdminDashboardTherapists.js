@@ -10,12 +10,14 @@ import {
     authSuccess
 } from "../../../../redux/authActions";
 import {connect} from "react-redux";
-import {saveState} from "../../../../helper/sessionStorage";
+import {loadState, saveState} from "../../../../helper/sessionStorage";
 import {jwtDecode} from "jwt-decode";
 import {FontAwesomeIcon} from "@fortawesome/react-fontawesome";
 import {faChevronLeft} from "@fortawesome/free-solid-svg-icons";
 import {Column} from "primereact/column";
 import {DataTable} from "primereact/datatable";
+import photo from "../../../../img/3585145_66102-removebg-preview.jpg";
+import Loading from "../../LoadingPage";
 const getRefreshToken = () => {
     const token = localStorage.getItem('REFRESH_TOKEN');
 
@@ -169,6 +171,22 @@ function AdminDashboardTherapists({loading,error,...props}){
         );
     };
 
+    const [isLoading, setIsLoading] = useState(true);
+
+    useEffect(() => {
+
+            const timer = setTimeout(() => {
+                setIsLoading(false);
+            }, 100);
+
+            return () => clearTimeout(timer);
+
+    }, []);
+
+    if (isLoading) {
+        return <Loading />;
+    }
+
     return (
         <main id="page-top">
             <div id="wrapper">
@@ -192,37 +210,48 @@ function AdminDashboardTherapists({loading,error,...props}){
                                         onClick={handleGenerateTherapistsClick}>Generate Therapist
                                 </button>
                             </div>
-                            <div className="card shadow mb-4">
-                                <div className="card-body">
-                                    <DataTable value={allUsers} removableSort className="custom-gridlines"
-                                               tableStyle={{minWidth: '50rem'}}
-                                               paginator rows={5} rowsPerPageOptions={[5, 10, 25, 50]}>
-                                        <Column field="id" header="Id" sortable
-                                        ></Column>
-                                        <Column field="name" header="Name" sortable
-                                        ></Column>
-                                        <Column field="surname" header="Surname" sortable
-                                        ></Column>
-                                        <Column field="dateOfBirth" header="Date Of Birth" sortable
-                                        ></Column>
-                                        <Column field="email" header="Email" sortable
-                                        ></Column>
-                                        <Column field="number" header="Phone Number" sortable
-                                        ></Column>
-                                        <Column field="gender.gender" header="Gender" sortable
-                                        ></Column>
-                                        <Column field="location.location" header="Location" sortable
-                                        ></Column>
-                                        <Column field="university.university" header="University" sortable
-                                        ></Column>
-                                        <Column field="experience" header="Experience" sortable
-                                        ></Column>
-                                        <Column field="dateAdded" header="Date Added" sortable
-                                        ></Column>
-                                        <Column header="Actions" body={actionBodyTemplate}></Column>
-                                    </DataTable>
+                            {allUsers.length > 0 ? <div className="card shadow mb-4">
+                                    <div className="card-body">
+                                        <DataTable value={allUsers} removableSort className="custom-gridlines"
+                                                   tableStyle={{minWidth: '50rem'}}
+                                                   paginator rows={5} rowsPerPageOptions={[5, 10, 25, 50]}>
+                                            <Column field="id" header="Id" sortable
+                                            ></Column>
+                                            <Column field="name" header="Name" sortable
+                                            ></Column>
+                                            <Column field="surname" header="Surname" sortable
+                                            ></Column>
+                                            <Column field="dateOfBirth" header="Date Of Birth" sortable
+                                            ></Column>
+                                            <Column field="email" header="Email" sortable
+                                            ></Column>
+                                            <Column field="number" header="Phone Number" sortable
+                                            ></Column>
+                                            <Column field="gender.gender" header="Gender" sortable
+                                            ></Column>
+                                            <Column field="location.location" header="Location" sortable
+                                            ></Column>
+                                            <Column field="university.university" header="University" sortable
+                                            ></Column>
+                                            <Column field="experience" header="Experience" sortable
+                                            ></Column>
+                                            <Column field="dateAdded" header="Date Added" sortable
+                                            ></Column>
+                                            <Column header="Actions" body={actionBodyTemplate}></Column>
+                                        </DataTable>
+                                    </div>
+                                </div> :
+                                <div style={{
+                                    display: "flex",
+                                    flexDirection: "column",
+                                    justifyContent: "center",
+                                    alignItems: "center",
+                                    paddingTop: "20px"
+                                }}>
+                                    <img src={photo} style={{maxWidth: "250px"}} alt={"photo"}/>
+                                    <h4 style={{color: "#5b5c63", fontSize: "28px"}}>No Current Therapist</h4>
                                 </div>
-                            </div>
+                            }
                         </div>
                     </div>
                 </div>

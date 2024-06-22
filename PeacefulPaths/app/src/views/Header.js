@@ -24,7 +24,7 @@ export default function Header(){
     return (
         <header className={isLogin?'isLoginHeader':scrolled ? 'scrolled' : ''}>
             <div className={"logo"}>
-                <h1 className={"isLoginLogo"}><span style={{color:"#007cf4"}}>Peaceful</span>Parts</h1>
+                <h1 className={isLogin &&  "isLoginLogo"}><span style={{color:"#007cf4"}}>Peaceful</span>Parts</h1>
             </div>
             <nav style={{display: 'flex', alignItems: 'center'}}>
                 {isLogin && <Link to="/" className="homeButton">Home</Link>}
