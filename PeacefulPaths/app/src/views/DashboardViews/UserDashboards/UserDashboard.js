@@ -43,6 +43,7 @@ import {Collapse} from "react-bootstrap";
 import Loading from "../LoadingPage";
 import photo2 from "../../../img/Cartoon-illustration-website-building-vector.jpg";
 import {faMessage} from "@fortawesome/free-regular-svg-icons";
+import DashboardFooter from "../DashboardFooter";
 let connected = null;
 const getRefreshToken = () => {
     const token = localStorage.getItem('REFRESH_TOKEN');
@@ -1319,6 +1320,7 @@ function UserDashboard({loading,error,...props}) {
                             }
                         </div>
                     </div>
+                    <DashboardFooter />
                 </div>
             </div>
         </main>

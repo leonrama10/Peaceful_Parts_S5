@@ -20,8 +20,8 @@ import malePhoto from "../../../img/Depositphotos_484354208_S.jpg"
 import photo from "../../../img/graphic-cartoon-character-website-development-vector-37663439.jpg"
 import femalePhoto from "../../../img/person-gray-photo-placeholder-woman-600nw-1241538838.webp"
 import {FontAwesomeIcon} from "@fortawesome/react-fontawesome";
-import {faChevronLeft, faPlus} from "@fortawesome/free-solid-svg-icons";
-import {faMessage} from "@fortawesome/free-regular-svg-icons";
+import {faChevronLeft} from "@fortawesome/free-solid-svg-icons";
+import DashboardFooter from "../DashboardFooter";
 let connected = null;
 const getRefreshToken = () => {
     const token = localStorage.getItem('REFRESH_TOKEN');
@@ -228,7 +228,7 @@ function OldChatTherapist({loading,error,...props}){
                                 </Link>
                             </div>
 
-                            <div className="card" style={{maxHeight: "calc(100vh - 125px)", marginBottom: "20px"}}>
+                            <div className="card" style={{height: "calc(100vh - 125px)", marginBottom: "20px"}}>
                                 <div style={{display: "flex", paddingLeft: "5px", paddingTop: "5px"}}>
                                     {therapistData.gender.gender === "M" ?
                                         <img style={{borderRadius: "100px", border: "1px solid grey"}}
@@ -248,36 +248,20 @@ function OldChatTherapist({loading,error,...props}){
                                     <div className="chat-content" ref={chatContentRef}>
                                         {
                                             oldChats.length === 0 ? (
-                                                <div style={{
-                                                    display: "flex",
-                                                    flexDirection: "column",
-                                                    justifyContent: "center",
-                                                    alignItems: "center",
-                                                    paddingBottom: "20px"
-                                                }}>
-                                                    <img src={photo} style={{maxWidth: "350px"}} alt={"photo"}/>
-                                                    <h4 style={{
-                                                        color: "#5b5c63",
-                                                        fontSize: "28px",
-                                                        paddingTop: "10px"
-                                                    }}>No Chats Available!</h4>
-                                                    {/*<p style={{*/}
-                                                    {/*    maxWidth: "400px",*/}
-                                                    {/*    textAlign: "center",*/}
-                                                    {/*    color: "#858796",*/}
-                                                    {/*    paddingTop: "10px",*/}
-                                                    {/*    paddingBottom: "10px"*/}
-                                                    {/*}}>Select a date to*/}
-                                                    {/*    initiate a conversation!*/}
-                                                    {/*</p>*/}
-                                                    {/*<Link*/}
-                                                    {/*    to={"/dashboard/userDashboard/addBookings"}*/}
-                                                    {/*    type={"button"}*/}
-                                                    {/*    style={{borderRadius: "15px"}}*/}
-                                                    {/*    className={"btn btn-primary"}><FontAwesomeIcon*/}
-                                                    {/*    style={{marginRight: "3.5px"}} icon={faPlus}/>Book Session*/}
-                                                    {/*</Link>*/}
-                                                </div>
+                                            <div style={{
+                                                display: "flex",
+                                                flexDirection: "column",
+                                                justifyContent: "center",
+                                                alignItems: "center",
+                                                marginTop: "180px"
+                                            }}>
+                                                <img src={photo} style={{maxWidth: "350px"}} alt={"photo"}/>
+                                                <h4 style={{
+                                                    color: "#5b5c63",
+                                                    fontSize: "28px",
+                                                    paddingTop: "10px"
+                                                }}>No Chats Available!</h4>
+                                            </div>
                                             ) : (
                                                 oldChats.map((data, index) => (
                                                     <div key={index} className="card" style={{
@@ -311,6 +295,7 @@ function OldChatTherapist({loading,error,...props}){
                             </div>
                         </div>
                     </div>
+                    <DashboardFooter />
                 </div>
             </div>
         </main>

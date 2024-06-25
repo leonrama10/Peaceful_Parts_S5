@@ -18,6 +18,7 @@ import {jwtDecode} from "jwt-decode";
 import {FontAwesomeIcon} from "@fortawesome/react-fontawesome";
 import {faChevronLeft, faChevronRight} from "@fortawesome/free-solid-svg-icons";
 import photo from "../../../img/3585145_66102-removebg-preview.jpg";
+import DashboardFooter from "../DashboardFooter";
 const getRefreshToken = () => {
     const token = localStorage.getItem('REFRESH_TOKEN');
 
@@ -277,6 +278,7 @@ function TherapistDashboardUsers({loading,error,...props}){
                             }
                         </div>
                     </div>
+                    <DashboardFooter />
                 </div>
             </div>
         </main>

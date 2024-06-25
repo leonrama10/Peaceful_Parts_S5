@@ -19,6 +19,7 @@ import {faArrowRight} from "@fortawesome/free-solid-svg-icons";
 import {FontAwesomeIcon} from "@fortawesome/react-fontawesome";
 import Loading from "../LoadingPage";
 import {faMessage} from "@fortawesome/free-regular-svg-icons";
+import DashboardFooter from "../DashboardFooter";
 const CanvasJS = CanvasJSReact.CanvasJS;
 const CanvasJSChart = CanvasJSReact.CanvasJSChart;
 const getRefreshToken = () => {
@@ -365,6 +366,7 @@ function TherapistDashboard({loading,error,...props}){
                             </div>
                         </div>
                     </div>
+                    <DashboardFooter />
                 </div>
             </div>
         </main>

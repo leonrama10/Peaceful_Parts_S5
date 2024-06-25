@@ -22,6 +22,7 @@ import {faChevronLeft, faMessage as faSolidMessage} from "@fortawesome/free-soli
 import {faMessage} from "@fortawesome/free-regular-svg-icons";
 import malePhoto from "../../../img/Depositphotos_484354208_S.jpg";
 import femalePhoto from "../../../img/person-gray-photo-placeholder-woman-600nw-1241538838.webp";
+import DashboardFooter from "../DashboardFooter";
 const getRefreshToken = () => {
     const token = localStorage.getItem('REFRESH_TOKEN');
 
@@ -389,6 +390,7 @@ function TherapistChatDashboard({loading,error,...props}){
                             </div>
                         </div>
                     </div>
+                    <DashboardFooter />
                 </div>
             </div>
         </main>

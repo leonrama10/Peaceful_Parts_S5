@@ -16,6 +16,7 @@ import { Range, getTrackBackground } from 'react-range';
 import {FontAwesomeIcon} from "@fortawesome/react-fontawesome";
 import {faChevronLeft} from "@fortawesome/free-solid-svg-icons";
 import {Alert} from "reactstrap";
+import DashboardFooter from "../DashboardFooter";
 const getRefreshToken = () => {
     const token = localStorage.getItem('REFRESH_TOKEN');
 
@@ -502,6 +503,7 @@ function TherapistAddNewWorkDays({loading,error,...props}){
                             </div>
                         </div>
                     </div>
+                    <DashboardFooter />
                 </div>
             </div>
         </main>

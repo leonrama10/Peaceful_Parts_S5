@@ -16,6 +16,8 @@ import {jwtDecode} from "jwt-decode";
 import Loading from "../LoadingPage";
 import {faArrowRight} from "@fortawesome/free-solid-svg-icons";
 import {FontAwesomeIcon} from "@fortawesome/react-fontawesome";
+import Footer from "../../Footer";
+import DashboardFooter from "../DashboardFooter";
 const getRefreshToken = () => {
     const token = localStorage.getItem('REFRESH_TOKEN');
 
@@ -177,7 +179,7 @@ function AdminDashboard({loading,error,...props}){
     }
 
     return (
-            <main id="page-top">
+            <main>
 
                 <div id="wrapper">
 
@@ -267,6 +269,7 @@ function AdminDashboard({loading,error,...props}){
                                 </div>
                             </div>
                         </div>
+                        <DashboardFooter />
                     </div>
                 </div>
             </main>

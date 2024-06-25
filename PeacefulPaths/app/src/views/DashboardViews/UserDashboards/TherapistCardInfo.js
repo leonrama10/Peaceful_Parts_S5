@@ -1,7 +1,6 @@
 import React, {useEffect, useState} from 'react';
 import {
     fetchConnectionsAmount,
-    fetchNextBooking,
     fetchUserData,
     fetchUserDataId,
     removeTherapist,
@@ -24,6 +23,7 @@ import femalePhoto from "../../../img/person-gray-photo-placeholder-woman-600nw-
 import {FontAwesomeIcon} from "@fortawesome/react-fontawesome";
 import {faChevronLeft, faUserPlus} from "@fortawesome/free-solid-svg-icons";
 import '../../../css/PopupStyles.css';
+import DashboardFooter from "../DashboardFooter";
 const getRefreshToken = () => {
     const token = localStorage.getItem('REFRESH_TOKEN');
 
@@ -256,6 +256,11 @@ function TherapistCardInfo({loading,error,...props}){
 
     const handleConnectedConnection = (e) => {
         e.preventDefault();
+
+        if (!window.confirm("You are already connected with another therapist!\n" +
+            "Are you sure you want to connect with another therapist?")) {
+            return;  // If user clicks 'Cancel', stop the function here
+        }
 
         removeTherapist(data.id).then((response)=>{
             if(response.status===200){
@@ -506,6 +511,7 @@ function TherapistCardInfo({loading,error,...props}){
                             </div>
                         </div>
                     </div>
+                    <DashboardFooter />
                 </div>
             </div>
         </main>

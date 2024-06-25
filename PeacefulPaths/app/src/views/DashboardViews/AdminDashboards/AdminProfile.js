@@ -17,6 +17,7 @@ import {FontAwesomeIcon} from "@fortawesome/react-fontawesome";
 import {faArrowRight, faChevronLeft} from "@fortawesome/free-solid-svg-icons";
 import Loading from "../LoadingPage";
 import PhoneInput from "react-phone-input-2";
+import DashboardFooter from "../DashboardFooter";
 const getRefreshToken = () => {
     const token = localStorage.getItem('REFRESH_TOKEN');
 
@@ -370,6 +371,7 @@ function AdminProfile({loading,error,...props}){
                             </Container>
                         </div>
                     </div>
+                    <DashboardFooter />
                 </div>
             </div>
         </main>

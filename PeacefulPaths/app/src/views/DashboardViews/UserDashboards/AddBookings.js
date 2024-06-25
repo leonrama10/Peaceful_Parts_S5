@@ -23,6 +23,7 @@ import '../../../css/Bookings.css';
 import {faChevronLeft} from "@fortawesome/free-solid-svg-icons";
 import {FontAwesomeIcon} from "@fortawesome/react-fontawesome";
 import photo from "../../../img/3585145_66102-removebg-preview.jpg";
+import DashboardFooter from "../DashboardFooter";
 let connected = null;
 const getRefreshToken = () => {
     const token = localStorage.getItem('REFRESH_TOKEN');
@@ -376,6 +377,7 @@ function AddBookings({loading,error,...props}){
                             }
                         </div>
                     </div>
+                    <DashboardFooter />
                 </div>
             </div>
         </main>

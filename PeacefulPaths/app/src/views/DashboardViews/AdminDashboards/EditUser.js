@@ -17,6 +17,7 @@ import {FontAwesomeIcon} from "@fortawesome/react-fontawesome";
 import {faChevronLeft, faCircleInfo} from "@fortawesome/free-solid-svg-icons";
 import Loading from "../LoadingPage";
 import PhoneInput from "react-phone-input-2";
+import DashboardFooter from "../DashboardFooter";
 let role;
 let userRole ;
 const getRefreshToken = () => {
@@ -1068,6 +1069,7 @@ function EditUser({loading,error,...props}){
                             </div>
                         </div>
                     </div>
+                    <DashboardFooter />
                 </div>
             </div>
         </main>

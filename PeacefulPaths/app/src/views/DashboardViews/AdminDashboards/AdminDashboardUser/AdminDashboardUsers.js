@@ -18,6 +18,7 @@ import {Column} from "primereact/column";
 import {DataTable} from "primereact/datatable";
 import photo from "../../../../img/3585145_66102-removebg-preview.jpg";
 import Loading from "../../LoadingPage";
+import DashboardFooter from "../../DashboardFooter";
 const getRefreshToken = () => {
     const token = localStorage.getItem('REFRESH_TOKEN');
 
@@ -246,6 +247,7 @@ function AdminDashboardUsers({loading,error,...props}){
                             }
                         </div>
                     </div>
+                    <DashboardFooter />
                 </div>
             </div>
         </main>

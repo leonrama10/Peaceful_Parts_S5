@@ -1,7 +1,7 @@
 import React, {useEffect, useState} from 'react';
 import {
     cancelBooking,
-    fetchAllNextBookings, fetchBookingsHistory, fetchTherapistBookingsHistory,
+    fetchAllNextBookings, fetchTherapistBookingsHistory,
     fetchUserData
 } from '../../../api/authService';
 import {Link, useNavigate} from 'react-router-dom';
@@ -19,6 +19,7 @@ import SideBarTherapist from "../SideBars/SideBarTherapist";
 import {jwtDecode} from "jwt-decode";
 import {FontAwesomeIcon} from "@fortawesome/react-fontawesome";
 import {faChevronLeft} from "@fortawesome/free-solid-svg-icons";
+import DashboardFooter from "../DashboardFooter";
 const getRefreshToken = () => {
     const token = localStorage.getItem('REFRESH_TOKEN');
 
@@ -343,6 +344,7 @@ function TherapistBookings({loading,error,...props}){
                             </div>
                         </div>
                     </div>
+                    <DashboardFooter />
                 </div>
             </div>
         </main>

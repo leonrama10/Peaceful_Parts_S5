@@ -25,6 +25,7 @@ import {faChevronLeft, faEllipsis, faInbox, faUserXmark} from "@fortawesome/free
 import {faPlus} from "@fortawesome/free-solid-svg-icons";
 import '../../../css/PopupStyles.css';
 import {Button, Form, Modal, FormGroup, Input, Label, ModalBody, ModalFooter, ModalHeader} from "reactstrap";
+import DashboardFooter from "../DashboardFooter";
 const getRefreshToken = () => {
     const token = localStorage.getItem('REFRESH_TOKEN');
 
@@ -551,6 +552,7 @@ function MyTherapist({loading,error,...props}){
                             </div>
                         </div>
                     </div>
+                    <DashboardFooter />
                 </div>
             </div>
         </main>

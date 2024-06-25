@@ -19,6 +19,7 @@ import {jwtDecode} from "jwt-decode";
 import {Button, Col, Form, Row} from "react-bootstrap";
 import {FontAwesomeIcon} from "@fortawesome/react-fontawesome";
 import {faChevronLeft} from "@fortawesome/free-solid-svg-icons";
+import DashboardFooter from "../DashboardFooter";
 let role;
 const getRefreshToken = () => {
     const token = localStorage.getItem('REFRESH_TOKEN');
@@ -351,6 +352,7 @@ function TherapistOldNotesEdit({loading,error,...props}){
                             </Row>
                         </div>
                     </div>
+                    <DashboardFooter />
                 </div>
             </div>
         </main>

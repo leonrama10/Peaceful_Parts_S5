@@ -15,6 +15,7 @@ import {FontAwesomeIcon} from "@fortawesome/react-fontawesome";
 import {faChevronLeft} from "@fortawesome/free-solid-svg-icons";
 import photo from "../../../img/360_F_522716503_R7mc1Xwqrc4kxqG2X7sOurKtQkgQ83XX-removebg-preview.png";
 import Loading from "../LoadingPage";
+import DashboardFooter from "../DashboardFooter";
 let role;
 let userRole;
 const getRefreshToken = () => {
@@ -219,6 +220,7 @@ function TherapistOldNotesHistory({loading,error,...props}){
                             }
                         </div>
                     </div>
+                    <DashboardFooter />
                 </div>
             </div>
         </main>

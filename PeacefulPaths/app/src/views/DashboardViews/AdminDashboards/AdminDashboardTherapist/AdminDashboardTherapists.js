@@ -10,7 +10,7 @@ import {
     authSuccess
 } from "../../../../redux/authActions";
 import {connect} from "react-redux";
-import {loadState, saveState} from "../../../../helper/sessionStorage";
+import {saveState} from "../../../../helper/sessionStorage";
 import {jwtDecode} from "jwt-decode";
 import {FontAwesomeIcon} from "@fortawesome/react-fontawesome";
 import {faChevronLeft} from "@fortawesome/free-solid-svg-icons";
@@ -18,6 +18,7 @@ import {Column} from "primereact/column";
 import {DataTable} from "primereact/datatable";
 import photo from "../../../../img/3585145_66102-removebg-preview.jpg";
 import Loading from "../../LoadingPage";
+import DashboardFooter from "../../DashboardFooter";
 const getRefreshToken = () => {
     const token = localStorage.getItem('REFRESH_TOKEN');
 
@@ -254,6 +255,7 @@ function AdminDashboardTherapists({loading,error,...props}){
                             }
                         </div>
                     </div>
+                    <DashboardFooter />
                 </div>
             </div>
         </main>

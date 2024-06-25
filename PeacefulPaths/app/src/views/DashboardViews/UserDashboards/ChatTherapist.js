@@ -24,6 +24,7 @@ import '../../../css/Notification.css';
 import sendButton from "../../../img/send.png";
 import malePhoto from "../../../img/Depositphotos_484354208_S.jpg";
 import femalePhoto from "../../../img/person-gray-photo-placeholder-woman-600nw-1241538838.webp";
+import DashboardFooter from "../DashboardFooter";
 let connected = null;
 const getRefreshToken = () => {
     const token = localStorage.getItem('REFRESH_TOKEN');
@@ -237,6 +238,9 @@ function ChatTherapist({loading,error,...props}){
 
     function handleSend(evt) {
         evt.preventDefault();
+
+
+
         sendMessage(values).then((response) => {
             setValues({...values, message: ''});
             setRefreshKey(oldKey => oldKey + 1);
@@ -257,10 +261,6 @@ function ChatTherapist({loading,error,...props}){
             }
         });
     }
-
-    React.useEffect(() => {
-        console.log("VALUESSSSSSSSS",values)
-    }, [values])
 
     const handleChange = async (e) => {
         const { name, value } = e.target;
@@ -373,8 +373,8 @@ function ChatTherapist({loading,error,...props}){
     useEffect(() => {
         if (chatContentRef.current) {
             // Check if the user is near the top or the bottom of the chat container
-            const isNearTop = chatContentRef.current.scrollTop < 100;
-            const isNearBottom = chatContentRef.current.scrollHeight - chatContentRef.current.clientHeight <= chatContentRef.current.scrollTop + 100;
+            const isNearTop = chatContentRef.current.scrollTop < 10;
+            const isNearBottom = chatContentRef.current.scrollHeight - chatContentRef.current.clientHeight <= chatContentRef.current.scrollTop + 30;
 
             // Scroll to the bottom if the user is near the top or the bottom
             if (isNearTop || isNearBottom) {
@@ -404,7 +404,7 @@ function ChatTherapist({loading,error,...props}){
 
                         <div className="container-fluid">
                             {connected &&
-                                <div className="card" style={{maxHeight: "calc(100vh - 125px)",marginBottom:"20px"}}>
+                                <div className="card" style={{height: "calc(100vh - 125px)",marginBottom:"20px"}}>
                                     {visible &&
                                         <div className="notification-container">
                                             <div className="notification">
@@ -483,7 +483,8 @@ function ChatTherapist({loading,error,...props}){
                                                       onChange={handleChange}
                                             />
                                                 <button style={{marginLeft: "5px", width: "45px"}} type="submit"
-                                                        className="btn btn-primary btn-user btn-block">
+                                                        className="btn btn-primary btn-user btn-block"
+                                                        disabled={!values.message.trim()}>
                                                     <img width={"20px"} src={sendButton} alt={"Send"}/>
                                                 </button>
                                             </form>
@@ -493,6 +494,7 @@ function ChatTherapist({loading,error,...props}){
                             }
                         </div>
                     </div>
+                    <DashboardFooter />
                 </div>
             </div>
         </main>

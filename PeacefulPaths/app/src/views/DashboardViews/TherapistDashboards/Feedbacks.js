@@ -15,6 +15,7 @@ import {connect} from "react-redux";
 import {jwtDecode} from "jwt-decode";
 import SideBarTherapist from "../SideBars/SideBarTherapist";
 import Loading from "../LoadingPage";
+import DashboardFooter from "../DashboardFooter";
 let connected = null;
 const getRefreshToken = () => {
     const token = localStorage.getItem('REFRESH_TOKEN');
@@ -203,6 +204,7 @@ function Feedbacks({loading,error,...props}) {
                             </div>
                         </div>
                     </div>
+                    <DashboardFooter />
                 </div>
             </div>
         </main>

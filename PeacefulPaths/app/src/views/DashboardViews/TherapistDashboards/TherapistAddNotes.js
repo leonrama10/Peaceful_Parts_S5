@@ -14,6 +14,7 @@ import {connect} from "react-redux";
 import DashboardNav from "../DashboardNav";
 import SideBarTherapist from "../SideBars/SideBarTherapist";
 import {jwtDecode} from "jwt-decode";
+import DashboardFooter from "../DashboardFooter";
 let userRole;
 const getRefreshToken = () => {
     const token = localStorage.getItem('REFRESH_TOKEN');
@@ -338,6 +339,7 @@ function TherapistAddNotes({loading,error,...props}){
                             </Container>
                         </div>
                     </div>
+                    <DashboardFooter />
                 </div>
             </div>
         </main>

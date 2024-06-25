@@ -17,6 +17,7 @@ import {faArrowRight, faChevronLeft, faCircleInfo} from "@fortawesome/free-solid
 import {FontAwesomeIcon} from "@fortawesome/react-fontawesome";
 import Loading from "../LoadingPage";
 import PhoneInput from "react-phone-input-2";
+import DashboardFooter from "../DashboardFooter";
 const getRefreshToken = () => {
     const token = localStorage.getItem('REFRESH_TOKEN');
 
@@ -720,6 +721,7 @@ function UserProfile({loading,error,...props}){
                             </div>
                         </div>
                     </div>
+                    <DashboardFooter />
                 </div>
             </div>
         </main>

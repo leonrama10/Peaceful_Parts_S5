@@ -15,6 +15,7 @@ import {jwtDecode} from "jwt-decode";
 import {FontAwesomeIcon} from "@fortawesome/react-fontawesome";
 import {faChevronLeft} from "@fortawesome/free-solid-svg-icons";
 import PhoneInput from "react-phone-input-2";
+import DashboardFooter from "../../DashboardFooter";
 const getRefreshToken = () => {
     const token = localStorage.getItem('REFRESH_TOKEN');
 
@@ -360,6 +361,7 @@ function RegisterBootAdmin({loading,error,...props}){
                            </div>
                        </div>
                    </div>
+                   <DashboardFooter />
                </div>
            </div>
        </main>

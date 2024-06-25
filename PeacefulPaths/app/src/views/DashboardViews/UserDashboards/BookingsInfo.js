@@ -21,6 +21,7 @@ import {jwtDecode} from "jwt-decode";
 import {FontAwesomeIcon} from "@fortawesome/react-fontawesome";
 import {faArrowRight, faChevronLeft, faPlus} from "@fortawesome/free-solid-svg-icons";
 import photo from "../../../img/3585145_66102-removebg-preview.jpg";
+import DashboardFooter from "../DashboardFooter";
 let connected = null;
 const getRefreshToken = () => {
     const token = localStorage.getItem('REFRESH_TOKEN');
@@ -494,6 +495,7 @@ function BookingsInfo({loading,error,...props}){
                             }
                         </div>
                     </div>
+                    <DashboardFooter />
                 </div>
             </div>
         </main>

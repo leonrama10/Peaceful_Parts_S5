@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from 'react';
-import {fetchAllUsersConnectedData, sendAdviceToUser, fetchUserData, fetchUserDataId} from '../../../api/authService';
+import {sendAdviceToUser, fetchUserData, fetchUserDataId} from '../../../api/authService';
 import {Link, useNavigate} from 'react-router-dom';
 import { connect } from 'react-redux';
 import { authenticate, authFailure, authSuccess, setLocation} from "../../../redux/authActions";
@@ -10,9 +10,8 @@ import {jwtDecode} from "jwt-decode";
 import SideBarTherapist from "../SideBars/SideBarTherapist";
 import DashboardNav from "../DashboardNav";
 import {FontAwesomeIcon} from "@fortawesome/react-fontawesome";
-import {faChevronLeft, faChevronRight} from "@fortawesome/free-solid-svg-icons";
-import {DataTable} from "primereact/datatable";
-import {Column} from "primereact/column";
+import {faChevronLeft} from "@fortawesome/free-solid-svg-icons";
+import DashboardFooter from "../DashboardFooter";
 
 const getRefreshToken = () => {
     const token = localStorage.getItem('REFRESH_TOKEN');
@@ -191,6 +190,7 @@ const SendAdvice = ({ loading, error, ...props }) => {
                             </div>
                         </div>
                     </div>
+                    <DashboardFooter />
                 </div>
             </div>
         </main>

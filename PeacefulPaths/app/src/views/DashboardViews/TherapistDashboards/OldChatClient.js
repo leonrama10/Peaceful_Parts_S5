@@ -19,6 +19,7 @@ import {faChevronLeft, faPlus} from "@fortawesome/free-solid-svg-icons";
 import malePhoto from "../../../img/Depositphotos_484354208_S.jpg";
 import femalePhoto from "../../../img/person-gray-photo-placeholder-woman-600nw-1241538838.webp";
 import photo from "../../../img/graphic-cartoon-character-website-development-vector-37663439.jpg";
+import DashboardFooter from "../DashboardFooter";
 const getRefreshToken = () => {
     const token = localStorage.getItem('REFRESH_TOKEN');
 
@@ -204,7 +205,7 @@ function OldChatClient({loading,error,...props}){
                                 </Link>
                             </div>
 
-                            <div className="card" style={{maxHeight: "calc(100vh - 125px)", marginBottom: "20px"}}>
+                            <div className="card" style={{height: "calc(100vh - 125px)", marginBottom: "20px"}}>
                                 <div style={{display: "flex", paddingLeft: "5px", paddingTop: "5px"}}>
                                     {userData.gender && userData.gender.gender === "M" ?
                                         <img style={{borderRadius: "100px", border: "1px solid grey"}}
@@ -229,7 +230,7 @@ function OldChatClient({loading,error,...props}){
                                                     flexDirection: "column",
                                                     justifyContent: "center",
                                                     alignItems: "center",
-                                                    paddingBottom: "20px"
+                                                    marginTop: "180px"
                                                 }}>
                                                     <img src={photo} style={{maxWidth: "350px"}} alt={"photo"}/>
                                                     <h4 style={{
@@ -271,6 +272,7 @@ function OldChatClient({loading,error,...props}){
                             </div>
                         </div>
                     </div>
+                    <DashboardFooter />
                 </div>
             </div>
         </main>

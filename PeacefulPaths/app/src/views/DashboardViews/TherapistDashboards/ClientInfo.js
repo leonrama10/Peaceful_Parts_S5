@@ -15,6 +15,7 @@ import SideBarTherapist from "../SideBars/SideBarTherapist";
 import {jwtDecode} from "jwt-decode";
 import {FontAwesomeIcon} from "@fortawesome/react-fontawesome";
 import {faChevronLeft} from "@fortawesome/free-solid-svg-icons";
+import DashboardFooter from "../DashboardFooter";
 let userRole ;
 const getRefreshToken = () => {
     const token = localStorage.getItem('REFRESH_TOKEN');
@@ -404,6 +405,7 @@ function ClientInfo({loading,error,...props}){
                             </Container>
                         </div>
                     </div>
+                    <DashboardFooter />
                 </div>
             </div>
         </main>

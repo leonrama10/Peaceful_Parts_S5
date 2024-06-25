@@ -16,6 +16,7 @@ import {jwtDecode} from "jwt-decode";
 import {FontAwesomeIcon} from "@fortawesome/react-fontawesome";
 import {faChevronLeft} from "@fortawesome/free-solid-svg-icons";
 import Loading from "../LoadingPage";
+import DashboardFooter from "../DashboardFooter";
 let role;
 let userRole;
 const getRefreshToken = () => {
@@ -288,6 +289,7 @@ function TherapistOldNotes({loading,error,...props}){
                             }
                         </div>
                     </div>
+                    <DashboardFooter />
                 </div>
             </div>
         </main>

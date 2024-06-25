@@ -14,6 +14,7 @@ import {authenticate, authFailure, authSuccess, setLocation} from "../../../redu
 import {connect} from "react-redux";
 import {jwtDecode} from "jwt-decode";
 import SideBarUser from "../SideBars/SideBarUser";
+import DashboardFooter from "../DashboardFooter";
 let connected = null;
 const getRefreshToken = () => {
     const token = localStorage.getItem('REFRESH_TOKEN');
@@ -191,6 +192,7 @@ function AdviceByTherapist({loading,error,...props}) {
                             </div>
                         </div>
                     </div>
+                    <DashboardFooter />
                 </div>
             </div>
         </main>
