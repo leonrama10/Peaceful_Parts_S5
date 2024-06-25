@@ -16,6 +16,7 @@ import {jwtDecode} from "jwt-decode";
 import {FontAwesomeIcon} from "@fortawesome/react-fontawesome";
 import {faChevronLeft, faCircleInfo} from "@fortawesome/free-solid-svg-icons";
 import Loading from "../LoadingPage";
+import PhoneInput from "react-phone-input-2";
 let role;
 let userRole ;
 const getRefreshToken = () => {
@@ -56,6 +57,8 @@ function EditUser({loading,error,...props}){
 
     let userInfoId =null
     const history = useNavigate ();
+    const [updateSuccess,setUpdateSuccess]=useState('');
+    const [updateError,setUpdateError]=useState('');
     const [data,setData]=useState({});
     const [userData,setUserData]=useState({});
     const [values, setValues] = useState({
@@ -215,7 +218,165 @@ function EditUser({loading,error,...props}){
         e.preventDefault();
 
         if (changedFields.length === 0) {
-            alert("Nothing has been updated.");
+            setUpdateError("Nothing has been updated!");
+            return;
+        }
+
+        const nameSurnameRegex = /^[a-zA-Z]+$/; // Matches any string with one or more letters
+        const phoneNumberRegex = /^\d{11}$/; // Matches any string with exactly 12 digits
+
+        // Validate name, surname and phoneNumber
+        if (!nameSurnameRegex.test(values.name) || !nameSurnameRegex.test(values.surname)) {
+            setUpdateError("Name and surname fields cannot be empty and should only contain letters!");
+            return;
+        }
+
+        if (!phoneNumberRegex.test(values.number)) {
+            setUpdateError("Phone number field should be exactly 11 digits long!");
+            return;
+        }
+
+        const emailRegex = /^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$/;
+
+        const locationRegex = /^(Kosovo|Albania|Montenegro|North Macedonia|Serbia)$/;
+
+        // Validate location
+        if (!locationRegex.test(values.location.location)) {
+            setUpdateError("Invalid selection. Please select a location.");
+            return;
+        }
+
+        if (userRole === 'ROLE_THERAPIST') {
+            // Regex for experience
+            const experienceRegex = /^[3-9]$|^([1-4][0-9]|50)$/; // Matches any number from 3 to 50
+
+            // Validate experience
+
+            if (!experienceRegex.test(values.experience)) {
+                setUpdateError("Invalid input. Work experience should be a number between 3 and 50.");
+                return;
+            }
+        }
+
+        if (userRole === 'ROLE_THERAPIST') {
+            // Regex for dateOfBirth
+            // Get the current date
+            const currentDate = new Date();
+
+            // Get the date of birth entered by the user
+            const dateOfBirth = new Date(values.dateOfBirth);
+
+            // Calculate the difference in years
+            const age = currentDate.getFullYear() - dateOfBirth.getFullYear();
+
+            // Check if the user is at least 24 years old
+            if (age < 24) {
+                setUpdateError("Invalid date of birth. You must be at least 24 years old.");
+                return;
+            }
+
+            // Regex for university
+            const universityRegex = /^(AAB|UBT|KAKTUS|UNIVERSITETI I PRISHTINES)$/;
+
+            // Validate university
+            if (!universityRegex.test(values.university.university)) {
+                setUpdateError("Invalid selection. Please select a university.");
+                return;
+            }
+
+            // Validate therapyType
+            if (!values.therapyTypeTherapist.length) {
+                setUpdateError("Invalid selection. Please select at least one therapy type.");
+                return;
+            }
+
+            if (!values.therapistTypeTherapist.length) {
+                setUpdateError("Invalid selection. Please select at least one therapist type.");
+                return;
+            }
+
+            if (!values.identityTypeTherapist.length) {
+                setUpdateError("Invalid selection. Please select at least one identity type.");
+                return;
+            }
+        }
+
+        if (userRole === 'ROLE_THERAPIST' || userRole === 'ROLE_USER' ) {
+            // Validate language
+            if (!values.language.length) {
+                setUpdateError("Invalid selection. Please select at least one language.");
+                return;
+            }
+        }
+
+        // Validate gender
+        if (!values.gender.gender) {
+            setUpdateError("Invalid selection. Please select a gender.");
+            return;
+        }
+
+        if (userRole === 'ROLE_USER') {
+            if (!values.therapistGender.gender) {
+                setUpdateError("Invalid selection. Please select therapists gender!");
+                return;
+            }
+
+
+            if (!values.relationshipStatus.answer) {
+                setUpdateError("Invalid selection. Please select relationship status!");
+                return;
+            }
+
+            if (!values.therapyHistory.answer) {
+                setUpdateError("Invalid selection. Please select therapy history!");
+                return;
+            }
+
+            if (!values.communication.answer) {
+                setUpdateError("Invalid selection. Please select communication!");
+                return;
+            }
+
+            if (!values.medicationHistory.answer) {
+                setUpdateError("Invalid selection. Please select medication history!");
+                return;
+            }
+
+            if (!values.physicalHealth.answer) {
+                setUpdateError("Invalid selection. Please select physical health!");
+                return;
+            }
+
+            if (!values.mentalState1.answer) {
+                setUpdateError("Invalid selection. Please select mental state!");
+                return;
+            }
+
+            if (!values.mentalState2.answer) {
+                setUpdateError("Invalid selection. Please select mental state!");
+                return;
+            }
+
+            if (!values.therapyTypeUser.therapyType) {
+                setUpdateError("Invalid selection. Please select at least one therapy type!");
+                return;
+            }
+
+
+            if (!values.therapistTypeUser.therapistType) {
+                setUpdateError("Invalid selection. Please select at least one therapist type.");
+                return;
+            }
+
+            if (!values.identityTypeUser.identityType) {
+                setUpdateError("Invalid selection. Please select at least one identity type.");
+                return;
+            }
+        }
+
+        // Validate email and password
+        if (!emailRegex.test(values.email)) {
+            setUpdateError("Invalid email format!");
             return;
         }
 
@@ -228,14 +389,7 @@ function EditUser({loading,error,...props}){
                     successMessage += 'No fields were changed';
                 }
 
-                if(userRole==="ROLE_ADMIN"){
-                    history('/dashboard/adminDashboard/admin');
-                }else if(userRole==="ROLE_THERAPIST"){
-                    history('/dashboard/adminDashboard/therapists');
-                }else if(userRole==="ROLE_USER"){
-                    history('/dashboard/adminDashboard/users');
-                }
-                alert(successMessage);
+                setUpdateSuccess(successMessage);
             } else{
                 props.loginFailure('Something went wrong! Please try again');
             }
@@ -350,6 +504,13 @@ function EditUser({loading,error,...props}){
         }
     };
 
+    const handlePhoneChange = (value) => {
+        setValues(values => ({
+            ...values,
+            number: value
+        }));
+    };
+
     const [isLoading, setIsLoading] = useState(true);
 
     useEffect(() => {
@@ -407,35 +568,48 @@ function EditUser({loading,error,...props}){
                             <div className="d-sm-flex align-items-center justify-content-between mb-4">
                                 <h1 className="h3 mb-0 text-800"
                                     style={{color: "#5a5c69"}}>Edit {userRole === "ROLE_ADMIN" ? "Admin" : userRole === "ROLE_THERAPIST" ? "Therapist" : "User"}</h1>
-                                <div style={{display: "flex", justifyContent: "end"}}>
-                                    <Button variant="primary" type="submit">
-                                        Save
-                                    </Button>
-                                    {userRole === "ROLE_USER" ?
-                                        <Link className="btn btn-danger"
-                                              to="/dashboard/adminDashboard/users"
-                                              type={"button"} style={{marginLeft: "5px"}}>Cancel</Link> :
-                                        userRole === "ROLE_THERAPIST" ?
-                                            <Link className="btn btn-danger"
-                                                  to="/dashboard/adminDashboard/therapists"
-                                                  type={"button"}
-                                                  style={{marginLeft: "5px"}}>Cancel</Link> :
-                                            <Link className="btn btn-danger"
-                                                  to="/dashboard/adminDashboard/admin"
-                                                  type={"button"} style={{marginLeft: "5px"}}>Cancel</Link>
-                                    }
-                                </div>
                             </div>
+
                             <div style={{display: 'flex', flexDirection: 'row', justifyContent: 'center'}}>
-                                {error &&
-                                    <Alert style={{marginTop: '20px'}} variant="danger">
-                                        {error}
-                                    </Alert>
-                                }
                                 <Form onSubmit={handleUpdate} style={{width: '100%'}}>
+                                    <div style={{display: "flex", justifyContent: "end",marginTop:"-70px"}}>
+                                        <Button variant="primary" type="submit">
+                                            Save
+                                        </Button>
+                                        {userRole === "ROLE_USER" ?
+                                            <Link className="btn btn-danger"
+                                                  to="/dashboard/adminDashboard/users"
+                                                  type={"button"} style={{marginLeft: "5px"}}>Cancel</Link> :
+                                            userRole === "ROLE_THERAPIST" ?
+                                                <Link className="btn btn-danger"
+                                                      to="/dashboard/adminDashboard/therapists"
+                                                      type={"button"}
+                                                      style={{marginLeft: "5px"}}>Cancel</Link> :
+                                                <Link className="btn btn-danger"
+                                                      to="/dashboard/adminDashboard/admin"
+                                                      type={"button"} style={{marginLeft: "5px"}}>Cancel</Link>
+                                        }
+                                    </div>
+                                    <div style={{
+                                        width: '100%',
+                                        textAlign: "center",
+                                        display: "flex",
+                                        justifyContent: "center"
+                                    }}>
+                                        {updateError &&
+                                            <Alert style={{marginTop: '20px'}} color="danger">
+                                                {updateError}
+                                            </Alert>
+                                        }
+                                        {updateSuccess &&
+                                            <Alert style={{marginTop: '20px'}} color="success">
+                                                {updateSuccess}
+                                            </Alert>
+                                        }
+                                    </div>
                                     <br/>
                                     <div style={{display: "flex", justifyContent: 'space-evenly'}}>
-                                        <div style={{width: "400px",paddingLeft:"5px",paddingRight:"5px"}}>
+                                        <div style={{width: "400px", paddingLeft: "5px", paddingRight: "5px"}}>
                                             <label htmlFor="specializationSelect">
                                                 <h3>{userRole === "ROLE_ADMIN" ? "Admin" : userRole === "ROLE_THERAPIST" ? "Therapist" : "User"} Information:</h3>
                                             </label>
@@ -467,7 +641,8 @@ function EditUser({loading,error,...props}){
                                                 <Form.Group controlId="formBasicAge">
                                                     <br/>
                                                     <Form.Label>Age</Form.Label>
-                                                    <Form.Control type="number" defaultValue={values.questionnaire && values.questionnaire.age}
+                                                    <Form.Control type="number"
+                                                                  defaultValue={values.questionnaire && values.questionnaire.age}
                                                                   name="age"
                                                                   min={18} max={99} onChange={handleChange}
                                                                   required/>
@@ -491,8 +666,15 @@ function EditUser({loading,error,...props}){
                                             <br/>
                                             <Form.Group controlId="formBasicPhone">
                                                 <Form.Label>Phone number</Form.Label>
-                                                <Form.Control type="tel" defaultValue={data.number}
-                                                              onChange={handleChange} name="number"/>
+                                                <PhoneInput
+                                                    buttonClass={"buttonClass"}
+                                                    country={'xk'}
+                                                    value={values.number}
+                                                    onChange={handlePhoneChange}
+                                                    inputClass="form-control form-control-user"
+                                                    specialLabel="Phone Number"
+                                                    required
+                                                />
                                             </Form.Group>
 
                                             {userRole === 'ROLE_THERAPIST' &&
@@ -536,7 +718,8 @@ function EditUser({loading,error,...props}){
                                                     <br/>
                                                     <Form.Label>Years of work experience</Form.Label>
                                                     <Form.Control type="number" defaultValue={data.experience}
-                                                                  onChange={handleChange} name="experience" min={0} max={50}/>
+                                                                  onChange={handleChange} name="experience" min={0}
+                                                                  max={50}/>
                                                 </Form.Group>
                                             }
 
@@ -585,301 +768,301 @@ function EditUser({loading,error,...props}){
                                             }
                                         </div>
                                         {(userRole === 'ROLE_THERAPIST') &&
-                                                <div style={{width:"350px",paddingLeft:"5px",paddingRight:"5px"}}>
-                                                    <label htmlFor="specializationSelect"><h3>What do they
-                                                        specialize
-                                                        in:</h3></label>
-                                                    <br/>
-                                                    <div className="custom-checkboxes">
-                                                        <label><h5>Therapy Type</h5></label>
-                                                        <div>
-                                                            <input
-                                                                type="checkbox"
-                                                                id="IndividualCheckbox"
-                                                                name="therapyTypeTherapist"
-                                                                value="1-Individual"
-                                                                checked={values.therapyTypeTherapist && values.therapyTypeTherapist.some(type => type.id === 1)}
-                                                                onChange={handleChange}
-                                                            />
-                                                            <label htmlFor="IndividualCheckbox">Individual
-                                                                Therapy</label>
-                                                        </div>
-                                                        <div>
-                                                            <input
-                                                                type="checkbox"
-                                                                id="CouplesCheckbox"
-                                                                name="therapyTypeTherapist"
-                                                                value="2-Couples"
-                                                                checked={values.therapyTypeTherapist && values.therapyTypeTherapist.some(type => type.id === 2)}
-                                                                onChange={handleChange}
-                                                            />
-                                                            <label htmlFor="CouplesCheckbox">Couples
-                                                                Therapy</label>
-                                                        </div>
-                                                        <div>
-                                                            <input
-                                                                type="checkbox"
-                                                                id="TeenCheckbox"
-                                                                name="therapyTypeTherapist"
-                                                                value="3-Teen"
-                                                                checked={values.therapyTypeTherapist && values.therapyTypeTherapist.some(type => type.id === 3)}
-                                                                onChange={handleChange}
-                                                            />
-                                                            <label htmlFor="TeenCheckbox">Teen Therapy</label>
-                                                        </div>
+                                            <div style={{width: "350px", paddingLeft: "5px", paddingRight: "5px"}}>
+                                                <label htmlFor="specializationSelect"><h3>What do they
+                                                    specialize
+                                                    in:</h3></label>
+                                                <br/>
+                                                <div className="custom-checkboxes">
+                                                    <label><h5>Therapy Type</h5></label>
+                                                    <div>
+                                                        <input
+                                                            type="checkbox"
+                                                            id="IndividualCheckbox"
+                                                            name="therapyTypeTherapist"
+                                                            value="1-Individual"
+                                                            checked={values.therapyTypeTherapist && values.therapyTypeTherapist.some(type => type.id === 1)}
+                                                            onChange={handleChange}
+                                                        />
+                                                        <label htmlFor="IndividualCheckbox">Individual
+                                                            Therapy</label>
                                                     </div>
-                                                    <hr/>
-                                                    <div className="custom-checkboxes">
-                                                        <label>
-                                                            <h5>Identity Type</h5>
-                                                        </label>
-                                                        <div>
-                                                            <input
-                                                                type="checkbox"
-                                                                id="straightCheckbox"
-                                                                name="identityTypeTherapist"
-                                                                value="1-Straight"
-                                                                checked={values.identityTypeTherapist && values.identityTypeTherapist.some(type => type.id === 1)}
-                                                                onChange={handleChange}
-                                                            />
-                                                            <label htmlFor="straightCheckbox">Straight</label>
-                                                        </div>
-                                                        <div>
-                                                            <input
-                                                                type="checkbox"
-                                                                id="gayCheckbox"
-                                                                name="identityTypeTherapist"
-                                                                value="2-Gay"
-                                                                checked={values.identityTypeTherapist && values.identityTypeTherapist.some(type => type.id === 2)}
-                                                                onChange={handleChange}
-                                                            />
-                                                            <label htmlFor="gayCheckbox">Gay</label>
-                                                        </div>
-                                                        <div>
-                                                            <input
-                                                                type="checkbox"
-                                                                id="lesbianCheckbox"
-                                                                name="identityTypeTherapist"
-                                                                value="3-Lesbian"
-                                                                checked={values.identityTypeTherapist && values.identityTypeTherapist.some(type => type.id === 3)}
-                                                                onChange={handleChange}
-                                                            />
-                                                            <label htmlFor="lesbianCheckbox">Lesbian</label>
-                                                        </div>
+                                                    <div>
+                                                        <input
+                                                            type="checkbox"
+                                                            id="CouplesCheckbox"
+                                                            name="therapyTypeTherapist"
+                                                            value="2-Couples"
+                                                            checked={values.therapyTypeTherapist && values.therapyTypeTherapist.some(type => type.id === 2)}
+                                                            onChange={handleChange}
+                                                        />
+                                                        <label htmlFor="CouplesCheckbox">Couples
+                                                            Therapy</label>
                                                     </div>
-                                                    <hr/>
-                                                    <div className="custom-checkboxes">
-                                                        <label><h5>Therapist Type</h5></label>
-                                                        <div>
-                                                            <input
-                                                                type="checkbox"
-                                                                id="listensCheckbox"
-                                                                name="therapistTypeTherapist"
-                                                                value="1-Listens"
-                                                                checked={values.therapistTypeTherapist && values.therapistTypeTherapist.some(type => type.id === 1)}
-                                                                onChange={handleChange}
-                                                            />
-                                                            <label htmlFor="listensCheckbox">A therapist that
-                                                                listens</label>
-                                                        </div>
-                                                        <div>
-                                                            <input
-                                                                type="checkbox"
-                                                                id="exploresPastCheckbox"
-                                                                name="therapistTypeTherapist"
-                                                                value="2-ExploresPast"
-                                                                checked={values.therapistTypeTherapist && values.therapistTypeTherapist.some(type => type.id === 2)}
-                                                                onChange={handleChange}
-                                                            />
-                                                            <label htmlFor="exploresPastCheckbox">A therapist
-                                                                that explores the past</label>
-                                                        </div>
-                                                        <div>
-                                                            <input
-                                                                type="checkbox"
-                                                                id="teachesSkillsCheckbox"
-                                                                name="therapistTypeTherapist"
-                                                                value="3-TeachesSkills"
-                                                                checked={values.therapistTypeTherapist && values.therapistTypeTherapist.some(type => type.id === 3)}
-                                                                onChange={handleChange}
-                                                            />
-                                                            <label htmlFor="teachesSkillsCheckbox">A therapist
-                                                                that teaches new skills</label>
-                                                        </div>
+                                                    <div>
+                                                        <input
+                                                            type="checkbox"
+                                                            id="TeenCheckbox"
+                                                            name="therapyTypeTherapist"
+                                                            value="3-Teen"
+                                                            checked={values.therapyTypeTherapist && values.therapyTypeTherapist.some(type => type.id === 3)}
+                                                            onChange={handleChange}
+                                                        />
+                                                        <label htmlFor="TeenCheckbox">Teen Therapy</label>
                                                     </div>
-                                                    <br/>
-                                                    <i><FontAwesomeIcon icon={faCircleInfo} style={{
-                                                        color: "#2e81fd"
-                                                    }}/>You can select more than one!</i>
                                                 </div>
+                                                <hr/>
+                                                <div className="custom-checkboxes">
+                                                    <label>
+                                                        <h5>Identity Type</h5>
+                                                    </label>
+                                                    <div>
+                                                        <input
+                                                            type="checkbox"
+                                                            id="straightCheckbox"
+                                                            name="identityTypeTherapist"
+                                                            value="1-Straight"
+                                                            checked={values.identityTypeTherapist && values.identityTypeTherapist.some(type => type.id === 1)}
+                                                            onChange={handleChange}
+                                                        />
+                                                        <label htmlFor="straightCheckbox">Straight</label>
+                                                    </div>
+                                                    <div>
+                                                        <input
+                                                            type="checkbox"
+                                                            id="gayCheckbox"
+                                                            name="identityTypeTherapist"
+                                                            value="2-Gay"
+                                                            checked={values.identityTypeTherapist && values.identityTypeTherapist.some(type => type.id === 2)}
+                                                            onChange={handleChange}
+                                                        />
+                                                        <label htmlFor="gayCheckbox">Gay</label>
+                                                    </div>
+                                                    <div>
+                                                        <input
+                                                            type="checkbox"
+                                                            id="lesbianCheckbox"
+                                                            name="identityTypeTherapist"
+                                                            value="3-Lesbian"
+                                                            checked={values.identityTypeTherapist && values.identityTypeTherapist.some(type => type.id === 3)}
+                                                            onChange={handleChange}
+                                                        />
+                                                        <label htmlFor="lesbianCheckbox">Lesbian</label>
+                                                    </div>
+                                                </div>
+                                                <hr/>
+                                                <div className="custom-checkboxes">
+                                                    <label><h5>Therapist Type</h5></label>
+                                                    <div>
+                                                        <input
+                                                            type="checkbox"
+                                                            id="listensCheckbox"
+                                                            name="therapistTypeTherapist"
+                                                            value="1-Listens"
+                                                            checked={values.therapistTypeTherapist && values.therapistTypeTherapist.some(type => type.id === 1)}
+                                                            onChange={handleChange}
+                                                        />
+                                                        <label htmlFor="listensCheckbox">A therapist that
+                                                            listens</label>
+                                                    </div>
+                                                    <div>
+                                                        <input
+                                                            type="checkbox"
+                                                            id="exploresPastCheckbox"
+                                                            name="therapistTypeTherapist"
+                                                            value="2-ExploresPast"
+                                                            checked={values.therapistTypeTherapist && values.therapistTypeTherapist.some(type => type.id === 2)}
+                                                            onChange={handleChange}
+                                                        />
+                                                        <label htmlFor="exploresPastCheckbox">A therapist
+                                                            that explores the past</label>
+                                                    </div>
+                                                    <div>
+                                                        <input
+                                                            type="checkbox"
+                                                            id="teachesSkillsCheckbox"
+                                                            name="therapistTypeTherapist"
+                                                            value="3-TeachesSkills"
+                                                            checked={values.therapistTypeTherapist && values.therapistTypeTherapist.some(type => type.id === 3)}
+                                                            onChange={handleChange}
+                                                        />
+                                                        <label htmlFor="teachesSkillsCheckbox">A therapist
+                                                            that teaches new skills</label>
+                                                    </div>
+                                                </div>
+                                                <br/>
+                                                <i><FontAwesomeIcon icon={faCircleInfo} style={{
+                                                    color: "#2e81fd"
+                                                }}/>You can select more than one!</i>
+                                            </div>
                                         }
-                                            {(userRole === 'ROLE_USER') &&
-                                                <div style={{width:"400px",paddingLeft:"5px",paddingRight:"5px"}}>
-                                                    <label htmlFor="specializationSelect"><h3>Therapy and Therapist
-                                                        preferences:</h3></label>
+                                        {(userRole === 'ROLE_USER') &&
+                                            <div style={{width: "400px", paddingLeft: "5px", paddingRight: "5px"}}>
+                                                <label htmlFor="specializationSelect"><h3>Therapy and Therapist
+                                                    preferences:</h3></label>
 
-                                                    <Form.Group controlId="formBasicTherapyTypeUser">
-                                                        <Form.Label>Therapy type:</Form.Label>
-                                                        <Form.Select name="therapyTypeUser"
-                                                                     value={values.therapyTypeUser ? `${values.therapyTypeUser.id}-${values.therapyTypeUser.therapyType}` : ''}
+                                                <Form.Group controlId="formBasicTherapyTypeUser">
+                                                    <Form.Label>Therapy type:</Form.Label>
+                                                    <Form.Select name="therapyTypeUser"
+                                                                 value={values.therapyTypeUser ? `${values.therapyTypeUser.id}-${values.therapyTypeUser.therapyType}` : ''}
+                                                                 onChange={handleChange} required>
+                                                        <option value="1-Individual">Individual
+                                                            Therapy
+                                                        </option>
+                                                        <option value="2-Couples">Couples
+                                                            Therapy
+                                                        </option>
+                                                        <option value="3-Teen">Teen Therapy</option>
+                                                    </Form.Select>
+                                                </Form.Group>
+                                                <br/>
+                                                <Form.Group controlId="formBasicTherapistGender">
+                                                    <Form.Label>Therapist gender:</Form.Label>
+                                                    <Form.Select name="therapistGender"
+                                                                 value={values.therapistGender ? `${values.therapistGender.id}-${values.therapistGender.gender}` : ''}
+                                                                 onChange={handleChange} required>
+                                                        <option value="1-M">Male therapist
+                                                        </option>
+                                                        <option value="2-F">Female therapist
+                                                        </option>
+                                                    </Form.Select>
+                                                </Form.Group>
+                                                <br/>
+                                                <Form.Group controlId="formBasicTherapistTypeUser">
+                                                    <Form.Label>Therapist type:</Form.Label>
+                                                    <Form.Select name="therapistTypeUser"
+                                                                 value={values.therapistTypeUser ? `${values.therapistTypeUser.id}-${values.therapistTypeUser.therapistType}` : ''}
+                                                                 onChange={handleChange} required>
+                                                        <option value="1-Listens">A therapist that
+                                                            listens
+                                                        </option>
+                                                        <option value="2-ExploresPast">A therapist
+                                                            that explores the past
+                                                        </option>
+                                                        <option value="3-TeachesSkills">A therapist
+                                                            that teaches new skills
+                                                        </option>
+                                                    </Form.Select>
+                                                </Form.Group>
+                                            </div>
+                                        }
+                                        {(userRole === 'ROLE_USER') &&
+                                            <div style={{width: "400px", paddingLeft: "5px", paddingRight: "5px"}}>
+                                                <div><label htmlFor="specializationSelect"><h2>More info about
+                                                    myself:</h2></label>
+
+                                                    <Form.Group controlId="formBasicRelationshipStatus">
+                                                        <Form.Label>Relationship status:</Form.Label>
+                                                        <Form.Select name="relationshipStatus"
+                                                                     value={values.relationshipStatus ? `${values.relationshipStatus.id}-${values.relationshipStatus.answer}` : ''}
                                                                      onChange={handleChange} required>
-                                                            <option value="1-Individual">Individual
-                                                                Therapy
+                                                            <option value="1-Single">Single</option>
+                                                            <option value="2-In a relationship">In a relationship
                                                             </option>
-                                                            <option value="2-Couples">Couples
-                                                                Therapy
-                                                            </option>
-                                                            <option value="3-Teen">Teen Therapy</option>
+                                                            <option value="3-Married">Married</option>
+                                                            <option value="4-Divorced">Divorced</option>
                                                         </Form.Select>
                                                     </Form.Group>
                                                     <br/>
-                                                    <Form.Group controlId="formBasicTherapistGender">
-                                                        <Form.Label>Therapist gender:</Form.Label>
-                                                        <Form.Select name="therapistGender"
-                                                                     value={values.therapistGender ? `${values.therapistGender.id}-${values.therapistGender.gender}` : ''}
+                                                    <Form.Group controlId="formBasicIdentityType">
+                                                        <Form.Label>My Identity type:</Form.Label>
+                                                        <Form.Select name="identityTypeUser"
+                                                                     value={values.identityTypeUser ? `${values.identityTypeUser.id}-${values.identityTypeUser.identityType}` : ''}
                                                                      onChange={handleChange} required>
-                                                            <option value="1-M">Male therapist
-                                                            </option>
-                                                            <option value="2-F">Female therapist
+                                                            <option value="1-Straight">Straight</option>
+                                                            <option value="2-Gay">Gay</option>
+                                                            <option value="3-Lesbian">Lesbian</option>
+                                                            <option value="4-Prefer not to say">Prefer not to say
                                                             </option>
                                                         </Form.Select>
                                                     </Form.Group>
                                                     <br/>
-                                                    <Form.Group controlId="formBasicTherapistTypeUser">
-                                                        <Form.Label>Therapist type:</Form.Label>
-                                                        <Form.Select name="therapistTypeUser"
-                                                                     value={values.therapistTypeUser ? `${values.therapistTypeUser.id}-${values.therapistTypeUser.therapistType}` : ''}
+                                                    <Form.Group controlId="formBasicTherapyHistory">
+                                                        <Form.Label>Been to therapy before?</Form.Label>
+                                                        <Form.Select name="therapyHistory"
+                                                                     value={values.therapyHistory ? `${values.therapyHistory.id}-${values.therapyHistory.answer}` : ''}
                                                                      onChange={handleChange} required>
-                                                            <option value="1-Listens">A therapist that
-                                                                listens
+                                                            <option value="1-Yes">Yes</option>
+                                                            <option value="2-No">No</option>
+                                                        </Form.Select>
+                                                    </Form.Group>
+                                                    <br/>
+                                                    <Form.Group controlId="formBasicCommunication">
+                                                        <Form.Label>Communication preferences:</Form.Label>
+                                                        <Form.Select name="communication"
+                                                                     value={values.communication ? `${values.communication.id}-${values.communication.answer}` : ''}
+                                                                     onChange={handleChange} required>
+                                                            <option value="1-Mostly via messaging">Mostly via
+                                                                messaging
                                                             </option>
-                                                            <option value="2-ExploresPast">A therapist
-                                                                that explores the past
+                                                            <option value="2-Mostly via phone">Mostly via phone
                                                             </option>
-                                                            <option value="3-TeachesSkills">A therapist
-                                                                that teaches new skills
+                                                            <option value="3-Video sessions">Video sessions</option>
+                                                            <option value="4-Not sure yet (decide later)">Not sure
+                                                                yet
+                                                                (decide later)
+                                                            </option>
+                                                        </Form.Select>
+                                                    </Form.Group>
+                                                    <br/>
+                                                    <Form.Group controlId="formBasicMedicationHistory">
+                                                        <Form.Label>Currently taking any medication:</Form.Label>
+                                                        <Form.Select name="medicationHistory"
+                                                                     value={values.medicationHistory ? `${values.medicationHistory.id}-${values.medicationHistory.answer}` : ''}
+                                                                     onChange={handleChange} required>
+                                                            <option value="1-Yes">Yes</option>
+                                                            <option value="2-No">No</option>
+                                                        </Form.Select>
+                                                    </Form.Group>
+                                                    <br/>
+                                                    <Form.Group controlId="formBasicPhysicalHealth">
+                                                        <Form.Label>Current physical health:</Form.Label>
+                                                        <Form.Select name="physicalHealth"
+                                                                     value={values.physicalHealth ? `${values.physicalHealth.id}-${values.physicalHealth.answer}` : ''}
+                                                                     onChange={handleChange} required>
+                                                            <option value="1-Good">Good</option>
+                                                            <option value="2-Fair">Fair</option>
+                                                            <option value="3-Poor">Poor</option>
+                                                        </Form.Select>
+                                                    </Form.Group>
+                                                    <br/>
+                                                    <Form.Group controlId="formBasicMentalState1">
+                                                        <Form.Label>Feeling down, depressed or
+                                                            hopeless:</Form.Label>
+                                                        <Form.Select name="mentalState1"
+                                                                     value={values.mentalState1 ? `${values.mentalState1.id}-${values.mentalState1.answer}` : ''}
+                                                                     onChange={handleChange} required>
+                                                            <option value="1-Not at all">Not at all</option>
+                                                            <option value="2-Several days">Several days</option>
+                                                            <option value="3-More than half the days">More than half
+                                                                the
+                                                                days
+                                                            </option>
+                                                            <option value="4-Nearly every day">Nearly every day
+                                                            </option>
+                                                        </Form.Select>
+                                                    </Form.Group>
+                                                    <br/>
+                                                    <Form.Group controlId="formBasicMentalState2">
+                                                        <Form.Label>Thoughts that they would be better off dead or
+                                                            of
+                                                            hurting themself in some way:</Form.Label>
+                                                        <Form.Select name="mentalState2"
+                                                                     value={values.mentalState2 ? `${values.mentalState2.id}-${values.mentalState2.answer}` : ''}
+                                                                     onChange={handleChange} required>
+                                                            <option value="1-Not at all">Not at all</option>
+                                                            <option value="2-Several days">Several days</option>
+                                                            <option value="3-More than half the days">More than half
+                                                                the
+                                                                days
+                                                            </option>
+                                                            <option value="4-Nearly every day">Nearly every day
                                                             </option>
                                                         </Form.Select>
                                                     </Form.Group>
                                                 </div>
-                                            }
-                                            {(userRole === 'ROLE_USER') &&
-                                                <div style={{width:"400px",paddingLeft:"5px",paddingRight:"5px"}}>
-                                                    <div><label htmlFor="specializationSelect"><h2>More info about
-                                                        myself:</h2></label>
-
-                                                        <Form.Group controlId="formBasicRelationshipStatus">
-                                                            <Form.Label>Relationship status:</Form.Label>
-                                                            <Form.Select name="relationshipStatus"
-                                                                         value={values.relationshipStatus ? `${values.relationshipStatus.id}-${values.relationshipStatus.answer}` : ''}
-                                                                         onChange={handleChange} required>
-                                                                <option value="1-Single">Single</option>
-                                                                <option value="2-In a relationship">In a relationship
-                                                                </option>
-                                                                <option value="3-Married">Married</option>
-                                                                <option value="4-Divorced">Divorced</option>
-                                                            </Form.Select>
-                                                        </Form.Group>
-                                                        <br/>
-                                                        <Form.Group controlId="formBasicIdentityType">
-                                                            <Form.Label>My Identity type:</Form.Label>
-                                                            <Form.Select name="identityTypeUser"
-                                                                         value={values.identityTypeUser ? `${values.identityTypeUser.id}-${values.identityTypeUser.identityType}` : ''}
-                                                                         onChange={handleChange} required>
-                                                                <option value="1-Straight">Straight</option>
-                                                                <option value="2-Gay">Gay</option>
-                                                                <option value="3-Lesbian">Lesbian</option>
-                                                                <option value="4-Prefer not to say">Prefer not to say
-                                                                </option>
-                                                            </Form.Select>
-                                                        </Form.Group>
-                                                        <br/>
-                                                        <Form.Group controlId="formBasicTherapyHistory">
-                                                            <Form.Label>Been to therapy before?</Form.Label>
-                                                            <Form.Select name="therapyHistory"
-                                                                         value={values.therapyHistory ? `${values.therapyHistory.id}-${values.therapyHistory.answer}` : ''}
-                                                                         onChange={handleChange} required>
-                                                                <option value="1-Yes">Yes</option>
-                                                                <option value="2-No">No</option>
-                                                            </Form.Select>
-                                                        </Form.Group>
-                                                        <br/>
-                                                        <Form.Group controlId="formBasicCommunication">
-                                                            <Form.Label>Communication preferences:</Form.Label>
-                                                            <Form.Select name="communication"
-                                                                         value={values.communication ? `${values.communication.id}-${values.communication.answer}` : ''}
-                                                                         onChange={handleChange} required>
-                                                                <option value="1-Mostly via messaging">Mostly via
-                                                                    messaging
-                                                                </option>
-                                                                <option value="2-Mostly via phone">Mostly via phone
-                                                                </option>
-                                                                <option value="3-Video sessions">Video sessions</option>
-                                                                <option value="4-Not sure yet (decide later)">Not sure
-                                                                    yet
-                                                                    (decide later)
-                                                                </option>
-                                                            </Form.Select>
-                                                        </Form.Group>
-                                                        <br/>
-                                                        <Form.Group controlId="formBasicMedicationHistory">
-                                                            <Form.Label>Currently taking any medication:</Form.Label>
-                                                            <Form.Select name="medicationHistory"
-                                                                         value={values.medicationHistory ? `${values.medicationHistory.id}-${values.medicationHistory.answer}` : ''}
-                                                                         onChange={handleChange} required>
-                                                                <option value="1-Yes">Yes</option>
-                                                                <option value="2-No">No</option>
-                                                            </Form.Select>
-                                                        </Form.Group>
-                                                        <br/>
-                                                        <Form.Group controlId="formBasicPhysicalHealth">
-                                                            <Form.Label>Current physical health:</Form.Label>
-                                                            <Form.Select name="physicalHealth"
-                                                                         value={values.physicalHealth ? `${values.physicalHealth.id}-${values.physicalHealth.answer}` : ''}
-                                                                         onChange={handleChange} required>
-                                                                <option value="1-Good">Good</option>
-                                                                <option value="2-Fair">Fair</option>
-                                                                <option value="3-Poor">Poor</option>
-                                                            </Form.Select>
-                                                        </Form.Group>
-                                                        <br/>
-                                                        <Form.Group controlId="formBasicMentalState1">
-                                                            <Form.Label>Feeling down, depressed or
-                                                                hopeless:</Form.Label>
-                                                            <Form.Select name="mentalState1"
-                                                                         value={values.mentalState1 ? `${values.mentalState1.id}-${values.mentalState1.answer}` : ''}
-                                                                         onChange={handleChange} required>
-                                                                <option value="1-Not at all">Not at all</option>
-                                                                <option value="2-Several days">Several days</option>
-                                                                <option value="3-More than half the days">More than half
-                                                                    the
-                                                                    days
-                                                                </option>
-                                                                <option value="4-Nearly every day">Nearly every day
-                                                                </option>
-                                                            </Form.Select>
-                                                        </Form.Group>
-                                                        <br/>
-                                                        <Form.Group controlId="formBasicMentalState2">
-                                                            <Form.Label>Thoughts that they would be better off dead or
-                                                                of
-                                                                hurting themself in some way:</Form.Label>
-                                                            <Form.Select name="mentalState2"
-                                                                         value={values.mentalState2 ? `${values.mentalState2.id}-${values.mentalState2.answer}` : ''}
-                                                                         onChange={handleChange} required>
-                                                                <option value="1-Not at all">Not at all</option>
-                                                                <option value="2-Several days">Several days</option>
-                                                                <option value="3-More than half the days">More than half
-                                                                    the
-                                                                    days
-                                                                </option>
-                                                                <option value="4-Nearly every day">Nearly every day
-                                                                </option>
-                                                            </Form.Select>
-                                                        </Form.Group>
-                                                    </div>
-                                                </div>
-                                            }
+                                            </div>
+                                        }
                                     </div>
                                 </Form>
                             </div>

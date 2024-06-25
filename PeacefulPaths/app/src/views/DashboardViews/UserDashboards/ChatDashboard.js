@@ -8,7 +8,6 @@ import {Link, useNavigate} from 'react-router-dom';
 import '../../../css/myCss.css';
 import DashboardNav from "../DashboardNav";
 import SideBarUser from "../SideBars/SideBarUser";
-import {Alert} from "reactstrap";
 import {
     authenticate,
     authFailure,
@@ -383,7 +382,7 @@ function ChatDashboard({loading,error,...props}){
                                     marginBottom: "20px"
                                 }}>
                                     <div className="card-body">
-                                        <h4>Chats</h4>
+                                        <h4>Old Chats</h4>
                                         {allTherapistData
                                             .filter((data, index, self) =>
                                                     index === self.findIndex((t) => (
@@ -446,9 +445,9 @@ function ChatDashboard({loading,error,...props}){
                                     flexDirection: "column",
                                     justifyContent: "center",
                                     alignItems: "center",
-                                    paddingTop: "20px"
+                                    paddingTop: "30px"
                                 }}>
-                                    <img src={photo} style={{maxWidth: "250px"}} alt={"photo"}/>
+                                    <img src={photo} style={{maxWidth: "400px"}} alt={"photo"}/>
                                     <h4 style={{color: "#5b5c63", fontSize: "28px"}}>No Chats Available</h4>
                                     <p style={{
                                         maxWidth: "400px",

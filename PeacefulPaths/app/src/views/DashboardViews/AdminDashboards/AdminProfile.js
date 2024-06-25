@@ -11,11 +11,12 @@ import {Alert} from "reactstrap";
 import {connect} from "react-redux";
 import DashboardNav from "../DashboardNav";
 import SideBarAdmin from "../SideBars/SideBarAdmin";
-import {loadState, saveState} from "../../../helper/sessionStorage";
+import {saveState} from "../../../helper/sessionStorage";
 import {jwtDecode} from "jwt-decode";
 import {FontAwesomeIcon} from "@fortawesome/react-fontawesome";
 import {faArrowRight, faChevronLeft} from "@fortawesome/free-solid-svg-icons";
 import Loading from "../LoadingPage";
+import PhoneInput from "react-phone-input-2";
 const getRefreshToken = () => {
     const token = localStorage.getItem('REFRESH_TOKEN');
 
@@ -133,9 +134,46 @@ function AdminProfile({loading,error,...props}){
         e.preventDefault();
         props.authenticate();
 
+        const nameSurnameRegex = /^[a-zA-Z]+$/; // Matches any string with one or more letters
+
+        // Validate name, surname and phoneNumber
+        if (!nameSurnameRegex.test(values.name) || !nameSurnameRegex.test(values.surname)) {
+            setUpdateError("Name and surname fields cannot be empty and should only contain letters!");
+            return;
+        }
+
+        const phoneNumberRegex = /^\d{11}$/;
+
+        if (!phoneNumberRegex.test(values.number)) {
+            setUpdateError("Phone number field should be exactly 11 digits long!");
+            return;
+        }
+
+        const locationRegex = /^(Kosovo|Albania|Montenegro|North Macedonia|Serbia)$/;
+
+        // Validate location
+        if (!locationRegex.test(values.location.location)) {
+            setUpdateError("Invalid selection. Please select a location.");
+            return;
+        }
+
+        const emailRegex = /^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$/;
+        const passwordRegex = /^(?=.*[A-Za-z])(?=.*\d)[A-Za-z\d]{8,}$/;
+
+        // Validate email and password
+        if (!emailRegex.test(values.email)) {
+            setUpdateError("Invalid email format!");
+            return;
+        }
+        if (!passwordRegex.test(values.password)) {
+            setUpdateError(" Minimum eight characters, at least one letter and one number!");
+            return;
+        }
+
         userUpdate(values).then((response)=>{
             if(response.status===201){
                 props.setUser(response.data);
+                setUpdateSuccess('Updated successfully.')
                 history('/dashboard/adminDashboard/profile');
             }
             else{
@@ -184,6 +222,13 @@ function AdminProfile({loading,error,...props}){
                             value
             }));
         }
+    };
+
+    const handlePhoneChange = (value) => {
+        setValues(values => ({
+            ...values,
+            number: value
+        }));
     };
 
     const [isLoading, setIsLoading] = useState(true);
@@ -266,13 +311,21 @@ function AdminProfile({loading,error,...props}){
                                                              onChange={handleChange} required>
                                                     <option value="1-M">Male</option>
                                                     <option value="2-F">Female</option>
+                                                    <option value="3-O">Other</option>
                                                 </Form.Select>
                                             </Form.Group>
                                             <br/>
                                             <Form.Group controlId="formBasicPhone">
                                                 <Form.Label>Phone</Form.Label>
-                                                <Form.Control type="tel" defaultValue={data.number}
-                                                              onChange={handleChange} name="number"/>
+                                                <PhoneInput
+                                                    buttonClass={"buttonClass"}
+                                                    country={'xk'}
+                                                    value={values.number}
+                                                    onChange={handlePhoneChange}
+                                                    inputClass="form-control form-control-user"
+                                                    specialLabel="Phone Number"
+                                                    required
+                                                />
                                             </Form.Group>
                                             <br/>
                                             <Form.Group controlId="formBasicAddress">

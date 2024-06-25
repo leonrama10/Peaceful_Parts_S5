@@ -177,7 +177,7 @@ function LoginBoot({loading,error,...props}){
                 }
             }
             else{
-                props.loginFailure('Something LEKAAAAAAAA!Please Try Again');
+                props.loginFailure('Something went wrong! Please try again.');
             }
         }).catch((err)=>{
 
@@ -189,12 +189,12 @@ function LoginBoot({loading,error,...props}){
                         props.loginFailure("Authentication Failed.Bad Credentials");
                         break;
                     default:
-                        props.loginFailure('Something BABAAAAAA!Please Try Again');
+                        props.loginFailure('Something went wrong! Please try again.');
                 }
             }
             else{
                 console.log("ERROR: ",err)
-                props.loginFailure('Something NaNAAAAA!Please Try Again');
+                props.loginFailure('Something went wrong! Please try again.');
             }
         });
     }
@@ -218,17 +218,17 @@ function LoginBoot({loading,error,...props}){
                 minHeight: "calc(100vh - 190px)",
                 overflow: "auto"
             }}>
-                <div className="card o-hidden border-0 shadow-lg " style={{width: '100%'}}>
-                    <div className="row">
+                <div className="card o-hidden border-0 shadow-lg " style={{width: '100%',height:"500px"}}>
+                    <div className="row" style={{width: '100%',height:"500px"}}>
                         <div className="col-lg-6 d-none d-lg-block"
                              style={{backgroundImage: `url(${blueDog})`, backgroundSize: 'cover'}}></div>
-                        <div className="col-lg-6">
+                        <div className="col-lg-6" >
                             <div className="p-5">
                                 <div className="text-center">
                                     <h1 className="h4 text-gray-900 mb-4">Welcome Back!</h1>
                                 </div>
                                 {error &&
-                                    <Alert style={{marginTop: '20px'}} variant="danger">
+                                    <Alert style={{marginTop: '20px'}} color="danger">
                                         {error}
                                     </Alert>
                                 }

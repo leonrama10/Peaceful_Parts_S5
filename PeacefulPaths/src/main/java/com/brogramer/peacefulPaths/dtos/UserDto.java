@@ -53,6 +53,7 @@ public class UserDto {
     @JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "yyyy-MM-dd HH:mm:ss")
     private LocalDateTime dateAdded;
     private String refreshToken;
+    private String about;
 
 
     public University getUniversity() {
@@ -142,7 +143,6 @@ public class UserDto {
     public void setSurname(String surname) {
         this.surname = surname;
     }
-
 
     public String getToken() {
         return token;
@@ -334,5 +334,13 @@ public class UserDto {
 
     public void setRefreshToken(String refreshToken) {
         this.refreshToken = refreshToken;
+    }
+
+    public String getAbout() {
+        return about;
+    }
+
+    public void setAbout(String about) {
+        this.about = about;
     }
 }

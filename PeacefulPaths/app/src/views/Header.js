@@ -4,7 +4,7 @@ import '../css/Header.css';
 
 export default function Header(){
     const location = useLocation();
-    const isLogin = location.pathname.startsWith('/loginBoot') || location.pathname.startsWith('/get-started');
+    const isLogin = location.pathname.startsWith('/loginBoot') || location.pathname.startsWith('/get-started') || location.pathname.startsWith('/forgotPassBoot') || location.pathname.startsWith('/verifyPasswordInfo') || location.pathname.startsWith('/passwordReset');
     const [scrolled, setScrolled] = useState(false);
 
     useEffect(() => {

@@ -1,5 +1,6 @@
 import React, {useEffect, useState} from 'react';
 import {
+    fetchConnectionsAmount,
     fetchNextBooking,
     fetchUserData,
     fetchUserDataId,
@@ -66,6 +67,7 @@ function TherapistCardInfo({loading,error,...props}){
     const [hideFilterMenu,setHideFilterMenu]=useState(true);
     const [bookingExists,setBookingExists]=useState(false);
     const [nextBooking,setNextBooking]=useState({});
+    const [connectionsAmount, setConnectionsAmount] = useState(0);
     const [therapistData, setTherapistData] = useState({
         id:0,
         email: '',
@@ -82,7 +84,8 @@ function TherapistCardInfo({loading,error,...props}){
         university: {},
         therapyTypeTherapist:[],
         therapistTypeTherapist:[],
-        identityTypeTherapist:[]
+        identityTypeTherapist:[],
+        about:''
     });
     const [userTherapistValues, setUserTherapistValues] = useState({
         userId:0,
@@ -106,16 +109,14 @@ function TherapistCardInfo({loading,error,...props}){
                         };
                     });
 
-                        if (connected) {
-                            fetchNextBooking({clientId: response.data.id, therapistId: therapistInfoId}).then((response) => {
-                                if (response.data.bookingId !== 0) {
-                                    setBookingExists(true)
-                                    setNextBooking(response.data)
-                                }
-                            }).catch((e) => {
-                                history('/loginBoot');
-                            });
-                        }
+                    fetchConnectionsAmount({
+                        therapistId: therapistInfoId
+                    }).then((response) => {
+                        setConnectionsAmount(response.data.amount);
+                    }).catch((e) => {
+                        history('/loginBoot');
+                    });
+
 
                         fetchUserDataId({id: therapistInfoId}).then((response) => {
                             if (response.data.roles.at(0).role === 'ROLE_THERAPIST') {
@@ -135,7 +136,8 @@ function TherapistCardInfo({loading,error,...props}){
                                     university: response.data.university,
                                     therapyTypeTherapist: response.data.therapyTypeTherapist,
                                     therapistTypeTherapist: response.data.therapistTypeTherapist,
-                                    identityTypeTherapist: response.data.identityTypeTherapist
+                                    identityTypeTherapist: response.data.identityTypeTherapist,
+                                    about: response.data.about
                                 })
 
                                 //problemi munet me kon te qikjo setUserThreapistValues nese ka naj error :)
@@ -183,16 +185,13 @@ function TherapistCardInfo({loading,error,...props}){
                         };
                     });
 
-                        if (connected) {
-                            fetchNextBooking({clientId: response.data.id, therapistId: therapistInfoId}).then((response) => {
-                                if (response.data.bookingId !== 0) {
-                                    setBookingExists(true)
-                                    setNextBooking(response.data)
-                                }
-                            }).catch((e) => {
-                                history('/loginBoot');
-                            });
-                        }
+                    fetchConnectionsAmount({
+                        therapistId: therapistInfoId
+                    }).then((response) => {
+                        setConnectionsAmount(response.data.amount);
+                    }).catch((e) => {
+                        history('/loginBoot');
+                    });
 
                         fetchUserDataId({id: therapistInfoId}).then((response) => {
                             if (response.data.roles.at(0).role === 'ROLE_THERAPIST') {
@@ -212,7 +211,8 @@ function TherapistCardInfo({loading,error,...props}){
                                     university: response.data.university,
                                     therapyTypeTherapist: response.data.therapyTypeTherapist,
                                     therapistTypeTherapist: response.data.therapistTypeTherapist,
-                                    identityTypeTherapist: response.data.identityTypeTherapist
+                                    identityTypeTherapist: response.data.identityTypeTherapist,
+                                    about: response.data.about
                                 })
 
                                 //problemi munet me kon te qikjo setUserThreapistValues nese ka naj error :)
@@ -355,7 +355,7 @@ function TherapistCardInfo({loading,error,...props}){
                                 </Link>
                             </div>
                             <div className="d-sm-flex align-items-center justify-content-between mb-4">
-                                <h1 className="h3 mb-0 text-800" style={{color: "#858796"}}>Therapist Info</h1>
+                                <h1 className="h3 mb-0 text-800" style={{color: "#5a5c69"}}>Therapist Info</h1>
                             </div>
                             {isPopupVisible && (
                                 <div className="overlay">
@@ -371,7 +371,7 @@ function TherapistCardInfo({loading,error,...props}){
                                         <hr/>
                                         <h5>Contact Info</h5>
                                         <p><b>Email</b>: {therapistData.email}</p>
-                                        <p><b>Phone number</b>: {therapistData.number}</p>
+                                        <p><b>Phone number</b>: +{therapistData.number}</p>
                                     </div>
                                 </div>
                             )}
@@ -393,7 +393,7 @@ function TherapistCardInfo({loading,error,...props}){
                                                 <button className={"contactButton"} onClick={showPopup}>Contact info
                                                 </button>
                                             </p>
-                                            <p style={{fontSize: "14px", color: "gray"}}>500+ connections</p>
+                                            <p style={{fontSize: "14px", color: "gray"}}>{connectionsAmount} {connectionsAmount===1?'connection':'connections'}</p>
                                             {connected ?
                                                 <div>
                                                     <i>You are already connected with another therapist!!!</i>
@@ -420,26 +420,19 @@ function TherapistCardInfo({loading,error,...props}){
                                     </div>
                                 </div>
                             </div>
-                            <div className="card therapistCardInfo">
+                            {therapistData.about && <div className="card therapistCardInfo">
                                 <div className="card-body">
                                     <h4>About</h4>
-                                    <p style={{fontSize: "14px"}}>Lorem Ipsum is simply dummy text of the printing and
-                                        typesetting industry. Lorem Ipsum has been the industry's standard dummy text
-                                        ever since the 1500s, when an unknown printer took a galley of type and
-                                        scrambled it to make a type specimen book. It has survived not only five
-                                        centuries, but also the leap into electronic typesetting, remaining essentially
-                                        unchanged. It was popularised in the 1960s with the release of Letraset sheets
-                                        containing Lorem Ipsum passages, and more recently with desktop publishing
-                                        software like Aldus PageMaker including versions of Lorem Ipsum.</p>
+                                    <p style={{fontSize: "14px"}}>{therapistData.about}</p>
                                 </div>
-                            </div>
+                            </div>}
                             <div className="card therapistCardInfo">
                                 <div className="card-body">
                                     <h4>Areas of Expertise</h4>
                                     <p style={{fontSize: "16px"}}>
                                         {therapistData.therapyTypeTherapist.map((type, index) => (
                                             <React.Fragment key={index}>
-                                                <span> {type.therapyType}</span>
+                                                <span> {type.therapyType==='Individual'?'Individual Therapy':type.therapyType==='Couples'?'Couples Therapy':type.therapyType==='Teen'?'Teen Therapy':''}</span>
                                                 {index < therapistData.therapyTypeTherapist.length - 1 && (
                                                     <span style={{
                                                         display: 'block',
@@ -455,7 +448,7 @@ function TherapistCardInfo({loading,error,...props}){
                                     <p style={{fontSize: "16px"}}>
                                         {therapistData.therapistTypeTherapist.map((type, index) => (
                                             <React.Fragment key={index}>
-                                                <span> {type.therapistType}</span>
+                                                <span> {type.therapistType==='Listens'?'A therapist that listens':type.therapistType==='ExploresPast'?'A therapist that explores the past':type.therapistType==='TeachesSkills'?'A therapist that teaches new skills':''}</span>
                                                 {index < therapistData.therapistTypeTherapist.length - 1 && (
                                                     <span style={{
                                                         display: 'block',

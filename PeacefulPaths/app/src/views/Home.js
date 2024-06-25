@@ -3,6 +3,7 @@ import {jwtDecode} from 'jwt-decode';
 import {Link, useNavigate} from "react-router-dom";
 import {fetchUserData} from "../api/authService";
 import '../css/Home.css';
+import photo from '../img/communication-concept-social-media-and-chat-talk-vector-35897944-removebg-preview.jpg';
 import FAQ from './FAQ';
 import {
     authenticate,
@@ -145,10 +146,10 @@ function Home({loading,error,...props}){
                          <p className="box1-a1" >For me and my partner <FontAwesomeIcon icon={faArrowRight} /></p>
                      </Link>
 
-                     <a href="https://www.teencounseling.com/parent_start/?teen_counseling=from_betterhelp" className="box3">
+                     <Link to="/get-started" className="box3">
                          <h3 className="box1-h4">Teen</h3>
                          <p className="box1-a1" >For my child <FontAwesomeIcon icon={faArrowRight} /></p>
-                     </a>
+                     </Link>
                  </div>
              </div>
 
@@ -188,11 +189,13 @@ function Home({loading,error,...props}){
                          an in-office therapist, but with the ability to <br/>
                          communicate when and how you want.
                      </p>
+                     <div className="part-three-main-right">
+                         <a className="pth-button-a1" href="/get-started">Get matched to a therapist</a>
+                     </div>
                  </div>
-
-                 <div className="part-three-main-right">
-                     <a className="pth-button-a1" href="/get-started">Get matched to a therapist</a>
-                 </div>
+                <div style={{paddingLeft:"50px"}}>
+                    <img width={"600px"} height={"500px"} src={photo} alt={"Photo"}/>
+                </div>
              </div>
 
 

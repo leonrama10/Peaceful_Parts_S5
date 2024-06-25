@@ -1,9 +1,5 @@
 import axios from 'axios';
 
-
-
-
-
 const getToken=()=>{
     return localStorage.getItem('USER_KEY');
 }
@@ -56,7 +52,6 @@ export const fetchAllUserData=()=>{
 }
 
 export const fetchUserDataId=(authRequest)=>{
-    console.log("LALALALLALALAL",authRequest)
     return axios({
         method:'POST',
         url:`${process.env.hostUrl||'http://localhost:8080'}/api/auth/userinfoId`,
@@ -718,6 +713,17 @@ export const fetchFeedback = (authRequest) => {
     return axios({
         method: 'POST',
         url: `${process.env.hostUrl || 'http://localhost:8080'}/api/auth/fetchFeedback`,
+        data:authRequest,
+        headers: {
+            'Authorization': 'Bearer ' + getToken()
+        }
+    });
+};
+
+export const fetchConnectionsAmount = (authRequest) => {
+    return axios({
+        method: 'POST',
+        url: `${process.env.hostUrl || 'http://localhost:8080'}/api/auth/fetchConnectionsAmount`,
         data:authRequest,
         headers: {
             'Authorization': 'Bearer ' + getToken()

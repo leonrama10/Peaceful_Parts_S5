@@ -170,8 +170,7 @@ font-size: 20px;
 .part-three-Container{
     display: flex;
     flex-direction: column;
-    padding-left: 100px;
-    width: 35%;
+    /*padding-left: 100px;*/
     justify-content: center;
     align-items: center;
 }
@@ -189,24 +188,25 @@ font-size: 20px;
 .part-three-main-right{
     display: flex;
     flex-direction: column;
-    justify-content: center;
-    align-items: center;
-    width: 30%;
+    justify-content: left;
+    align-items: start;
+    width:100%;
+    padding-top:20px;
 }
 
 .part-three-main-right .pth-button-a1{
-border-radius: 30px;
-width: 50%;
-height: 48px;
-background-color: #4fa6ff;
-border: 1px solid #4fa6ff;
-font-size: 19px;
-transition: 3ms;
-font-weight: 500;
-color: #004c9c;
-text-align: center;
-padding-top: 8px;
-text-decoration: none;
+    border-radius: 30px;
+    width: 50%;
+    height: 48px;
+    background-color: #4fa6ff;
+    border: 1px solid #4fa6ff;
+    font-size: 19px;
+    transition: 3ms;
+    font-weight: 500;
+    color: #004c9c;
+    text-align: center;
+    padding:10px;
+    text-decoration: none;
 }
 
 .part-three-main-right .pth-button-a1:hover{

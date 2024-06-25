@@ -31,6 +31,8 @@ public class TherapistInfo {
             inverseJoinColumns = @JoinColumn(name = "therapist_type_id"))
     private Collection<TherapistType> therapistType;
 
+    @Column(name = "about")
+    private String about;
 
     public TherapistInfo() {}
 
@@ -43,6 +45,14 @@ public class TherapistInfo {
         this.therapyType = therapyType;
         this.identityType = identityType;
         this.therapistType = therapistType;
+    }
+
+    public String getAbout() {
+        return about;
+    }
+
+    public void setAbout(String about) {
+        this.about = about;
     }
 
     public Collection<TherapyType> getTherapyType() {

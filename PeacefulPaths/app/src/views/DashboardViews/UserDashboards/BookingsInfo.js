@@ -480,9 +480,9 @@ function BookingsInfo({loading,error,...props}){
                                     flexDirection: "column",
                                     justifyContent: "center",
                                     alignItems: "center",
-                                    paddingTop: "20px"
+                                    paddingTop: "6px"
                                 }}>
-                                    <img src={photo} style={{maxWidth: "250px"}} alt={"photo"}/>
+                                    <img src={photo} style={{maxWidth: "400px"}} alt={"photo"}/>
                                     <h4 style={{color: "#5b5c63", fontSize: "28px"}}>No Bookings Available</h4>
                                     <p style={{
                                         maxWidth: "400px",

@@ -1,7 +1,7 @@
 import React, {useEffect, useState} from 'react';
 import {fetchUserData, userUpdate} from '../../../api/authService';
 import {Link, useNavigate} from 'react-router-dom';
-import {Container, Row, Col, Form, Button} from 'react-bootstrap';
+import {Form, Button} from 'react-bootstrap';
 import {
     authenticate,
     authFailure,
@@ -16,6 +16,7 @@ import {jwtDecode} from "jwt-decode";
 import {faArrowRight, faChevronLeft, faCircleInfo} from "@fortawesome/free-solid-svg-icons";
 import {FontAwesomeIcon} from "@fortawesome/react-fontawesome";
 import Loading from "../LoadingPage";
+import PhoneInput from "react-phone-input-2";
 const getRefreshToken = () => {
     const token = localStorage.getItem('REFRESH_TOKEN');
 
@@ -194,6 +195,106 @@ function UserProfile({loading,error,...props}){
         e.preventDefault();
         props.authenticate();
 
+        const nameSurnameRegex = /^[a-zA-Z]+$/; // Matches any string with one or more letters
+        const phoneNumberRegex = /^\d{11}$/; // Matches any string with exactly 12 digits
+
+        // Validate name, surname and phoneNumber
+        if (!nameSurnameRegex.test(values.name) || !nameSurnameRegex.test(values.surname)) {
+            setUpdateError("Name and surname fields cannot be empty and should only contain letters!");
+            return;
+        }
+
+        if (!phoneNumberRegex.test(values.number)) {
+            setUpdateError("Phone number field should be exactly 11 digits long!");
+            return;
+        }
+
+        const emailRegex = /^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$/;
+
+        const locationRegex = /^(Kosovo|Albania|Montenegro|North Macedonia|Serbia)$/;
+
+        // Validate location
+        if (!locationRegex.test(values.location.location)) {
+            setUpdateError("Invalid selection. Please select a location.");
+            return;
+        }
+
+        // Validate language
+        if (!values.language.length) {
+            setUpdateError("Invalid selection. Please select at least one language.");
+            return;
+        }
+
+        // Validate gender
+        if (!values.gender.gender) {
+            setUpdateError("Invalid selection. Please select a gender.");
+            return;
+        }
+
+
+        if (!values.therapistGender.gender) {
+            setUpdateError("Invalid selection. Please select therapists gender!");
+            return;
+        }
+
+
+        if (!values.relationshipStatus.answer) {
+            setUpdateError("Invalid selection. Please select relationship status!");
+            return;
+        }
+
+        if (!values.therapyHistory.answer) {
+            setUpdateError("Invalid selection. Please select therapy history!");
+            return;
+        }
+
+        if (!values.communication.answer) {
+            setUpdateError("Invalid selection. Please select communication!");
+            return;
+        }
+
+        if (!values.medicationHistory.answer) {
+            setUpdateError("Invalid selection. Please select medication history!");
+            return;
+        }
+
+        if (!values.physicalHealth.answer) {
+            setUpdateError("Invalid selection. Please select physical health!");
+            return;
+        }
+
+        if (!values.mentalState1.answer) {
+            setUpdateError("Invalid selection. Please select mental state!");
+            return;
+        }
+
+        if (!values.mentalState2.answer) {
+            setUpdateError("Invalid selection. Please select mental state!");
+            return;
+        }
+
+        if (!values.therapyTypeUser.therapyType) {
+            setUpdateError("Invalid selection. Please select at least one therapy type!");
+            return;
+        }
+
+
+        if (!values.therapistTypeUser.therapistType) {
+            setUpdateError("Invalid selection. Please select at least one therapist type.");
+            return;
+        }
+
+        if (!values.identityTypeUser.identityType) {
+            setUpdateError("Invalid selection. Please select at least one identity type.");
+            return;
+        }
+
+        // Validate email and password
+        if (!emailRegex.test(values.email)) {
+            setUpdateError("Invalid email format!");
+            return;
+        }
+
         userUpdate(values).then((response)=>{
             if(response.status===201){
                 props.setUser(response.data);
@@ -268,6 +369,13 @@ function UserProfile({loading,error,...props}){
         }
     };
 
+    const handlePhoneChange = (value) => {
+        setValues(values => ({
+            ...values,
+            number: value
+        }));
+    };
+
     const [isLoading, setIsLoading] = useState(true);
 
     useEffect(() => {
@@ -297,7 +405,7 @@ function UserProfile({loading,error,...props}){
                         <DashboardNav data={data} setUser={props.setUser} />
 
                         <div className="container-fluid" style={{marginBottom: '50px'}}>
-                            <div style={{marginLeft: "-10px", marginTop: "-15px"}}>
+                            <div style={{marginLeft: "-15px", marginTop: "-15px"}}>
                                 <Link to={"/dashboard/userDashboard"}
                                       className="btn goBack"
                                       style={{color: "#0d6efd"}}
@@ -311,12 +419,12 @@ function UserProfile({loading,error,...props}){
 
                             <div style={{display: 'flex', flexDirection: 'row', justifyContent: 'center'}}>
                                 {updateError &&
-                                    <Alert style={{marginTop: '20px'}} variant="danger">
+                                    <Alert style={{marginTop: '20px'}} color="danger">
                                         {updateError}
                                     </Alert>
                                 }
                                 {updateSuccess &&
-                                    <Alert style={{marginTop: '20px'}} variant="success">
+                                    <Alert style={{marginTop: '20px'}} color="success">
                                         {updateSuccess}
                                     </Alert>
                                 }
@@ -365,8 +473,15 @@ function UserProfile({loading,error,...props}){
                                             <br/>
                                             <Form.Group controlId="formBasicPhone">
                                                 <Form.Label>Phone</Form.Label>
-                                                <Form.Control type="tel" defaultValue={data.number}
-                                                              onChange={handleChange} name="number"/>
+                                                <PhoneInput
+                                                    buttonClass={"buttonClass"}
+                                                    country={'xk'}
+                                                    value={values.number}
+                                                    onChange={handlePhoneChange}
+                                                    inputClass="form-control form-control-user"
+                                                    specialLabel="Phone Number"
+                                                    required
+                                                />
                                             </Form.Group>
                                             <br/>
                                             <Form.Group controlId="formBasicAddress">

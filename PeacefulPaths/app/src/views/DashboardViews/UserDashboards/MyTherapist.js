@@ -1,5 +1,6 @@
 import React, {useEffect, useState} from 'react';
 import {
+    fetchConnectionsAmount,
     fetchNextBooking,
     fetchUserData,
     fetchUserDataId,
@@ -89,6 +90,7 @@ function MyTherapist({loading,error,...props}){
         userId:0,
         therapistId:0
     })
+    const [connectionsAmount, setConnectionsAmount] = useState(0);
 
     useEffect(() => {
         myTherapistInfoId = loadState("myTherapistInfoId",0)
@@ -105,6 +107,14 @@ function MyTherapist({loading,error,...props}){
                             ...data,
                             userId: response.data.id
                         };
+                    });
+
+                    fetchConnectionsAmount({
+                        therapistId: myTherapistInfoId
+                    }).then((response) => {
+                        setConnectionsAmount(response.data.amount);
+                    }).catch((e) => {
+                        history('/loginBoot');
                     });
 
                     if (connected) {
@@ -184,7 +194,15 @@ function MyTherapist({loading,error,...props}){
                         };
                     });
 
-                    if (connected) {
+                    fetchConnectionsAmount({
+                        therapistId: myTherapistInfoId
+                    }).then((response) => {
+                        setConnectionsAmount(response.data.amount);
+                    }).catch((e) => {
+                        history('/loginBoot');
+                    });
+
+
                         fetchNextBooking({clientId: response.data.id, therapistId: myTherapistInfoId}).then((response) => {
                             if (response.data.bookingId !== 0) {
                                 setBookingExists(true)
@@ -193,7 +211,7 @@ function MyTherapist({loading,error,...props}){
                         }).catch((e) => {
                             history('/loginBoot');
                         });
-                    }
+
 
                     fetchUserDataId({id: myTherapistInfoId}).then((response) => {
                         if (response.data.roles.at(0).role === 'ROLE_THERAPIST') {
@@ -263,32 +281,6 @@ function MyTherapist({loading,error,...props}){
     const [feedbackModal, setFeedbackModal] = useState(false);
     const [feedback, setFeedback] = useState("");
 
-    // function handleRemove(userId,therapistId) {
-    //     toggleFeedbackModal();
-    //
-    //     const feedbackData = {
-    //         userId: data.id,
-    //         therapistId: therapistData.id,
-    //         feedback: feedback
-    //     };
-    //
-    //     removeTherapist(userId).then((response)=>{
-    //         if(response.status===200){
-    //             toggleFeedbackModal();
-    //             submitFeedback(feedbackData);
-    //             saveState("therapistInfoId",therapistId)
-    //             saveState("myTherapistInfoId",0)
-    //             saveState("connected/id:"+therapistId,false)
-    //             saveState("connected",false)
-    //             history("/dashboard/userDashboard/therapistInfo")
-    //         } else{
-    //             history('/loginBoot');
-    //         }
-    //     }).catch((err)=>{
-    //         history('/loginBoot');
-    //     });
-    // }
-
     function handleBookSession() {
         history("/dashboard/userDashboard/addBookings")
     }
@@ -306,14 +298,11 @@ function MyTherapist({loading,error,...props}){
     const toggleDropdown = () => setShowDropdown(!showDropdown);
 
     const toggleFeedbackModal = () => {
-        console.log("WAZAPPp",feedbackModal)
         setFeedbackModal(!feedbackModal);
-        console.log("WAZAPPp",feedbackModal)
     };
 
     const handleRemove = () => {
         toggleFeedbackModal();
-        console.log("HELLOOOOO")
     };
 
     const handleFeedbackSubmit = (userId,therapistId) => {
@@ -394,7 +383,7 @@ function MyTherapist({loading,error,...props}){
                                         <hr/>
                                         <h5>Contact Info</h5>
                                         <p><b>Email</b>: {therapistData.email}</p>
-                                        <p><b>Phone number</b>: {therapistData.number}</p>
+                                        <p><b>Phone number</b>: +{therapistData.number}</p>
                                     </div>
                                 </div>
                             )}
@@ -416,7 +405,7 @@ function MyTherapist({loading,error,...props}){
                                                 <button className={"contactButton"} onClick={showPopup}>Contact info
                                                 </button>
                                             </p>
-                                            <p style={{fontSize: "14px", color: "gray"}}>500+ connections</p>
+                                            <p style={{fontSize: "14px", color: "gray"}}>{connectionsAmount} {connectionsAmount===1?'connection':'connections'}</p>
                                             <div style={{display: "flex", alignItems: "center"}}>
                                                 <button className={"connectButton"}
                                                         onClick={handleMessaging}>

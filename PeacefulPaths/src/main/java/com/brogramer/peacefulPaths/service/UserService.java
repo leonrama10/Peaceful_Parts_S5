@@ -332,6 +332,7 @@ public class UserService implements UserDetailsService {
                     therapistInfo.setTherapistType(userDto.getTherapistTypeTherapist());
                     therapistInfo.setTherapyType(userDto.getTherapyTypeTherapist());
                     therapistInfo.setIdentityType(userDto.getIdentityTypeTherapist());
+                    therapistInfo.setAbout(userDto.getAbout());
 
                     therapistInfoRepository.save(therapistInfo);
 
@@ -384,7 +385,7 @@ public class UserService implements UserDetailsService {
                 therapistInfo.setTherapistType(userDto.getTherapistTypeTherapist());
                 therapistInfo.setTherapyType(userDto.getTherapyTypeTherapist());
                 therapistInfo.setIdentityType(userDto.getIdentityTypeTherapist());
-
+                therapistInfo.setAbout(userDto.getAbout());
                 therapistInfoRepository.save(therapistInfo);
 
                 user.setTherapistInfo(therapistInfo);
@@ -424,12 +425,14 @@ public class UserService implements UserDetailsService {
             userDto1.setTherapistTypeTherapist(therapistInfo.getTherapistType());
             userDto1.setTherapyTypeTherapist(therapistInfo.getTherapyType());
             userDto1.setIdentityTypeTherapist(therapistInfo.getIdentityType());
+            userDto1.setAbout(therapistInfo.getAbout());
+            userDto1.setExperience(savedUser.getExperience());
         }else{
             userDto1.setGender(savedUser.getGender());
         }
-        userDto1.setExperience(savedUser.getExperience());
         userDto1.setExpirationTime(savedUser.getExpirationTime());
         userDto1.setResetToken(savedUser.getResetToken());
+        userDto1.setDateAdded(savedUser.getDateAdded());
 
         return userDto1;
     }
@@ -463,12 +466,15 @@ public class UserService implements UserDetailsService {
     public UserDto findByEmail(String email) {
 
         return findUserByEmailAndConvert(email);
+
     }
 
     public void sendEmail(UserDto user) throws MessagingException {
         String token = UUID.randomUUID().toString();
         user.setResetToken(token);
         user.setExpirationTime(System.currentTimeMillis() + (60 * 10 * 1000));
+
+        update(user);
 
         MimeMessage message = javaMailSender.createMimeMessage();
         MimeMessageHelper helper = new MimeMessageHelper(message, true);
@@ -480,8 +486,8 @@ public class UserService implements UserDetailsService {
 
         String emailContent = "<p>Hello,</p>" +
                 "<p>" + verificationLink + "</p>" +
-                "<p>If you didn't request this email or have any questions, please contact us at markaj.leka@gmail.com</p>" +
-                "<p>Thanks,<br>PeacefulParts team</p>";
+                "<p>If you didn't request this email or have any questions, please contact us at contact@peacefulparts.com</p>" +
+                "<p>Thanks you,<br>PeacefulParts team.</p>";
 
         helper.setText(emailContent, true);
 
@@ -502,6 +508,7 @@ public class UserService implements UserDetailsService {
         advice.setDateAdded(LocalDateTime.now());
         adviceRepository.save(advice);
     }
+
     public List<Advice> findAdviceByUserId(int userId) {
         Optional<User> user = userRepository.findById(userId);
         if (user.isEmpty()) {
@@ -510,9 +517,6 @@ public class UserService implements UserDetailsService {
 
         return adviceRepository.findByUser(user.get());
     }
-
-
-
 
     @Transactional
     public void connect(int userId, int therapistId) {
@@ -637,7 +641,6 @@ public class UserService implements UserDetailsService {
 
         return new ArrayList<>(therapists);
     }
-
 
     public Collection<User> findAllTherapistsByGetStarted(int userId) {
         Collection<Roles> roles = new ArrayList<>();
@@ -1388,5 +1391,10 @@ public class UserService implements UserDetailsService {
     public List<Feedback> fetchFeedback(FeedbackDto feedbackDto) {
         User therapist = userRepository.findById(feedbackDto.getTherapistId()).get();
         return feedbackRepository.findAllByTherapistId(therapist);
+    }
+
+    public int fetchConnectionsAmount(ConnectionDto connectionDto) {
+        Collection<Integer> collection = userRepository.findAllUsersConnectedById(connectionDto.getTherapistId());
+        return collection.size();
     }
 }

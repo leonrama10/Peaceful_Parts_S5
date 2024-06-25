@@ -14,6 +14,7 @@ import {loadState, saveState} from "../../../../helper/sessionStorage";
 import {jwtDecode} from "jwt-decode";
 import {FontAwesomeIcon} from "@fortawesome/react-fontawesome";
 import {faChevronLeft} from "@fortawesome/free-solid-svg-icons";
+import photo from "../../../../img/3585145_66102-removebg-preview.jpg";
 const getRefreshToken = () => {
     const token = localStorage.getItem('REFRESH_TOKEN');
 
@@ -234,7 +235,7 @@ function EditTherapistClientBookings({loading,error,...props}){
                                                     )
                                                 })
                                             }
-                                            {!emptyFutureBoolean && <p>No bookings in the future!</p>}
+                                            {!emptyFutureBoolean && <i style={{color:"#d10606"}}>No bookings in the future!</i>}
                                         </div>
 
                                         <br/>
@@ -307,10 +308,24 @@ function EditTherapistClientBookings({loading,error,...props}){
                                                     )
                                                 })
                                             }
-                                            {!emptyExpiredBoolean && <p>No expired bookings!</p>}
+                                            {!emptyExpiredBoolean && <i style={{color:"#d10606"}}>No expired bookings!</i>}
                                         </div>
                                     </div> :
-                                    <p>This client has no bookings!</p>
+                                    <div style={{
+                                        display: "flex",
+                                        flexDirection: "column",
+                                        justifyContent: "center",
+                                        alignItems: "center",
+                                        paddingTop: "6px"
+                                            }}>
+                                        <img src={photo} style={{maxWidth: "400px"}} alt={"photo"}/>
+                                        <h4 style={{color: "#5b5c63", fontSize: "28px"}}>No Bookings Available</h4>
+                                        <p style={{
+                                            maxWidth: "400px",
+                                            textAlign: "center",
+                                            color: "#858796"
+                                        }}>This client has no bookings!</p>
+                                    </div>
                                 }
                         </div>
                     </div>

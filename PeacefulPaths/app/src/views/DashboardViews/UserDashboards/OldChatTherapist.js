@@ -218,93 +218,97 @@ function OldChatTherapist({loading,error,...props}){
                         }
 
                         <div className="container-fluid">
-                            <div style={{marginLeft: "-10px", marginTop: "-15px",marginBottom:"10px"}}>
+                            <div style={{marginLeft: "-10px", marginTop: "-15px", marginBottom: "10px"}}>
                                 <Link to={"/dashboard/userDashboard/chatDashboard"}
                                       className="btn goBack"
                                       style={{color: "#0d6efd"}}
                                       type="button"
-                                ><FontAwesomeIcon icon={faChevronLeft} style={{marginRight: "3.5px"}}/>Go to Message Center
+                                ><FontAwesomeIcon icon={faChevronLeft} style={{marginRight: "3.5px"}}/>Go to Message
+                                    Center
                                 </Link>
                             </div>
 
-                            {connected &&
-                                <div className="card" style={{maxHeight: "calc(100vh - 125px)", marginBottom: "20px"}}>
-                                    <div style={{display: "flex", paddingLeft: "5px", paddingTop: "5px"}}>
-                                        {therapistData.gender.gender === "M" ?
-                                            <img style={{borderRadius: "100px", border: "1px solid grey"}}
-                                                 width={"40px"} src={malePhoto} alt={"photo"}/> :
-                                            <img style={{borderRadius: "100px", border: "1px solid grey"}}
-                                                 width={"40px"} src={femalePhoto} alt={"photo"}/>
-                                        }
-                                        <h6 style={{paddingTop: "10px", paddingLeft: "10px"}}>
-                                            {therapistData.name} {therapistData.surname}
-                                        </h6>
-                                    </div>
-                                    <div className="card-body" style={{
-                                        display: "flex",
-                                        flexDirection: "column",
-                                        justifyContent: "space-between"
-                                    }}>
-                                        <div className="chat-content" ref={chatContentRef}>
-                                            {
-                                                oldChats.length === 0 ? (
-                                                    <div style={{
-                                                        display: "flex",
-                                                        flexDirection: "column",
-                                                        justifyContent: "center",
-                                                        alignItems: "center",
-                                                        paddingBottom:"20px"
+                            <div className="card" style={{maxHeight: "calc(100vh - 125px)", marginBottom: "20px"}}>
+                                <div style={{display: "flex", paddingLeft: "5px", paddingTop: "5px"}}>
+                                    {therapistData.gender.gender === "M" ?
+                                        <img style={{borderRadius: "100px", border: "1px solid grey"}}
+                                             width={"40px"} src={malePhoto} alt={"photo"}/> :
+                                        <img style={{borderRadius: "100px", border: "1px solid grey"}}
+                                             width={"40px"} src={femalePhoto} alt={"photo"}/>
+                                    }
+                                    <h6 style={{paddingTop: "10px", paddingLeft: "10px"}}>
+                                        {therapistData.name} {therapistData.surname}
+                                    </h6>
+                                </div>
+                                <div className="card-body" style={{
+                                    display: "flex",
+                                    flexDirection: "column",
+                                    justifyContent: "space-between"
+                                }}>
+                                    <div className="chat-content" ref={chatContentRef}>
+                                        {
+                                            oldChats.length === 0 ? (
+                                                <div style={{
+                                                    display: "flex",
+                                                    flexDirection: "column",
+                                                    justifyContent: "center",
+                                                    alignItems: "center",
+                                                    paddingBottom: "20px"
+                                                }}>
+                                                    <img src={photo} style={{maxWidth: "350px"}} alt={"photo"}/>
+                                                    <h4 style={{
+                                                        color: "#5b5c63",
+                                                        fontSize: "28px",
+                                                        paddingTop: "10px"
+                                                    }}>No Chats Available!</h4>
+                                                    {/*<p style={{*/}
+                                                    {/*    maxWidth: "400px",*/}
+                                                    {/*    textAlign: "center",*/}
+                                                    {/*    color: "#858796",*/}
+                                                    {/*    paddingTop: "10px",*/}
+                                                    {/*    paddingBottom: "10px"*/}
+                                                    {/*}}>Select a date to*/}
+                                                    {/*    initiate a conversation!*/}
+                                                    {/*</p>*/}
+                                                    {/*<Link*/}
+                                                    {/*    to={"/dashboard/userDashboard/addBookings"}*/}
+                                                    {/*    type={"button"}*/}
+                                                    {/*    style={{borderRadius: "15px"}}*/}
+                                                    {/*    className={"btn btn-primary"}><FontAwesomeIcon*/}
+                                                    {/*    style={{marginRight: "3.5px"}} icon={faPlus}/>Book Session*/}
+                                                    {/*</Link>*/}
+                                                </div>
+                                            ) : (
+                                                oldChats.map((data, index) => (
+                                                    <div key={index} className="card" style={{
+                                                        maxWidth: '30vw',
+                                                        minHeight: "40px",
+                                                        maxHeight: "240px",
+                                                        marginTop: "10px",
+                                                        marginLeft: data.writtenBy === 'User' ? 'auto' : '0',
+                                                        display: 'flex',
+                                                        flexDirection: 'column',
+                                                        alignItems: data.writtenBy === 'User' ? 'flex-end' : 'flex-start',
+                                                        border: "none"
                                                     }}>
-                                                        <img src={photo} style={{maxWidth: "350px"}} alt={"photo"}/>
-                                                        <h4 style={{color: "#5b5c63", fontSize: "28px",paddingTop:"10px"}}>No Chats Available!</h4>
-                                                        <p style={{
-                                                            maxWidth: "400px",
-                                                            textAlign: "center",
-                                                            color: "#858796",
-                                                            paddingTop:"10px",
-                                                            paddingBottom:"10px"
-                                                        }}>Select a date to
-                                                            initiate a conversation!
-                                                        </p>
-                                                        <Link
-                                                            to={"/dashboard/userDashboard/addBookings"}
-                                                            type={"button"}
-                                                            style={{borderRadius:"15px"}}
-                                                            className={"btn btn-primary"}><FontAwesomeIcon style={{marginRight:"3.5px"}} icon={faPlus}/>Book Session
-                                                        </Link>
-                                                    </div>
-                                                ) : (
-                                                    oldChats.map((data, index) => (
-                                                        <div key={index} className="card" style={{
-                                                            maxWidth: '30vw',
+                                                        <div className="card-body" style={{
+                                                            padding: "6px 6px 0 6px",
                                                             minHeight: "40px",
                                                             maxHeight: "240px",
-                                                            marginTop: "10px",
-                                                            marginLeft: data.writtenBy === 'User' ? 'auto' : '0',
-                                                            display: 'flex',
-                                                            flexDirection: 'column',
-                                                            alignItems: data.writtenBy === 'User' ? 'flex-end' : 'flex-start',
-                                                            border: "none"
+                                                            color: "white",
+                                                            maxWidth: '30vw',
+                                                            backgroundColor: data.writtenBy === 'User' ? '#4e73df' : '#a3a3a3',
+                                                            borderRadius: '10px'
                                                         }}>
-                                                            <div className="card-body" style={{
-                                                                padding: "6px 6px 0 6px",
-                                                                minHeight: "40px",
-                                                                maxHeight: "240px",
-                                                                color: "white",
-                                                                maxWidth: '30vw',
-                                                                backgroundColor: data.writtenBy === 'User' ? '#4e73df' : '#a3a3a3',
-                                                                borderRadius: '10px'
-                                                            }}>
-                                                                <p style={{maxHeight: "240px"}}>{data.message}</p>
-                                                            </div>
+                                                            <p style={{maxHeight: "240px"}}>{data.message}</p>
                                                         </div>
-                                                    ))
-                                                )
-                                            }
-                                        </div>
+                                                    </div>
+                                                ))
+                                            )
+                                        }
                                     </div>
                                 </div>
-                            }
+                            </div>
                         </div>
                     </div>
                 </div>

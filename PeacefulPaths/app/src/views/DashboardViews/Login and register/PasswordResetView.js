@@ -5,6 +5,7 @@ import '../../../css/sb-admin-2.min.css';
 import {Alert} from "reactstrap";
 import {authenticate, authFailure, authSuccess} from "../../../redux/authActions";
 import {connect} from "react-redux";
+import blueDog from "../../../img/360_F_707594227_0VXeidsvzawU5WJkCvldiF0aud4SVKOx-removebg-preview.jpg";
 
 function PasswordResetView({loading,error,...props}){
 
@@ -53,35 +54,35 @@ function PasswordResetView({loading,error,...props}){
                 }
             }
             else{
+                console.log("WOHOOOOOOO")
                 localStorage.clear();
                 history('/loginBoot');
             }
         }).catch((e)=>{
+            console.log("LUSHIIIIIIIIIII")
             localStorage.clear();
             history('/loginBoot');
         })
     },[])
 
 
-    console.log("YPPPPPPPPPPPPPPP ", values)
     const handleSubmit=(evt)=>{
         evt.preventDefault();
         props.authenticate();
 
+        const passwordRegex = /^(?=.*[A-Za-z])(?=.*\d)[A-Za-z\d]{8,}$/; // Minimum eight characters, at least one letter and one number
+
+        if (!passwordRegex.test(values.password)) {
+            setPasswordResetFailure('Minimum eight characters, at least one letter and one number!');
+            return;
+        }
+
         if (values.password === confirmPassword) {
             userResetPassword(values).then((response)=>{
-                if(response.status===201){
-                    props.setUser(response.data);
-                    if (response.data.roles.at(0)){
-                        history('/loginBoot');
-                    }
-                    else{
-                        setPasswordResetFailure('Please Try Again!!!');
-                    }
-                }
-                else{
-                    setPasswordResetFailure('Something LEKAAAAAAA!Please Try Again');
-                }
+                // props.setUser(response.data);
+
+                    history('/loginBoot');
+
             }).catch((err)=>{
 
                 if(err && err.response){
@@ -118,70 +119,58 @@ function PasswordResetView({loading,error,...props}){
     };
 
     return (
-        <main className="bg-gradient-primary">
-
-            <div className="container">
-
-                <div className="row justify-content-center">
-
-                    <div className="col-xl-10 col-lg-12 col-md-9">
-
-                        <div className="card o-hidden border-0 shadow-lg my-5">
-                            <div className="card-body p-0">
-
-                                <div className="row">
-                                    <div className="col-lg-6 d-none d-lg-block bg-password-image"></div>
-                                    <div className="col-lg-6">
-                                        <div className="p-5">
-                                            <div className="container">
-                                                <p className="h4 mb-4">Reset Password</p>
-                                                { passwordResetFailure &&
-                                                    <Alert style={{marginTop:'20px'}} variant="danger">
-                                                        {passwordResetFailure}
-                                                    </Alert>
-                                                }
-                                                <form onSubmit={handleSubmit}>
-                                                    <div className="form-group">
-                                                        <input type="password"
-                                                               className="form-control form-control-user"
-                                                               id="exampleInputPassword" placeholder="Password"
-                                                               onChange={handleChange}
-                                                               name="password"
-                                                               autoComplete="new-password" required/>
-                                                    </div>
-                                                    <div className="form-group">
-                                                        <input
-                                                            type="password"
-                                                            name="confirmPassword"
-                                                            onChange={handleChange}
-                                                            className="form-control form-control-user"
-                                                            placeholder="Confirm Password" required
-                                                        />
-                                                    </div>
-                                                    <button type="submit" className="btn btn-info col-2">Login</button>
-                                                </form>
-                                                <hr/>
-                                                <Link to="/loginboot">Back to Login Page</Link>
-                                            </div>
+        <main className="bg-gradient-primary" style={{paddingTop:"58.4px"}}>
+            <div className="container" style={{
+                display: 'flex',
+                justifyContent: 'center',
+                alignItems: 'center',
+                padding: "10px",
+                minHeight: "calc(100vh - 190px)",
+                overflow: "auto"
+            }}>
+                <div className="card o-hidden border-0 shadow-lg my-5" style={{width: '100%', height: "500px"}}>
+                    <div className="row" style={{width: '100%', height: "500px"}}>
+                        <div className="col-lg-6 d-none d-lg-block " style={{backgroundImage: `url(${blueDog})`, backgroundSize: '120%'}}></div>
+                        <div className="col-lg-6" style={{display: "flex", justifyContent: "", alignItems: "center"}}>
+                            <div className="p-5" style={{width:'100%'}}>
+                                <div className="container">
+                                    <p className="h4 mb-4">Reset Password</p>
+                                    {passwordResetFailure &&
+                                        <Alert style={{marginTop: '20px'}} color="danger">
+                                            {passwordResetFailure}
+                                        </Alert>
+                                    }
+                                    <form onSubmit={handleSubmit}>
+                                        <div className="form-group">
+                                            <input type="password"
+                                                   className="form-control form-control-user"
+                                                   id="exampleInputPassword" placeholder="Password"
+                                                   onChange={handleChange}
+                                                   name="password"
+                                                   autoComplete="new-password" required/>
                                         </div>
-                                    </div>
+                                        <div className="form-group">
+                                            <input
+                                                type="password"
+                                                name="confirmPassword"
+                                                onChange={handleChange}
+                                                className="form-control form-control-user"
+                                                placeholder="Confirm Password" required
+                                            />
+                                        </div>
+                                        <button type="submit" className="btn btn-info col-2">Login</button>
+                                    </form>
+                                    <hr/>
+                                    <Link to="/loginboot">Back to Login Page</Link>
                                 </div>
                             </div>
                         </div>
-
                     </div>
 
                 </div>
 
+
             </div>
-
-            <script src="../../../vendor/jquery/jquery.min.js"></script>
-            <script src="../../../vendor/bootstrap/js/bootstrap.bundle.min.js"></script>
-
-            <script src="../../../vendor/jquery-easing/jquery.easing.min.js"></script>
-
-            <script src="../../../js/sb-admin-2.min.js"></script>
-
         </main>
     )
 }

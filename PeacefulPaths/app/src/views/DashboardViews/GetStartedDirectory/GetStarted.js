@@ -452,7 +452,6 @@ function GetStarted({loading,error,...props}){
         'Nearly every day': 4
     };
 
-
     const [currentQuestion, setCurrentQuestion] = useState(0);
     const [isQuizOver, setIsQuizOver] = useState(false);
     const [continueButton , setContinueButton] = useState(false);

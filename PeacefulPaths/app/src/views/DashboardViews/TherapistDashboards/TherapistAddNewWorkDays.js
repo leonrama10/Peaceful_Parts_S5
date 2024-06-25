@@ -15,6 +15,7 @@ import {jwtDecode} from "jwt-decode";
 import { Range, getTrackBackground } from 'react-range';
 import {FontAwesomeIcon} from "@fortawesome/react-fontawesome";
 import {faChevronLeft} from "@fortawesome/free-solid-svg-icons";
+import {Alert} from "reactstrap";
 const getRefreshToken = () => {
     const token = localStorage.getItem('REFRESH_TOKEN');
 
@@ -296,29 +297,19 @@ function TherapistAddNewWorkDays({loading,error,...props}){
                             <h1 className="h3 mb-0 text-800" style={{color: "#5a5c69"}}>Work Days</h1>
                         </div>
 
+                        <div style={{display: "flex", justifyContent: "center", alignItems: 'center'}}>
+                            {values.days.length===0 &&
+                                <Alert style={{marginTop: '20px',textAlign:"center",width:"25%"}} color={"success"}>
+                                    You currently are on a break :)
+                                </Alert>
+                            }
+                        </div>
+
                         <div style={{
                             marginBottom: '100px', display: "flex",
                             justifyContent: "space-evenly", textAlign: "center"
                         }}>
-                            {/*{workDays.length > 0 && <div style={{marginBottom: '100px'}}>*/}
-                            {/*    <h4>Work Days:</h4>*/}
-                            {/*    {workDays.length > 0 && workDays.map((workDay, index) => {*/}
-                            {/*        // Access the day property from the workDay object*/}
-                            {/*        const day = workDay.day;*/}
 
-                            {/*        // Return a paragraph element with the day*/}
-                            {/*        return (*/}
-                            {/*            <p key={index}>{day}</p>*/}
-                            {/*        );*/}
-                            {/*    })}*/}
-                            {/*    <br/>*/}
-                            {/*    <h4>From:</h4>*/}
-                            {/*    <p>{formatTime(workHours.startTime)}</p>*/}
-
-                            {/*    <br/>*/}
-                            {/*    <h4>To:</h4>*/}
-                            {/*    <p>{formatTime(workHours.endTime)}</p>*/}
-                            {/*</div>}*/}
                             <div className={"card shadow"} style={{
                                 height: "550px",
                                 width: "550px",

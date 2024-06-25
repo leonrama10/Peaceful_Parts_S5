@@ -1,7 +1,7 @@
 import React, {useEffect, useState} from 'react';
 import {
     fetchAllTherapistData,
-    fetchAllTherapistNotConnectedData,
+    fetchAllTherapistNotConnectedData, fetchConnectionsAmount,
     fetchNextBooking,
     fetchUserData,
     fetchUserTherapistConnectionData,
@@ -88,6 +88,7 @@ function UserDashboard({loading,error,...props}) {
     const [hideTherapists, setHideTherapists] = useState(false);
     const [bookingExists, setBookingExists] = useState(false);
     const [nextBooking, setNextBooking] = useState({});
+    const [connectionsAmount, setConnectionsAmount] = useState(0);
     const [therapistData, setTherapistData] = useState({
         id: 0,
         email: '',
@@ -131,6 +132,14 @@ function UserDashboard({loading,error,...props}) {
                         therapistId = response.data.id;
                         saveState("connected", true)
                         saveState("connected/id:" + response.data.id, true)
+
+                        fetchConnectionsAmount({
+                            therapistId: response.data.id
+                        }).then((response) => {
+                            setConnectionsAmount(response.data.amount);
+                        }).catch((e) => {
+                            history('/loginBoot');
+                        });
 
                         //Qtu ka met me kqyr endSessionBoolean !!!
                         fetchNextBooking({
@@ -267,6 +276,14 @@ function UserDashboard({loading,error,...props}) {
                         therapistId = response.data.id;
                         saveState("connected", true)
                         saveState("connected/id:" + response.data.id, true)
+
+                        fetchConnectionsAmount({
+                            therapistId: response.data.id
+                        }).then((response) => {
+                            setConnectionsAmount(response.data.amount);
+                        }).catch((e) => {
+                            history('/loginBoot');
+                        });
 
                         fetchNextBooking({
                             clientId: newFilterUserData.userId,
@@ -1017,7 +1034,7 @@ function UserDashboard({loading,error,...props}) {
                                                 <hr/>
                                                 <h5>Contact Info</h5>
                                                 <p><b>Email</b>: {therapistData.email}</p>
-                                                <p><b>Phone number</b>: {therapistData.number}</p>
+                                                <p><b>Phone number</b>: +{therapistData.number}</p>
                                             </div>
                                         </div>
                                     )}
@@ -1038,7 +1055,7 @@ function UserDashboard({loading,error,...props}) {
                                                     <button className={"contactButton"} onClick={showPopup}>Contact info
                                                     </button>
                                                 </p>
-                                                <p style={{fontSize: "14px", color: "gray"}}>500+ connections</p>
+                                                <p style={{fontSize: "14px", color: "gray"}}>{connectionsAmount} {connectionsAmount===1?'connection':'connections'}</p>
                                                 <div>
                                                     <button className={"connectButton"}
                                                             onClick={handleMessaging}>
@@ -1256,6 +1273,7 @@ function UserDashboard({loading,error,...props}) {
                                         style={{paddingLeft: "30px"}}
                                     />
                                     <i style={{
+                                        color:"#0a66c2",
                                         position: "absolute",
                                         left: "10px",
                                         top: "50%",

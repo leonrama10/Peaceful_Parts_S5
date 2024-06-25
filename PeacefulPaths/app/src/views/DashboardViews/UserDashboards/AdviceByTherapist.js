@@ -177,7 +177,8 @@ function AdviceByTherapist({loading,error,...props}) {
                                         display: "flex",
                                         justifyContent: "center",
                                         flexDirection: "column",
-                                        alignItems: "center"
+                                        alignItems: "center",
+                                        paddingTop: "29px"
                                     }}>
                                     <img src={photo} alt={"photo"} style={{width: "400px"}}/>
                                         <h4 style={{color: "#5b5c63", fontSize: "28px"}}>No advice available.</h4>

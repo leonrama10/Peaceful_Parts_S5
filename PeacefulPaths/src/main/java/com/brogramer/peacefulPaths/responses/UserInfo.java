@@ -15,6 +15,7 @@ import java.util.Date;
 public class UserInfo {
 
     private String email;
+    private String about;
     private String token;
     private int id;
     private int experience;
@@ -340,5 +341,13 @@ public class UserInfo {
 
     public void setRemoveDate(LocalDateTime removeDate) {
         this.removeDate = removeDate;
+    }
+
+    public String getAbout() {
+        return about;
+    }
+
+    public void setAbout(String about) {
+        this.about = about;
     }
 }

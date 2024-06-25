@@ -22,6 +22,7 @@ import {jwtDecode} from "jwt-decode";
 import '../../../css/Bookings.css';
 import {faChevronLeft} from "@fortawesome/free-solid-svg-icons";
 import {FontAwesomeIcon} from "@fortawesome/react-fontawesome";
+import photo from "../../../img/3585145_66102-removebg-preview.jpg";
 let connected = null;
 const getRefreshToken = () => {
     const token = localStorage.getItem('REFRESH_TOKEN');
@@ -196,7 +197,6 @@ function AddBookings({loading,error,...props}){
     }, []);
 
 
-
     function handleSubmit(evt) {
         evt.preventDefault();
 
@@ -254,17 +254,11 @@ function AddBookings({loading,error,...props}){
 
                         <DashboardNav data={data} setUser={props.setUser} />
 
-                        { connectionFailure &&
-                            <Alert style={{marginTop:'20px'}} variant="danger">
-                                {connectionFailure}
-                            </Alert>
-                        }
-
                         <div className="container-fluid">
                             <div style={{display: "flex", justifyContent: "start", alignItems: 'center'}}>
-                                <Link  to={"/dashboard/userDashboard/bookingsInfo"} className="btn goBack" style={{color:"#0d6efd",marginLeft:"-10px"}}
+                                <Link  to={`/dashboard/userDashboard${workDays.length===0?'':bookingsMessage?'':'/bookingsInfo'}`} className="btn goBack" style={{color:"#0d6efd",marginLeft:"-10px"}}
                                       type="button"
-                                ><FontAwesomeIcon icon={faChevronLeft} style={{marginRight:"3.5px"}}/>Go to Bookings
+                                ><FontAwesomeIcon icon={faChevronLeft} style={{marginRight:"3.5px"}}/>{workDays.length===0?"Go to Dashboard":bookingsMessage?"Go to Dashboard":"Go to Bookings"}
                                 </Link>
                             </div>
                             <div className="d-sm-flex align-items-center justify-content-between mb-4">
@@ -272,83 +266,114 @@ function AddBookings({loading,error,...props}){
                             </div>
                         </div>
                         <div style={{display:"flex",justifyContent:"center"}}>
-                            {connected && <div className="card shadow" style={{width:"500px"}}>
-                                <div className="card-body">
-                                    {bookingsMessage &&
-                                        <Alert style={{marginTop: '20px'}} variant="info">
-                                            Make your first booking :)
-                                        </Alert>
-                                    }
+                            {connected ?
+                                workDays.length>0?
+                                    <div className="card shadow" style={{width: "500px"}}>
+                                        <div className="card-body">
+                                            {bookingsMessage &&
+                                                <Alert style={{marginTop: '20px'}} variant="info">
+                                                    Make your first booking :)
+                                                </Alert>
+                                            }
 
-                                    <h4>Therapist works these days:</h4>
-                                    <div style={{
-                                        display: 'flex',
-                                        justifyContent: 'space-around',
-                                        alignItems: 'center',
-                                        marginTop: "50px",
-                                        marginBottom: "50px"
-                                    }}>
-                                        <div style={{display: 'flex'}}>
-                                            {workDays.map((workDay, index) => {
-                                                const day = workDay.day;
-                                                return (
-                                                    <div key={index} style={{
-                                                        display: 'flex',
-                                                        flexDirection: 'column',
-                                                        justifyContent: 'center',
-                                                        alignItems: 'center',
-                                                        margin: '0 5px',
-                                                        width: '45px',
-                                                        height: '45px',
-                                                        borderRadius: '50%',
-                                                        background: '#0d6efd',
-                                                        color: 'white',
-                                                        fontWeight: 'bold'
-                                                    }}>
-                                                        <span>{day.slice(0, 3).toUpperCase()}</span>
-                                                    </div>
-                                                );
-                                            })}
+                                            <h4>Therapist works these days:</h4>
+                                            <div style={{
+                                                display: 'flex',
+                                                justifyContent: 'space-around',
+                                                alignItems: 'center',
+                                                marginTop: "50px",
+                                                marginBottom: "50px"
+                                            }}>
+                                                <div style={{display: 'flex'}}>
+                                                    {workDays.map((workDay, index) => {
+                                                        const day = workDay.day;
+                                                        return (
+                                                            <div key={index} style={{
+                                                                display: 'flex',
+                                                                flexDirection: 'column',
+                                                                justifyContent: 'center',
+                                                                alignItems: 'center',
+                                                                margin: '0 5px',
+                                                                width: '45px',
+                                                                height: '45px',
+                                                                borderRadius: '50%',
+                                                                background: '#0d6efd',
+                                                                color: 'white',
+                                                                fontWeight: 'bold'
+                                                            }}>
+                                                                <span>{day.slice(0, 3).toUpperCase()}</span>
+                                                            </div>
+                                                        );
+                                                    })}
+                                                </div>
+                                            </div>
+
+                                            <form className="form-AddBookings" onSubmit={handleSubmit}>
+                                                <label htmlFor="sessionDate">Select Date:</label><br/>
+                                                <input type="date" id="sessionDate" name="date" defaultValue={values.date}
+                                                       min={new Date().toISOString().split('T')[0]}
+                                                       onChange={handleChange}/><br/>
+                                                <select name="hour" onChange={handleChange}>
+                                                    <option value="">Select Hour</option>
+                                                    {hours.map((hourObj, index) => {
+                                                        // Format the hour to look like time
+                                                        const hour = hourObj.hour.map(num => num < 10 ? `0${num}` : num).join(':');
+                                                        return (
+                                                            <option key={index} value={hour}>
+                                                                {hour}
+                                                            </option>
+                                                        );
+                                                    })}
+                                                </select>
+
+                                                <i style={{marginTop: "15px", marginBottom: "15px"}}>Info: You cant have two
+                                                    bookings in the same day.</i>
+                                                <br/><br/>
+                                                <div style={{
+                                                    display: "flex",
+                                                    justifyContent: "center",
+                                                    alignItems: "center",
+                                                    marginBottom: "20px"
+                                                }}>
+                                                    <input type="submit" value="Save" className="btn btn-primary "/>
+                                                    <Link className="btn btn-danger" style={{marginLeft: "5px"}}
+                                                          type={"button"}
+                                                          to="/dashboard/userDashboard/bookingsInfo">
+                                                        Cancel
+                                                    </Link>
+                                                </div>
+                                            </form>
                                         </div>
-                                    </div>
-
-                                    <form className="form-AddBookings" onSubmit={handleSubmit}>
-                                        <label htmlFor="sessionDate">Select Date:</label><br/>
-                                        <input type="date" id="sessionDate" name="date" defaultValue={values.date}
-                                               min={new Date().toISOString().split('T')[0]}
-                                               onChange={handleChange}/><br/>
-                                        <select name="hour" onChange={handleChange}>
-                                            <option value="">Select Hour</option>
-                                            {hours.map((hourObj, index) => {
-                                                // Format the hour to look like time
-                                                const hour = hourObj.hour.map(num => num < 10 ? `0${num}` : num).join(':');
-                                                return (
-                                                    <option key={index} value={hour}>
-                                                        {hour}
-                                                    </option>
-                                                );
-                                            })}
-                                        </select>
-
-                                        <i style={{marginTop: "15px", marginBottom: "15px"}}>Info: You cant have two
-                                            bookings in the same day.</i>
-                                        <br/><br/>
-                                        <div style={{
-                                            display: "flex",
-                                            justifyContent: "center",
-                                            alignItems: "center",
-                                            marginBottom:"20px"
-                                        }}>
-                                            <input type="submit" value="Save" className="btn btn-primary "/>
-                                            <Link className="btn btn-danger" style={{marginLeft: "5px"}}
-                                                  type={"button"}
-                                                  to="/dashboard/userDashboard/bookingsInfo">
-                                                Cancel
-                                            </Link>
-                                        </div>
-                                    </form>
+                                    </div>:
+                                <div style={{
+                                    display: "flex",
+                                    flexDirection: "column",
+                                    justifyContent: "center",
+                                    alignItems: "center",
+                                    paddingTop: "30px"
+                                }}>
+                                    <img src={photo} style={{maxWidth: "400px"}} alt={"photo"}/>
+                                    <h4 style={{color: "#5b5c63", fontSize: "28px"}}>Therapist is currently on a break :)</h4>
                                 </div>
-                            </div>}
+                                :
+                                <div style={{
+                                    display: "flex",
+                                    flexDirection: "column",
+                                    justifyContent: "center",
+                                    alignItems: "center",
+                                    paddingTop: "30px"
+                                }}>
+                                    <img src={photo} style={{maxWidth: "400px"}} alt={"photo"}/>
+                                    <h4 style={{color: "#5b5c63", fontSize: "28px"}}>Booking unavailable!</h4>
+                                    <p style={{
+                                        maxWidth: "400px",
+                                        textAlign: "center",
+                                        color: "#858796"
+                                    }}>You need to connect with a therapist first!</p>
+                                    <Link to={"/dashboard/userDashboard"} className={"discoverButton"}
+                                       type={"button"}>Discover</Link>
+                                </div>
+                            }
                         </div>
                     </div>
                 </div>

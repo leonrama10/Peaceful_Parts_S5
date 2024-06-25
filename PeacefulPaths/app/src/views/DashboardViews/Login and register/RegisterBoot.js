@@ -128,7 +128,7 @@ function RegisterBoot({loading,error,...props}){
 
     return (
             <div className="container" style={{ display: 'flex', justifyContent: 'center', alignItems: 'center', padding:"10px" , minHeight:"calc(100vh - 190px)",overflow: "auto"}}>
-                <div className="card o-hidden border-0 shadow-lg " style={{ width: '80%' }}>
+                <div className="card o-hidden border-0 shadow-lg " style={{ width: '100%' }}>
                     <div className="row">
                         <div className="col-lg-5 d-none d-lg-block " style={{
                             backgroundImage: `url(${cat})`,
@@ -141,7 +141,7 @@ function RegisterBoot({loading,error,...props}){
                                     <h1 className="h4 text-gray-900 mb-4">Create an Account!</h1>
                                 </div>
                                 {registerFailure &&
-                                    <Alert style={{marginTop: '20px'}} variant="danger">
+                                    <Alert style={{marginTop: '20px'}} color="danger">
                                         {registerFailure}
                                     </Alert>
                                 }

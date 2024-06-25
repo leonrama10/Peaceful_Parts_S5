@@ -96,6 +96,7 @@ public class AuthController {
             userInfo.setTherapyTypeTherapist(userDetails.getTherapistInfo().getTherapyType());
             userInfo.setTherapistTypeTherapist(userDetails.getTherapistInfo().getTherapistType());
             userInfo.setIdentityTypeTherapist(userDetails.getTherapistInfo().getIdentityType());
+            userInfo.setAbout(userDetails.getTherapistInfo().getAbout());
             userInfo.setExperience(userDetails.getExperience());
         }else{
             userInfo.setGender(userDetails.getGender());
@@ -397,6 +398,7 @@ public class AuthController {
             userInfo.setRelationshipStatus(userDetails.getQuestionnaire().getRelationshipStatus());
         }else if (role.contains(roleTherapist)){
             userInfo.setLocation(userDetails.getLocation());
+            userInfo.setAbout(userDetails.getTherapistInfo().getAbout());
             userInfo.setGender(userDetails.getGender());
             userInfo.setDateOfBirth(userDetails.getDateOfBirth());
             userInfo.setLanguage(userDetails.getLanguage());
@@ -405,23 +407,25 @@ public class AuthController {
             userInfo.setTherapistTypeTherapist(userDetails.getTherapistInfo().getTherapistType());
             userInfo.setTherapyTypeTherapist(userDetails.getTherapistInfo().getTherapyType());
             userInfo.setIdentityTypeTherapist(userDetails.getTherapistInfo().getIdentityType());
+            userInfo.setExperience(userDetails.getExperience());
         }else {
             userInfo.setGender(userDetails.getGender());
         }
-        userInfo.setExperience(userDetails.getExperience());
         userInfo.setResetToken(userDetails.getResetToken());
         userInfo.setExpirationTime(userDetails.getExpirationTime());
-        if (userDetails.getToken() != null || userDetails.getToken().isEmpty()) {
-            Authentication auth = userAuthenticationProvider.validateToken(userDetails.getToken());
-            if (auth!=null) {
-                // Token has not expired
-                userInfo.setToken(userDetails.getToken());
-            } else {
-                // Token has expired
-                userInfo.setToken(userAuthenticationProvider.createToken(userDetails.getUsername()));
-                User user = converToUser(userInfo);
-                userRepository.save(user);
-            }
+        if (userDetails.getToken() != null ) {
+//            if (userDetails.getToken().isEmpty()) {
+                Authentication auth = userAuthenticationProvider.validateToken(userDetails.getToken());
+                if (auth != null) {
+                    // Token has not expired
+                    userInfo.setToken(userDetails.getToken());
+                } else {
+                    // Token has expired
+                    userInfo.setToken(userAuthenticationProvider.createToken(userDetails.getUsername()));
+                    User user = converToUser(userInfo);
+                    userRepository.save(user);
+                }
+//            }
         } else {
             // Token does not exist
             userInfo.setToken(userAuthenticationProvider.createToken(userDetails.getUsername()));
@@ -467,10 +471,9 @@ public class AuthController {
     @PostMapping("/auth/sendEmail")
     public ResponseEntity<UserDto> sendEmail(@RequestBody @Valid CredentialsDto credentialsDto) throws MessagingException {
         UserDto user = userService.findByEmail(credentialsDto.getEmail());
-//        user.setToken(userAuthenticationProvider.createToken(user.getEmail()));
+        user.setToken(userAuthenticationProvider.createToken(user.getEmail()));
         userService.sendEmail(user);
-        userService.update(user);
-        return ResponseEntity.created(URI.create("/users/" + user.getId())).body(user);
+        return ResponseEntity.ok(user);
     }
 
     @PutMapping("/auth/resetPassword")
@@ -900,5 +903,14 @@ public class AuthController {
         return ResponseEntity.ok(feedbackList);
     }
 
+    @PostMapping("/auth/fetchConnectionsAmount")
+    public ResponseEntity<?> fetchConnectionsAmount(@RequestBody @Valid ConnectionDto connectionDto){
+        int connectionsAmount = userService.fetchConnectionsAmount(connectionDto);
+
+        ConnectionDto connectionDto1 = new ConnectionDto();
+        connectionDto1.setAmount(connectionsAmount);
+
+        return ResponseEntity.ok(connectionDto1);
+    }
 
 }

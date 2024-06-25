@@ -1,26 +1,30 @@
 import React , { useState } from 'react';
-import { Link } from 'react-router-dom';
-import {Dropdown, Modal, Button} from "react-bootstrap";
+import {Link, useNavigate} from 'react-router-dom';
 import {saveState,loadState} from "../../helper/sessionStorage";
 import malePhoto from "../../img/Depositphotos_484354208_S.jpg"
 import femalePhoto from "../../img/person-gray-photo-placeholder-woman-600nw-1241538838.webp"
 import {faArrowRightFromBracket} from "@fortawesome/free-solid-svg-icons";
 import {FontAwesomeIcon} from "@fortawesome/react-fontawesome";
 import {faUser} from "@fortawesome/free-regular-svg-icons";
+import { Dropdown} from 'react-bootstrap';
+import {Button, Modal,ModalBody, ModalFooter, ModalHeader} from "reactstrap";
 export default function DashboardNav(props){
     const [showModal, setShowModal] = useState(false);
     const role = loadState("role",'')
     const [location, setLocation] = React.useState('');
+    const history = useNavigate ();
 
     function handleLogout() {
-        setShowModal(true);
+        setShowModal(!showModal);
     }
+
 
     function logout()  {
         setShowModal(false);
         props.setUser(null);
         saveState("role",'')
         saveState("connected",false)
+        history('/loginBoot');
     }
 
     React.useEffect(()=>{
@@ -63,24 +67,23 @@ export default function DashboardNav(props){
                                 <FontAwesomeIcon icon={faUser}/> Profile
                             </Dropdown.Item>
                             <Dropdown.Divider/>
-                            <Dropdown.Item as={Link} to="/loginBoot" onClick={handleLogout} style={{marginLeft: "0px"}}>
+                            <Dropdown.Item onClick={handleLogout} style={{marginLeft: "0px"}}>
                                 <FontAwesomeIcon icon={faArrowRightFromBracket}/> Logout
                             </Dropdown.Item>
                         </Dropdown.Menu>
                     </Dropdown>
-
                 </ul>
-
             </nav>
-            <Modal show={showModal} onHide={() => setShowModal(false)}>
-                <Modal.Header closeButton>
-                    <Modal.Title>Confirm Logout</Modal.Title>
-                </Modal.Header>
-                <Modal.Body>Are you sure you want to logout?</Modal.Body>
-                <Modal.Footer>
-                    <Button variant="secondary" onClick={() => setShowModal(false)}>Cancel</Button>
-                    <Button variant="primary" onClick={logout}>Logout</Button>
-                </Modal.Footer>
+
+            <Modal isOpen={showModal} toggle={handleLogout}>
+                <ModalHeader toggle={handleLogout}>Confirm Logout</ModalHeader>
+                <ModalBody>
+                    Are you sure you want to logout?
+                </ModalBody>
+                <ModalFooter>
+                    <Button color="primary" onClick={logout}>Logout</Button>
+                    <Button color="secondary" onClick={handleLogout}>Cancel</Button>
+                </ModalFooter>
             </Modal>
         </>
     )

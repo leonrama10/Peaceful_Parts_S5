@@ -1,7 +1,7 @@
 import React, {useEffect, useState} from 'react';
 import {fetchUserData, userUpdate} from '../../../api/authService';
 import {Link, useNavigate} from 'react-router-dom';
-import {Container, Row, Col, Form, Button} from 'react-bootstrap';
+import {Form, Button} from 'react-bootstrap';
 import {
     authenticate,
     authFailure,
@@ -16,6 +16,7 @@ import {jwtDecode} from "jwt-decode";
 import {FontAwesomeIcon} from "@fortawesome/react-fontawesome";
 import {faArrowRight, faChevronLeft, faCircleInfo} from "@fortawesome/free-solid-svg-icons";
 import Loading from "../LoadingPage";
+import PhoneInput from "react-phone-input-2";
 const getRefreshToken = () => {
     const token = localStorage.getItem('REFRESH_TOKEN');
 
@@ -74,6 +75,7 @@ function TherapistProfile({loading,error,...props}){
         therapyTypeTherapist: [],
         identityTypeTherapist: [],
         dateOfBirth: '',
+        about:''
     });
 
     useEffect(() => {
@@ -101,7 +103,8 @@ function TherapistProfile({loading,error,...props}){
                         therapistTypeTherapist: response.data.therapistTypeTherapist,
                         therapyTypeTherapist: response.data.therapyTypeTherapist,
                         identityTypeTherapist: response.data.identityTypeTherapist,
-                        dateOfBirth: response.data.dateOfBirth
+                        dateOfBirth: response.data.dateOfBirth,
+                        about: response.data.about
                     })
                 }
                 else{
@@ -126,7 +129,6 @@ function TherapistProfile({loading,error,...props}){
             props.setLocation("/dashboard/therapistDashboard/profile")
             fetchUserData().then((response)=>{
                 if (response.data.roles.at(0).role === 'ROLE_THERAPIST'){
-                    
                     saveState("role",'ROLE_THERAPIST')
                     setData(response.data);
                     setValues({
@@ -146,7 +148,8 @@ function TherapistProfile({loading,error,...props}){
                         therapistTypeTherapist: response.data.therapistTypeTherapist,
                         therapyTypeTherapist: response.data.therapyTypeTherapist,
                         identityTypeTherapist: response.data.identityTypeTherapist,
-                        dateOfBirth: response.data.dateOfBirth
+                        dateOfBirth: response.data.dateOfBirth,
+                        about: response.data.about
                     })
                 }
                 else{
@@ -178,6 +181,101 @@ function TherapistProfile({loading,error,...props}){
         e.preventDefault();
         props.authenticate();
 
+        const nameSurnameRegex = /^[a-zA-Z]+$/; // Matches any string with one or more letters
+        const phoneNumberRegex = /^\d{11}$/; // Matches any string with exactly 12 digits
+
+        // Validate name, surname and phoneNumber
+        if (!nameSurnameRegex.test(values.name) || !nameSurnameRegex.test(values.surname)) {
+            setUpdateError("Name and surname fields cannot be empty and should only contain letters!");
+            return;
+        }
+
+        // Regex for dateOfBirth
+        // Get the current date
+        const currentDate = new Date();
+
+        // Get the date of birth entered by the user
+        const dateOfBirth = new Date(values.dateOfBirth);
+
+        // Calculate the difference in years
+        const age = currentDate.getFullYear() - dateOfBirth.getFullYear();
+
+        // Check if the user is at least 24 years old
+        if (age < 24) {
+            setUpdateError("Invalid date of birth. You must be at least 24 years old.");
+            return;
+        }
+
+        // Regex for university
+        const universityRegex = /^(AAB|UBT|KAKTUS|UNIVERSITETI I PRISHTINES)$/;
+
+        // Validate university
+        if (!universityRegex.test(values.university.university)) {
+            setUpdateError("Invalid selection. Please select a university.");
+            return;
+        }
+
+        if (!phoneNumberRegex.test(values.number)) {
+            setUpdateError("Phone number field should be exactly 11 digits long!");
+            return;
+        }
+
+        const emailRegex = /^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$/;
+        const passwordRegex = /^(?=.*[A-Za-z])(?=.*\d)[A-Za-z\d]{8,}$/; // Minimum eight characters, at least one letter and one number
+
+
+        const locationRegex = /^(Kosovo|Albania|Montenegro|North Macedonia|Serbia)$/;
+
+        // Validate location
+        if (!locationRegex.test(values.location.location)) {
+            setUpdateError("Invalid selection. Please select a location.");
+            return;
+        }
+
+        // Validate language
+        if (!values.language.length) {
+            setUpdateError("Invalid selection. Please select at least one language.");
+            return;
+        }
+
+        // Validate gender
+        if (!values.gender.gender) {
+            setUpdateError("Invalid selection. Please select a gender.");
+            return;
+        }
+
+        // Regex for experience
+        const experienceRegex = /^[3-9]$|^([1-4][0-9]|50)$/; // Matches any number from 3 to 50
+
+        // Validate experience
+        if (!experienceRegex.test(values.experience)) {
+            setUpdateError("Invalid input. Work experience should be a number between 3 and 50.");
+            return;
+        }
+
+
+        // Validate therapyType
+        if (!values.therapyTypeTherapist.length) {
+            setUpdateError("Invalid selection. Please select at least one therapy type.");
+            return;
+        }
+
+        if (!values.therapistTypeTherapist.length) {
+            setUpdateError("Invalid selection. Please select at least one therapist type.");
+            return;
+        }
+
+        if (!values.identityTypeTherapist.length) {
+            setUpdateError("Invalid selection. Please select at least one identity type.");
+            return;
+        }
+
+        // Validate email and password
+        if (!emailRegex.test(values.email)) {
+            setUpdateError("Invalid email format!");
+            return;
+        }
+
         userUpdate(values).then((response)=>{
             if(response.status===201){
                 props.setUser(response.data);
@@ -187,11 +285,8 @@ function TherapistProfile({loading,error,...props}){
             else{
                 setUpdateError('Something LEKAAAAAAA!Please Try Again');
             }
-
         }).catch((err)=>{
-
             if(err && err.response){
-
                 switch(err.response.status){
                     case 401:
                         console.log("401 status");
@@ -199,15 +294,12 @@ function TherapistProfile({loading,error,...props}){
                         break;
                     default:
                         setUpdateError('Something BABAAAAAA!Please Try Again');
-
                 }
-
             }
             else{
                 console.log("ERROR: ",err)
                 setUpdateError('Something NaNAAAAA!Please Try Again');
             }
-
         });
     };
 
@@ -217,6 +309,14 @@ function TherapistProfile({loading,error,...props}){
         const therapistTypeObject = { id: Number(value.split('-')[0]), therapistType: value.split('-')[1] };
         const therapyTypeObject = { id: Number(value.split('-')[0]), therapyType: value.split('-')[1] };
         const identityTypeObject = { id: Number(value.split('-')[0]), identityType: value.split('-')[1] };
+
+        if (name === 'about') {
+            const letterCount = value.replace(/\s+/g, '').length;
+            if (letterCount > 500) {
+                setUpdateError("Your input exceeds the 500 letter limit.");
+                return;
+            }
+        }
 
         if (name === 'language') {
             if (values.language.some(lang => lang.id === languageObject.id)) {
@@ -278,6 +378,13 @@ function TherapistProfile({loading,error,...props}){
         }
     };
 
+    const handlePhoneChange = (value) => {
+        setValues(values => ({
+            ...values,
+            number: value
+        }));
+    };
+
     const [isLoading, setIsLoading] = useState(true);
 
     useEffect(() => {
@@ -319,17 +426,18 @@ function TherapistProfile({loading,error,...props}){
                                 <h1 className="h3 mb-0 text-800" style={{color: "#5a5c69"}}>Account Information</h1>
                             </div>
 
+                            {updateError &&
+                                <Alert style={{marginTop: '20px',textAlign:"center"}} color="danger">
+                                    {updateError}
+                                </Alert>
+                            }
+                            {updateSuccess &&
+                                <Alert style={{marginTop: '20px',textAlign:"center"}} color="success">
+                                    {updateSuccess}
+                                </Alert>
+                            }
+
                             <div style={{display: 'flex', flexDirection: 'row', justifyContent: 'center'}}>
-                                {updateError &&
-                                    <Alert style={{marginTop: '20px'}} variant="danger">
-                                        {updateError}
-                                    </Alert>
-                                }
-                                {updateSuccess &&
-                                    <Alert style={{marginTop: '20px'}} variant="success">
-                                        {updateSuccess}
-                                    </Alert>
-                                }
                                 <br/>
                                 <Form onSubmit={handleUpdate} style={{width: '100%'}}>
                                     <br/>
@@ -374,8 +482,15 @@ function TherapistProfile({loading,error,...props}){
                                             <br/>
                                             <Form.Group controlId="formBasicPhone">
                                                 <Form.Label>Phone</Form.Label>
-                                                <Form.Control type="tel" defaultValue={data.number}
-                                                              onChange={handleChange} name="number"/>
+                                                <PhoneInput
+                                                    buttonClass={"buttonClass"}
+                                                    country={'xk'}
+                                                    value={values.number}
+                                                    onChange={handlePhoneChange}
+                                                    inputClass="form-control form-control-user"
+                                                    specialLabel="Phone Number"
+                                                    required
+                                                />
                                             </Form.Group>
                                             <br/>
                                             <Form.Group controlId="formBasicAddress">
@@ -394,7 +509,7 @@ function TherapistProfile({loading,error,...props}){
                                             <Form.Group controlId="formBasicAddress">
                                                 <Form.Label>Years of experience</Form.Label>
                                                 <Form.Control type="number" defaultValue={data.experience}
-                                                              onChange={handleChange} name="experience" min={0}/>
+                                                              onChange={handleChange} name="experience" min={3} max={50}/>
                                             </Form.Group>
                                             <br/>
                                             <div className="custom-checkboxes">
@@ -438,7 +553,7 @@ function TherapistProfile({loading,error,...props}){
                                                 }}/>You can select more than one language!</i>
                                             </div>
                                         </div>
-                                        <div style={{width:"350px",paddingLeft:"5px",paddingRight:"5px"}}>
+                                        <div style={{width: "350px", paddingLeft: "5px", paddingRight: "5px"}}>
                                             <div>
                                                 <label htmlFor="specializationSelect"><h3>What do I
                                                     specialize
@@ -563,17 +678,32 @@ function TherapistProfile({loading,error,...props}){
                                                 <br/>
                                                 <i>
                                                     <FontAwesomeIcon icon={faCircleInfo} style={{
-                                                    color: "#2e81fd"
-                                                }}/>You can select more than one!
+                                                        color: "#2e81fd"
+                                                    }}/>You can select more than one!
                                                 </i>
                                             </div>
+                                            <br/>
+                                            <div style={{display: "flex", flexDirection: "column"}}>
+                                                <label htmlFor="about"><h3>About:</h3></label>
+                                                <textarea id="about" name="about"
+                                                          value={values.about}
+                                                          placeholder="Enter about yourself here..."
+                                                          onChange={handleChange}
+                                                />
+                                            </div>
+                                            <br/>
+                                            <i>
+                                                <FontAwesomeIcon icon={faCircleInfo} style={{
+                                                    color: "#2e81fd"
+                                                }}/>Limit 500 letters!
+                                            </i>
                                         </div>
                                     </div>
                                     <br/>
                                     <hr/>
                                     <br/>
                                     <div style={{display: "flex", justifyContent: "space-between"}}>
-                                        <div className="text-left">
+                                    <div className="text-left">
                                             <Link className="small" to="/forgotPassBoot"
                                                   style={{marginLeft: "5px", textDecoration: "none", fontSize: "15px"}}>Change
                                                 Password</Link>

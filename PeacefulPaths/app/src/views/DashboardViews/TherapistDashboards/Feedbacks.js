@@ -14,6 +14,7 @@ import {authenticate, authFailure, authSuccess, setLocation} from "../../../redu
 import {connect} from "react-redux";
 import {jwtDecode} from "jwt-decode";
 import SideBarTherapist from "../SideBars/SideBarTherapist";
+import Loading from "../LoadingPage";
 let connected = null;
 const getRefreshToken = () => {
     const token = localStorage.getItem('REFRESH_TOKEN');
@@ -120,6 +121,20 @@ function Feedbacks({loading,error,...props}) {
         }
     }, []);
 
+
+    const [isLoading, setIsLoading] = useState(true);
+
+    useEffect(() => {
+        const timer = setTimeout(() => {
+            setIsLoading(false);
+        }, 200);
+
+        return () => clearTimeout(timer);
+    }, []);
+
+    if (isLoading) {
+        return <Loading />;
+    }
 
     return (
         <main id="page-top">

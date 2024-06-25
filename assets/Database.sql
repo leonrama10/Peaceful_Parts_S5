@@ -195,6 +195,7 @@ DROP TABLE IF EXISTS `therapist_info`;
 SET FOREIGN_KEY_CHECKS = 1;
 CREATE TABLE `therapist_info` (
     `id` INT AUTO_INCREMENT,
+    `about` varchar(500) default NULL,
     PRIMARY KEY (`id`)
 ) AUTO_INCREMENT=1;
 
