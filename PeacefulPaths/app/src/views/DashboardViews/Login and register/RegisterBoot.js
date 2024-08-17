@@ -9,6 +9,8 @@ import cat from "../../../img/cat.png";
 import PhoneInput from 'react-phone-input-2';
 import 'react-phone-input-2/lib/style.css';
 import '../../../css/custom-phone-input.css';
+import {FontAwesomeIcon} from "@fortawesome/react-fontawesome";
+import {faEye, faEyeSlash} from "@fortawesome/free-solid-svg-icons";
 
 function RegisterBoot({loading,error,...props}){
 
@@ -125,6 +127,17 @@ function RegisterBoot({loading,error,...props}){
         }));
     };
 
+    const [showPassword, setShowPassword] = useState(false);
+
+    const togglePasswordVisibility = () => {
+        setShowPassword(!showPassword);
+    };
+
+    const [showConfirmPassword, setShowConfirmPassword] = useState(false);
+
+    const toggleConfirmPasswordVisibility = () => {
+        setShowConfirmPassword(!showConfirmPassword);
+    };
 
     return (
             <div className="container" style={{ display: 'flex', justifyContent: 'center', alignItems: 'center', padding:"10px" , minHeight:"calc(100vh - 190px)",overflow: "auto"}}>
@@ -181,16 +194,30 @@ function RegisterBoot({loading,error,...props}){
                                     </div>
                                     <div className="form-group row">
                                         <div className="col-sm-6 mb-3 mb-sm-0">
-                                            <input type="password" className="form-control form-control-user"
+                                            <input type={showPassword ? "text" : "password"} className="form-control form-control-user"
                                                    id="exampleInputPassword" placeholder="Password"
                                                    value={values.password}
                                                    onChange={handleChange} name="password" required/>
+                                            <button className={"showPasswordBtn"} type={"button"}
+                                                    onClick={togglePasswordVisibility}>
+                                                <FontAwesomeIcon style={{fontSize: "15px"}}
+                                                                 icon={showPassword ? faEye : faEyeSlash}/>
+                                                <span
+                                                    className="tooltip-text">{showPassword ? "Hide" : "Show"} Password</span>
+                                            </button>
                                         </div>
                                         <div className="col-sm-6">
-                                            <input type="password" className="form-control form-control-user"
+                                            <input type={showConfirmPassword ? "text" : "password"} className="form-control form-control-user"
                                                    id="exampleRepeatPassword" placeholder="Repeat Password"
                                                    value={confirmPassword}
                                                    onChange={handleChange} name="confirmPassword" required/>
+                                            <button className={"showPasswordBtn"} type={"button"}
+                                                    onClick={toggleConfirmPasswordVisibility}>
+                                                <FontAwesomeIcon style={{fontSize: "15px"}}
+                                                                 icon={showConfirmPassword ? faEye : faEyeSlash}/>
+                                                <span
+                                                    className="tooltip-text">{showConfirmPassword ? "Hide" : "Show"} Password</span>
+                                            </button>
                                         </div>
                                     </div>
                                     <button type="submit" className="btn btn-primary btn-user btn-block">

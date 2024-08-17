@@ -3,6 +3,7 @@ import {connect} from 'react-redux';
 import {fetchUserData, userLogin} from '../../../api/authService';
 import {Link, useNavigate} from 'react-router-dom';
 import blueDog from "../../../img/wp8767335.jpg.png";
+import '../../../css/Login.css';
 import {
     authenticate,
     authFailure,
@@ -12,6 +13,8 @@ import {
 import {Alert} from "reactstrap";
 import {saveState} from "../../../helper/sessionStorage";
 import {jwtDecode} from "jwt-decode";
+import {faEye, faEyeSlash} from "@fortawesome/free-solid-svg-icons";
+import {FontAwesomeIcon} from "@fortawesome/react-fontawesome";
 const getRefreshToken = () => {
     const token = localStorage.getItem('REFRESH_TOKEN');
 
@@ -207,6 +210,12 @@ function LoginBoot({loading,error,...props}){
         }));
     };
 
+    const [showPassword, setShowPassword] = useState(false);
+
+    const togglePasswordVisibility = () => {
+        setShowPassword(!showPassword);
+    };
+
 
     return (
         <main className="bg-gradient-primary" style={{paddingTop:"58.4px"}}>
@@ -239,12 +248,18 @@ function LoginBoot({loading,error,...props}){
                                                placeholder="Enter Email Address..." value={values.email}
                                                name="email" onChange={handleChange} required/>
                                     </div>
-                                    <div className="form-group">
-                                        <input type="password" className="form-control form-control-user"
+                                    <div className="form-group" style={{position:"relative",display:"flex"}}>
+                                        <input type={showPassword ? "text" : "password"} className="form-control form-control-user"
                                                id="exampleInputPassword" placeholder="Password"
                                                value={values.password} onChange={handleChange}
                                                name="password"
                                                autoComplete="new-password" required/>
+                                        <button className={"showPasswordBtn"} type={"button"}
+                                                onClick={togglePasswordVisibility}>
+                                            <FontAwesomeIcon style={{fontSize: "15px"}} icon={showPassword ? faEye : faEyeSlash}/>
+                                            <span
+                                                className="tooltip-text">{showPassword ? "Hide" : "Show"} Password</span>
+                                        </button>
                                     </div>
                                     <div className="form-group">
                                         <div className="custom-control custom-checkbox small">

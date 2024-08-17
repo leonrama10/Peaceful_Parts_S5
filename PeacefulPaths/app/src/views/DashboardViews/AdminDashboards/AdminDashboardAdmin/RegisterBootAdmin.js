@@ -13,7 +13,7 @@ import DashboardNav from "../../DashboardNav";
 import {saveState} from "../../../../helper/sessionStorage";
 import {jwtDecode} from "jwt-decode";
 import {FontAwesomeIcon} from "@fortawesome/react-fontawesome";
-import {faChevronLeft} from "@fortawesome/free-solid-svg-icons";
+import {faChevronLeft, faEye, faEyeSlash} from "@fortawesome/free-solid-svg-icons";
 import PhoneInput from "react-phone-input-2";
 import DashboardFooter from "../../DashboardFooter";
 const getRefreshToken = () => {
@@ -200,6 +200,18 @@ function RegisterBootAdmin({loading,error,...props}){
         }));
     };
 
+    const [showPassword, setShowPassword] = useState(false);
+
+    const togglePasswordVisibility = () => {
+        setShowPassword(!showPassword);
+    };
+
+    const [showConfirmPassword, setShowConfirmPassword] = useState(false);
+
+    const toggleConfirmPasswordVisibility = () => {
+        setShowConfirmPassword(!showConfirmPassword);
+    };
+
    return (
        <main id="page-top">
 
@@ -329,22 +341,36 @@ function RegisterBootAdmin({loading,error,...props}){
 
                                                            <div className="form-group row">
                                                                <div className="col-sm-6 mb-3 mb-sm-0">
-                                                                   <input type="password"
+                                                                   <input type={showPassword ? "text" : "password"}
                                                                           className="form-control form-control-user"
                                                                           id="exampleInputPassword"
                                                                           placeholder="Password"
                                                                           value={values.password}
                                                                           onChange={handleChange} name="password"
                                                                           required/>
+                                                                   <button className={"showPasswordBtn"} type={"button"}
+                                                                           onClick={togglePasswordVisibility}>
+                                                                       <FontAwesomeIcon style={{fontSize: "15px"}}
+                                                                                        icon={showPassword ? faEye : faEyeSlash}/>
+                                                                       <span
+                                                                           className="tooltip-text">{showPassword ? "Hide" : "Show"} Password</span>
+                                                                   </button>
                                                                </div>
                                                                <div className="col-sm-6">
-                                                                   <input type="password"
+                                                                   <input type={showConfirmPassword ? "text" : "password"}
                                                                           className="form-control form-control-user"
                                                                           id="exampleRepeatPassword"
                                                                           placeholder="Repeat Password"
                                                                           value={confirmPassword}
                                                                           onChange={handleChange} name="confirmPassword"
                                                                           required/>
+                                                                   <button className={"showPasswordBtn"} type={"button"}
+                                                                           onClick={toggleConfirmPasswordVisibility}>
+                                                                       <FontAwesomeIcon style={{fontSize: "15px"}}
+                                                                                        icon={showConfirmPassword ? faEye : faEyeSlash}/>
+                                                                       <span
+                                                                           className="tooltip-text">{showConfirmPassword ? "Hide" : "Show"} Password</span>
+                                                                   </button>
                                                                </div>
                                                            </div>
                                                            <button type="submit"

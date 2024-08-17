@@ -1,7 +1,45 @@
-#showPasswordBtn {
+.showPasswordBtn {
     position: absolute;
-    right: 75.3%;
-    top: 32%;
+    right: 10px;
+    top: 50%;
     transform: translateY(-50%);
+    background-color: transparent;
+    color: #007bff;
+    border: none;
+    padding: 5px 10px;
     cursor: pointer;
+    border-radius: 5px;
+}
+
+.showPasswordBtn:hover .tooltip-text {
+    visibility: visible;
+    opacity: 1;
+}
+
+.tooltip-text {
+    visibility: hidden;
+    width: 120px;
+    background-color: #007cf4;
+    color: #fff;
+    text-align: center;
+    border-radius: 5px;
+    padding: 5px;
+    position: absolute;
+    z-index: 1;
+    bottom: 125%; /* Position above the button */
+    left: 50%;
+    margin-left: -60px;
+    opacity: 0;
+    transition: opacity 0.3s;
+}
+
+.tooltip-text::after {
+    content: "";
+    position: absolute;
+    top: 100%; /* At the bottom of the tooltip */
+    left: 50%;
+    margin-left: -5px;
+    border-width: 5px;
+    border-style: solid;
+    border-color: #007cf4 transparent transparent transparent;
 }
