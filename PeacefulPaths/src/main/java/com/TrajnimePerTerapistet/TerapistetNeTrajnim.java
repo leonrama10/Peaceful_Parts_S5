@@ -14,5 +14,4 @@ public class TerapistetNeTrajnim {
 
     private String statusi;
 
-
 }
